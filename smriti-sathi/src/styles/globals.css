@@ -1,0 +1,269 @@
+/* ==========================================================================
+   Smriti Sathi — Lumosity-Grade Design System
+   Inspired by award-winning cognitive training UI (Lumosity / Elevate / Peak)
+   Adapted for elderly cognitive care (SIH26003) with high contrast & accessibility
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Lumosity Dark Palette */
+  --color-bg: #0A1420;             /* Deepest midnight navy */
+  --color-bg-subtle: #0E1C2D;      /* Subtle dark elevation */
+  --color-card: #15253B;           /* Primary card background */
+  --color-card-hover: #1C314E;     /* Card hover / active */
+  --color-card-subtle: #101F33;    /* Secondary container */
+  --color-border: #223752;         /* Crisp card border */
+  --color-border-subtle: #192C44;
+  --color-border-focus: #FF7247;
+
+  /* Typography Colors */
+  --color-text: #FFFFFF;
+  --color-text-secondary: #94A9C4;
+  --color-text-muted: #647B99;
+  --color-text-inverse: #0A1420;
+
+  /* Lumosity Vibrant Accents */
+  --color-primary: #FF7247;        /* Lumosity warm coral/orange */
+  --color-primary-hover: #FF855F;
+  --color-primary-glow: rgba(255, 114, 71, 0.35);
+
+  --color-accent-teal: #10B981;    /* Emerald / health green */
+  --color-accent-blue: #0EA5E9;    /* Speed / memory cyan */
+  --color-accent-purple: #A855F7;  /* Flexibility / reasoning */
+  --color-accent-amber: #F59E0B;   /* Attention amber */
+  --color-accent-rose: #EC4899;    /* Language / math pink */
+
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+
+  /* Typography */
+  --font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-size-xs: 13px;
+  --font-size-sm: 15px;
+  --font-size-base: 18px;
+  --font-size-lg: 22px;
+  --font-size-xl: 26px;
+  --font-size-2xl: 32px;
+  --font-size-3xl: 40px;
+
+  --line-height: 1.45;
+
+  /* Spacing */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 20px;
+  --space-xl: 28px;
+  --space-2xl: 36px;
+
+  /* Geometry */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  --touch-min: 56px;
+  --max-width: 580px;
+
+  /* Elevation */
+  --shadow-card: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 24px rgba(255, 114, 71, 0.25);
+  --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.6);
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background-color: var(--color-bg);
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 0%, #15273F 0%, #0A1420 55%);
+  background-attachment: fixed;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: var(--radius-md);
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Layout container */
+.app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  width: 100%;
+  padding-bottom: 96px; /* space for bottom nav */
+}
+
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md) var(--space-lg);
+  width: 100%;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+/* Pill Badges */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.pill-memory {
+  background: rgba(14, 165, 233, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.pill-routine {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pill-health {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.pill-reasoning {
+  background: rgba(168, 85, 247, 0.15);
+  color: #C084FC;
+  border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* Card Styles */
+.lumos-card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.lumos-card:active {
+  transform: scale(0.985);
+}
+
+/* Primary CTA Button (Lumosity Start style) */
+.btn-primary-lumos {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-family);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  padding: 16px 36px;
+  min-height: 56px;
+  cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  width: 100%;
+}
+
+.btn-primary-lumos:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 0 32px rgba(255, 114, 71, 0.45);
+}
+
+.btn-primary-lumos:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary-lumos {
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  padding: 14px 24px;
+  min-height: 52px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.btn-secondary-lumos:hover {
+  background: var(--color-card-hover);
+  border-color: var(--color-text-muted);
+}

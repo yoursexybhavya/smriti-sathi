@@ -1,0 +1,68 @@
+--- a/generate_deck.js
++++ b/generate_deck.js
+@@ -156,7 +156,14 @@
+-function addStandardHeader(slide, kicker, title, subtitle, kickerColor = C.GOLD_DARK) {
++function addStandardHeader(slide, kicker, title, subtitle, kickerColor = C.GOLD_DARK, options = {}) {
++  const titleFontSize = options.titleFontSize || (title.length > 52 ? 28 : 34);
++  const titleY = options.titleY || 0.83;
++  const titleH = options.titleH || 0.58;
++  const subtitleY = options.subtitleY || 1.41;
++  const subtitleH = options.subtitleH || 0.32;
++  const subtitleFontSize = options.subtitleFontSize || 13;
++
+   // Category Kicker / Subtitle (Calibri 10.5pt bold uppercase)
+   slide.addText(kicker, {
+     x: 0.8,
+     y: 0.55,
+     w: 11.733,
+     h: 0.28,
+     fontFace: FONT.BODY,
+     fontSize: 10.5,
+     bold: true,
+     color: kickerColor,
+     margin: 0
+   });
+ 
+-  // Main Slide Title (Cambria 34pt bold serif)
++  // Main Slide Title (Cambria bold serif)
+   slide.addText(title, {
+     x: 0.8,
+-    y: 0.83,
++    y: titleY,
+     w: 11.733,
+-    h: 0.58,
++    h: titleH,
+     fontFace: FONT.TITLE,
+-    fontSize: 34,
++    fontSize: titleFontSize,
+     bold: true,
+     color: C.TEXT_MAIN,
+     margin: 0
+   });
+ 
+   // Subtitle / Lead-in (Calibri 13pt)
+   slide.addText(subtitle, {
+     x: 0.8,
+-    y: 1.41,
++    y: subtitleY,
+     w: 11.733,
+-    h: 0.32,
++    h: subtitleH,
+     fontFace: FONT.BODY,
+-    fontSize: 13,
++    fontSize: subtitleFontSize,
+     color: C.TEXT_MUTED,
+     margin: 0
+   });
+ }
+@@ -470,7 +477,8 @@
+     addStandardHeader(
+       slide,
+       '01 / THE VISITOR FRICTION',
+-      'You’re Standing in Front of History. But Where’s the Story?',
++      'Standing in Front of History. But Where’s the Story?',
+       'India preserves 3,693 protected monuments, yet 98% offer zero native digital context on-site.',
+-      C.TERRACOTTA_DARK
++      C.TERRACOTTA_DARK,
++      { titleFontSize: 28 }
+     );

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Smriti Sathi — Bhashini Services Integration Specification</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap');
+
+  @page {
+    size: A4 portrait;
+    margin: 18mm 16mm 18mm 16mm;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1E293B;
+    background-color: #FFFFFF;
+    line-height: 1.5;
+    font-size: 10.5pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header {
+    border-bottom: 2px solid #0F172A;
+    padding-bottom: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .title-area h1 {
+    font-size: 20pt;
+    font-weight: 800;
+    color: #0F262B;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .title-area .subtitle {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #2D6A4F;
+  }
+
+  .badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 8pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-sih {
+    background-color: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+  }
+
+  .badge-bhashini {
+    background-color: #E0F2FE;
+    color: #0369A1;
+    border: 1px solid #BAE6FD;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    background-color: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    font-size: 9.5pt;
+  }
+
+  .meta-item strong {
+    color: #0F172A;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #0F172A;
+    border-left: 4px solid #2D6A4F;
+    padding-left: 8px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #1E293B;
+    margin-top: 14px;
+    margin-bottom: 6px;
+  }
+
+  p {
+    margin-bottom: 8px;
+    color: #334155;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+    color: #334155;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  .card {
+    background-color: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-weight: 700;
+    color: #0F262B;
+    font-size: 10.5pt;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .card-badge {
+    background-color: #DCFCE7;
+    color: #166534;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 8pt;
+    font-weight: 700;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 16px 0;
+    font-size: 9.5pt;
+  }
+
+  th, td {
+    border: 1px solid #CBD5E1;
+    padding: 8px 10px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #F1F5F9;
+    color: #0F172A;
+    font-weight: 700;
+  }
+
+  .diagram-box {
+    background: #0F172A;
+    color: #F8FAFC;
+    padding: 14px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    margin: 12px 0;
+    white-space: pre-wrap;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
+
+  .footer {
+    margin-top: 24px;
+    padding-top: 10px;
+    border-top: 1px solid #E2E8F0;
+    font-size: 8.5pt;
+    color: #64748B;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="title-area">
+      <h1>Smriti Sathi (স্মৃতি সাথী)</h1>
+      <div class="subtitle">Bhashini AI Services Integration & Use Case Specification</div>
+    </div>
+    <div class="badges">
+      <span class="badge badge-sih">SIH 2026 &bull; PS ID: SIH26003</span>
+      <span class="badge badge-bhashini">Bhashini Udyat API Request</span>
+    </div>
+  </div>
+
+  <!-- METADATA BOX -->
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Platform Name:</strong> Smriti Sathi (স্মৃতি সাথী)</div>
+    <div class="meta-item"><strong>Sponsoring Ministry:</strong> Ministry of Development of North Eastern Region (MDoNER)</div>
+    <div class="meta-item"><strong>Primary Domain:</strong> Healthcare & Assisted Elderly Dementia Care</div>
+    <div class="meta-item"><strong>Bhashini Services Requested:</strong> TTS (Text-to-Speech), ASR (Speech-to-Text), NMT (Machine Translation)</div>
+    <div class="meta-item"><strong>Target Languages:</strong> Assamese (অসমীয়া), Bodo (बर'), Manipuri (মৈতৈলোন্), English, Hindi</div>
+    <div class="meta-item"><strong>Target Hardware:</strong> Android Bedside Tablets (SM-T290) & Companion Smartphones</div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <h2>1. Problem Statement & Clinical Rationale</h2>
+  <p>
+    Dementia and Mild Cognitive Impairment (MCI) among the aging population in the <strong>North Eastern Region (NER)</strong> of India present unique challenges: linguistic fragmentation, rural geographic isolation, and severe shortages of specialized psychogeriatric personnel. Elderly citizens across Assam, Bodoland, and Manipur predominantly speak native regional languages (Assamese, Bodo, and Manipuri) and frequently face high rates of digital illiteracy.
+  </p>
+  <p>
+    Standard cognitive training applications depend entirely on high-literacy English text and touch-heavy interactions, rendering them completely inaccessible to rural elders. <strong>Smriti Sathi bridges this divide by embedding the Government of India's Bhashini National Language Translation Mission directly into a clinically-validated cognitive care ecosystem.</strong>
+  </p>
+
+  <!-- SECTION 2 -->
+  <h2>2. Detailed Use Case Breakdown for Bhashini AI Services</h2>
+  <p>
+    Our platform harnesses three foundational Bhashini AI service pillars (Dhruva API pipeline) to create an empathetic, voice-first companion:
+  </p>
+
+  <div class="card">
+    <div class="card-title">
+      <span>A. Text-to-Speech (TTS) — Voice Guidance & Reminiscence</span>
+      <span class="card-badge">Bhashini TTS API</span>
+    </div>
+    <p>
+      <strong>Operational Role:</strong> Verbal instruction generation for non-literate and visually impaired dementia patients.
+    </p>
+    <ul>
+      <li><strong>Cognitive Exercise Prompts:</strong> Rather than forcing elders to read onscreen instructions, Bhashini TTS narrates game objectives gently in Assamese, Bodo, and Manipuri (e.g., <em>"একে ধৰণৰ কাৰ্ড বিচাৰক / Find the matching pair"</em>).</li>
+      <li><strong>Audio Daily Orientation (Masterpiece):</strong> Recites morning-to-night schedules to re-anchor chronological orientation and prevent delirium.</li>
+      <li><strong>Spoken Medication & Hydration Alarms:</strong> Speaks high-priority reminders aloud at scheduled times in the elder's native dialect, ensuring time-critical adherence.</li>
+      <li><strong>Cultural Reminiscence Therapy:</strong> Delivers regional folk proverbs and cultural narratives to evoke positive emotional recall and cognitive stimulation.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span>B. Automatic Speech Recognition (ASR) — Natural Elder Voice Input</span>
+      <span class="card-badge">Bhashini ASR API</span>
+    </div>
+    <p>
+      <strong>Operational Role:</strong> Hands-free voice response capture for seniors with tremors, arthritis, or touch confusion.
+    </p>
+    <ul>
+      <li><strong>Verbal Game Responses:</strong> Elders can speak their memory answers (e.g., reciting market costs in Bodo or naming items in Manipuri) without needing touchscreen fine-motor control.</li>
+      <li><strong>Voice-Driven Medication Logging:</strong> Elders acknowledge medication intake verbally (e.g., <em>"ঔষধ খাই ললো / I have taken the medicine"</em>), which Bhashini ASR transcribes and logs in local IndexedDB.</li>
+      <li><strong>Emergency Vocal Distress:</strong> Detects spoken distress keywords in native languages to activate emergency caregiver beacons.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span>C. Neural Machine Translation (NMT) — Caregiver & ASHA Bridge</span>
+      <span class="card-badge">Bhashini NMT API</span>
+    </div>
+    <p>
+      <strong>Operational Role:</strong> Cross-lingual harmonization between rural elders and distant family members or urban clinicians.
+    </p>
+    <ul>
+      <li>Translates regional patient notes and symptom descriptions into English and Hindi for centralized medical records and ASHA coordinators.</li>
+      <li>Enables urban family members living outside the region to configure medication regimens and reminders in English, which are translated into native Assamese/Bodo/Manipuri voice prompts on the bedside tablet.</li>
+    </ul>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- PAGE 2 -->
+  <h2>3. System Architecture & Bhashini Pipeline</h2>
+  <p>
+    The system follows an offline-first hybrid pipeline designed specifically for low-connectivity rural healthcare environments:
+  </p>
+
+  <div class="diagram-box">
+  +---------------------------------------------------------------------------------+
+  |                          ELDER BEDSIDE TABLET STATION                           |
+  |                                                                                 |
+  |   [ Microphone Input ]                   [ Native Audio / Speaker Output ]     |
+  |            |                                           ^                        |
+  |            v                                           |                        |
+  |   +-------------------+                       +-------------------+             |
+  |   | Speech Capture    |                       | Audio Synthesis   |             |
+  |   +-------------------+                       +-------------------+             |
+  |            |                                           ^                        |
+  |            v                                           |                        |
+  |   +---------------------------------------------------------------+             |
+  |   |                   BHASHINI DHRUVA AI PIPELINE                 |             |
+  |   |                                                               |             |
+  |   |   1. ASR (Assamese, Bodo, Manipuri) -> Audio to Text          |             |
+  |   |   2. NMT -> Regional text to Hindi/English Standardization   |             |
+  |   |   3. TTS -> Synthetic voice generation in native dialect      |             |
+  |   +---------------------------------------------------------------+             |
+  |            |                                           |                        |
+  |            v                                           v                        |
+  |   +---------------------------------------------------------------+             |
+  |   |          LOCAL CLINICAL ENGINE & SECURE INDEXEDDB (ENCRYPTED)  |             |
+  |   |   - Adaptive Cognitive Staircase Engine (CST Guidelines)     |             |
+  |   |   - Offline Medication Schedules & Voice Prompts Cache        |             |
+  |   |   - Local DPDP Act 2023 Encrypted Telemetry Record            |             |
+  |   +---------------------------------------------------------------+             |
+  |            |                                                                    |
+  |            +---( Offline Bluetooth LE P2P )---> [ Child Companion Smartphone ]  |
+  |            +---( Opportunistic Cloud REST )---> [ ASHA Worker Health Portal ]   |
+  +---------------------------------------------------------------------------------+
+  </div>
+
+  <!-- SECTION 4 -->
+  <h2>4. Supported Language Matrix & Dialect Coverage</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Language</th>
+        <th>Script</th>
+        <th>Bhashini Service Used</th>
+        <th>Clinical Application in Smriti Sathi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Assamese (অসমীয়া)</strong></td>
+        <td>Bengali-Assamese</td>
+        <td>TTS, ASR, NMT</td>
+        <td>Brahmaputra Valley elder routine prompts, tea-garden market estimation games, and folk songs.</td>
+      </tr>
+      <tr>
+        <td><strong>Bodo (बर')</strong></td>
+        <td>Devanagari</td>
+        <td>TTS, ASR, NMT</td>
+        <td>Bodoland Territorial Region dialect voice assistance, daily schedule narration, and med logs.</td>
+      </tr>
+      <tr>
+        <td><strong>Manipuri (মৈতৈলোন্)</strong></td>
+        <td>Bengali / Meetei</td>
+        <td>TTS, ASR, NMT</td>
+        <td>Imphal valley cultural reminiscence proverbs, medication voice reminders, and cognitive quizzes.</td>
+      </tr>
+      <tr>
+        <td><strong>English & Hindi</strong></td>
+        <td>Latin / Devanagari</td>
+        <td>TTS, NMT</td>
+        <td>Caregiver dashboard metrics, clinical reports for doctors, and national evaluation fallback.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SECTION 5 -->
+  <h2>5. Data Privacy & Compliance (DPDP Act 2023)</h2>
+  <p>
+    Smriti Sathi treats patient voice and cognitive telemetry with the highest standard of healthcare confidentiality under the <strong>Digital Personal Data Protection (DPDP) Act 2023</strong>:
+  </p>
+  <ul>
+    <li><strong>Zero Biometric Voice Retention:</strong> Spoken audio sent to Bhashini APIs is processed transiently for recognition and immediately discarded; no patient voice samples are stored on external servers.</li>
+    <li><strong>Encrypted Local Storage:</strong> All patient identity details, cognitive assessment scores, and reminder logs are encrypted at rest using AES-GCM in local IndexedDB.</li>
+    <li><strong>Revocable Caregiver Consent:</strong> A designated family guardian maintains explicit granular consent controls to authorize or revoke data synchronization at any time.</li>
+  </ul>
+
+  <!-- SECTION 6 -->
+  <h2>6. Conclusion & Impact</h2>
+  <p>
+    Integrating Bhashini's AI language infrastructure transforms Smriti Sathi from a conventional screen-bound app into a culturally compassionate, voice-first medical companion for rural North Eastern dementia patients. Access to the requested Bhashini Udyat API keys will directly empower the prototype demonstration and field pilot testing for the Smart India Hackathon 2026.
+  </p>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Smriti Sathi — Team SIH26003 (Ministry of Development of North Eastern Region)</span>
+    <span>Official Submission Document for Bhashini API Access</span>
+  </div>
+
+</body>
+</html>

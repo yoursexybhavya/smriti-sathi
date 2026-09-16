@@ -1,0 +1,13 @@
+{
+  "name": "Smriti Sathi — स्मृति साथी",
+  "short_name": "Smriti Sathi",
+  "description": "Memory care that speaks your language — online or offline",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF8F0",
+  "theme_color": "#2D6A4F",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

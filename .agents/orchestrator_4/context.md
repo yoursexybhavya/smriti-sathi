@@ -1,0 +1,31 @@
+# Context & Ground Truth Reference
+
+## Core Design System: Cinematic Dark-Editorial
+- **Colors**:
+  - `BG_DARK`: `0D0B09`
+  - `CARD_DARK`: `1A1714`
+  - `CARD_BORDER`: `2E2A25`
+  - `GOLD`: `C69214`
+  - `GOLD_LIGHT`: `D4A856`
+  - `TEXT_WHITE`: `FFFFFF`
+  - `TEXT_CREAM`: `E8E0D4`
+  - `TEXT_MUTED`: `8A8279`
+  - `UI_CREAM`: `F5F0E8`
+- **Typography Rules**:
+  - Headings: Cambria bold (36-44pt) in `TEXT_WHITE`, key/second line in `GOLD`
+  - Section labels: Calibri (10-11pt) in `GOLD`, ALL CAPS, `charSpacing: 3-4`
+  - Body: Calibri (12-14pt) in `TEXT_CREAM`
+  - Card titles: Calibri (14-16pt) bold in `TEXT_WHITE`
+  - Card body: Calibri (11-12pt) in `TEXT_MUTED`
+  - Coordinates/GPS: Calibri (9-10pt) in `TEXT_MUTED`, ALL CAPS, top-right
+  - Taglines: Cambria italic (22-28pt) in `GOLD`, right-aligned
+- **Key Layout Patterns**:
+  - Pattern A (Full-Bleed Photo + Letterbox + Overlay): Slides 1 & 8
+  - Pattern B (Half-Bleed Photo + Stacked Dark Cards): Slides 2 & 7
+  - Pattern C (Map + Stepping + UI Mockup Card): Slides 3 & 4
+  - Pattern D (Architecture Flow + Connectors + Sub-panels): Slides 5 & 6
+- **Strict Prohibition**:
+  - NEVER use accent lines under titles
+  - NEVER use decorative color bars or accent stripes
+  - Keep all text elements native and editable
+  - Maintain 100% of existing text content, speaker notes, and judging criteria coverage
