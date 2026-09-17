@@ -1,1 +1,0 @@
-/Users/krishnajangid/.gemini/config/skills/pptx/scripts/office/validate.py
