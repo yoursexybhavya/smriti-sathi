@@ -48,21 +48,30 @@ export function useVoice() {
 
     try {
       window.speechSynthesis.cancel(); // Stop any currently playing speech
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
 
       const utterance = new SpeechSynthesisUtterance(text);
       const targetLang = overrideLang || language;
       const preferredCodes = SPEECH_LANG_MAP[targetLang] || ['en-IN'];
 
-      // Find best available voice
-      const voices = window.speechSynthesis.getVoices();
+      // Find best available voice from voices list
+      let voices = window.speechSynthesis.getVoices();
       let matchedVoice = null;
 
-      for (const code of preferredCodes) {
-        matchedVoice = voices.find((v) => v.lang.toLowerCase().startsWith(code.toLowerCase().slice(0, 2)));
-        if (matchedVoice) {
-          utterance.voice = matchedVoice;
-          utterance.lang = matchedVoice.lang;
-          break;
+      if (voices.length > 0) {
+        for (const code of preferredCodes) {
+          matchedVoice = voices.find(
+            (v) =>
+              v.lang.toLowerCase() === code.toLowerCase() ||
+              v.lang.toLowerCase().replace('_', '-').startsWith(code.toLowerCase().slice(0, 2))
+          );
+          if (matchedVoice) {
+            utterance.voice = matchedVoice;
+            utterance.lang = matchedVoice.lang;
+            break;
+          }
         }
       }
 
@@ -70,9 +79,9 @@ export function useVoice() {
         utterance.lang = preferredCodes[0];
       }
 
-      // Elderly-friendly speech pacing
-      utterance.rate = 0.85; // Slightly slower for clear comprehension
-      utterance.pitch = 1.0;
+      // Dementia-friendly speech pacing: unhurried, clear, gentle
+      utterance.rate = 0.82;
+      utterance.pitch = 1.05;
       utterance.volume = 1.0;
 
       window.speechSynthesis.speak(utterance);
