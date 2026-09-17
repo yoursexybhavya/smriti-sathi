@@ -82,17 +82,20 @@ export function LanguageWorkout() {
           setIsCorrect(null);
         } else {
           setIsComplete(true);
-          const pId = patient?.id || 1;
-          db.gameSessions.add({
-            patientId: pId,
-            gameType: 'memoryMatch',
-            difficulty: 2,
-            score: 100,
-            accuracy: 1.0,
-            responseTimeMs: 3800,
-            playedAt: new Date(),
-            synced: 0,
-          }).then(() => refreshStats());
+          if (patient?.id) {
+            db.gameSessions.add({
+              patientId: patient.id,
+              gameType: 'language',
+              domain: 'attentionFocus',
+              difficulty: 2,
+              score: 100,
+              accuracy: 1.0,
+              responseTimeMs: 3800,
+              distractorRejectionRate: 1.0,
+              playedAt: new Date(),
+              synced: 0,
+            }).then(() => refreshStats());
+          }
           speak(t.gameComplete, language);
         }
       }, 1600);

@@ -107,17 +107,20 @@ export function MathWorkout() {
           setIsCorrect(null);
         } else {
           setIsComplete(true);
-          const pId = patient?.id || 1;
-          db.gameSessions.add({
-            patientId: pId,
-            gameType: 'dailyRoutine',
-            difficulty: 1,
-            score: 100,
-            accuracy: 1.0,
-            responseTimeMs: 3500,
-            playedAt: new Date(),
-            synced: 0,
-          }).then(() => refreshStats());
+          if (patient?.id) {
+            db.gameSessions.add({
+              patientId: patient.id,
+              gameType: 'math',
+              domain: 'processingSpeed',
+              difficulty: 1,
+              score: 100,
+              accuracy: 1.0,
+              responseTimeMs: 3500,
+              latencyMs: 3500,
+              playedAt: new Date(),
+              synced: 0,
+            }).then(() => refreshStats());
+          }
           speak(t.gameComplete, language);
         }
       }, 1500);

@@ -12,13 +12,31 @@ interface PatientContextType {
   patients: Patient[];
   stats: PatientStats;
   isLoading: boolean;
+  setupCompleted: boolean;
+  userRole: 'elder' | 'caregiver';
   setPatient: (patient: Patient) => void;
   selectPatient: (id: number) => Promise<void>;
-  createPatient: (name: string, age: number, language: string) => Promise<Patient>;
+  createPatient: (
+    name: string,
+    age: number,
+    language: string,
+    remindersEnabled?: { medicine: boolean; hydration: boolean; brainWorkout: boolean }
+  ) => Promise<Patient>;
   updatePatient: (id: number, data: Partial<Patient>) => Promise<void>;
   deletePatient: (id: number) => Promise<void>;
   refreshStats: () => Promise<void>;
   clearAllData: () => Promise<void>;
+  setUserRole: (role: 'elder' | 'caregiver') => Promise<void>;
+  completeOnboarding: (data: {
+    name: string;
+    age: number;
+    language: string;
+    role: 'elder' | 'caregiver';
+    pin: string;
+    remindersEnabled: { medicine: boolean; hydration: boolean; brainWorkout: boolean };
+  }) => Promise<Patient>;
+  verifyCaregiverPin: (enteredPin: string) => Promise<boolean>;
+  setCaregiverPin: (pin: string) => Promise<void>;
 }
 
 const PatientContext = createContext<PatientContextType | null>(null);
@@ -72,6 +90,8 @@ export function PatientProvider({ children }: { children: ReactNode }) {
   const [patients, setPatientsState] = useState<Patient[]>([]);
   const [stats, setStats] = useState<PatientStats>({ streak: 0, cpi: 0, totalPlayed: 0 });
   const [isLoading, setIsLoading] = useState(true);
+  const [setupCompleted, setSetupCompleted] = useState(false);
+  const [userRole, setUserRoleState] = useState<'elder' | 'caregiver'>('elder');
 
   const refreshStats = useCallback(async () => {
     if (patient?.id) {
@@ -86,32 +106,34 @@ export function PatientProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const initPatients = async () => {
       try {
-        let all = await db.patients.toArray();
-        if (all.length === 0) {
-          const defaultElder: Patient = {
-            name: 'Baa (আইতা)',
-            age: 72,
-            language: 'as',
-            createdAt: new Date(),
-          };
-          const id = await db.patients.add(defaultElder);
-          const created = { ...defaultElder, id };
-          all = [created];
+        const setupSetting = await db.settings.get('setup_completed');
+        const roleSetting = await db.settings.get('user_role');
+        if (roleSetting?.value === 'caregiver' || roleSetting?.value === 'elder') {
+          setUserRoleState(roleSetting.value);
         }
+
+        const all = await db.patients.toArray();
         setPatientsState(all);
 
-        // Check stored active patient id
-        const savedActive = await db.settings.get('activePatientId');
-        let active = all[0];
-        if (savedActive && savedActive.value) {
-          const found = all.find((p) => p.id === parseInt(savedActive.value));
-          if (found) active = found;
-        }
+        if (all.length > 0 && setupSetting?.value === 'true') {
+          setSetupCompleted(true);
+          const savedActive = await db.settings.get('activePatientId');
+          let active = all[0];
+          if (savedActive && savedActive.value) {
+            const found = all.find((p) => p.id === parseInt(savedActive.value));
+            if (found) active = found;
+          }
 
-        setPatientState(active);
-        if (active.id) {
-          const s = await calculatePatientStats(active.id);
-          setStats(s);
+          setPatientState(active);
+          if (active.id) {
+            const s = await calculatePatientStats(active.id);
+            setStats(s);
+          }
+        } else {
+          // No setup yet completed -> require first-launch onboarding
+          setSetupCompleted(false);
+          setPatientState(null);
+          setStats({ streak: 0, cpi: 0, totalPlayed: 0 });
         }
       } catch (err) {
         console.warn('Error initializing patients from DB:', err);
@@ -145,8 +167,19 @@ export function PatientProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const createPatient = async (name: string, age: number, language: string): Promise<Patient> => {
-    const newPatient: Patient = { name, age, language, createdAt: new Date() };
+  const createPatient = async (
+    name: string,
+    age: number,
+    language: string,
+    remindersEnabled?: { medicine: boolean; hydration: boolean; brainWorkout: boolean }
+  ): Promise<Patient> => {
+    const newPatient: Patient = {
+      name,
+      age,
+      language,
+      remindersEnabled: remindersEnabled || { medicine: true, hydration: true, brainWorkout: true },
+      createdAt: new Date(),
+    };
     const id = await db.patients.add(newPatient);
     const created = { ...newPatient, id };
     const updatedList = [...patients, created];
@@ -155,6 +188,93 @@ export function PatientProvider({ children }: { children: ReactNode }) {
     await db.settings.put({ key: 'activePatientId', value: id.toString() });
     setStats({ streak: 0, cpi: 0, totalPlayed: 0 });
     return created;
+  };
+
+  const completeOnboarding = async (data: {
+    name: string;
+    age: number;
+    language: string;
+    role: 'elder' | 'caregiver';
+    pin: string;
+    remindersEnabled: { medicine: boolean; hydration: boolean; brainWorkout: boolean };
+  }): Promise<Patient> => {
+    const newElder: Patient = {
+      name: data.name,
+      age: data.age,
+      language: data.language,
+      remindersEnabled: data.remindersEnabled,
+      createdAt: new Date(),
+    };
+    const id = await db.patients.add(newElder);
+    const created = { ...newElder, id };
+    setPatientsState([created]);
+    setPatientState(created);
+    setUserRoleState(data.role);
+    setSetupCompleted(true);
+
+    // Persist settings
+    await db.settings.put({ key: 'activePatientId', value: id.toString() });
+    await db.settings.put({ key: 'caregiver_pin', value: data.pin || '1234' });
+    await db.settings.put({ key: 'user_role', value: data.role });
+    await db.settings.put({ key: 'setup_completed', value: 'true' });
+    await db.settings.put({ key: 'language', value: data.language });
+    localStorage.setItem('smriti_language', data.language);
+
+    // Setup initial care reminders if enabled
+    if (data.remindersEnabled.medicine) {
+      await db.reminders.add({
+        patientId: id,
+        type: 'medicine',
+        label: 'Blood Pressure & Heart Medicine (ৰাতিপুৱাৰ ঔষধ)',
+        timeHour: 9,
+        timeMinute: 0,
+        repeatDays: [0, 1, 2, 3, 4, 5, 6],
+        isActive: true,
+        lastAcked: null,
+      });
+    }
+    if (data.remindersEnabled.hydration) {
+      await db.reminders.add({
+        patientId: id,
+        type: 'water',
+        label: 'Drink a glass of warm water (এগিলাচ পানী খাওক)',
+        timeHour: 11,
+        timeMinute: 0,
+        repeatDays: [0, 1, 2, 3, 4, 5, 6],
+        isActive: true,
+        lastAcked: null,
+      });
+    }
+    if (data.remindersEnabled.brainWorkout) {
+      await db.reminders.add({
+        patientId: id,
+        type: 'activity',
+        label: 'Daily Cognitive Workout (স্মৃতি অনুশীলন)',
+        timeHour: 16,
+        timeMinute: 0,
+        repeatDays: [0, 1, 2, 3, 4, 5, 6],
+        isActive: true,
+        lastAcked: null,
+      });
+    }
+
+    setStats({ streak: 0, cpi: 0, totalPlayed: 0 });
+    return created;
+  };
+
+  const verifyCaregiverPin = async (enteredPin: string): Promise<boolean> => {
+    const pinSetting = await db.settings.get('caregiver_pin');
+    const storedPin = pinSetting?.value || '1234';
+    return enteredPin.trim() === storedPin.trim();
+  };
+
+  const setCaregiverPin = async (pin: string) => {
+    await db.settings.put({ key: 'caregiver_pin', value: pin.trim() });
+  };
+
+  const setUserRole = async (role: 'elder' | 'caregiver') => {
+    setUserRoleState(role);
+    await db.settings.put({ key: 'user_role', value: role });
   };
 
   const updatePatient = async (id: number, data: Partial<Patient>) => {
@@ -197,6 +317,8 @@ export function PatientProvider({ children }: { children: ReactNode }) {
         patients,
         stats,
         isLoading,
+        setupCompleted,
+        userRole,
         setPatient,
         selectPatient,
         createPatient,
@@ -204,6 +326,10 @@ export function PatientProvider({ children }: { children: ReactNode }) {
         deletePatient,
         refreshStats,
         clearAllData,
+        setUserRole,
+        completeOnboarding,
+        verifyCaregiverPin,
+        setCaregiverPin,
       }}
     >
       {children}

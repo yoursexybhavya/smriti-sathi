@@ -4,18 +4,37 @@ export interface Patient {
   id?: number;
   name: string;
   age: number;
-  language: string; // 'en' | 'as' | 'brx' | 'mni'
+  language: string; // 'en' | 'as' | 'brx' | 'mni' | 'hi'
+  photoUrl?: string;
+  remindersEnabled?: {
+    medicine: boolean;
+    hydration: boolean;
+    brainWorkout: boolean;
+  };
   createdAt: Date;
 }
+
+export type CognitiveDomain =
+  | 'workingMemory'
+  | 'processingSpeed'
+  | 'temporalOrientation'
+  | 'attentionFocus'
+  | 'careAdherence';
 
 export interface GameSession {
   id?: number;
   patientId: number;
-  gameType: 'memoryMatch' | 'dailyRoutine';
+  gameType: 'memoryMatch' | 'dailyRoutine' | 'math' | 'language';
+  domain?: CognitiveDomain;
   difficulty: number; // 1-4
   score: number;
   accuracy: number; // 0-1
   responseTimeMs: number;
+  recallAccuracyFirstLook?: number; // Speed match working memory
+  attemptCount?: number;            // Speed match attempt count
+  latencyMs?: number;               // motor-visual latency (ms, render->touch)
+  sequencingErrors?: number;        // Daily Routine sequencing
+  distractorRejectionRate?: number; // Language distractor rejection
   playedAt: Date;
   synced: number; // 0 = not synced, 1 = synced
 }

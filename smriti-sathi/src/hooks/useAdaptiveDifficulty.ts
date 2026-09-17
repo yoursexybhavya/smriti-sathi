@@ -87,10 +87,13 @@ export function useAdaptiveDifficulty(
       const session: GameSession = {
         patientId,
         gameType,
+        domain: gameType === 'memoryMatch' ? 'workingMemory' : 'temporalOrientation',
         difficulty: difficultyState.currentLevel,
         score,
         accuracy,
         responseTimeMs,
+        recallAccuracyFirstLook: gameType === 'memoryMatch' ? accuracy : undefined,
+        sequencingErrors: gameType === 'dailyRoutine' ? Math.round((1 - accuracy) * 4) : undefined,
         playedAt: new Date(),
         synced: 0,
       };
