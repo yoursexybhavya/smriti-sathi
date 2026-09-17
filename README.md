@@ -18,6 +18,25 @@
 
 ---
 
+## 📱 Download & Install Android APK (Direct Link)
+
+> **Ready for Testing on Android Tablets & Phones:**
+> You can download the compiled production APK directly from GitHub onto your tablet browser in one tap:
+
+[![Download APK](https://img.shields.io/badge/Download%20APK-SmritiSathi--v1.0.apk-brightgreen?style=for-the-badge&logo=android)](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-v1.0.apk)
+
+**Direct Download URL:**  
+🔗 **[https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-v1.0.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-v1.0.apk)**
+
+### Quick Tablet Installation Steps:
+1. Open Chrome or any browser on your Android tablet/phone.
+2. Tap the download link above (or go to [Releases](https://github.com/yoursexybhavya/smriti-sathi/releases)).
+3. Once downloaded, tap the file in your notification bar or **Files &rarr; Downloads**.
+4. Tap **Install** (if prompted *"Allow installs from this source"*, tap **Settings** & toggle **Allow**).
+5. Open **Smriti Sathi** — it runs 100% offline immediately!
+
+---
+
 ## 🧭 The Problem We Solve
 
 In the **North Eastern Region (NER)** of India, elderly patients suffering from Mild Cognitive Impairment (MCI) and Dementia face acute healthcare barriers:
@@ -153,15 +172,22 @@ npm start
 
 ---
 
-## 🌐 1-Click Cloud Hosting (Outside Google Play Store)
+## 🌐 Free Cloud Hosting (Step-by-Step for Render.com)
 
-To host the companion sync server and telemetry dashboard online for free:
-1. Connect this repository to [Render.com](https://render.com) (or Railway.app / Glitch.com).
-2. Configure a **Web Service**:
-   - **Root Directory:** `smriti-sathi`
-   - **Build Command:** `npm install && npm run build`
-   - **Start Command:** `node server/index.js`
-3. Enter your generated Render URL into the app's **Parent-Child Sync** tab (`My Brain -> PARENT-CHILD SYNC`) for remote cloud telemetry.
+To host the companion sync server and telemetry dashboard online for free (takes 3 minutes):
+1. Sign up or log into [Render.com](https://render.com) using your GitHub account (`yoursexybhavya`).
+2. Click **New +** &rarr; **Web Service**.
+3. Select and connect `smriti-sathi`.
+4. Enter these exact fields:
+   - **Name:** `smriti-sathi-api`
+   - **Root Directory:** `smriti-sathi/server`
+   - **Environment:** `Node`
+   - **Build Command:** `npm install`
+   - **Start Command:** `node index.js`
+   - **Plan:** `Free` ($0/month)
+5. Click **Create Web Service**.
+6. Render will deploy your server and provide a public URL like `https://smriti-sathi-api.onrender.com`.
+7. In the Android app, go to **Caregiver Dashboard** &rarr; **PARENT-CHILD SYNC 📲**, paste your Render URL, and tap **Trigger Cloud Sync** to back up patient data!
 
 ---
 
