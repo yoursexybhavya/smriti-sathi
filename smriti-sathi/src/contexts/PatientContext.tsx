@@ -30,6 +30,16 @@ export function PatientProvider({ children }: { children: ReactNode }) {
         setPatientState({ ...defaultElder, id });
       }
       setIsLoading(false);
+    }).catch((err) => {
+      console.warn('Could not load patient from DB, using fallback:', err);
+      setPatientState({
+        id: 1,
+        name: 'Baa (আইতা)',
+        age: 72,
+        language: 'as',
+        createdAt: new Date(),
+      });
+      setIsLoading(false);
     });
   }, []);
 

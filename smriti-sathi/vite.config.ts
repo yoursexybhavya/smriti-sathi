@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: './',
+  build: {
+    target: 'es2020',
+  },
   plugins: [
     react(),
     VitePWA({

@@ -19,6 +19,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (setting && setting.value in translations) {
         setLanguageState(setting.value as Language);
       }
+    }).catch((err) => {
+      console.warn('Could not load language from DB, defaulting to English:', err);
     });
   }, []);
 
