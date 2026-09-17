@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: smriti-sathi
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node smriti-sathi/server/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
