@@ -6,6 +6,7 @@ import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
 import { languageNames, type Language } from '../i18n/translations';
 import { ProfileSwitcherModal } from './ProfileSwitcherModal';
+import { FamilyPairingModal } from './FamilyPairingModal';
 
 export function TopHeader() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export function TopHeader() {
   const { speak } = useVoice();
 
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showPairingModal, setShowPairingModal] = useState(false);
 
   const cycleLanguage = () => {
     const langs: Language[] = ['as', 'brx', 'mni', 'en'];
@@ -117,6 +119,28 @@ export function TopHeader() {
 
         {/* Right: Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* 1-Tap Family Link (Parent-Child Pairing) Button */}
+          <button
+            onClick={() => setShowPairingModal(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              backgroundColor: '#17253D',
+              border: '1px solid #38BDF8',
+              borderRadius: 'var(--radius-pill)',
+              padding: '6px 12px',
+              fontSize: '13px',
+              fontWeight: 700,
+              color: '#38BDF8',
+              cursor: 'pointer',
+            }}
+            title={t.familyLink}
+          >
+            <span>👨‍👩‍👧</span>
+            <span>{t.familyLink}</span>
+          </button>
+
           {/* Multilingual quick-switch pill */}
           <button
             onClick={cycleLanguage}
@@ -181,6 +205,12 @@ export function TopHeader() {
       <ProfileSwitcherModal
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
+      />
+
+      {/* Family Link & Parent-Child Pairing Modal */}
+      <FamilyPairingModal
+        isOpen={showPairingModal}
+        onClose={() => setShowPairingModal(false)}
       />
     </>
   );

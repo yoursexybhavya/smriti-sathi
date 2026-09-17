@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { User, Globe, Eye, ShieldCheck, Check, Edit3, Users, Download, RefreshCw, Sparkles, Trash2 } from 'lucide-react';
+import { User, Globe, Eye, ShieldCheck, Check, Edit3, Users, Download, RefreshCw, Sparkles, Trash2, Smartphone } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
 import { languageNames, type Language } from '../i18n/translations';
 import { ProfileSwitcherModal } from '../components/ProfileSwitcherModal';
+import { FamilyPairingModal } from '../components/FamilyPairingModal';
 import { checkAppUpdates, CURRENT_APP_VERSION, type UpdateInfo } from '../components/UpdateChecker';
 
 export function Settings() {
@@ -18,6 +19,7 @@ export function Settings() {
   const [textSize, setTextSize] = useState<'normal' | 'large'>('normal');
   const [consentGranted, setConsentGranted] = useState(true);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showPairingModal, setShowPairingModal] = useState(false);
 
   // Update check states
   const [checkingUpdate, setCheckingUpdate] = useState(false);
@@ -204,6 +206,48 @@ export function Settings() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Family Account & Caregiver Pairing Card */}
+        <div
+          className="lumos-card"
+          style={{
+            padding: '20px',
+            border: '1px solid #233A57',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Smartphone size={20} color="#38BDF8" />
+              <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
+                {t.familyAccountTitle}
+              </span>
+            </div>
+            <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 800, backgroundColor: 'rgba(16, 185, 129, 0.15)', padding: '3px 8px', borderRadius: '4px' }}>
+              1-TAP PAIR
+            </span>
+          </div>
+
+          <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '14px', lineHeight: 1.4 }}>
+            {t.familyAccountDesc}
+          </p>
+
+          <button
+            onClick={() => setShowPairingModal(true)}
+            className="btn-secondary-lumos"
+            style={{
+              width: '100%',
+              padding: '12px',
+              minHeight: '48px',
+              fontSize: '14px',
+              borderColor: '#38BDF8',
+              color: '#38BDF8',
+              backgroundColor: '#122237',
+            }}
+          >
+            <span>👨‍👩‍👧</span>
+            <span>{t.pairAccountBtn} / Sync Status</span>
+          </button>
         </div>
 
         {/* Regional Language (Bhashini AI) Card */}
@@ -467,6 +511,12 @@ export function Settings() {
       <ProfileSwitcherModal
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
+      />
+
+      {/* Family Account Pairing Modal */}
+      <FamilyPairingModal
+        isOpen={showPairingModal}
+        onClose={() => setShowPairingModal(false)}
       />
     </div>
   );

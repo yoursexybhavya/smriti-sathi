@@ -217,6 +217,18 @@ export interface Translations {
   updateDismiss: string;
   updateCheckPrompt: string;
   noUpdateFound: string;
+
+  // Family Account & Pairing
+  familyLink: string;
+  familyAccountTitle: string;
+  familyAccountDesc: string;
+  elderSyncCode: string;
+  childPhoneLabel: string;
+  caregiverNameLabel: string;
+  pairAccountBtn: string;
+  pairedSuccess: string;
+  shareWhatsappReport: string;
+  cloudSyncNow: string;
 }
 
 const en: Translations = {
@@ -417,6 +429,18 @@ const en: Translations = {
   updateDismiss: 'Later',
   updateCheckPrompt: 'Checking GitHub for updates...',
   noUpdateFound: 'You are on the latest version of Smriti Sathi!',
+
+  // Family Account & Pairing
+  familyLink: 'Family Link',
+  familyAccountTitle: 'Family Account & Pairing',
+  familyAccountDesc: 'Connect elder bedside tablet with child companion phone',
+  elderSyncCode: 'Elder Device Sync Code',
+  childPhoneLabel: 'Child / Caregiver Mobile Number',
+  caregiverNameLabel: 'Caregiver Name & Relation (e.g. Son, Daughter)',
+  pairAccountBtn: 'Link Caregiver Phone',
+  pairedSuccess: 'Family Account Linked Successfully',
+  shareWhatsappReport: 'Share Daily Report via WhatsApp',
+  cloudSyncNow: 'Sync Data to Cloud',
 };
 
 const as: Translations = {
@@ -617,6 +641,18 @@ const as: Translations = {
   updateDismiss: 'পিছত',
   updateCheckPrompt: 'নতুন আপডেট পৰীক্ষা কৰি থকা হৈছে...',
   noUpdateFound: 'আপুনি স্মৃতি সাথীৰ সৰ্বশেষ সংস্কৰণ ব্যৱহাৰ কৰি আছে!',
+
+  // Family Account & Pairing
+  familyLink: 'পৰিয়াল সংযোগ',
+  familyAccountTitle: 'পৰিয়াল একাউন্ট আৰু সংযোগ',
+  familyAccountDesc: 'আইতা/দেউতাৰ টেবলেট সন্তানৰ মোবাইলৰ সৈতে সংযোগ কৰক',
+  elderSyncCode: 'জ্যেষ্ঠ সদস্যৰ সংযোগ ক’ড',
+  childPhoneLabel: 'সন্তান / যত্নকাৰীৰ মোবাইল নম্বৰ',
+  caregiverNameLabel: 'যত্নকাৰীৰ নাম আৰু সম্পৰ্ক (যেনে: ল’ৰা, ছোৱালী)',
+  pairAccountBtn: 'যত্নকাৰীৰ ফোন সংযোগ কৰক',
+  pairedSuccess: 'পৰিয়াল একাউন্ট সফলতাৰে সংযোগ কৰা হ’ল',
+  shareWhatsappReport: 'হোৱাটছএপত দৈনিক স্বাস্থ্য ৰিপৰ্ট পঠিয়াওক',
+  cloudSyncNow: 'ক্লাউডলৈ তথ্য সংমিশ্ৰণ কৰক',
 };
 
 // Bodo translations (Devanagari script)
@@ -818,6 +854,18 @@ const brx: Translations = {
   updateDismiss: 'उनाव',
   updateCheckPrompt: 'गोदान आपदेत नायबाय थानाय...',
   noUpdateFound: 'नोंथाङा जोबथा महर बाहायगासिनो दं!',
+
+  // Family Account & Pairing
+  familyLink: 'नोगोर लोगो',
+  familyAccountTitle: 'नोगोर एकान्ट आरो लोगो खालामनाय',
+  familyAccountDesc: 'गोजौ मानसि टैबलेटखौ फिसाफोरनि मबाइलजों लोगो खालाम',
+  elderSyncCode: 'गोजौ मानसि डिभाइस कोड',
+  childPhoneLabel: 'फिसा / सामलायग्रा मबाइल नम्बर',
+  caregiverNameLabel: 'सामलायग्रानि मुं आरो सम्बन्ध',
+  pairAccountBtn: 'सामलायग्रा फोन लोगो खालाम',
+  pairedSuccess: 'नोगोर एकान्ट मोजाङै लोगो जाबाय',
+  shareWhatsappReport: 'व्हाट्सएपआव साननि रिपर्ट हर',
+  cloudSyncNow: 'क्लाउड सिंक खालाम',
 };
 
 // Manipuri translations (Bengali script)
@@ -1019,6 +1067,18 @@ const mni: Translations = {
   updateDismiss: 'তুংদা',
   updateCheckPrompt: 'অনৌবা অপদেত য়েংলি...',
   noUpdateFound: 'নহাক্না অরোইবা সংস্করন শিজিন্নরি!',
+
+  // Family Account & Pairing
+  familyLink: 'ইমুং শম্নবা',
+  familyAccountTitle: 'ইমুংগী একাউন্ট অমসুং শম্নবা',
+  familyAccountDesc: 'অহলগী তেবলেট মচাগী মোবাইলগা শম্নহনবা',
+  elderSyncCode: 'অহলগী দিভাইস কোড',
+  childPhoneLabel: 'মচা / য়েংশিনবগী মোবাইল নম্বর',
+  caregiverNameLabel: 'য়েংশিনবগী মমিং অমসুং মরী',
+  pairAccountBtn: 'য়েংশিনবগী ফোন শম্নহনবা',
+  pairedSuccess: 'ইমুংগী একাউন্ট ময়েক শেংনা শম্নরে',
+  shareWhatsappReport: 'হোৱাতসএপতা নুমিৎ খুদিংগী রিপোর্ত থাবা',
+  cloudSyncNow: 'ক্লাউদতা দেতা সিঙ্ক তৌবা',
 };
 
 export const translations: Record<Language, Translations> = { en, as, brx, mni };

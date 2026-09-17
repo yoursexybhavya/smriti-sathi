@@ -333,3 +333,32 @@ body {
   }
 }
 
+/* Tablet Landscape Optimizations */
+@media (min-width: 600px) and (orientation: landscape) {
+  :root {
+    --max-width: 1180px;
+  }
+
+  .page {
+    padding: var(--space-md) var(--space-xl);
+  }
+
+  .tablet-landscape-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .tablet-landscape-row {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+  }
+
+  .tablet-game-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
