@@ -15,7 +15,7 @@ import {
 
 export function DailyRoutine() {
   const { t } = useLanguage();
-  const { patient } = usePatient();
+  const { patient, refreshStats } = usePatient();
   const navigate = useNavigate();
   const { speak, playSuccessChime, playCardFlip } = useVoice();
 
@@ -75,7 +75,7 @@ export function DailyRoutine() {
       if (updated.isComplete && !hasSaved) {
         const result = getResult(updated);
         const score = Math.max(10, Math.round(result.accuracy * 100));
-        saveGameAndAdjust(result.accuracy, score, result.timeMs);
+        saveGameAndAdjust(result.accuracy, score, result.timeMs).then(() => refreshStats());
         setHasSaved(true);
 
         const labels = updated.placedCards.map((c) => (c ? getActivityLabel(c.label) : ''));

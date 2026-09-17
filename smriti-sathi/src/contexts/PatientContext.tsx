@@ -18,6 +18,7 @@ interface PatientContextType {
   updatePatient: (id: number, data: Partial<Patient>) => Promise<void>;
   deletePatient: (id: number) => Promise<void>;
   refreshStats: () => Promise<void>;
+  clearAllData: () => Promise<void>;
 }
 
 const PatientContext = createContext<PatientContextType | null>(null);
@@ -179,6 +180,16 @@ export function PatientProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const clearAllData = async () => {
+    try {
+      await db.gameSessions.clear();
+      await db.reminderLogs.clear();
+      setStats({ streak: 0, cpi: 0, totalPlayed: 0 });
+    } catch (err) {
+      console.error('Error clearing data:', err);
+    }
+  };
+
   return (
     <PatientContext.Provider
       value={{
@@ -192,6 +203,7 @@ export function PatientProvider({ children }: { children: ReactNode }) {
         updatePatient,
         deletePatient,
         refreshStats,
+        clearAllData,
       }}
     >
       {children}

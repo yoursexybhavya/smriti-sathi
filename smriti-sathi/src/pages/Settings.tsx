@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Globe, Eye, ShieldCheck, Check, Edit3, Users, Download, RefreshCw, Sparkles } from 'lucide-react';
+import { User, Globe, Eye, ShieldCheck, Check, Edit3, Users, Download, RefreshCw, Sparkles, Trash2 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
@@ -9,7 +9,7 @@ import { checkAppUpdates, CURRENT_APP_VERSION, type UpdateInfo } from '../compon
 
 export function Settings() {
   const { language, setLanguage, t } = useLanguage();
-  const { patient, updatePatient } = usePatient();
+  const { patient, updatePatient, clearAllData } = usePatient();
   const { speak } = useVoice();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -415,6 +415,51 @@ export function Settings() {
               </button>
             </div>
           )}
+        </div>
+
+        {/* Zero-Baseline / Reset All Activity & Scores Card */}
+        <div
+          className="lumos-card"
+          style={{
+            padding: '20px',
+            border: '1px solid #7F1D1D',
+            backgroundColor: '#161118',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <Trash2 size={20} color="#EF4444" />
+            <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#FCA5A5', textTransform: 'uppercase' }}>
+              {t.resetAllData}
+            </span>
+          </div>
+          <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '14px' }}>
+            {t.resetAllDataDesc}
+          </p>
+
+          <button
+            onClick={async () => {
+              if (window.confirm(t.resetDataConfirm)) {
+                await clearAllData();
+                alert(t.resetDataSuccess);
+              }
+            }}
+            style={{
+              padding: '10px 18px',
+              borderRadius: 'var(--radius-pill)',
+              border: '1px solid #EF4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.15)',
+              color: '#FCA5A5',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <Trash2 size={15} />
+            <span>{t.resetAllData}</span>
+          </button>
         </div>
       </div>
 

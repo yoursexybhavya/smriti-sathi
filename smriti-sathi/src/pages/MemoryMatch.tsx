@@ -16,7 +16,7 @@ import {
 
 export function MemoryMatch() {
   const { t } = useLanguage();
-  const { patient } = usePatient();
+  const { patient, refreshStats } = usePatient();
   const navigate = useNavigate();
   const { speak, playSuccessChime, playCardFlip } = useVoice();
 
@@ -71,7 +71,7 @@ export function MemoryMatch() {
           if (evaluated.isComplete && !hasSaved) {
             const result = getResult(evaluated);
             const score = Math.max(10, Math.round(result.accuracy * 100));
-            saveGameAndAdjust(result.accuracy, score, result.timeMs);
+            saveGameAndAdjust(result.accuracy, score, result.timeMs).then(() => refreshStats());
             setHasSaved(true);
             speak(`${t.wellDone}! Workout complete.`);
           }

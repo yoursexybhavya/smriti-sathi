@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Volume2, RotateCcw, Home, Award, BookOpen, Check } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
+import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
 import { db } from '../db/database';
 
@@ -42,6 +44,8 @@ const LANGUAGE_DATA: LanguageCard[] = [
 
 export function LanguageWorkout() {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
+  const { patient, refreshStats } = usePatient();
   const { speak, playSuccessChime, playCardFlip } = useVoice();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -54,9 +58,9 @@ export function LanguageWorkout() {
 
   useEffect(() => {
     if (card && !isComplete) {
-      speak(`Language recall. The word is ${card.word} in ${card.langName}. What does it mean?`);
+      speak(`${card.word}. ${card.meaning}`, language);
     }
-  }, [currentIndex, isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentIndex, isComplete, language]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOptionSelect = (opt: string) => {
     if (selectedOption !== null || isComplete) return;
@@ -69,7 +73,7 @@ export function LanguageWorkout() {
       playSuccessChime();
       setIsCorrect(true);
       setScore((prev) => prev + 1);
-      speak(`Correct! ${card.word} means ${card.meaning}.`);
+      speak(t.greatJob, language);
 
       setTimeout(() => {
         if (currentIndex < LANGUAGE_DATA.length - 1) {
@@ -78,8 +82,9 @@ export function LanguageWorkout() {
           setIsCorrect(null);
         } else {
           setIsComplete(true);
+          const pId = patient?.id || 1;
           db.gameSessions.add({
-            patientId: 1,
+            patientId: pId,
             gameType: 'memoryMatch',
             difficulty: 2,
             score: 100,
@@ -87,13 +92,13 @@ export function LanguageWorkout() {
             responseTimeMs: 3800,
             playedAt: new Date(),
             synced: 0,
-          });
-          speak('Language workout complete! You have rich cultural memory.');
+          }).then(() => refreshStats());
+          speak(t.gameComplete, language);
         }
       }, 1600);
     } else {
       setIsCorrect(false);
-      speak('Take your time, let the memory come naturally.');
+      speak(t.tryAgain, language);
       setTimeout(() => {
         setSelectedOption(null);
         setIsCorrect(null);
@@ -122,7 +127,7 @@ export function LanguageWorkout() {
           }}
         >
           <ArrowLeft size={18} />
-          <span>Exit</span>
+          <span>{t.backToHome}</span>
         </button>
 
         <div
@@ -137,11 +142,11 @@ export function LanguageWorkout() {
             letterSpacing: '0.5px',
           }}
         >
-          WORD {currentIndex + 1} OF {LANGUAGE_DATA.length}
+          {currentIndex + 1} / {LANGUAGE_DATA.length}
         </div>
 
         <button
-          onClick={() => speak(`The word is ${card.word} in ${card.langName}. Pronounced ${card.pronunciation}.`)}
+          onClick={() => speak(`${card.word}. ${card.meaning}`, language)}
           style={{
             background: '#15253B',
             border: '1px solid #223752',
@@ -154,7 +159,7 @@ export function LanguageWorkout() {
             color: '#FFFFFF',
             cursor: 'pointer',
           }}
-          title="Voice prompt"
+          title={t.voiceGuide}
         >
           <Volume2 size={20} />
         </button>
@@ -307,10 +312,10 @@ export function LanguageWorkout() {
             </div>
 
             <h2 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
-              Language Workout Complete!
+              {t.gameComplete}
             </h2>
             <p style={{ fontSize: 'var(--font-size-sm)', color: '#94A9C4', marginBottom: '20px' }}>
-              Regional vocabulary & proverbs recall
+              {t.languageDesc}
             </p>
 
             <div
@@ -323,12 +328,12 @@ export function LanguageWorkout() {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '14px', color: '#94A9C4' }}>Score</span>
+                <span style={{ fontSize: '14px', color: '#94A9C4' }}>{t.score}</span>
                 <span style={{ fontSize: '14px', fontWeight: 800, color: '#FFFFFF' }}>{score} / {LANGUAGE_DATA.length}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '14px', color: '#94A9C4' }}>Dialects Exercised</span>
-                <span style={{ fontSize: '14px', fontWeight: 800, color: '#38BDF8' }}>Assamese, Bodo, Manipuri</span>
+                <span style={{ fontSize: '14px', color: '#94A9C4' }}>SPI</span>
+                <span style={{ fontSize: '14px', fontWeight: 800, color: '#38BDF8' }}>✓ Saved</span>
               </div>
             </div>
 
@@ -344,14 +349,14 @@ export function LanguageWorkout() {
                 }}
               >
                 <RotateCcw size={18} />
-                <span>Play Again</span>
+                <span>{t.playAgain}</span>
               </button>
               <button
                 className="btn-secondary-lumos"
                 onClick={() => navigate('/games')}
               >
                 <Home size={18} />
-                <span>Back to Games</span>
+                <span>{t.backToHome}</span>
               </button>
             </div>
           </div>

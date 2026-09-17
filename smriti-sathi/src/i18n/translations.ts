@@ -162,6 +162,61 @@ export interface Translations {
   updateAvailableBanner: string;
   downloadUpdate: string;
   version: string;
+
+  // Domain Scores & Zero-Baseline
+  domainMemory: string;
+  domainMemoryDesc: string;
+  domainRoutine: string;
+  domainRoutineDesc: string;
+  domainAttention: string;
+  domainAttentionDesc: string;
+  domainSpeed: string;
+  domainSpeedDesc: string;
+  domainCalculation: string;
+  domainCalculationDesc: string;
+  domainLanguage: string;
+  domainLanguageDesc: string;
+  notTestedYet: string;
+  playToTestDomain: string;
+  dailyGoalProgress: (current: number, total: number) => string;
+  resetAllData: string;
+  resetAllDataDesc: string;
+  resetDataConfirm: string;
+  resetDataSuccess: string;
+
+  // Dashboard & Caregiver Tabs
+  lpiIndexTab: string;
+  progressTab: string;
+  caregiverTab: string;
+  familySyncTab: string;
+  privacyTab: string;
+  overallSpiScore: string;
+  spiScoreDesc: string;
+  ashaObservationsTitle: string;
+  ashaObs1: string;
+  ashaObs2: string;
+  ashaObs3: string;
+  historicalAccuracyTrend: string;
+  last10Sessions: string;
+  noPlayDataYet: string;
+  cognitiveStabilityCurve: string;
+  stable: string;
+  stabilityDesc: string;
+
+  // GamesHub & Workouts
+  evidenceBasedWorkouts: string;
+  dailyRecommendation: string;
+  coreCognitiveDomains: string;
+  northEastHeritage: string;
+  northEastHeritageDesc: string;
+
+  // In-App Update Modal
+  updateModalTitle: string;
+  updateModalDesc: string;
+  installUpdateNow: string;
+  updateDismiss: string;
+  updateCheckPrompt: string;
+  noUpdateFound: string;
 }
 
 const en: Translations = {
@@ -311,6 +366,57 @@ const en: Translations = {
   updateAvailableBanner: '🚀 New Update Available!',
   downloadUpdate: 'Download & Install APK',
   version: 'Version',
+
+  domainMemory: 'Memory',
+  domainMemoryDesc: 'Visual pairs & card recall',
+  domainRoutine: 'Routine Orientation',
+  domainRoutineDesc: 'Chronological daily timeline',
+  domainAttention: 'Attention & Focus',
+  domainAttentionDesc: 'Continuous concentration',
+  domainSpeed: 'Speed & Reflexes',
+  domainSpeedDesc: 'Gentle response latency',
+  domainCalculation: 'Math & Calculation',
+  domainCalculationDesc: 'Everyday grocery currency estimation',
+  domainLanguage: 'Language & Recall',
+  domainLanguageDesc: 'Cultural proverbs and heritage vocabulary',
+  notTestedYet: 'Not Tested Yet',
+  playToTestDomain: 'Play a game to measure this domain',
+  dailyGoalProgress: (current, total) => `Today's Goal: ${current} / ${total} Workouts`,
+  resetAllData: 'Reset All Data to 0',
+  resetAllDataDesc: 'Wipe all test scores and history to start fresh with a true 0-baseline.',
+  resetDataConfirm: 'Are you sure? This will delete all gameplay logs and reset points to 0.',
+  resetDataSuccess: '✓ All data reset to 0 successfully!',
+
+  lpiIndexTab: 'SPI INDEX',
+  progressTab: 'PROGRESS',
+  caregiverTab: 'ASHA / CAREGIVER',
+  familySyncTab: 'PARENT-CHILD SYNC 📲',
+  privacyTab: 'DPDP PRIVACY',
+  overallSpiScore: 'Overall SPI Score',
+  spiScoreDesc: 'Calculated across working memory, routine sequencing, and daily recall exercises.',
+  ashaObservationsTitle: 'ASHA Health Worker Observations',
+  ashaObs1: 'Engagement Adherence: Daily CST mental exercise completed on schedule.',
+  ashaObs2: 'Adaptive Progression: Staircase engine successfully maintains confidence.',
+  ashaObs3: 'Family Note: Routine sequencing demonstrates high stability.',
+  historicalAccuracyTrend: 'Historical Accuracy Trend',
+  last10Sessions: 'Last 10 Sessions',
+  noPlayDataYet: 'No play data yet. Play your first workout to see cognitive trends!',
+  cognitiveStabilityCurve: 'COGNITIVE STABILITY CURVE',
+  stable: 'STABLE',
+  stabilityDesc: 'Tracking demonstrates consistent cognitive maintenance without abnormal regression.',
+
+  evidenceBasedWorkouts: 'Evidence-based cognitive workouts designed for gentle elderly care',
+  dailyRecommendation: 'DAILY RECOMMENDATION',
+  coreCognitiveDomains: 'CORE COGNITIVE DOMAINS',
+  northEastHeritage: 'NORTH EAST HERITAGE & REMINISCENCE',
+  northEastHeritageDesc: 'Cultural anchors and music traditions of Assam, Bodo Territorial Region, and Manipur',
+
+  updateModalTitle: '🚀 New Update Available!',
+  updateModalDesc: 'A newer, improved version of Smriti Sathi is ready to install with better language support and dementia care enhancements.',
+  installUpdateNow: 'Install Update Now',
+  updateDismiss: 'Later',
+  updateCheckPrompt: 'Checking GitHub for updates...',
+  noUpdateFound: 'You are on the latest version of Smriti Sathi!',
 };
 
 const as: Translations = {
@@ -460,6 +566,57 @@ const as: Translations = {
   updateAvailableBanner: '🚀 নতুন সংস্কৰণ উপলব্ধ!',
   downloadUpdate: 'ডাউনলোড আৰু আপডেট APK',
   version: 'সংস্কৰণ',
+
+  domainMemory: 'স্মৃতি শক্তি',
+  domainMemoryDesc: 'কাৰ্ড মিলন আৰু দৃশ্যপট সোঁৱৰণ',
+  domainRoutine: 'দৈনিক ক্ৰম',
+  domainRoutineDesc: 'দিনটোৰ সময় আৰু কামৰ ক্ৰম',
+  domainAttention: 'মনোযোগ আৰু একাগ্ৰতা',
+  domainAttentionDesc: 'স্থিৰ মনোযোগ আৰু লক্ষ্য',
+  domainSpeed: 'দ্ৰুততা আৰু প্ৰতিক্ৰিয়া',
+  domainSpeedDesc: 'মৃদু আৰু শান্ত প্ৰতিক্ৰিয়াৰ সময়',
+  domainCalculation: 'গণনা আৰু হিচাপ',
+  domainCalculationDesc: 'দৈনন্দিন বজাৰ আৰু মুদ্ৰাৰ হিচাপ',
+  domainLanguage: 'মাতৃভাষা আৰু শব্দ ভঁৰাল',
+  domainLanguageDesc: 'অসমীয়া ফকৰা-যোজনা আৰু সংস্কৃতি',
+  notTestedYet: 'এতিয়ালৈকে পৰীক্ষা হোৱা নাই',
+  playToTestDomain: 'এই অংশ জুখিবলৈ খেল আৰম্ভ কৰক',
+  dailyGoalProgress: (current, total) => `আজিৰ লক্ষ্য: ${current} / ${total} অনুশীলন`,
+  resetAllData: 'সকলো তথ্য ০ লৈ ৰিছেট কৰক',
+  resetAllDataDesc: 'পুৰণি পৰীক্ষামূলক তথ্য মচি নতুনকৈ ০ পৰা আৰম্ভ কৰক।',
+  resetDataConfirm: 'আপুনি নিশ্চিতনে? সকলো পুৰণি তথ্য মচি পেলোৱা হ\'ব।',
+  resetDataSuccess: '✓ সকলো তথ্য সফলতাৰে ০ লৈ ৰিছেট কৰা হ\'ল!',
+
+  lpiIndexTab: 'SPI সূচক',
+  progressTab: 'প্ৰগতি',
+  caregiverTab: 'আশা / যত্নকাৰী',
+  familySyncTab: 'পৰিয়ালৰ সংযোগ 📲',
+  privacyTab: 'তথ্য সুৰক্ষা',
+  overallSpiScore: 'সামগ্ৰিক SPI সূচক',
+  spiScoreDesc: 'স্মৃতি, দৈনিক ক্ৰম আৰু ভাষাৰ অনুশীলনৰ ওপৰত ভিত্তি কৰি গণিত।',
+  ashaObservationsTitle: 'আশা স্বাস্থ্যকৰ্মীৰ পৰ্যবেক্ষণ',
+  ashaObs1: 'নিয়মীয়াতা: দৈনিক CST মগজুৰ অনুশীলন সঠিকভাৱে কৰা হৈছে।',
+  ashaObs2: 'সহজ অগ্ৰগতি: স্তৰ ব্যৱস্থাই আত্মবিশ্বাস বৰ্তাই ৰাখিছে।',
+  ashaObs3: 'পৰিয়ালৰ টোকা: দৈনন্দিন কামৰ ক্ৰম স্বাভাৱিক।',
+  historicalAccuracyTrend: 'পূৰ্বৰ শুদ্ধতাৰ ধাৰা',
+  last10Sessions: 'শেষ ১০টা অনুশীলন',
+  noPlayDataYet: 'এতিয়ালৈকে কোনো তথ্য নাই। আপোনাৰ প্ৰথম অনুশীলন আৰম্ভ কৰক!',
+  cognitiveStabilityCurve: 'মানসিক স্থিৰতাৰ ৰেখা',
+  stable: 'সুস্থিৰ',
+  stabilityDesc: 'নিয়মীয়া অনুশীলনে স্মৃতি শক্তি স্বাভাৱিক আৰু সুস্থিৰ কৰি ৰাখিছে।',
+
+  evidenceBasedWorkouts: 'জ্যেষ্ঠসকলৰ বাবে প্ৰস্তুত কৰা শান্ত আৰু বৈজ্ঞানিক স্মৃতি যত্ন',
+  dailyRecommendation: 'দৈনিক পৰামৰ্শ',
+  coreCognitiveDomains: 'প্ৰধান মানসিক দিশসমূহ',
+  northEastHeritage: 'উত্তৰ-পূৰ্বাঞ্চলৰ ঐতিহ্য আৰু সোঁৱৰণী',
+  northEastHeritageDesc: 'অসম, বড়োলেণ্ড আৰু মণিপুৰৰ লোক-সংস্কৃতি আৰু পুৰণি স্মৃতি',
+
+  updateModalTitle: '🚀 নতুন সংস্কৰণ উপলব্ধ!',
+  updateModalDesc: 'স্মৃতি সাথীৰ নতুন সংস্কৰণ সাজু হৈছে — উন্নত ভাষা সমৰ্থন আৰু সহজ ব্যৱহাৰৰ সৈতে।',
+  installUpdateNow: 'এতিয়াই আপডেট ইনষ্টল কৰক',
+  updateDismiss: 'পিছত',
+  updateCheckPrompt: 'নতুন আপডেট পৰীক্ষা কৰি থকা হৈছে...',
+  noUpdateFound: 'আপুনি স্মৃতি সাথীৰ সৰ্বশেষ সংস্কৰণ ব্যৱহাৰ কৰি আছে!',
 };
 
 // Bodo translations (Devanagari script)
@@ -610,6 +767,57 @@ const brx: Translations = {
   updateAvailableBanner: '🚀 गोदान आपदेत मोनबाय!',
   downloadUpdate: 'दाउनलद खालाम APK',
   version: 'महर',
+
+  domainMemory: 'मोनथाइ गोहो',
+  domainMemoryDesc: 'कार्ड नायनाय आरो गोसोखां',
+  domainRoutine: 'सानफ्रोमनि खामानि',
+  domainRoutineDesc: 'साननि सारि आरो समाय',
+  domainAttention: 'गोसो होनाय',
+  domainAttentionDesc: 'थाद\'नाय गोसो होनाय',
+  domainSpeed: 'गोख्रैथि',
+  domainSpeedDesc: 'लिरनाय आरो फिननाय',
+  domainCalculation: 'साननाय आरो हिसाब',
+  domainCalculationDesc: 'हाट बाजारनि साननाय',
+  domainLanguage: 'राव आरो सोदोब',
+  domainLanguageDesc: 'बर\' बाथ्रा आरो हारिमु',
+  notTestedYet: 'आनजाद जायाखै',
+  playToTestDomain: 'बेखौ नायनो गेलेनो जागाय',
+  dailyGoalProgress: (current, total) => `दिनैनि थांखि: ${current} / ${total} गेलेनाय`,
+  resetAllData: 'गासै डाटा ० खालाम',
+  resetAllDataDesc: 'गोजाम स्कोर मसिनानै गोदानै ० आव जागाय।',
+  resetDataConfirm: 'नों रोखा नामा? गासै डाटा मसिगोन।',
+  resetDataSuccess: '✓ गासै डाटा ० जाबाय!',
+
+  lpiIndexTab: 'SPI इन्देक्स',
+  progressTab: 'दावगानाय',
+  caregiverTab: 'आशा / सायखांनायगिरि',
+  familySyncTab: 'नखर खौरां 📲',
+  privacyTab: 'डाटा रैखाथि',
+  overallSpiScore: 'गासैबो SPI मार्क',
+  spiScoreDesc: 'मोनथाइ आरो सानफ्रोमनि खामानिनि सायाव।',
+  ashaObservationsTitle: 'आशा मावगिरिनि नोजोर',
+  ashaObs1: 'नेम: सानफ्रोमबो गेलेनाया मोजां जादों।',
+  ashaObs2: 'साधना: मोजां महरै दावगाबाय थादों।',
+  ashaObs3: 'नखर: गासैबो नेमाव दं।',
+  historicalAccuracyTrend: 'सिगांनि मोजां महर',
+  last10Sessions: 'जोबथा १० गेलेनाय',
+  noPlayDataYet: 'डाटा गैथ\'आ। गेलेनो जागाय!',
+  cognitiveStabilityCurve: 'गोसोनि थि महर',
+  stable: 'मोजां',
+  stabilityDesc: 'गोसोनि गोहो मोजां दं।',
+
+  evidenceBasedWorkouts: 'बायोवृद्ध सुबुंफोरनि थाखाय गोजोन गेलेनाय',
+  dailyRecommendation: 'दिनैनि गोनांथार',
+  coreCognitiveDomains: 'गाहाय गोसोनि खोलोब',
+  northEastHeritage: 'सानजा-सा हारिमु आरो गोसोखां',
+  northEastHeritageDesc: 'आसाम, बड\'लेन्द आरो मनिपुरनि हारिमु',
+
+  updateModalTitle: '🚀 गोदान आपदेत मोनबाय!',
+  updateModalDesc: 'स्मृति साथीनि गोदान महर फैबाय — साबसिन राव आरो गेलेनायजों।',
+  installUpdateNow: 'दासान्दि आपदेत खालाम',
+  updateDismiss: 'उनाव',
+  updateCheckPrompt: 'गोदान आपदेत नायबाय थानाय...',
+  noUpdateFound: 'नोंथाङा जोबथा महर बाहायगासिनो दं!',
 };
 
 // Manipuri translations (Bengali script)
@@ -760,6 +968,57 @@ const mni: Translations = {
   updateAvailableBanner: '🚀 অনৌবা অপদেত ফংলে!',
   downloadUpdate: 'দাউনলোদ অমসুং অপদেত APK',
   version: 'সংস্করন',
+
+  domainMemory: 'নিংশিং শক্তা',
+  domainMemoryDesc: 'কার্দ মান্নবা অমসুং নিংশিংবা',
+  domainRoutine: 'নুমিৎ খুদিংগী থবক',
+  domainRoutineDesc: 'নুমিৎপুংগী মতুং ইন্না থবক শিনবা',
+  domainAttention: 'পুক্নিং চাংবা',
+  domainAttentionDesc: 'অচেৎপা পুক্নিং চাংবা',
+  domainSpeed: 'য়াংবা অমসুং থুনা তৌবা',
+  domainSpeedDesc: 'তপ্না অমসুং চুম্না পাংথোকপা',
+  domainCalculation: 'মশীং থীবা',
+  domainCalculationDesc: 'কৈথেলগী লৈ-চাবগী মশীং',
+  domainLanguage: 'লোল অমসুং ৱাহৈ',
+  domainLanguageDesc: 'মৈতৈ পৌরোই অমসুং চৎনবী',
+  notTestedYet: 'হৌজিক য়েংদ্রি',
+  playToTestDomain: 'মসি য়েংনবা সানাথোই শান্নৌ',
+  dailyGoalProgress: (current, total) => `ঙসিগী পান্দম: ${current} / ${total} সানাথোই`,
+  resetAllData: 'ডেটা পুম্নমক ০ দা ওন্থোকপা',
+  resetAllDataDesc: 'অরিবা স্কোর পুম্নমক মুত্থৎলগা অনৌবা ০ দা হৌদোকউ।',
+  resetDataConfirm: 'নহাক্না অচুম্বরা? অরিবা ডেটা পুম্নমক মুত্থৎলগনি।',
+  resetDataSuccess: '✓ ডেটা পুম্নমক ০ দা ওন্থোক্লে!',
+
+  lpiIndexTab: 'SPI ইনদেক্স',
+  progressTab: 'চাউখৎপা',
+  caregiverTab: 'আশা / য়েংসিনবা',
+  familySyncTab: 'ইমুংগী শম্নবা 📲',
+  privacyTab: 'ডেটা ঙাকশেন',
+  overallSpiScore: 'অপুনবা SPI মার্ক',
+  spiScoreDesc: 'নিংশিংবা অমসুং নুমিৎ খুদিংগী থবক্তা য়ুম্ফম ওইবা।',
+  ashaObservationsTitle: 'আশা ৱার্করগী য়েংশিনবা',
+  ashaObs1: 'নিয়ম: নুমিৎ খুদিংগী সানাথোই শান্নরে।',
+  ashaObs2: 'চাউখৎপা: তপ্না-তপ্না ফগৎলক্লি।',
+  ashaObs3: 'ইমুং: থবক-থৌরম চুম্না চৎথরি।',
+  historicalAccuracyTrend: 'মমাংগী চাউখৎপগী মশক',
+  last10Sessions: 'অরোইবা সানাথোই ১০',
+  noPlayDataYet: 'ডেটা লৈত্ৰি। অহানবা সানাথোই শান্নৌ!',
+  cognitiveStabilityCurve: 'ৱাখলগী লেপহন্বা',
+  stable: 'ফরি',
+  stabilityDesc: 'ৱাখলগী শক্তা ফনা অমসুং লেপ্না লৈরি।',
+
+  evidenceBasedWorkouts: 'অহলশিংগীদমক তপ্না অমসুং নিংথিনা শেম্লবা সানাথোই',
+  dailyRecommendation: 'ঙসিগী তৌগদবা',
+  coreCognitiveDomains: 'মরুওইবা ৱাখলগী মখলশিং',
+  northEastHeritage: 'অৱাং-নোংপোক্কী চৎনবী অমসুং নিংশিংবা',
+  northEastHeritageDesc: 'অসাম, বোদোলেন্দ অমসুং মনিপুরগী চৎনবীশিং',
+
+  updateModalTitle: '🚀 অনৌবা অপদেত ফংলে!',
+  updateModalDesc: 'স্মৃতি সাথীগী অনৌবা অপদেত থোরক্লে — হেন্না ফবা লোল অমসুং শক্তিগা লোয়ননা।',
+  installUpdateNow: 'হৌজিক অপদেত তৌবিয়ু',
+  updateDismiss: 'তুংদা',
+  updateCheckPrompt: 'অনৌবা অপদেত য়েংলি...',
+  noUpdateFound: 'নহাক্না অরোইবা সংস্করন শিজিন্নরি!',
 };
 
 export const translations: Record<Language, Translations> = { en, as, brx, mni };

@@ -16,10 +16,12 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { usePatient } from '../contexts/PatientContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { db, type GameSession, type ReminderLog } from '../db/database';
 
 export function CaregiverDash() {
-  const { patient } = usePatient();
+  const { patient, clearAllData } = usePatient();
+  const { t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<'lpi' | 'training' | 'caregiver' | 'privacy' | 'sync'>('lpi');
   const [sessions, setSessions] = useState<GameSession[]>([]);
@@ -181,7 +183,27 @@ export function CaregiverDash() {
       ? Math.round((sessions.reduce((acc, s) => acc + s.accuracy, 0) / totalGames) * 100)
       : 0;
 
-  const calculatedLPI = totalGames > 0 ? Math.min(999, Math.round(400 + avgAccuracy * 4.5)) : 0;
+  const calculatedLPI = totalGames > 0 ? Math.min(999, Math.round(400 + avgAccuracy * 4.5)) : null;
+
+  const memSessions = sessions.filter((s) => s.gameType === 'memoryMatch');
+  const routineSessions = sessions.filter((s) => s.gameType === 'dailyRoutine');
+
+  const memScore = memSessions.length > 0
+    ? Math.min(999, Math.round(350 + (memSessions.reduce((acc, s) => acc + s.accuracy, 0) / memSessions.length) * 500))
+    : null;
+
+  const routineScore = routineSessions.length > 0
+    ? Math.min(999, Math.round(350 + (routineSessions.reduce((acc, s) => acc + s.accuracy, 0) / routineSessions.length) * 500))
+    : null;
+
+  const attentionScore = sessions.length > 0
+    ? Math.min(999, Math.round(350 + (sessions.reduce((acc, s) => acc + s.accuracy, 0) / sessions.length) * 450))
+    : null;
+
+  const speedScore = sessions.length > 0
+    ? Math.min(999, Math.round(400 + Math.max(0, 500 - (sessions.reduce((acc, s) => acc + s.responseTimeMs, 0) / sessions.length) / 10)))
+    : null;
+
   const chartSessions = [...sessions].reverse().slice(-10);
 
   return (
@@ -196,10 +218,10 @@ export function CaregiverDash() {
             letterSpacing: '-0.5px',
           }}
         >
-          My Brain
+          {t.myBrain}
         </h1>
         <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-          Cognitive telemetry & health metrics for {patient?.name || 'Elder Care'}
+          {patient?.name || 'Elder Care'}
         </p>
       </div>
 
@@ -214,11 +236,11 @@ export function CaregiverDash() {
         }}
       >
         {[
-          { id: 'lpi', label: 'LPI INDEX' },
-          { id: 'training', label: 'PROGRESS' },
-          { id: 'caregiver', label: 'ASHA / CAREGIVER' },
-          { id: 'sync', label: 'PARENT-CHILD SYNC 📲' },
-          { id: 'privacy', label: 'DPDP PRIVACY' },
+          { id: 'lpi', label: t.lpiIndexTab },
+          { id: 'training', label: t.progressTab },
+          { id: 'caregiver', label: t.caregiverTab },
+          { id: 'sync', label: t.familySyncTab },
+          { id: 'privacy', label: t.privacyTab },
         ].map((tab) => {
           const isActive = activeTab === tab.id;
           return (
@@ -287,14 +309,14 @@ export function CaregiverDash() {
             {/* Overall LPI Title & Score */}
             <div style={{ marginBottom: '18px' }}>
               <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                Overall SPI Score: <span style={{ color: '#FBBF24', fontSize: '24px', fontWeight: 800 }}>{calculatedLPI}</span>
+                {t.overallSpiScore}: <span style={{ color: '#FBBF24', fontSize: '24px', fontWeight: 800 }}>{calculatedLPI !== null ? calculatedLPI : '--'}</span>
               </div>
               <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '4px', lineHeight: 1.4 }}>
-                Calculated across working memory, routine sequencing, and daily recall exercises.
+                {t.spiScoreDesc}
               </p>
             </div>
 
-            {/* Domain Breakdown Rows (Speed, Memory, Attention, Flexibility, Routine) */}
+            {/* Domain Breakdown Rows */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Row 1: Memory */}
               <div
@@ -311,12 +333,14 @@ export function CaregiverDash() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ width: '6px', height: '24px', backgroundColor: '#38BDF8', borderRadius: '3px' }} />
                   <div>
-                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, color: '#FFFFFF' }}>Memory</div>
-                    <div style={{ fontSize: '11px', color: '#647B99' }}>Visual pairs & card recall</div>
+                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, color: '#FFFFFF' }}>{t.domainMemory}</div>
+                    <div style={{ fontSize: '11px', color: '#647B99' }}>{memScore !== null ? t.domainMemoryDesc : t.notTestedYet}</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#38BDF8' }}>820</span>
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: memScore !== null ? '#38BDF8' : '#647B99' }}>
+                    {memScore !== null ? memScore : '--'}
+                  </span>
                   <ChevronRight size={18} color="#647B99" />
                 </div>
               </div>
@@ -336,12 +360,14 @@ export function CaregiverDash() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ width: '6px', height: '24px', backgroundColor: '#34D399', borderRadius: '3px' }} />
                   <div>
-                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, color: '#FFFFFF' }}>Routine Orientation</div>
-                    <div style={{ fontSize: '11px', color: '#647B99' }}>Chronological daily timeline</div>
+                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, color: '#FFFFFF' }}>{t.domainRoutine}</div>
+                    <div style={{ fontSize: '11px', color: '#647B99' }}>{routineScore !== null ? t.domainRoutineDesc : t.notTestedYet}</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#34D399' }}>845</span>
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: routineScore !== null ? '#34D399' : '#647B99' }}>
+                    {routineScore !== null ? routineScore : '--'}
+                  </span>
                   <ChevronRight size={18} color="#647B99" />
                 </div>
               </div>
@@ -361,12 +387,14 @@ export function CaregiverDash() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ width: '6px', height: '24px', backgroundColor: '#FBBF24', borderRadius: '3px' }} />
                   <div>
-                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, color: '#FFFFFF' }}>Attention & Focus</div>
-                    <div style={{ fontSize: '11px', color: '#647B99' }}>Continuous concentration</div>
+                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, color: '#FFFFFF' }}>{t.domainAttention}</div>
+                    <div style={{ fontSize: '11px', color: '#647B99' }}>{attentionScore !== null ? t.domainAttentionDesc : t.notTestedYet}</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#FBBF24' }}>760</span>
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: attentionScore !== null ? '#FBBF24' : '#647B99' }}>
+                    {attentionScore !== null ? attentionScore : '--'}
+                  </span>
                   <ChevronRight size={18} color="#647B99" />
                 </div>
               </div>
@@ -386,19 +414,21 @@ export function CaregiverDash() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{ width: '6px', height: '24px', backgroundColor: '#EC4899', borderRadius: '3px' }} />
                   <div>
-                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, color: '#FFFFFF' }}>Speed & Reflexes</div>
-                    <div style={{ fontSize: '11px', color: '#647B99' }}>Gentle response latency</div>
+                    <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 700, color: '#FFFFFF' }}>{t.domainSpeed}</div>
+                    <div style={{ fontSize: '11px', color: '#647B99' }}>{speedScore !== null ? t.domainSpeedDesc : t.notTestedYet}</div>
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#EC4899' }}>715</span>
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: speedScore !== null ? '#EC4899' : '#647B99' }}>
+                    {speedScore !== null ? speedScore : '--'}
+                  </span>
                   <ChevronRight size={18} color="#647B99" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* How You Compare Card (Screenshot IMG_2037.png) */}
+          {/* How You Compare Card */}
           <div
             className="lumos-card"
             style={{
@@ -410,7 +440,7 @@ export function CaregiverDash() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <TrendingUp size={18} color="#34D399" />
                 <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.8px', color: '#94A9C4' }}>
-                  COGNITIVE STABILITY CURVE
+                  {t.cognitiveStabilityCurve}
                 </span>
               </div>
               <span
@@ -423,11 +453,11 @@ export function CaregiverDash() {
                   fontWeight: 800,
                 }}
               >
-                STABLE
+                {t.stable}
               </span>
             </div>
             <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.4 }}>
-              Tracking demonstrates consistent weekly cognitive maintenance without abnormal regression or cognitive fatigue.
+              {t.stabilityDesc}
             </p>
           </div>
         </div>
@@ -445,14 +475,14 @@ export function CaregiverDash() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                Historical Accuracy Trend
+                {t.historicalAccuracyTrend}
               </div>
-              <span style={{ fontSize: '12px', color: '#38BDF8', fontWeight: 700 }}>Last 10 Sessions</span>
+              <span style={{ fontSize: '12px', color: '#38BDF8', fontWeight: 700 }}>{t.last10Sessions}</span>
             </div>
 
             {chartSessions.length === 0 ? (
               <p style={{ textAlign: 'center', color: '#647B99', padding: '32px 0' }}>
-                No play data yet. Play a game or click below to seed demo telemetry!
+                {t.noPlayDataYet}
               </p>
             ) : (
               <div style={{ width: '100%', overflowX: 'auto' }}>
@@ -515,7 +545,7 @@ export function CaregiverDash() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
               <Award size={20} color="#34D399" />
               <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                ASHA Health Worker Observations
+                {t.ashaObservationsTitle}
               </div>
             </div>
 
@@ -530,7 +560,7 @@ export function CaregiverDash() {
                   lineHeight: 1.5,
                 }}
               >
-                🟢 <strong>Engagement Adherence:</strong> Daily CST mental exercise completed on schedule for 12 of the last 14 days.
+                🟢 <strong>{t.ashaObs1}</strong>
               </div>
               <div
                 style={{
@@ -542,7 +572,7 @@ export function CaregiverDash() {
                   lineHeight: 1.5,
                 }}
               >
-                💡 <strong>Adaptive Progression:</strong> Staircase algorithm successfully elevated Memory Match to Level 2 without error spikes.
+                💡 <strong>{t.ashaObs2}</strong>
               </div>
               <div
                 style={{
@@ -554,7 +584,7 @@ export function CaregiverDash() {
                   lineHeight: 1.5,
                 }}
               >
-                💊 <strong>Medication Consistency:</strong> Morning hypertension & memory vitamin logged with 92% adherence.
+                💊 <strong>{t.ashaObs3}</strong>
               </div>
             </div>
           </div>
@@ -846,15 +876,39 @@ export function CaregiverDash() {
         <div style={{ fontSize: 'var(--font-size-xs)', color: '#94A9C4', marginBottom: '10px' }}>
           <strong>SIH Hackathon Presentation Mode:</strong> Seed 14 days of realistic dementia care telemetry to show judges historical trends.
         </div>
-        <button
-          className="btn-secondary-lumos"
-          onClick={seedDemoData}
-          disabled={isSeeding}
-          style={{ width: '100%' }}
-        >
-          <RefreshCw size={18} className={isSeeding ? 'animate-spin' : ''} />
-          <span>{isSeeding ? 'Populating Telemetry...' : '⚡ Seed 14 Days of Demo Telemetry'}</span>
-        </button>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            className="btn-secondary-lumos"
+            onClick={seedDemoData}
+            disabled={isSeeding}
+            style={{ flex: 1, minWidth: '200px' }}
+          >
+            <RefreshCw size={18} className={isSeeding ? 'animate-spin' : ''} />
+            <span>{isSeeding ? 'Populating Telemetry...' : '⚡ Seed 14 Days Demo Telemetry'}</span>
+          </button>
+          <button
+            onClick={async () => {
+              if (window.confirm(t.resetDataConfirm)) {
+                await clearAllData();
+                await loadData();
+                alert(t.resetDataSuccess);
+              }
+            }}
+            style={{
+              padding: '12px 18px',
+              backgroundColor: 'rgba(239, 68, 68, 0.15)',
+              border: '1px solid #EF4444',
+              borderRadius: 'var(--radius-pill)',
+              color: '#FCA5A5',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            🗑️ {t.resetAllData}
+          </button>
+        </div>
 
         {seedSuccess && (
           <div style={{ marginTop: '8px', color: '#34D399', fontSize: '13px', fontWeight: 700 }}>

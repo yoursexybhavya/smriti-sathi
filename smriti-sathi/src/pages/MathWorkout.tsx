@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Volume2, RotateCcw, Home, Award, Calculator } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
+import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
 import { db } from '../db/database';
 
 interface MathQuestion {
   id: number;
-  prompt: string;
-  items: { emoji: string; name: string; cost: number }[];
+  prompt: Record<string, string>;
+  items: { emoji: string; name: Record<string, string>; cost: number }[];
   correctAnswer: number;
   options: number[];
 }
@@ -15,30 +17,45 @@ interface MathQuestion {
 const MATH_QUESTIONS: MathQuestion[] = [
   {
     id: 1,
-    prompt: 'Buying morning tea and biscuits at the local stall:',
+    prompt: {
+      en: 'Buying morning tea and biscuits at the local stall:',
+      as: 'ৰাতিপুৱাৰ চাহ আৰু বিস্কুট কিনাৰ হিচাপ:',
+      brx: 'फुंनि साहा आरो बिस्कुट बायनायनि साननाय:',
+      mni: 'অয়ুক্কী চা অমসুং বিস্কুত লৈবগী মমল:',
+    },
     items: [
-      { emoji: '☕', name: 'Assam Chai', cost: 15 },
-      { emoji: '🍪', name: 'Biscuits', cost: 10 },
+      { emoji: '☕', name: { en: 'Assam Chai', as: 'অসমীয়া চাহ', brx: 'साहा', mni: 'চা' }, cost: 15 },
+      { emoji: '🍪', name: { en: 'Biscuits', as: 'বিস্কুট', brx: 'बिस्कुट', mni: 'বিস্কুত' }, cost: 10 },
     ],
     correctAnswer: 25,
     options: [20, 25, 30],
   },
   {
     id: 2,
-    prompt: 'Purchasing fresh seasonal fruits from the market:',
+    prompt: {
+      en: 'Purchasing fresh seasonal fruits from the market:',
+      as: 'বজাৰৰ পৰা সতেজ ফল-মূল কিনাৰ হিচাপ:',
+      brx: 'हाथाइनिफ्राय फिथाइ बायनायনি সाननाय:',
+      mni: 'কৈথেলদগী হৌরবা ঊহৈ লৈবগী মমল:',
+    },
     items: [
-      { emoji: '🍌', name: 'Bananas', cost: 30 },
-      { emoji: '🍎', name: 'Apples', cost: 40 },
+      { emoji: '🍌', name: { en: 'Bananas', as: 'কল', brx: 'थालिर', mni: 'হায়দোং' }, cost: 30 },
+      { emoji: '🍎', name: { en: 'Apples', as: 'আপেল', brx: 'आपेल', mni: 'সেব' }, cost: 40 },
     ],
     correctAnswer: 70,
     options: [60, 70, 80],
   },
   {
     id: 3,
-    prompt: 'Grocery essentials for evening dinner:',
+    prompt: {
+      en: 'Grocery essentials for evening dinner:',
+      as: 'ৰাতিৰ আহাৰৰ বাবে গেলামাল সামগ্ৰী:',
+      brx: 'मोनाबिलिनि ओंखामनि थाखाय मैगं-थासै:',
+      mni: 'নুমিদাংগী চাক্কী পোৎ-চৈ:',
+    },
     items: [
-      { emoji: '🍚', name: 'Rice packet', cost: 50 },
-      { emoji: '🥬', name: 'Fresh Greens', cost: 20 },
+      { emoji: '🍚', name: { en: 'Rice packet', as: 'চাউলৰ টোপোলা', brx: 'माय', mni: 'চেংগী পোৎ' }, cost: 50 },
+      { emoji: '🥬', name: { en: 'Fresh Greens', as: 'সতেজ শাক', brx: 'मैगं', mni: 'নাপী-শিঙাউ' }, cost: 20 },
     ],
     correctAnswer: 70,
     options: [65, 70, 75],
@@ -47,6 +64,8 @@ const MATH_QUESTIONS: MathQuestion[] = [
 
 export function MathWorkout() {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
+  const { patient, refreshStats } = usePatient();
   const { speak, playSuccessChime, playCardFlip } = useVoice();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -56,13 +75,18 @@ export function MathWorkout() {
   const [isComplete, setIsComplete] = useState(false);
 
   const question = MATH_QUESTIONS[currentIndex];
+  const langKey = language in question.prompt ? language : 'en';
+
+  const currentPrompt = question.prompt[langKey] || question.prompt.en;
 
   useEffect(() => {
     if (question && !isComplete) {
-      const totalText = question.items.map((it) => `${it.name} ${it.cost} rupees`).join(' and ');
-      speak(`${question.prompt}. ${totalText}. What is the total?`);
+      const totalText = question.items
+        .map((it) => `${it.name[langKey] || it.name.en} ${it.cost}`)
+        .join(', ');
+      speak(`${currentPrompt}. ${totalText}.`, language);
     }
-  }, [currentIndex, isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentIndex, isComplete, language]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOptionSelect = (opt: number) => {
     if (selectedOption !== null || isComplete) return;
@@ -74,7 +98,7 @@ export function MathWorkout() {
       playSuccessChime();
       setIsCorrect(true);
       setScore((prev) => prev + 1);
-      speak('Correct! Wonderful calculation.');
+      speak(t.greatJob, language);
 
       setTimeout(() => {
         if (currentIndex < MATH_QUESTIONS.length - 1) {
@@ -83,8 +107,9 @@ export function MathWorkout() {
           setIsCorrect(null);
         } else {
           setIsComplete(true);
+          const pId = patient?.id || 1;
           db.gameSessions.add({
-            patientId: 1,
+            patientId: pId,
             gameType: 'dailyRoutine',
             difficulty: 1,
             score: 100,
@@ -92,13 +117,13 @@ export function MathWorkout() {
             responseTimeMs: 3500,
             playedAt: new Date(),
             synced: 0,
-          });
-          speak('Workout complete! You did great on everyday market calculations.');
+          }).then(() => refreshStats());
+          speak(t.gameComplete, language);
         }
       }, 1500);
     } else {
       setIsCorrect(false);
-      speak('Almost there! Take your time.');
+      speak(t.tryAgain, language);
       setTimeout(() => {
         setSelectedOption(null);
         setIsCorrect(null);
@@ -127,7 +152,7 @@ export function MathWorkout() {
           }}
         >
           <ArrowLeft size={18} />
-          <span>Exit</span>
+          <span>{t.backToHome}</span>
         </button>
 
         <div
@@ -142,13 +167,15 @@ export function MathWorkout() {
             letterSpacing: '0.5px',
           }}
         >
-          QUESTION {currentIndex + 1} OF {MATH_QUESTIONS.length}
+          {currentIndex + 1} / {MATH_QUESTIONS.length}
         </div>
 
         <button
           onClick={() => {
-            const totalText = question.items.map((it) => `${it.name} ${it.cost} rupees`).join(' and ');
-            speak(`${question.prompt}. ${totalText}. What is the total?`);
+            const totalText = question.items
+              .map((it) => `${it.name[langKey] || it.name.en} ${it.cost}`)
+              .join(', ');
+            speak(`${currentPrompt}. ${totalText}.`, language);
           }}
           style={{
             background: '#15253B',
@@ -162,7 +189,7 @@ export function MathWorkout() {
             color: '#FFFFFF',
             cursor: 'pointer',
           }}
-          title="Voice prompt"
+          title={t.voiceGuide}
         >
           <Volume2 size={20} />
         </button>
@@ -195,10 +222,10 @@ export function MathWorkout() {
         </div>
 
         <h2 style={{ fontSize: 'var(--font-size-base)', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
-          Market & Currency Estimation
+          {t.mathEstimation}
         </h2>
         <p style={{ fontSize: 'var(--font-size-xs)', color: '#94A9C4', marginBottom: '18px' }}>
-          {question.prompt}
+          {currentPrompt}
         </p>
 
         {/* Item bill receipt */}
@@ -227,7 +254,9 @@ export function MathWorkout() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '24px' }}>{item.emoji}</span>
-                <span style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF' }}>{item.name}</span>
+                <span style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF' }}>
+                  {item.name[langKey] || item.name.en}
+                </span>
               </div>
               <span style={{ fontSize: '16px', fontWeight: 800, color: '#F472B6' }}>₹{item.cost}</span>
             </div>
@@ -235,7 +264,7 @@ export function MathWorkout() {
         </div>
 
         <div style={{ fontSize: '14px', fontWeight: 800, color: '#647B99', marginBottom: '10px', letterSpacing: '0.8px', textTransform: 'uppercase' }}>
-          SELECT TOTAL AMOUNT:
+          {t.score}:
         </div>
 
         {/* Option Buttons */}
@@ -322,10 +351,10 @@ export function MathWorkout() {
             </div>
 
             <h2 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
-              Math Workout Complete!
+              {t.gameComplete}
             </h2>
             <p style={{ fontSize: 'var(--font-size-sm)', color: '#94A9C4', marginBottom: '20px' }}>
-              Everyday market currency and mental calculation
+              {t.mathDesc}
             </p>
 
             <div
@@ -338,12 +367,12 @@ export function MathWorkout() {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '14px', color: '#94A9C4' }}>Score</span>
+                <span style={{ fontSize: '14px', color: '#94A9C4' }}>{t.score}</span>
                 <span style={{ fontSize: '14px', fontWeight: 800, color: '#FFFFFF' }}>{score} / {MATH_QUESTIONS.length}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '14px', color: '#94A9C4' }}>Telemetry Status</span>
-                <span style={{ fontSize: '14px', fontWeight: 800, color: '#34D399' }}>✓ Saved to Local SPI</span>
+                <span style={{ fontSize: '14px', color: '#94A9C4' }}>SPI</span>
+                <span style={{ fontSize: '14px', fontWeight: 800, color: '#34D399' }}>✓ Saved</span>
               </div>
             </div>
 
@@ -359,14 +388,14 @@ export function MathWorkout() {
                 }}
               >
                 <RotateCcw size={18} />
-                <span>Play Again</span>
+                <span>{t.playAgain}</span>
               </button>
               <button
                 className="btn-secondary-lumos"
                 onClick={() => navigate('/games')}
               >
                 <Home size={18} />
-                <span>Back to Games</span>
+                <span>{t.backToHome}</span>
               </button>
             </div>
           </div>

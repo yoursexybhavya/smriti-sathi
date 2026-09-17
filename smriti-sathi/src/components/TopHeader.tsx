@@ -111,7 +111,7 @@ export function TopHeader() {
               color={stats.cpi > 0 ? '#FBBF24' : '#647B99'}
               fill={stats.cpi > 0 ? '#FBBF24' : 'none'}
             />
-            <span>{stats.cpi > 0 ? stats.cpi : '0'}</span>
+            <span>{stats.cpi > 0 ? stats.cpi : '--'}</span>
           </div>
         </div>
 

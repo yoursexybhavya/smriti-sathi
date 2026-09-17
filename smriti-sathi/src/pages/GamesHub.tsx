@@ -29,7 +29,7 @@ export function GamesHub() {
           {t.games}
         </h1>
         <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-          Evidence-based cognitive workouts designed for gentle elderly care
+          {t.evidenceBasedWorkouts}
         </p>
       </div>
 
@@ -57,13 +57,13 @@ export function GamesHub() {
               letterSpacing: '0.5px',
             }}
           >
-            DAILY RECOMMENDATION
+            {t.dailyRecommendation}
           </span>
           <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 800, color: '#FFFFFF', marginTop: '6px' }}>
-            Speed Match &bull; Working Memory
+            {t.speedMatchTitle} &bull; {t.domainMemory}
           </div>
           <p style={{ fontSize: 'var(--font-size-xs)', color: '#94A9C4', marginTop: '2px' }}>
-            Level {memLevel} &bull; Adaptive Staircase Engine
+            {t.level} {memLevel} &bull; Adaptive Staircase Engine
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export function GamesHub() {
             textTransform: 'uppercase',
           }}
         >
-          CORE COGNITIVE DOMAINS
+          {t.coreCognitiveDomains}
         </h3>
 
         <div className="responsive-card-grid">
@@ -132,14 +132,14 @@ export function GamesHub() {
               </div>
               <div>
                 <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                  Speed Match
+                  {t.speedMatchTitle}
                 </div>
                 <div style={{ fontSize: '12px', color: '#94A9C4', marginTop: '2px' }}>
-                  Visual recall and card pairing
+                  {t.speedMatchSubtitle}
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                  <span className="pill-badge pill-memory">MEMORY</span>
-                  <span style={{ fontSize: '11px', color: '#38BDF8', fontWeight: 700 }}>LEVEL {memLevel}</span>
+                  <span className="pill-badge pill-memory">{t.domainMemory.toUpperCase()}</span>
+                  <span style={{ fontSize: '11px', color: '#38BDF8', fontWeight: 700 }}>{t.level.toUpperCase()} {memLevel}</span>
                 </div>
               </div>
             </div>
@@ -177,14 +177,14 @@ export function GamesHub() {
               </div>
               <div>
                 <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                  Masterpiece (Daily Routine)
+                  {t.masterpieceTitle}
                 </div>
                 <div style={{ fontSize: '12px', color: '#94A9C4', marginTop: '2px' }}>
-                  Chronological timeline ordering
+                  {t.masterpieceSubtitle}
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                  <span className="pill-badge pill-routine">ROUTINE</span>
-                  <span style={{ fontSize: '11px', color: '#60A5FA', fontWeight: 700 }}>LEVEL {routineLevel}</span>
+                  <span className="pill-badge pill-routine">{t.domainRoutine.toUpperCase()}</span>
+                  <span style={{ fontSize: '11px', color: '#60A5FA', fontWeight: 700 }}>{t.level.toUpperCase()} {routineLevel}</span>
                 </div>
               </div>
             </div>
@@ -222,14 +222,14 @@ export function GamesHub() {
               </div>
               <div>
                 <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                  Math &amp; Grocery Currency
+                  {t.mathEstimation}
                 </div>
                 <div style={{ fontSize: '12px', color: '#94A9C4', marginTop: '2px' }}>
-                  Daily shopping, currency arithmetic, and estimation
+                  {t.mathDesc}
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                  <span className="pill-badge pill-attention">CALCULATION</span>
-                  <span style={{ fontSize: '11px', color: '#F472B6', fontWeight: 700 }}>LEVEL 1</span>
+                  <span className="pill-badge pill-attention">{t.domainCalculation.toUpperCase()}</span>
+                  <span style={{ fontSize: '11px', color: '#F472B6', fontWeight: 700 }}>{t.level.toUpperCase()} 1</span>
                 </div>
               </div>
             </div>
@@ -267,10 +267,10 @@ export function GamesHub() {
               </div>
               <div>
                 <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                  Language &amp; Cultural Proverbs
+                  {t.languageBhashini}
                 </div>
                 <div style={{ fontSize: '12px', color: '#94A9C4', marginTop: '2px' }}>
-                  Assamese, Bodo, and Manipuri vocabulary &amp; voice
+                  {t.languageDesc}
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
                   <span className="pill-badge pill-speed">BHASHINI AI</span>
@@ -296,8 +296,11 @@ export function GamesHub() {
             textTransform: 'uppercase',
           }}
         >
-          NORTH EAST HERITAGE & REMINISCENCE
+          {t.northEastHeritage}
         </h3>
+        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
+          {t.northEastHeritageDesc}
+        </p>
 
         <div className="responsive-card-grid">
           <div
@@ -332,10 +335,10 @@ export function GamesHub() {
               </div>
               <div>
                 <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                  Folk Melody & Song Recall
+                  {t.ebbFlowTitle}
                 </div>
                 <div style={{ fontSize: '12px', color: '#94A9C4', marginTop: '2px' }}>
-                  Familiar NER tunes (Bihu, Losar, Dhol)
+                  {t.ebbFlowSubtitle}
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
                   <span className="pill-badge pill-reasoning">REMINISCENCE</span>
@@ -378,10 +381,10 @@ export function GamesHub() {
               </div>
               <div>
                 <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                  Caregiver Photo Album
+                  {t.favorites}
                 </div>
                 <div style={{ fontSize: '12px', color: '#94A9C4', marginTop: '2px' }}>
-                  Personalized family faces & names
+                  {t.favoritesDesc}
                 </div>
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
                   <span className="pill-badge pill-health">FAMILY</span>

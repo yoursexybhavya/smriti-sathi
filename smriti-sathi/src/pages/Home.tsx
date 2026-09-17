@@ -127,7 +127,7 @@ export function Home() {
                   stroke="#FF7247"
                   strokeWidth="5"
                   strokeDasharray={264}
-                  strokeDashoffset={todayPlayedCount > 0 ? 132 : 230}
+                  strokeDashoffset={264 - Math.min(264, Math.round((todayPlayedCount / 3) * 264))}
                   strokeLinecap="round"
                   style={{ transition: 'stroke-dashoffset 0.6s ease' }}
                 />
@@ -161,7 +161,7 @@ export function Home() {
                 marginBottom: '6px',
               }}
             >
-              {t.workoutCount(todayPlayedCount + 1, 30)}
+              {t.dailyGoalProgress(todayPlayedCount, 3)}
             </div>
 
             {/* Workout Title */}

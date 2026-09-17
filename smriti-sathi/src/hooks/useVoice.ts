@@ -9,6 +9,7 @@
 import { useCallback, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Language } from '../i18n/translations';
+import { synthesizeBhashiniTTS } from '../services/bhashiniService';
 
 // Web Speech API language mappings
 const SPEECH_LANG_MAP: Record<Language, string[]> = {
@@ -21,6 +22,7 @@ const SPEECH_LANG_MAP: Record<Language, string[]> = {
 export function useVoice() {
   const { language } = useLanguage();
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize Web Audio Context on demand
   const getAudioContext = useCallback(() => {
@@ -38,25 +40,46 @@ export function useVoice() {
 
   /**
    * Speak a text message in the user's preferred language.
-   * Uses Web Speech API synthesis with intelligent voice selection.
+   * Priority: Online Government Bhashini AI Neural Voice -> Offline Web Speech API.
    */
-  const speak = useCallback((text: string, overrideLang?: Language) => {
+  const speak = useCallback(async (text: string, overrideLang?: Language) => {
+    const targetLang = overrideLang || language;
+
+    // Cancel previous audio if playing
+    if (activeAudioRef.current) {
+      activeAudioRef.current.pause();
+      activeAudioRef.current = null;
+    }
+
+    // Try online Bhashini TTS first if navigator is online
+    if (navigator.onLine && targetLang !== 'en') {
+      try {
+        const audioUri = await synthesizeBhashiniTTS(text, targetLang);
+        if (audioUri) {
+          const audio = new Audio(audioUri);
+          activeAudioRef.current = audio;
+          await audio.play();
+          return;
+        }
+      } catch {
+        // Fall through to offline Web Speech
+      }
+    }
+
     if (!('speechSynthesis' in window)) {
       console.warn('Speech synthesis not supported on this device');
       return;
     }
 
     try {
-      window.speechSynthesis.cancel(); // Stop any currently playing speech
+      window.speechSynthesis.cancel();
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
 
       const utterance = new SpeechSynthesisUtterance(text);
-      const targetLang = overrideLang || language;
       const preferredCodes = SPEECH_LANG_MAP[targetLang] || ['en-IN'];
 
-      // Find best available voice from voices list
       let voices = window.speechSynthesis.getVoices();
       let matchedVoice = null;
 
