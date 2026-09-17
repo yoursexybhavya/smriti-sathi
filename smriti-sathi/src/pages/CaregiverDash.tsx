@@ -33,7 +33,7 @@ export function CaregiverDash() {
   const [cloudSyncing, setCloudSyncing] = useState(false);
   const [cloudStatus, setCloudStatus] = useState<string>('Ready for Cloud Backup');
   const [cloudSyncedAt, setCloudSyncedAt] = useState<string | null>('Yesterday at 09:15 PM');
-  const [serverUrl, setServerUrl] = useState<string>('https://smriti-sathi-api.onrender.com');
+  const [serverUrl, setServerUrl] = useState<string>('https://smriti-sathi.onrender.com');
   const [sosActive, setSosActive] = useState(false);
   const [sosSent, setSosSent] = useState(false);
 
