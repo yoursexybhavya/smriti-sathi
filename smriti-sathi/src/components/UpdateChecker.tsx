@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Download, Sparkles, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export const CURRENT_APP_VERSION = 'v1.0.5';
+export const CURRENT_APP_VERSION = 'v1.0.6';
 const GITHUB_REPO = 'yoursexybhavya/smriti-sathi';
 
 export interface UpdateInfo {

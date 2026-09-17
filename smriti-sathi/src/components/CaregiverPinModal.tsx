@@ -229,7 +229,7 @@ export function CaregiverPinModal({ isOpen, onSuccess, onClose }: CaregiverPinMo
             padding: '8px',
           }}
         >
-          {t.cancel || 'Cancel'}
+          {(t as any).cancel || 'Cancel'}
         </button>
       </div>
     </div>

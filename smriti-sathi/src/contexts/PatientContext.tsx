@@ -37,6 +37,11 @@ interface PatientContextType {
     role: 'elder' | 'caregiver';
     pin: string;
     remindersEnabled: { medicine: boolean; hydration: boolean; brainWorkout: boolean };
+    reminderTimes?: {
+      medicine: { hour: number; minute: number };
+      hydration: { hour: number; minute: number };
+      brainWorkout: { hour: number; minute: number };
+    };
   }) => Promise<Patient>;
   verifyCaregiverPin: (enteredPin: string) => Promise<boolean>;
   setCaregiverPin: (pin: string) => Promise<void>;
@@ -200,6 +205,11 @@ export function PatientProvider({ children }: { children: ReactNode }) {
     role: 'elder' | 'caregiver';
     pin: string;
     remindersEnabled: { medicine: boolean; hydration: boolean; brainWorkout: boolean };
+    reminderTimes?: {
+      medicine: { hour: number; minute: number };
+      hydration: { hour: number; minute: number };
+      brainWorkout: { hour: number; minute: number };
+    };
   }): Promise<Patient> => {
     const newElder: Patient = {
       name: data.name,
@@ -217,20 +227,29 @@ export function PatientProvider({ children }: { children: ReactNode }) {
 
     // Persist settings
     await db.settings.put({ key: 'activePatientId', value: id.toString() });
-    await db.settings.put({ key: 'caregiver_pin', value: data.pin || '1234' });
     await db.settings.put({ key: 'user_role', value: data.role });
     await db.settings.put({ key: 'setup_completed', value: 'true' });
     await db.settings.put({ key: 'language', value: data.language });
     localStorage.setItem('smriti_language', data.language);
 
-    // Setup initial care reminders if enabled
+    // Only save PIN for caregiver role (elder should never need PIN)
+    if (data.role === 'caregiver' && data.pin.length === 4) {
+      await db.settings.put({ key: 'caregiver_pin', value: data.pin });
+    }
+
+    // Use custom times if provided, otherwise sensible defaults
+    const medTime = data.reminderTimes?.medicine || { hour: 9, minute: 0 };
+    const waterTime = data.reminderTimes?.hydration || { hour: 11, minute: 0 };
+    const brainTime = data.reminderTimes?.brainWorkout || { hour: 16, minute: 0 };
+
+    // Setup care reminders with plain language labels
     if (data.remindersEnabled.medicine) {
       await db.reminders.add({
         patientId: id,
         type: 'medicine',
-        label: 'Blood Pressure & Heart Medicine (ৰাতিপুৱাৰ ঔষধ)',
-        timeHour: 9,
-        timeMinute: 0,
+        label: 'Morning Medicine',
+        timeHour: medTime.hour,
+        timeMinute: medTime.minute,
         repeatDays: [0, 1, 2, 3, 4, 5, 6],
         isActive: true,
         lastAcked: null,
@@ -240,9 +259,9 @@ export function PatientProvider({ children }: { children: ReactNode }) {
       await db.reminders.add({
         patientId: id,
         type: 'water',
-        label: 'Drink a glass of warm water (এগিলাচ পানী খাওক)',
-        timeHour: 11,
-        timeMinute: 0,
+        label: 'Drink Water',
+        timeHour: waterTime.hour,
+        timeMinute: waterTime.minute,
         repeatDays: [0, 1, 2, 3, 4, 5, 6],
         isActive: true,
         lastAcked: null,
@@ -252,9 +271,9 @@ export function PatientProvider({ children }: { children: ReactNode }) {
       await db.reminders.add({
         patientId: id,
         type: 'activity',
-        label: 'Daily Cognitive Workout (স্মৃতি অনুশীলন)',
-        timeHour: 16,
-        timeMinute: 0,
+        label: 'Memory Game Time',
+        timeHour: brainTime.hour,
+        timeMinute: brainTime.minute,
         repeatDays: [0, 1, 2, 3, 4, 5, 6],
         isActive: true,
         lastAcked: null,
@@ -267,8 +286,9 @@ export function PatientProvider({ children }: { children: ReactNode }) {
 
   const verifyCaregiverPin = async (enteredPin: string): Promise<boolean> => {
     const pinSetting = await db.settings.get('caregiver_pin');
-    const storedPin = pinSetting?.value || '1234';
-    return enteredPin.trim() === storedPin.trim();
+    // If no PIN was ever set (elder-only setup), allow direct access
+    if (!pinSetting?.value) return true;
+    return enteredPin.trim() === pinSetting.value.trim();
   };
 
   const setCaregiverPin = async (pin: string) => {
