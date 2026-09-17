@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import { User, Globe, Eye, ShieldCheck, Check, Edit3 } from 'lucide-react';
+import { User, Globe, Eye, ShieldCheck, Check, Edit3, Users, Download, RefreshCw, Sparkles } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
 import { languageNames, type Language } from '../i18n/translations';
-import { db } from '../db/database';
+import { ProfileSwitcherModal } from '../components/ProfileSwitcherModal';
+import { checkAppUpdates, CURRENT_APP_VERSION, type UpdateInfo } from '../components/UpdateChecker';
 
 export function Settings() {
-  const { language, setLanguage } = useLanguage();
-  const { patient, createPatient, setPatient } = usePatient();
+  const { language, setLanguage, t } = useLanguage();
+  const { patient, updatePatient } = usePatient();
   const { speak } = useVoice();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -16,6 +17,12 @@ export function Settings() {
   const [age, setAge] = useState('');
   const [textSize, setTextSize] = useState<'normal' | 'large'>('normal');
   const [consentGranted, setConsentGranted] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Update check states
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateResult, setUpdateResult] = useState<UpdateInfo | null>(null);
+  const [updateCheckedOnce, setUpdateCheckedOnce] = useState(false);
 
   useEffect(() => {
     if (patient) {
@@ -25,21 +32,30 @@ export function Settings() {
   }, [patient]);
 
   const handleSaveProfile = async () => {
-    if (!name.trim() || !age) return;
+    if (!name.trim() || !age || !patient?.id) return;
     const parsedAge = parseInt(age) || 70;
-
-    if (patient && patient.id) {
-      await db.patients.update(patient.id, { name: name.trim(), age: parsedAge });
-      setPatient({ ...patient, name: name.trim(), age: parsedAge });
-    } else {
-      await createPatient(name.trim(), parsedAge, language);
-    }
+    await updatePatient(patient.id, { name: name.trim(), age: parsedAge });
     setIsEditing(false);
   };
 
   const handleLanguageChange = (lang: Language) => {
     setLanguage(lang);
     speak(languageNames[lang], lang);
+  };
+
+  const handleCheckUpdates = async () => {
+    setCheckingUpdate(true);
+    setUpdateResult(null);
+    try {
+      const res = await checkAppUpdates();
+      setUpdateResult(res);
+      setUpdateCheckedOnce(true);
+    } catch {
+      setUpdateResult({ hasUpdate: false, latestVersion: CURRENT_APP_VERSION, downloadUrl: '' });
+      setUpdateCheckedOnce(true);
+    } finally {
+      setCheckingUpdate(false);
+    }
   };
 
   return (
@@ -54,255 +70,359 @@ export function Settings() {
             letterSpacing: '-0.5px',
           }}
         >
-          Settings
+          {t.settings}
         </h1>
         <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-          Elder profile, language, and accessibility preferences
+          {t.appTagline}
         </p>
       </div>
 
-      {/* Elder Profile Card */}
-      <div
-        className="lumos-card"
-        style={{
-          padding: '20px',
-          border: '1px solid #233A57',
-        }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <User size={20} color="#38BDF8" />
-            <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
-              ELDER PROFILE
-            </span>
-          </div>
-          {patient && !isEditing && (
-            <button
-              onClick={() => setIsEditing(true)}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#FF7247',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-              }}
-            >
-              <Edit3 size={15} />
-              <span>Edit</span>
-            </button>
-          )}
-        </div>
-
-        {isEditing || !patient ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <input
-              type="text"
-              placeholder="Elder's Name (e.g. Baa / Krishna)"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{
-                padding: '12px 14px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid #223752',
-                backgroundColor: '#0F1D2F',
-                color: '#FFFFFF',
-                fontSize: '15px',
-              }}
-            />
-            <input
-              type="number"
-              placeholder="Age"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              style={{
-                padding: '12px 14px',
-                borderRadius: 'var(--radius-sm)',
-                border: '1px solid #223752',
-                backgroundColor: '#0F1D2F',
-                color: '#FFFFFF',
-                fontSize: '15px',
-              }}
-            />
-            <div style={{ display: 'flex', gap: '10px' }}>
+      {/* Responsive Grid of Setting Cards */}
+      <div className="settings-grid">
+        {/* Elder Profile Card */}
+        <div
+          className="lumos-card"
+          style={{
+            padding: '20px',
+            border: '1px solid #233A57',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <User size={20} color="#38BDF8" />
+              <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
+                {t.elderProfile}
+              </span>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
               <button
-                className="btn-primary-lumos"
-                onClick={handleSaveProfile}
-                style={{ flex: 1, minHeight: '48px', padding: '10px' }}
+                onClick={() => setShowProfileModal(true)}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  border: '1px solid #38BDF8',
+                  borderRadius: 'var(--radius-pill)',
+                  color: '#38BDF8',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  padding: '4px 10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
               >
-                Save Profile
+                <Users size={14} />
+                <span>{t.switchProfile}</span>
               </button>
-              {patient && (
+              {patient && !isEditing && (
                 <button
-                  className="btn-secondary-lumos"
-                  onClick={() => setIsEditing(false)}
-                  style={{ flex: 1, minHeight: '48px', padding: '10px' }}
+                  onClick={() => setIsEditing(true)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#FF7247',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    padding: '4px 6px',
+                  }}
                 >
-                  Cancel
+                  <Edit3 size={15} />
+                  <span>{t.edit}</span>
                 </button>
               )}
             </div>
           </div>
-        ) : (
-          <div>
-            <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 800, color: '#FFFFFF' }}>
-              {patient.name}
-            </div>
-            <div style={{ fontSize: '13px', color: '#94A9C4', marginTop: '2px' }}>
-              Age {patient.age} &bull; Registered for Daily Dementia Cognitive Care
-            </div>
-          </div>
-        )}
-      </div>
 
-      {/* Multilingual Voice (Bhashini AI) */}
-      <div
-        className="lumos-card"
-        style={{
-          padding: '20px',
-          border: '1px solid #233A57',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-          <Globe size={20} color="#34D399" />
-          <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
-            REGIONAL LANGUAGE (BHASHINI AI)
-          </span>
+          {isEditing ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', color: '#94A9C4', marginBottom: '4px' }}>
+                  {t.elderNameLabel}
+                </label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid #223752',
+                    backgroundColor: '#0F1D2F',
+                    color: '#FFFFFF',
+                    fontSize: '15px',
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', color: '#94A9C4', marginBottom: '4px' }}>
+                  {t.ageLabel}
+                </label>
+                <input
+                  type="number"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid #223752',
+                    backgroundColor: '#0F1D2F',
+                    color: '#FFFFFF',
+                    fontSize: '15px',
+                  }}
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+                <button
+                  className="btn-primary-lumos"
+                  onClick={handleSaveProfile}
+                  style={{ flex: 1, minHeight: '46px', padding: '10px', fontSize: '15px' }}
+                >
+                  {t.saveProfile}
+                </button>
+                <button
+                  className="btn-secondary-lumos"
+                  onClick={() => setIsEditing(false)}
+                  style={{ flex: 1, minHeight: '46px', padding: '10px', fontSize: '15px' }}
+                >
+                  {t.cancel}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize: 'var(--font-size-lg)', fontWeight: 800, color: '#FFFFFF' }}>
+                {patient?.name || 'Krishna'}
+              </div>
+              <div style={{ fontSize: '13px', color: '#94A9C4', marginTop: '4px', lineHeight: 1.4 }}>
+                {t.ageLabel}: {patient?.age || 72} &bull; {t.registeredCare}
+              </div>
+            </div>
+          )}
         </div>
-        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-          Powers text-to-speech instructions, proverbs, and game audio in your native tongue:
-        </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {(Object.entries(languageNames) as [Language, string][]).map(([code, langTitle]) => {
-            const isSelected = language === code;
-            return (
+        {/* Regional Language (Bhashini AI) Card */}
+        <div
+          className="lumos-card"
+          style={{
+            padding: '20px',
+            border: '1px solid #233A57',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+            <Globe size={20} color="#34D399" />
+            <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
+              {t.regionalLanguage}
+            </span>
+          </div>
+          <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
+            {t.regionalLanguageDesc}
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {(Object.entries(languageNames) as [Language, string][]).map(([code, langTitle]) => {
+              const isSelected = language === code;
+              return (
+                <button
+                  key={code}
+                  onClick={() => handleLanguageChange(code)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 16px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: isSelected ? 'rgba(56, 189, 248, 0.12)' : '#0F1D2F',
+                    border: isSelected ? '1px solid #38BDF8' : '1px solid #1C314E',
+                    color: '#FFFFFF',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  <span style={{ fontSize: '14px', fontWeight: 700 }}>{langTitle}</span>
+                  {isSelected && <Check size={18} color="#38BDF8" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Accessibility Controls Card */}
+        <div
+          className="lumos-card"
+          style={{
+            padding: '20px',
+            border: '1px solid #233A57',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <Eye size={20} color="#FBBF24" />
+            <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
+              {t.accessibility}
+            </span>
+          </div>
+
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', marginBottom: '8px' }}>
+              {t.textScaling}
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <button
-                key={code}
-                onClick={() => handleLanguageChange(code)}
+                onClick={() => {
+                  setTextSize('normal');
+                  document.documentElement.setAttribute('data-text-size', 'normal');
+                }}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px 16px',
+                  flex: 1,
+                  padding: '12px',
                   borderRadius: 'var(--radius-sm)',
-                  backgroundColor: isSelected ? 'rgba(56, 189, 248, 0.12)' : '#0F1D2F',
-                  border: isSelected ? '1px solid #38BDF8' : '1px solid #1C314E',
+                  border: textSize === 'normal' ? '2px solid #FF7247' : '1px solid #1C314E',
+                  backgroundColor: textSize === 'normal' ? 'rgba(255, 114, 71, 0.15)' : '#0F1D2F',
                   color: '#FFFFFF',
+                  fontWeight: 700,
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease',
                 }}
               >
-                <span style={{ fontSize: '14px', fontWeight: 700 }}>{langTitle}</span>
-                {isSelected && <Check size={18} color="#38BDF8" />}
+                {t.standardText}
               </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Accessibility Controls */}
-      <div
-        className="lumos-card"
-        style={{
-          padding: '20px',
-          border: '1px solid #233A57',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-          <Eye size={20} color="#FBBF24" />
-          <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
-            ACCESSIBILITY
-          </span>
-        </div>
-
-        <div>
-          <div style={{ fontSize: '14px', fontWeight: 700, color: '#FFFFFF', marginBottom: '8px' }}>
-            Visual Text Scaling
+              <button
+                onClick={() => {
+                  setTextSize('large');
+                  document.documentElement.setAttribute('data-text-size', 'large');
+                }}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: textSize === 'large' ? '2px solid #FF7247' : '1px solid #1C314E',
+                  backgroundColor: textSize === 'large' ? 'rgba(255, 114, 71, 0.15)' : '#0F1D2F',
+                  color: '#FFFFFF',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                {t.largeText}
+              </button>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
+        </div>
+
+        {/* DPDP Act Compliance Card */}
+        <div
+          className="lumos-card"
+          style={{
+            padding: '20px',
+            border: '1px solid #233A57',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <ShieldCheck size={20} color="#10B981" />
+            <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
+              {t.dpdpCompliance}
+            </span>
+          </div>
+          <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '14px' }}>
+            {t.dpdpDesc}
+          </p>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: consentGranted ? '#34D399' : '#EF4444' }}>
+              {consentGranted ? t.consentActive : t.consentRevoked}
+            </span>
             <button
-              onClick={() => {
-                setTextSize('normal');
-                document.documentElement.setAttribute('data-text-size', 'normal');
-              }}
+              onClick={() => setConsentGranted(!consentGranted)}
               style={{
-                flex: 1,
-                padding: '12px',
-                borderRadius: 'var(--radius-sm)',
-                border: textSize === 'normal' ? '2px solid #FF7247' : '1px solid #1C314E',
-                backgroundColor: textSize === 'normal' ? 'rgba(255, 114, 71, 0.15)' : '#0F1D2F',
+                padding: '8px 16px',
+                borderRadius: 'var(--radius-pill)',
+                border: '1px solid #223752',
+                backgroundColor: '#0F1D2F',
                 color: '#FFFFFF',
+                fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
               }}
             >
-              Standard
-            </button>
-            <button
-              onClick={() => {
-                setTextSize('large');
-                document.documentElement.setAttribute('data-text-size', 'large');
-              }}
-              style={{
-                flex: 1,
-                padding: '12px',
-                borderRadius: 'var(--radius-sm)',
-                border: textSize === 'large' ? '2px solid #FF7247' : '1px solid #1C314E',
-                backgroundColor: textSize === 'large' ? 'rgba(255, 114, 71, 0.15)' : '#0F1D2F',
-                color: '#FFFFFF',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              🔍 Large Text (Elderly)
+              {consentGranted ? t.revoke : t.grant}
             </button>
           </div>
         </div>
+
+        {/* Application Updates & OTA Card */}
+        <div
+          className="lumos-card"
+          style={{
+            padding: '20px',
+            border: '1px solid #233A57',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <Sparkles size={20} color="#A855F7" />
+            <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
+              {t.appUpdates}
+            </span>
+          </div>
+          <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '14px' }}>
+            {t.version}: <strong style={{ color: '#FFFFFF' }}>{CURRENT_APP_VERSION}</strong> &bull; Offline PWA & Native Android APK
+          </p>
+
+          {updateResult?.hasUpdate ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ padding: '10px 12px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10B981', borderRadius: 'var(--radius-sm)', color: '#34D399', fontSize: '13px', fontWeight: 600 }}>
+                {t.updateAvailableBanner} ({updateResult.latestVersion})
+              </div>
+              <a
+                href={updateResult.downloadUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary-lumos"
+                style={{ textDecoration: 'none', padding: '12px', minHeight: '46px', fontSize: '14px', backgroundColor: '#10B981' }}
+              >
+                <Download size={18} />
+                <span>{t.downloadUpdate}</span>
+              </a>
+            </div>
+          ) : (
+            <div>
+              {updateCheckedOnce && (
+                <div style={{ fontSize: '13px', color: '#34D399', marginBottom: '10px', fontWeight: 600 }}>
+                  {t.upToDate}
+                </div>
+              )}
+              <button
+                onClick={handleCheckUpdates}
+                disabled={checkingUpdate}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-pill)',
+                  border: '1px solid #2B466B',
+                  backgroundColor: '#132338',
+                  color: '#38BDF8',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: checkingUpdate ? 'not-allowed' : 'pointer',
+                }}
+              >
+                <RefreshCw size={15} className={checkingUpdate ? 'spin' : ''} />
+                <span>{checkingUpdate ? t.checkingUpdates : t.checkForUpdates}</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* DPDP Act Compliance */}
-      <div
-        className="lumos-card"
-        style={{
-          padding: '20px',
-          border: '1px solid #233A57',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-          <ShieldCheck size={20} color="#10B981" />
-          <span style={{ fontSize: '13px', fontWeight: 800, letterSpacing: '0.6px', color: '#94A9C4', textTransform: 'uppercase' }}>
-            DPDP ACT 2023 COMPLIANCE
-          </span>
-        </div>
-        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', lineHeight: 1.5, marginBottom: '14px' }}>
-          Data is stored locally on this Android device. All patient telemetry is revocable by the designated family caregiver.
-        </p>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: consentGranted ? '#34D399' : '#EF4444' }}>
-            {consentGranted ? '✓ Consent Active (DPDP Validated)' : '✕ Consent Revoked'}
-          </span>
-          <button
-            onClick={() => setConsentGranted(!consentGranted)}
-            style={{
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-pill)',
-              border: '1px solid #223752',
-              backgroundColor: '#0F1D2F',
-              color: '#FFFFFF',
-              fontSize: '12px',
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            {consentGranted ? 'Revoke' : 'Grant'}
-          </button>
-        </div>
-      </div>
+      {/* Account Switcher Modal */}
+      <ProfileSwitcherModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
     </div>
   );
 }

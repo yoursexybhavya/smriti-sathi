@@ -11,14 +11,51 @@ export interface Translations {
   reminders: string;
   settings: string;
   caregiver: string;
+  myBrain: string;
 
-  // Home
+  // Header & Status
+  hi: string;
   welcomeBack: string;
-  letsPlay: string;
-  todayGames: string;
-  noGamesToday: string;
+  points: string;
+  streak: string;
+  dailyActiveStreak: string;
+  cognitiveIndex: string;
+  voiceGuide: string;
+  switchProfile: string;
 
-  // Games
+  // Home Screen
+  firstWorkout: string;
+  todaysRoutine: string;
+  workoutCount: (current: number, total: number) => string;
+  start: string;
+  continueWorkout: string;
+  workoutDesc: string;
+  todaysExercises: string;
+  speedMatchTitle: string;
+  speedMatchSubtitle: string;
+  masterpieceTitle: string;
+  masterpieceSubtitle: string;
+  ebbFlowTitle: string;
+  ebbFlowSubtitle: string;
+  trainOfThoughtTitle: string;
+  trainOfThoughtSubtitle: string;
+  moreWorkouts: string;
+  allIncludedOffline: string;
+  mathEstimation: string;
+  mathDesc: string;
+  languageBhashini: string;
+  languageDesc: string;
+  favorites: string;
+  favoritesDesc: string;
+  strengthen: string;
+  strengthenDesc: string;
+  quickRoutine: string;
+  quickDesc: string;
+  playNow: string;
+  clinicalEvidenceTitle: string;
+  clinicalEvidenceDesc: string;
+
+  // Games General
   memoryMatch: string;
   memoryMatchDesc: string;
   dailyRoutine: string;
@@ -29,7 +66,7 @@ export interface Translations {
   greatJob: string;
   wellDone: string;
   keepGoing: string;
-  tryAgain: string; // Encouraging, not punishing
+  tryAgain: string;
   gameComplete: string;
   playAgain: string;
   backToHome: string;
@@ -67,7 +104,7 @@ export interface Translations {
   noReminders: string;
   dismiss: string;
 
-  // Caregiver
+  // Caregiver / My Brain
   caregiverDashboard: string;
   engagementSummary: string;
   gamesPlayed: string;
@@ -80,29 +117,103 @@ export interface Translations {
   alerts: string;
   noAlerts: string;
 
-  // Settings
+  // Profiles & Accounts
+  elderProfile: string;
+  allProfiles: string;
+  activeProfile: string;
+  addProfile: string;
+  createNewProfile: string;
+  elderNameLabel: string;
+  ageLabel: string;
+  nativeLanguageLabel: string;
+  saveProfile: string;
+  cancel: string;
+  edit: string;
+  delete: string;
+  registeredCare: string;
+
+  // Settings & Accessibility
   language: string;
   textSize: string;
   normal: string;
   large: string;
+  standardText: string;
+  largeText: string;
+  regionalLanguage: string;
+  regionalLanguageDesc: string;
+  accessibility: string;
+  textScaling: string;
+  dpdpCompliance: string;
+  dpdpDesc: string;
   consent: string;
   consentGranted: string;
   revokeConsent: string;
   grantConsent: string;
+  consentActive: string;
+  consentRevoked: string;
+  revoke: string;
+  grant: string;
+
+  // Updates
+  appUpdates: string;
+  checkForUpdates: string;
+  checkingUpdates: string;
+  upToDate: string;
+  updateAvailableBanner: string;
+  downloadUpdate: string;
+  version: string;
 }
 
 const en: Translations = {
   appName: 'Smriti Sathi',
-  appTagline: 'Memory care that speaks your language',
+  appTagline: 'Memory care that speaks your language — online or offline',
   home: 'Home',
   games: 'Games',
   reminders: 'Reminders',
   settings: 'Settings',
   caregiver: 'Caregiver',
-  welcomeBack: 'Welcome back!',
-  letsPlay: "Let's play!",
-  todayGames: 'Games played today',
-  noGamesToday: 'No games played yet today',
+  myBrain: 'My Brain',
+
+  hi: 'Hi',
+  welcomeBack: 'Welcome back',
+  points: 'Points',
+  streak: 'Streak',
+  dailyActiveStreak: 'Daily Active Streak',
+  cognitiveIndex: 'Cognitive Performance Index (CPI)',
+  voiceGuide: 'Voice Guide',
+  switchProfile: 'Switch Profile',
+
+  firstWorkout: 'Your First Workout',
+  todaysRoutine: "Today's Cognitive Routine",
+  workoutCount: (current, total) => `Workout ${current} of ${total}`,
+  start: 'Start',
+  continueWorkout: 'Continue Workout',
+  workoutDesc: "Each game exercises a different domain of your thinking. Let's give them all a try.",
+  todaysExercises: "Today's Exercises",
+  speedMatchTitle: 'Speed Match',
+  speedMatchSubtitle: 'SPEED • MEMORY',
+  masterpieceTitle: 'Masterpiece (Daily Routine)',
+  masterpieceSubtitle: 'REASONING • ORIENTATION',
+  ebbFlowTitle: 'Ebb and Flow (Reminiscence)',
+  ebbFlowSubtitle: 'FLEXIBILITY • HERITAGE',
+  trainOfThoughtTitle: 'Train of Thought (Routine & Meds)',
+  trainOfThoughtSubtitle: 'ATTENTION • DAILY SCHEDULE',
+  moreWorkouts: 'More Workouts',
+  allIncludedOffline: 'ALL INCLUDED • OFFLINE',
+  mathEstimation: 'Math & Estimation',
+  mathDesc: 'Challenge your estimation, counting, and everyday grocery currency skills.',
+  languageBhashini: 'Language (Bhashini AI)',
+  languageDesc: 'Explore Assamese, Bodo, and Manipuri proverbs, vocabulary, and stories.',
+  favorites: 'Favorites',
+  favoritesDesc: 'Treat your brain to the cognitive care games you enjoy playing the most.',
+  strengthen: 'Strengthen (Errorless Care)',
+  strengthenDesc: 'Gentle guided practice that boosts confidence and prevents cognitive frustration.',
+  quickRoutine: 'Quick Routine',
+  quickDesc: 'Short, calm memory exercises in 5 minutes or less.',
+  playNow: 'PLAY NOW →',
+  clinicalEvidenceTitle: 'Evidence-Based Cognitive Stimulation',
+  clinicalEvidenceDesc: 'Built on Cochrane-reviewed Cognitive Stimulation Therapy (CST) and errorless learning principles, specifically tuned for low-connectivity care in the North Eastern Region.',
+
   memoryMatch: 'Memory Match',
   memoryMatchDesc: 'Find matching pairs of cards',
   dailyRoutine: 'Daily Routine',
@@ -133,6 +244,7 @@ const en: Translations = {
   eveningTea: 'Evening Tea',
   dinner: 'Dinner',
   sleep: 'Sleep',
+
   medicine: 'Medicine',
   water: 'Water',
   activity: 'Activity',
@@ -143,7 +255,8 @@ const en: Translations = {
   reminderAcknowledged: 'Done!',
   addReminder: 'Add Reminder',
   noReminders: 'No reminders set',
-  dismiss: 'Done',
+  dismiss: 'Dismiss',
+
   caregiverDashboard: 'Caregiver Dashboard',
   engagementSummary: 'Engagement Summary',
   gamesPlayed: 'Games Played',
@@ -155,28 +268,101 @@ const en: Translations = {
   lastDays: 'Last 7 days',
   alerts: 'Alerts',
   noAlerts: 'No alerts — everything looks good!',
+
+  elderProfile: 'Elder Profile',
+  allProfiles: 'Registered Elders',
+  activeProfile: 'Active Elder',
+  addProfile: 'Add Elder Profile',
+  createNewProfile: 'Register New Elder',
+  elderNameLabel: "Elder's Name (e.g. Baa / Krishna)",
+  ageLabel: 'Age',
+  nativeLanguageLabel: 'Primary Language',
+  saveProfile: 'Save Profile',
+  cancel: 'Cancel',
+  edit: 'Edit',
+  delete: 'Delete',
+  registeredCare: 'Registered for Daily Dementia Cognitive Care',
+
   language: 'Language',
   textSize: 'Text Size',
-  normal: 'Normal',
+  normal: 'Standard',
   large: 'Large',
+  standardText: 'Standard',
+  largeText: '🔍 Large Text (Elderly)',
+  regionalLanguage: 'REGIONAL LANGUAGE (BHASHINI AI)',
+  regionalLanguageDesc: 'Powers text-to-speech instructions, proverbs, and game audio in your native tongue:',
+  accessibility: 'ACCESSIBILITY',
+  textScaling: 'Visual Text Scaling',
+  dpdpCompliance: 'DPDP ACT 2023 COMPLIANCE',
+  dpdpDesc: 'Data is stored locally on this Android device. All patient telemetry is revocable by the designated family caregiver.',
   consent: 'Data Consent',
   consentGranted: 'You have given consent to store your activity data',
   revokeConsent: 'Revoke Consent',
   grantConsent: 'Grant Consent',
+  consentActive: '✓ Consent Active (DPDP Validated)',
+  consentRevoked: '✕ Consent Revoked',
+  revoke: 'Revoke',
+  grant: 'Grant',
+
+  appUpdates: 'APPLICATION UPDATES',
+  checkForUpdates: 'Check for Updates',
+  checkingUpdates: 'Checking for updates...',
+  upToDate: '✓ Smriti Sathi is up to date',
+  updateAvailableBanner: '🚀 New Update Available!',
+  downloadUpdate: 'Download & Install APK',
+  version: 'Version',
 };
 
 const as: Translations = {
   appName: 'স্মৃতি সাথী',
-  appTagline: 'আপোনাৰ ভাষাত স্মৃতি যত্ন',
+  appTagline: 'আপোনাৰ ভাষাত স্মৃতি যত্ন — অনলাইন বা অফলাইন',
   home: 'ঘৰ',
   games: 'খেল',
   reminders: 'সোঁৱৰণী',
   settings: 'ছেটিংছ',
   caregiver: 'যত্নকাৰী',
-  welcomeBack: 'পুনৰ স্বাগতম!',
-  letsPlay: 'আহক খেলো!',
-  todayGames: 'আজি খেলা খেল',
-  noGamesToday: 'আজি এতিয়ালৈকে কোনো খেল খেলা হোৱা নাই',
+  myBrain: 'মোৰ মগজু',
+
+  hi: 'নমস্কাৰ',
+  welcomeBack: 'পুনৰ স্বাগতম',
+  points: 'পইণ্ট',
+  streak: 'ক্ৰম',
+  dailyActiveStreak: 'দৈনিক সক্ৰিয় ক্ৰম',
+  cognitiveIndex: 'জ্ঞানভিত্তিক সূচক (CPI)',
+  voiceGuide: 'মাতৃভাষাৰ কণ্ঠ সহায়ক',
+  switchProfile: 'প্ৰফাইল সলনি কৰক',
+
+  firstWorkout: 'আপোনাৰ প্ৰথম অভ্যাস',
+  todaysRoutine: 'আজিৰ মগজুৰ ৰুটিন',
+  workoutCount: (current, total) => `অনুশীলন ${current} / ${total}`,
+  start: 'আৰম্ভ কৰক',
+  continueWorkout: 'আগবঢ়াওক',
+  workoutDesc: 'প্ৰতিটো খেলেই আপোনাৰ চিন্তা-শক্তিৰ ভিন্ন অংশক সক্ৰিয় কৰে। আহক খেলো।',
+  todaysExercises: 'আজিৰ অনুশীলনসমূহ',
+  speedMatchTitle: 'দ্ৰুত স্মৃতি মিলন',
+  speedMatchSubtitle: 'গতি • স্মৃতি শক্তি',
+  masterpieceTitle: 'দৈনন্দিন অভ্যাস (ক্ৰম সজ্জা)',
+  masterpieceSubtitle: 'যুক্তি • দৈনন্দিন ক্ৰম',
+  ebbFlowTitle: 'স্মৃতি আৰু সুৰ (অতীত সোঁৱৰণ)',
+  ebbFlowSubtitle: 'মনৰ স্থিতি • ঐতিহ্য',
+  trainOfThoughtTitle: 'মনোযোগ আৰু ঔষধ সোঁৱৰণী',
+  trainOfThoughtSubtitle: 'মনোযোগ • দিনপঞ্জী',
+  moreWorkouts: 'অধিক মগজুৰ অনুশীলন',
+  allIncludedOffline: 'সকলো উপলব্ধ • অফলাইন',
+  mathEstimation: 'গণনা আৰু হিচাপ',
+  mathDesc: 'দৈনন্দিন বজাৰ, মুদ্ৰা আৰু সংখ্যা গণনাৰ সহজ অভ্যাস।',
+  languageBhashini: 'মাতৃভাষাৰ যত্ন (ভাষিনী AI)',
+  languageDesc: 'অসমীয়া ফকৰা-যোজনা, শব্দ ভঁৰাল আৰু পুৰণি লোককথা।',
+  favorites: 'প্ৰিয় খেলসমূহ',
+  favoritesDesc: 'আপুনি খেলিবলৈ ভাল পোৱা স্মৃতিবৰ্ধক খেলসমূহ উপভোগ কৰক।',
+  strengthen: 'সহজ আৰু উৎসাহজনক যত্ন',
+  strengthenDesc: 'ভুলহীন আৰু চাপমুক্ত পদ্ধতিৰে আত্মবিশ্বাস বৃদ্ধি কৰক।',
+  quickRoutine: 'দ্ৰুত ৫ মিনিটৰ ৰুটিন',
+  quickDesc: 'কম সময়ৰ বাবে প্ৰস্তুত কৰা শান্ত মগজুৰ অনুশীলন।',
+  playNow: 'খেলক →',
+  clinicalEvidenceTitle: 'চিকিৎসাজনিত আৰু বৈজ্ঞানিক যত্ন',
+  clinicalEvidenceDesc: 'আন্তঃৰাষ্ট্ৰীয় CST পদ্ধতি আৰু উত্তৰ-পূৰ্বাঞ্চলৰ ভাষিক প্ৰয়োজনীয়তালৈ চাই প্ৰস্তুত কৰা সৰল স্মৃতি যত্ন।',
+
   memoryMatch: 'স্মৃতি মিলন',
   memoryMatchDesc: 'একে ধৰণৰ কাৰ্ড বিচাৰক',
   dailyRoutine: 'দৈনিক ৰুটিন',
@@ -207,6 +393,7 @@ const as: Translations = {
   eveningTea: 'আবেলিৰ চাহ',
   dinner: 'ৰাতিৰ আহাৰ',
   sleep: 'শুৱা',
+
   medicine: 'ঔষধ',
   water: 'পানী',
   activity: 'কাৰ্যকলাপ',
@@ -217,7 +404,8 @@ const as: Translations = {
   reminderAcknowledged: 'হৈ গ\'ল!',
   addReminder: 'সোঁৱৰণী যোগ কৰক',
   noReminders: 'কোনো সোঁৱৰণী নাই',
-  dismiss: 'হৈ গ\'ল',
+  dismiss: 'বাতিল কৰক',
+
   caregiverDashboard: 'যত্নকাৰীৰ ডেছব\'ৰ্ড',
   engagementSummary: 'সংযোগৰ সাৰাংশ',
   gamesPlayed: 'খেলা খেল',
@@ -225,33 +413,106 @@ const as: Translations = {
   accuracy: 'শুদ্ধতা',
   reminderAdherence: 'সোঁৱৰণী পালন',
   performanceTrend: 'প্ৰদৰ্শনৰ ধাৰা',
-  noDataYet: 'এতিয়ালৈকে কোনো তথ্য নাই',
+  noDataYet: 'এতিয়ালৈকে কোনো তথ্য নাই। খেল আৰম্ভ কৰক!',
   lastDays: 'শেষ ৭ দিন',
   alerts: 'সতৰ্কতা',
   noAlerts: 'কোনো সতৰ্কতা নাই — সকলো ঠিকে আছে!',
+
+  elderProfile: 'জ্যেষ্ঠ ব্যক্তিৰ প্ৰফাইল',
+  allProfiles: 'পঞ্জীকৃত জ্যেষ্ঠসকল',
+  activeProfile: 'বৰ্তমানৰ জ্যেষ্ঠ',
+  addProfile: 'নতুন প্ৰফাইল যোগ কৰক',
+  createNewProfile: 'নতুন সদস্য অন্তৰ্ভুক্ত কৰক',
+  elderNameLabel: 'জ্যেষ্ঠ ব্যক্তিৰ নাম (যেনে আইতা / দেউতা)',
+  ageLabel: 'বয়স',
+  nativeLanguageLabel: 'মাতৃভাষা',
+  saveProfile: 'সংৰক্ষণ কৰক',
+  cancel: 'বাতিল কৰক',
+  edit: 'সম্পাদনা',
+  delete: 'মচি পেলাওক',
+  registeredCare: 'দৈনিক ডিমেনচিয়া যত্নৰ অধীনত পঞ্জীকৃত',
+
   language: 'ভাষা',
   textSize: 'আখৰৰ আকাৰ',
   normal: 'সাধাৰণ',
   large: 'ডাঙৰ',
+  standardText: 'সাধাৰণ',
+  largeText: '🔍 ডাঙৰ আখৰ (জ্যেষ্ঠসকলৰ বাবে)',
+  regionalLanguage: 'আঞ্চলিক ভাষা (ভাষিনী AI)',
+  regionalLanguageDesc: 'আপোনাৰ নিজৰ মাতৃভাষাত স্পষ্ট কণ্ঠ আৰু সহায় নিৰ্দেশনা:',
+  accessibility: 'সহজ ব্যৱহাৰ (এক্সেচিবিলিটি)',
+  textScaling: 'আখৰৰ আকাৰ সলনি',
+  dpdpCompliance: 'ডিজিটেল ব্যক্তিগত তথ্য সুৰক্ষা (DPDP 2023)',
+  dpdpDesc: 'সকলো তথ্য কেৱল এই টেবলেটতে সংৰক্ষিত। পৰিয়ালৰ তত্ত্বাৱধায়কে যিকোনো সময়তে অনুমতি সলনি কৰিব পাৰে।',
   consent: 'তথ্যৰ সন্মতি',
-  consentGranted: 'আপুনি আপোনাৰ কাৰ্যকলাপৰ তথ্য সংৰক্ষণৰ সন্মতি দিছে',
+  consentGranted: 'আপুনি কাৰ্যকলাপৰ তথ্য সংৰক্ষণৰ সন্মতি দিছে',
   revokeConsent: 'সন্মতি প্ৰত্যাহাৰ কৰক',
   grantConsent: 'সন্মতি দিয়ক',
+  consentActive: '✓ সন্মতি সক্ৰিয় (সুৰক্ষিত)',
+  consentRevoked: '✕ সন্মতি স্থগিত',
+  revoke: 'প্ৰত্যাহাৰ',
+  grant: 'অনুমোদন',
+
+  appUpdates: 'এপ্লিকেচন আপডেট',
+  checkForUpdates: 'নতুন সংস্কৰণ পৰীক্ষা কৰক',
+  checkingUpdates: 'পৰীক্ষা কৰি থকা হৈছে...',
+  upToDate: '✓ স্মৃতি সাথী সম্পূৰ্ণ আপ-টু-ডেট',
+  updateAvailableBanner: '🚀 নতুন সংস্কৰণ উপলব্ধ!',
+  downloadUpdate: 'ডাউনলোড আৰু আপডেট APK',
+  version: 'সংস্কৰণ',
 };
 
 // Bodo translations (Devanagari script)
 const brx: Translations = {
   appName: 'स्मृति साथी',
-  appTagline: 'नोंथाइनि रावओ सायाव',
+  appTagline: 'नोंथाइनि रावओ सायाव — अनलाइन एबा अफलाइन',
   home: 'नोगोरजों',
   games: 'गेलेनाय',
   reminders: 'मोनहोनाय',
   settings: 'गोरोबथा',
   caregiver: 'सायखांनायगिरि',
-  welcomeBack: 'फैगौ मोनसे ओंखारलाय!',
-  letsPlay: 'हाय गेलेनो!',
-  todayGames: 'दिनै गेलेनाय',
-  noGamesToday: 'दिनै गेलेनाय जायाखै',
+  myBrain: 'आंनि गोसो',
+
+  hi: 'खुम्चुम',
+  welcomeBack: 'फैगौ मोनसे ओंखारलाय',
+  points: 'मार्क',
+  streak: 'सारि',
+  dailyActiveStreak: 'सानफ्रोमबोनि सारि',
+  cognitiveIndex: 'गोसोनि सूचक (CPI)',
+  voiceGuide: 'राव सहाय',
+  switchProfile: 'प्रफाइल सोलाय',
+
+  firstWorkout: 'नोंथाइनि गिबि गेलेनाय',
+  todaysRoutine: 'दिनैनि गोसोनि हाबाफारि',
+  workoutCount: (current, total) => `गेलेनाय ${current} / ${total}`,
+  start: 'जागाय',
+  continueWorkout: 'सालायलांबाय था',
+  workoutDesc: 'मोनफ्रोमबो गेलेनाया नोंथाइनि साननाय शक्तिखौ बांहोयो। फै गेलेनो।',
+  todaysExercises: 'दिनैनि गेलेनायफोर',
+  speedMatchTitle: 'गोख्रै मोनथाइ',
+  speedMatchSubtitle: 'गोख्रै • मोनथाइ',
+  masterpieceTitle: 'सानफ्रोमबोनि खामानि',
+  masterpieceSubtitle: 'साननाय • सारि दोननाय',
+  ebbFlowTitle: 'गोसोखांफानाय आरो खन्थाइ',
+  ebbFlowSubtitle: 'गोसोनि गोहो • दोहोरोम',
+  trainOfThoughtTitle: 'गोसो होनाय आरो मुलि',
+  trainOfThoughtSubtitle: 'गोसो होनाय • सानफ्रोमबोनि खामानि',
+  moreWorkouts: 'गुबुन गेलेनायफोर',
+  allIncludedOffline: 'गासैबो दं • अफलाइन',
+  mathEstimation: 'सानखान्थि आरो हिसाब',
+  mathDesc: 'सानफ्रोमबोनि हाथायाव बाहायनाय रां-रुफा आरो हिसाब।',
+  languageBhashini: 'नोंथाइनि राव (भाषिनी AI)',
+  languageDesc: 'बर\' राव, बाथ्रा आरो सल\'फोर।',
+  favorites: 'मोजां मोननाय गेलेनाय',
+  favoritesDesc: 'नोंनि मोजां मोननाय गोसोनि गेलेनायखौ गेले।',
+  strengthen: 'रेबगें गेलेनाय',
+  strengthenDesc: 'गोरोन्थिया गैयि आरो गोरलै गेलेनाय।',
+  quickRoutine: 'गोख्रै ५ मिनिटनि हाबा',
+  quickDesc: 'कम समायनि गोसोनि हाबाफारि।',
+  playNow: 'गेलेनो →',
+  clinicalEvidenceTitle: 'गोसोनि गोहो बांहोनाय',
+  clinicalEvidenceDesc: 'दैदेनजानाय CST पद्धति आरो बर\' रावजों बाहायजानाय।',
+
   memoryMatch: 'मोनथाइ गेलेनाय',
   memoryMatchDesc: 'मावरि कार्ड नायना',
   dailyRoutine: 'सान्नायजों खामानि',
@@ -282,6 +543,7 @@ const brx: Translations = {
   eveningTea: 'बेलासिनि साहा',
   dinner: 'मोनाबिलि जानाय',
   sleep: 'गोसो खोनाय',
+
   medicine: 'दाबाइ',
   water: 'दै',
   activity: 'खामानि',
@@ -292,7 +554,8 @@ const brx: Translations = {
   reminderAcknowledged: 'जादों!',
   addReminder: 'मोनहोनाय दाजाब',
   noReminders: 'मोनहोनाय गैयि',
-  dismiss: 'जादों',
+  dismiss: 'दानगार',
+
   caregiverDashboard: 'सायखांनायगिरिनि डेसबर्ड',
   engagementSummary: 'लोगोसे दाबनायनि सारांश',
   gamesPlayed: 'गेलेनाय',
@@ -300,33 +563,106 @@ const brx: Translations = {
   accuracy: 'गोरोब',
   reminderAdherence: 'मोनहोनाय मानि',
   performanceTrend: 'खामानिनि गति',
-  noDataYet: 'एसे तक data गैयि',
+  noDataYet: 'एसे तक data गैयि। गेलेनाय जागाय!',
   lastDays: 'जोबथा ७ सान',
   alerts: 'सावगारि',
   noAlerts: 'सावगारि गैयि — गासैबो मोजां!',
+
+  elderProfile: 'गोजौ सुबुंनि प्रफाइल',
+  allProfiles: 'गासै प्रफाइल',
+  activeProfile: 'चालु सुबुं',
+  addProfile: 'गोदान प्रफाइल दाजाब',
+  createNewProfile: 'गोदान सुबुं थिसन',
+  elderNameLabel: 'सुबुंनि मुं (जेरै आइ / आफा)',
+  ageLabel: 'बैसो',
+  nativeLanguageLabel: 'गाहाय राव',
+  saveProfile: 'दोनथुम',
+  cancel: 'दानगार',
+  edit: 'सोलाय',
+  delete: 'मसि',
+  registeredCare: 'दिनैनि गोसोनि हेफाजाबाव मुं थिसनबाय',
+
   language: 'राव',
   textSize: 'हांखोनि महर',
   normal: 'गुबुन',
   large: 'गेदेर',
+  standardText: 'गुबुन',
+  largeText: '🔍 गेदेर हांखो',
+  regionalLanguage: 'नोंथाइनि राव (भाषिनी AI)',
+  regionalLanguageDesc: 'नोंथाइनि गाहाय रावजों रोखा खोन्थाय आरो सहाय:',
+  accessibility: 'गोरलै बाहायनाय',
+  textScaling: 'हांखोनि महर',
+  dpdpCompliance: 'डाटा सुबुरुं (DPDP 2023)',
+  dpdpDesc: 'गासै डाटा बे टेबलेटावनो दोनथुमनाय जायो।',
   consent: 'डाटा अनुमति',
   consentGranted: 'नों data सेव खालामनायनि अनुमति होदों',
   revokeConsent: 'अनुमति फिन लानाय',
   grantConsent: 'अनुमति होनाय',
+  consentActive: '✓ अनुमति जाबाय',
+  consentRevoked: '✕ अनुमति फिन लाबाय',
+  revoke: 'फिन लानाय',
+  grant: 'होनाय',
+
+  appUpdates: 'एप आपदेत',
+  checkForUpdates: 'गोदान आपदेत नाय',
+  checkingUpdates: 'नायबाय थानाय...',
+  upToDate: '✓ गासैबो गोदान',
+  updateAvailableBanner: '🚀 गोदान आपदेत मोनबाय!',
+  downloadUpdate: 'दाउनलद खालाम APK',
+  version: 'महर',
 };
 
-// Manipuri translations (we'll use Bengali script as fallback since Meetei Mayek support varies)
+// Manipuri translations (Bengali script)
 const mni: Translations = {
   appName: 'স্মৃতি সাথী',
-  appTagline: 'নহাক্কী লোনদা পাম্বৈ',
+  appTagline: 'নহাক্কী লোনদা নিংশিং পাম্বৈ — ওনলাইন নত্রগা ওফলাইন',
   home: 'য়ুম',
   games: 'সানাথোই',
   reminders: 'নিংশিংহন্বা',
   settings: 'সেটিংস',
   caregiver: 'য়েংসিনবা',
-  welcomeBack: 'অমুক ওকচরি!',
-  letsPlay: 'সানাথোই শানসি!',
-  todayGames: 'ঙসি সানাথোই শান্নরবশিং',
-  noGamesToday: 'ঙসি সানাথোই অমত্তা শান্নদ্রি',
+  myBrain: 'ঐগী ৱাখল',
+
+  hi: 'খুরুমজরি',
+  welcomeBack: 'অমুক ওকচরি',
+  points: 'পয়েন্ট',
+  streak: 'লেপহন্বা',
+  dailyActiveStreak: 'নুমিৎ খুদিংগী লেপহন্বা',
+  cognitiveIndex: 'ৱাখলগী শক্তিমাল (CPI)',
+  voiceGuide: 'লোনগী খোন্থোক সহায়',
+  switchProfile: 'প্রফাইল হোংদোকপা',
+
+  firstWorkout: 'নহাক্কী অহানবা শানাথোই',
+  todaysRoutine: 'ঙসিগী নিংশিং থৌরম',
+  workoutCount: (current, total) => `শানাথোই ${current} / ${total}`,
+  start: 'হৌদোকউ',
+  continueWorkout: 'মখা চত্থউ',
+  workoutDesc: 'শানাথোই খুদিংমক্না ৱাখলবু হেন্না থৌনা হাপ্পা ঙমহল্লি। শানসি।',
+  todaysExercises: 'ঙসিগী শানাথোইশিং',
+  speedMatchTitle: 'য়াম্না থুনা নিংশিংবা',
+  speedMatchSubtitle: 'খোংজেল • নিংশিংবা',
+  masterpieceTitle: 'নুমিৎ খুদিংগী থবক',
+  masterpieceSubtitle: 'ৱাখল • মতম ক্ৰম',
+  ebbFlowTitle: 'পুন্সিগী নীংশিংবা শৈশক',
+  ebbFlowSubtitle: 'ৱাখল শিংথা • লিখন',
+  trainOfThoughtTitle: 'লুচিংবা অমসুং হিদাক নীংশিংবা',
+  trainOfThoughtSubtitle: 'লুচিংবা • থবক ক্ৰম',
+  moreWorkouts: 'অতোপ্পা শানাথোইশিং',
+  allIncludedOffline: 'পুম্নমক য়াওরে • ওফলাইন',
+  mathEstimation: 'শেন্থোক শেনবুং নিংশিংবা',
+  mathDesc: 'নুমিৎ খুদিংগী কৈথেল অমসুং শেন্থোকপগী মশক খংদোকপা।',
+  languageBhashini: 'মৈতৈলোন (ভাষিনী AI)',
+  languageDesc: 'মৈতৈ পাউৰৌ, ৱাহৈ অমসুং পুৱারিগী ৱারীশিং।',
+  favorites: 'পাম্নবা শানাথোই',
+  favoritesDesc: 'নহাক্না শানবা পাম্বা নিংশিং শানাথোইশিং শানবিয়ু।',
+  strengthen: 'নুংঙাইবা শানাথোই',
+  strengthenDesc: 'অশোক অপন য়াওদনা থৌনা হাপ্পা শানাথোই।',
+  quickRoutine: 'মিনিট ৫ গী শানাথোই',
+  quickDesc: 'মতম তেন্না ৱাখল শান্তনা শান্নবা।',
+  playNow: 'শানসি →',
+  clinicalEvidenceTitle: 'ৱাখলগী চেকশিন থৌরাং',
+  clinicalEvidenceDesc: 'মালেমগী CST পদ্ধতি অমসুং মৈতৈলোনগী লাইথোকহল্লবা পাম্বৈ।',
+
   memoryMatch: 'নিংশিং শানাথোই',
   memoryMatchDesc: 'মান্নবা কার্দশিং ফংবিয়ু',
   dailyRoutine: 'নুমিৎ খুদিংগী থবক',
@@ -357,6 +693,7 @@ const mni: Translations = {
   eveningTea: 'নুংথিলনুংগী চা',
   dinner: 'অনুংবানুংগী চাক',
   sleep: 'তুম্বা',
+
   medicine: 'লায়েং',
   water: 'ঈশিং',
   activity: 'তৌগৎপা',
@@ -367,7 +704,8 @@ const mni: Translations = {
   reminderAcknowledged: 'ওইরে!',
   addReminder: 'নিংশিংহন্বা থাপু',
   noReminders: 'নিংশিংহন্বা অমত্তা লৈতে',
-  dismiss: 'ওইরে',
+  dismiss: 'লেপপা',
+
   caregiverDashboard: 'য়েংসিনবগী ডেসবোর্ড',
   engagementSummary: 'শরুক য়াবগী মশক',
   gamesPlayed: 'শান্নরবা সানাথোই',
@@ -375,18 +713,53 @@ const mni: Translations = {
   accuracy: 'অচুম্বা',
   reminderAdherence: 'নিংশিংহন্বা ইন্নরবা',
   performanceTrend: 'তৌবিবগী মখল',
-  noDataYet: 'হৌজিক ফংনদ্রে',
+  noDataYet: 'হৌজিক ফংনদ্রে। শানাথোই শানসি!',
   lastDays: 'মঙাতানিরবা নুমিৎ ৭',
   alerts: 'চেকশিন্নবা',
   noAlerts: 'চেকশিন্নবা লৈতে — পুম্নমক ফজরি!',
+
+  elderProfile: 'অহন মীওইগী প্রফাইল',
+  allProfiles: 'পঞ্জীকৃত মীওইশিং',
+  activeProfile: 'হৌজিক্কী মীওই',
+  addProfile: 'অনৌবা প্রফাইল হাপ্পা',
+  createNewProfile: 'অনৌবা মীওই পঞ্জীকৃত তৌবা',
+  elderNameLabel: 'মীওইগী মমিং (ইবুংখো / ইবেম্মা)',
+  ageLabel: 'চহি',
+  nativeLanguageLabel: 'অহানবা লোল',
+  saveProfile: 'থম্বীয়ু',
+  cancel: 'লেপপা',
+  edit: 'শেমদোকপা',
+  delete: 'মুত্থৎপা',
+  registeredCare: 'নুমিৎ খুদিংগী নিংশিং যত্নদা য়াওরে',
+
   language: 'লোল',
   textSize: 'ইয়েক চাওনা',
   normal: 'গুনবাল',
   large: 'অচৌবা',
+  standardText: 'গুনবাল',
+  largeText: '🔍 অচৌবা ইয়েক',
+  regionalLanguage: 'মৈতৈলোন (ভাষিনী AI)',
+  regionalLanguageDesc: 'নহাক্কী লোনদা অশেংবা ৱাহৈ অমসুং নিংশিংবা:',
+  accessibility: 'লাইথোকহল্লবা',
+  textScaling: 'ইয়েক চাওনা শেম্বা',
+  dpdpCompliance: 'ডেটা ঙাকশেন (DPDP 2023)',
+  dpdpDesc: 'ডেটা পুম্নমক টেব্লেত অসিদা থম্মি। য়েংসিনবনা মতম খুদিংদা লৌথোকপা য়াই।',
   consent: 'ডেটা অনুমতি',
   consentGranted: 'নহাক্না তৌরবশিংগী ডেটা থম্নবা অয়াবা পীরে',
   revokeConsent: 'অনুমতি লৌথোকপা',
   grantConsent: 'অনুমতি পীবা',
+  consentActive: '✓ অয়াবা পীরে (ঙাকশেল্লবা)',
+  consentRevoked: '✕ অয়াবা লৌথোক্লে',
+  revoke: 'লৌথোকপা',
+  grant: 'পীবা',
+
+  appUpdates: 'এপ্লিকেসন অপদেত',
+  checkForUpdates: 'অনৌবা সংস্করন য়েংবা',
+  checkingUpdates: 'য়েংলি...',
+  upToDate: '✓ অপ-তু-দেত ওইরে',
+  updateAvailableBanner: '🚀 অনৌবা অপদেত ফংলে!',
+  downloadUpdate: 'দাউনলোদ অমসুং অপদেত APK',
+  version: 'সংস্করন',
 };
 
 export const translations: Record<Language, Translations> = { en, as, brx, mni };

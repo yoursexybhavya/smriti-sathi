@@ -69,7 +69,7 @@
   --radius-pill: 9999px;
 
   --touch-min: 56px;
-  --max-width: 580px;
+  --max-width: 640px;
 
   /* Elevation */
   --shadow-card: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
@@ -79,6 +79,18 @@
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-normal: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --max-width: 1120px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --max-width: 1240px;
+  }
 }
 
 /* Reset */
@@ -140,6 +152,14 @@ body {
   margin: 0 auto;
   width: 100%;
   padding-bottom: 96px; /* space for bottom nav */
+  transition: max-width var(--transition-normal);
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
 }
 
 .page {
@@ -267,3 +287,49 @@ body {
   background: var(--color-card-hover);
   border-color: var(--color-text-muted);
 }
+
+/* Tablet Responsive Grids */
+.responsive-layout-2col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .responsive-layout-2col {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 24px;
+    align-items: start;
+  }
+}
+
+.responsive-card-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .responsive-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+}
+
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+@media (min-width: 768px) {
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 20px;
+    align-items: start;
+  }
+}
+

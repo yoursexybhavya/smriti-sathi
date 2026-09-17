@@ -10,7 +10,7 @@ export function BottomNav() {
   const tabs = [
     { path: '/', label: t.home, icon: Sun },
     { path: '/games', label: t.games, icon: Layers },
-    { path: '/caregiver', label: 'My Brain', icon: TrendingUp },
+    { path: '/caregiver', label: t.myBrain, icon: TrendingUp },
     { path: '/reminders', label: t.reminders, icon: Bell },
     { path: '/settings', label: t.settings, icon: User },
   ];

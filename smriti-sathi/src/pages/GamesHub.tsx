@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { Layers, CalendarCheck, Music, HeartHandshake, ChevronRight, Play, Calculator, BookOpen } from 'lucide-react';
 import { usePatient } from '../contexts/PatientContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useAdaptiveDifficulty } from '../hooks/useAdaptiveDifficulty';
 import { useVoice } from '../hooks/useVoice';
 
 export function GamesHub() {
   const { patient } = usePatient();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { speak } = useVoice();
 
@@ -24,7 +26,7 @@ export function GamesHub() {
             letterSpacing: '-0.5px',
           }}
         >
-          Games Library
+          {t.games}
         </h1>
         <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
           Evidence-based cognitive workouts designed for gentle elderly care
@@ -99,7 +101,7 @@ export function GamesHub() {
           CORE COGNITIVE DOMAINS
         </h3>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="responsive-card-grid">
           {/* Game 1 */}
           <div
             className="lumos-card"
@@ -297,7 +299,7 @@ export function GamesHub() {
           NORTH EAST HERITAGE & REMINISCENCE
         </h3>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div className="responsive-card-grid">
           <div
             className="lumos-card"
             onClick={() => {

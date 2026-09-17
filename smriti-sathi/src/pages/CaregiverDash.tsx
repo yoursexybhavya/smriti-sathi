@@ -95,9 +95,17 @@ export function CaregiverDash() {
 
   // Load patient sessions and logs
   const loadData = useCallback(async () => {
-    const allSessions = await db.gameSessions.orderBy('playedAt').reverse().limit(30).toArray();
-    setSessions(allSessions);
-  }, []);
+    if (!patient?.id) {
+      setSessions([]);
+      return;
+    }
+    const allSessions = await db.gameSessions
+      .where('patientId')
+      .equals(patient.id)
+      .reverse()
+      .sortBy('playedAt');
+    setSessions(allSessions.slice(0, 30));
+  }, [patient?.id]);
 
   useEffect(() => {
     loadData();
@@ -171,9 +179,9 @@ export function CaregiverDash() {
   const avgAccuracy =
     totalGames > 0
       ? Math.round((sessions.reduce((acc, s) => acc + s.accuracy, 0) / totalGames) * 100)
-      : 78;
+      : 0;
 
-  const calculatedLPI = totalGames > 0 ? 600 + Math.round(avgAccuracy * 2.8) : 785;
+  const calculatedLPI = totalGames > 0 ? Math.min(999, Math.round(400 + avgAccuracy * 4.5)) : 0;
   const chartSessions = [...sessions].reverse().slice(-10);
 
   return (

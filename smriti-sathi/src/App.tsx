@@ -4,6 +4,7 @@ import { PatientProvider } from './contexts/PatientContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { TopHeader } from './components/TopHeader';
 import { BottomNav } from './components/BottomNav';
+import { UpdateBanner } from './components/UpdateChecker';
 import { Home } from './pages/Home';
 import { GamesHub } from './pages/GamesHub';
 import { MemoryMatch } from './pages/MemoryMatch';
@@ -21,6 +22,7 @@ export default function App() {
         <LanguageProvider>
           <PatientProvider>
             <div className="app-container">
+              <UpdateBanner />
               <TopHeader />
               <div style={{ flex: 1 }}>
                 <Routes>
