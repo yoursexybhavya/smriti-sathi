@@ -94,6 +94,20 @@ if (fs.existsSync(distPath)) {
   app.get('*', (req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
   });
+} else {
+  app.get('/', (req, res) => {
+    res.json({
+      status: 'ONLINE',
+      message: 'Smriti Sathi Cloud Testing Server is live & healthy!',
+      platform: 'SIH26003',
+      endpoints: {
+        health: '/health',
+        sync: 'POST /api/sync',
+        telemetry: 'GET /api/telemetry',
+        sos: 'POST /api/sos'
+      }
+    });
+  });
 }
 
 app.listen(PORT, '0.0.0.0', () => {
