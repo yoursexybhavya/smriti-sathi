@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="128" fill="#2D6A4F"/>
+  <circle cx="256" cy="256" r="180" fill="#FFF8F0" opacity="0.15"/>
+  <!-- Gentle Tea Leaf / Mind Motif -->
+  <path d="M256 100 C340 100 400 180 400 280 C400 370 330 420 256 420 C182 420 112 370 112 280 C112 180 172 100 256 100 Z" fill="#FFF8F0"/>
+  <path d="M256 120 C256 220 220 320 160 380" stroke="#2D6A4F" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <path d="M256 240 C285 220 320 220 345 240" stroke="#2D6A4F" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M230 300 C270 285 300 295 325 320" stroke="#2D6A4F" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <circle cx="256" cy="180" r="16" fill="#BC6C25"/>
+</svg>

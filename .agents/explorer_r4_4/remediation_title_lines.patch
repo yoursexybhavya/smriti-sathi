@@ -1,0 +1,36 @@
+--- generate_deck.js
++++ generate_deck.js
+@@ -728,18 +728,10 @@
+     });
+ 
+-    // Gold Accent Rule
+-    slide.addShape(pres.shapes.LINE, {
+-      x: 0.8,
+-      y: 2.10,
+-      w: 2.0,
+-      h: 0,
+-      line: { color: C.GOLD, width: 1.5 }
+-    });
+-
+-    // Subtitle
++    // Subtitle (positioned with natural whitespace below headline, no accent rule)
+     slide.addText('India preserves 3,693 protected monuments, yet 98% offer zero native digital context on-site.', {
+       x: 0.8,
+-      y: 2.22,
++      y: 2.18,
+       w: 5.5,
+       h: 0.55,
+       fontFace: FONT.BODY,
+@@ -2588,11 +2580,2 @@
+     });
+ 
+-    // Decorative divider rule with center reticle
+-    slide.addShape(pres.shapes.LINE, {
+-      x: 4.666,
+-      y: 2.15,
+-      w: 4.00,
+-      h: 0,
+-      line: { color: C.GOLD, width: 1 }
+-    });
+-    addCoordinateReticle(slide, pres, 6.666, 2.15);
+-

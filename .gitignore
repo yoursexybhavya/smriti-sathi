@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# Builds & Binaries
+dist/
+build/
+*.apk
+
+# Environment & OS
+.DS_Store
+.env
+.env.local
+
