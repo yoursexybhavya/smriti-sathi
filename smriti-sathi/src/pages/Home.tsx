@@ -12,18 +12,15 @@ import {
   Brain,
   Layers,
   CalendarCheck,
-  CheckCircle2,
 } from 'lucide-react';
 import { usePatient } from '../contexts/PatientContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useVoice } from '../hooks/useVoice';
 import { db } from '../db/database';
 
 export function Home() {
   const { patient, refreshStats } = usePatient();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { speak } = useVoice();
 
   const [todayPlayedCount, setTodayPlayedCount] = useState(0);
 
@@ -47,6 +44,12 @@ export function Home() {
     <div className="page" style={{ padding: '8px 16px 32px 16px', gap: '20px' }}>
       {/* Personalized Greeting Header */}
       <div>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', backgroundColor: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '9999px', padding: '4px 12px', marginBottom: '8px' }}>
+          <Brain size={14} color="#38BDF8" />
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#38BDF8', letterSpacing: '0.5px' }}>
+            Smriti Sathi (স্মৃতি সাথী) — Memory Care Companion
+          </span>
+        </div>
         <h1
           style={{
             fontSize: 'var(--font-size-2xl)',
@@ -320,13 +323,10 @@ export function Home() {
                 <ChevronRight size={20} color="#647B99" />
               </div>
 
-              {/* Exercise 3: Reminiscence & Voice Care */}
+              {/* Exercise 3: Math Workout — Processing Speed */}
               <div
                 className="lumos-card"
-                onClick={() => {
-                  speak(t.ebbFlowTitle);
-                  navigate('/games/memory-match');
-                }}
+                onClick={() => navigate('/games/math')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -341,22 +341,22 @@ export function Home() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '50%',
-                      backgroundColor: '#0D9488',
+                      backgroundColor: '#DB2777',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      boxShadow: '0 4px 12px rgba(13, 148, 136, 0.3)',
+                      boxShadow: '0 4px 12px rgba(219, 39, 119, 0.3)',
                     }}
                   >
-                    <Sparkles size={24} color="#FFFFFF" />
+                    <Calculator size={24} color="#FFFFFF" />
                   </div>
                   <div>
                     <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                      {t.ebbFlowTitle}
+                      {t.mathEstimation}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: 800, color: '#2DD4BF', letterSpacing: '0.5px' }}>
-                      {t.ebbFlowSubtitle}
+                    <div style={{ fontSize: '12px', fontWeight: 800, color: '#F472B6', letterSpacing: '0.5px' }}>
+                      {t.mathWorkoutSubtitle || 'PROCESSING SPEED'}
                     </div>
                   </div>
                 </div>
@@ -364,10 +364,10 @@ export function Home() {
                 <ChevronRight size={20} color="#647B99" />
               </div>
 
-              {/* Exercise 4: Train of Thought */}
+              {/* Exercise 4: Language & Proverbs — Attention & Focus */}
               <div
                 className="lumos-card"
-                onClick={() => navigate('/reminders')}
+                onClick={() => navigate('/games/language')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -382,22 +382,22 @@ export function Home() {
                       width: '48px',
                       height: '48px',
                       borderRadius: '50%',
-                      backgroundColor: '#16A34A',
+                      backgroundColor: '#0891B2',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
-                      boxShadow: '0 4px 12px rgba(22, 163, 74, 0.3)',
+                      boxShadow: '0 4px 12px rgba(8, 145, 178, 0.3)',
                     }}
                   >
-                    <CheckCircle2 size={24} color="#FFFFFF" />
+                    <BookOpen size={24} color="#FFFFFF" />
                   </div>
                   <div>
                     <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                      {t.trainOfThoughtTitle}
+                      {t.languageBhashini}
                     </div>
-                    <div style={{ fontSize: '12px', fontWeight: 800, color: '#4ADE80', letterSpacing: '0.5px' }}>
-                      {t.trainOfThoughtSubtitle}
+                    <div style={{ fontSize: '12px', fontWeight: 800, color: '#22D3EE', letterSpacing: '0.5px' }}>
+                      {t.languageWorkoutSubtitle || 'ATTENTION & FOCUS'}
                     </div>
                   </div>
                 </div>

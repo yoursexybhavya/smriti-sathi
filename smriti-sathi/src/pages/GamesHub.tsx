@@ -1,15 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { Layers, CalendarCheck, Music, HeartHandshake, ChevronRight, Play, Calculator, BookOpen } from 'lucide-react';
+import { Layers, CalendarCheck, ChevronRight, Play, Calculator, BookOpen } from 'lucide-react';
 import { usePatient } from '../contexts/PatientContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAdaptiveDifficulty } from '../hooks/useAdaptiveDifficulty';
-import { useVoice } from '../hooks/useVoice';
 
 export function GamesHub() {
   const { patient } = usePatient();
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { speak } = useVoice();
 
   const { currentLevel: memLevel } = useAdaptiveDifficulty(patient?.id, 'memoryMatch');
   const { currentLevel: routineLevel } = useAdaptiveDifficulty(patient?.id, 'dailyRoutine');
@@ -275,119 +273,6 @@ export function GamesHub() {
                 <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
                   <span className="pill-badge pill-speed">BHASHINI AI</span>
                   <span style={{ fontSize: '11px', color: '#22D3EE', fontWeight: 700 }}>MULTILINGUAL</span>
-                </div>
-              </div>
-            </div>
-
-            <ChevronRight size={20} color="#647B99" />
-          </div>
-        </div>
-      </div>
-
-      {/* Reminiscence & Regional Culture Module */}
-      <div>
-        <h3
-          style={{
-            fontSize: 'var(--font-size-base)',
-            fontWeight: 800,
-            color: '#647B99',
-            letterSpacing: '0.8px',
-            marginBottom: '12px',
-            textTransform: 'uppercase',
-          }}
-        >
-          {t.northEastHeritage}
-        </h3>
-        <p style={{ fontSize: 'var(--font-size-xs)', color: 'var(--color-text-secondary)', marginBottom: '14px' }}>
-          {t.northEastHeritageDesc}
-        </p>
-
-        <div className="responsive-card-grid">
-          <div
-            className="lumos-card"
-            onClick={() => {
-              speak('Regional folk melodies: Bihu, Losar, and Chapchar Kut songs for reminiscence therapy.');
-              navigate('/games/memory-match');
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '16px',
-              cursor: 'pointer',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '16px',
-                  backgroundColor: '#8B5CF6',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
-                }}
-              >
-                <Music size={26} color="#FFFFFF" />
-              </div>
-              <div>
-                <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                  {t.ebbFlowTitle}
-                </div>
-                <div style={{ fontSize: '12px', color: '#94A9C4', marginTop: '2px' }}>
-                  {t.ebbFlowSubtitle}
-                </div>
-                <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                  <span className="pill-badge pill-reasoning">REMINISCENCE</span>
-                </div>
-              </div>
-            </div>
-
-            <ChevronRight size={20} color="#647B99" />
-          </div>
-
-          <div
-            className="lumos-card"
-            onClick={() => {
-              speak('Family photo album reminiscence. Caregivers can upload personalized photos.');
-              navigate('/games/memory-match');
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '16px',
-              cursor: 'pointer',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '16px',
-                  backgroundColor: '#EC4899',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)',
-                }}
-              >
-                <HeartHandshake size={26} color="#FFFFFF" />
-              </div>
-              <div>
-                <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                  {t.favorites}
-                </div>
-                <div style={{ fontSize: '12px', color: '#94A9C4', marginTop: '2px' }}>
-                  {t.favoritesDesc}
-                </div>
-                <div style={{ display: 'flex', gap: '6px', marginTop: '6px' }}>
-                  <span className="pill-badge pill-health">FAMILY</span>
                 </div>
               </div>
             </div>

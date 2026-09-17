@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { db, type Patient, type GameSession } from '../db/database';
+import { seedDemoProfiles } from '../db/demoData';
 
 export interface PatientStats {
   streak: number;
@@ -26,6 +27,8 @@ interface PatientContextType {
   deletePatient: (id: number) => Promise<void>;
   refreshStats: () => Promise<void>;
   clearAllData: () => Promise<void>;
+  seedClinicalDemo: () => Promise<void>;
+  resetToFreshInstall: () => Promise<void>;
   setUserRole: (role: 'elder' | 'caregiver') => Promise<void>;
   completeOnboarding: (data: {
     name: string;
@@ -310,6 +313,49 @@ export function PatientProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const seedClinicalDemo = async () => {
+    try {
+      setIsLoading(true);
+      await db.gameSessions.clear();
+      await db.reminderLogs.clear();
+      await db.patients.clear();
+      await seedDemoProfiles();
+      const all = await db.patients.toArray();
+      setPatientsState(all);
+      setSetupCompleted(true);
+      if (all.length > 0) {
+        setPatientState(all[0]);
+        const s = await calculatePatientStats(all[0].id!);
+        setStats(s);
+      }
+    } catch (err) {
+      console.error('Error seeding demo profiles:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetToFreshInstall = async () => {
+    try {
+      setIsLoading(true);
+      await db.patients.clear();
+      await db.gameSessions.clear();
+      await db.reminders.clear();
+      await db.reminderLogs.clear();
+      await db.settings.clear();
+      localStorage.removeItem('smriti_language');
+      setPatientsState([]);
+      setPatientState(null);
+      setSetupCompleted(false);
+      setUserRoleState('elder');
+      setStats({ streak: 0, cpi: 0, totalPlayed: 0 });
+    } catch (err) {
+      console.error('Error resetting to fresh install:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <PatientContext.Provider
       value={{
@@ -326,6 +372,8 @@ export function PatientProvider({ children }: { children: ReactNode }) {
         deletePatient,
         refreshStats,
         clearAllData,
+        seedClinicalDemo,
+        resetToFreshInstall,
         setUserRole,
         completeOnboarding,
         verifyCaregiverPin,

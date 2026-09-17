@@ -10,10 +10,20 @@ export const BHASHINI_CONFIG = {
   PIPELINE_URL: 'https://dhruva-api.bhashini.gov.in/services/inference/pipeline',
 };
 
+const ttsAudioCache = new Map<string, string>();
+
 export async function synthesizeBhashiniTTS(
   text: string,
   sourceLanguage: 'as' | 'brx' | 'mni' | 'en'
 ): Promise<string | null> {
+  const cacheKey = `${sourceLanguage}:${text.trim()}`;
+  if (ttsAudioCache.has(cacheKey)) {
+    return ttsAudioCache.get(cacheKey)!;
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2200);
+
   try {
     const payload = {
       pipelineTasks: [
@@ -45,7 +55,10 @@ export async function synthesizeBhashiniTTS(
         'ulca-api-key': BHASHINI_CONFIG.UDYAT_API_KEY,
       },
       body: JSON.stringify(payload),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!res.ok) {
       console.warn('Bhashini TTS responded with status:', res.status);
@@ -55,10 +68,13 @@ export async function synthesizeBhashiniTTS(
     const data = await res.json();
     const audioContent = data?.pipelineResponse?.[0]?.audio?.[0]?.audioContent;
     if (audioContent) {
-      return `data:audio/wav;base64,${audioContent}`;
+      const audioUri = `data:audio/wav;base64,${audioContent}`;
+      ttsAudioCache.set(cacheKey, audioUri);
+      return audioUri;
     }
     return null;
   } catch (err) {
+    clearTimeout(timeoutId);
     console.warn('Bhashini TTS network/offline fallback triggered:', err);
     return null;
   }

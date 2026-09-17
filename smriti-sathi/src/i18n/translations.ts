@@ -35,6 +35,8 @@ export interface Translations {
   speedMatchSubtitle: string;
   masterpieceTitle: string;
   masterpieceSubtitle: string;
+  mathWorkoutSubtitle: string;
+  languageWorkoutSubtitle: string;
   ebbFlowTitle: string;
   ebbFlowSubtitle: string;
   trainOfThoughtTitle: string;
@@ -258,9 +260,11 @@ const en: Translations = {
   workoutDesc: "Each game exercises a different domain of your thinking. Let's give them all a try.",
   todaysExercises: "Today's Exercises",
   speedMatchTitle: 'Speed Match',
-  speedMatchSubtitle: 'SPEED • MEMORY',
+  speedMatchSubtitle: 'WORKING MEMORY',
   masterpieceTitle: 'Masterpiece (Daily Routine)',
-  masterpieceSubtitle: 'REASONING • ORIENTATION',
+  masterpieceSubtitle: 'TEMPORAL ORIENTATION',
+  mathWorkoutSubtitle: 'PROCESSING SPEED',
+  languageWorkoutSubtitle: 'ATTENTION & FOCUS',
   ebbFlowTitle: 'Ebb and Flow (Reminiscence)',
   ebbFlowSubtitle: 'FLEXIBILITY • HERITAGE',
   trainOfThoughtTitle: 'Train of Thought (Routine & Meds)',
@@ -470,9 +474,11 @@ const as: Translations = {
   workoutDesc: 'প্ৰতিটো খেলেই আপোনাৰ চিন্তা-শক্তিৰ ভিন্ন অংশক সক্ৰিয় কৰে। আহক খেলো।',
   todaysExercises: 'আজিৰ অনুশীলনসমূহ',
   speedMatchTitle: 'দ্ৰুত স্মৃতি মিলন',
-  speedMatchSubtitle: 'গতি • স্মৃতি শক্তি',
+  speedMatchSubtitle: 'কাৰ্য্যকৰী স্মৃতি (WORKING MEMORY)',
   masterpieceTitle: 'দৈনন্দিন অভ্যাস (ক্ৰম সজ্জা)',
-  masterpieceSubtitle: 'যুক্তি • দৈনন্দিন ক্ৰম',
+  masterpieceSubtitle: 'সময় আৰু স্থান (TEMPORAL ORIENTATION)',
+  mathWorkoutSubtitle: 'প্ৰক্ৰিয়াকৰণ গতি (PROCESSING SPEED)',
+  languageWorkoutSubtitle: 'মনোযোগ আৰু একাগ্ৰতা (ATTENTION & FOCUS)',
   ebbFlowTitle: 'স্মৃতি আৰু সুৰ (অতীত সোঁৱৰণ)',
   ebbFlowSubtitle: 'মনৰ স্থিতি • ঐতিহ্য',
   trainOfThoughtTitle: 'মনোযোগ আৰু ঔষধ সোঁৱৰণী',
@@ -683,9 +689,11 @@ const brx: Translations = {
   workoutDesc: 'मोनफ्रोमबो गेलेनाया नोंथाइनि साननाय शक्तिखौ बांहोयो। फै गेलेनो।',
   todaysExercises: 'दिनैनि गेलेनायफोर',
   speedMatchTitle: 'गोख्रै मोनथाइ',
-  speedMatchSubtitle: 'गोख्रै • मोनथाइ',
+  speedMatchSubtitle: 'मोनथाइ सांग्रांथि (WORKING MEMORY)',
   masterpieceTitle: 'सानफ्रोमबोनि खामानि',
-  masterpieceSubtitle: 'साननाय • सारि दोननाय',
+  masterpieceSubtitle: 'सान आरो जायगा (TEMPORAL ORIENTATION)',
+  mathWorkoutSubtitle: 'गोख्रै सांग्रांथि (PROCESSING SPEED)',
+  languageWorkoutSubtitle: 'गोसो होनाय (ATTENTION & FOCUS)',
   ebbFlowTitle: 'गोसोखांफानाय आरो खन्थाइ',
   ebbFlowSubtitle: 'गोसोनि गोहो • दोहोरोम',
   trainOfThoughtTitle: 'गोसो होनाय आरो मुलि',
@@ -896,9 +904,11 @@ const mni: Translations = {
   workoutDesc: 'শানাথোই খুদিংমক্না ৱাখলবু হেন্না থৌনা হাপ্পা ঙমহল্লি। শানসি।',
   todaysExercises: 'ঙসিগী শানাথোইশিং',
   speedMatchTitle: 'য়াম্না থুনা নিংশিংবা',
-  speedMatchSubtitle: 'খোংজেল • নিংশিংবা',
+  speedMatchSubtitle: 'নিংশিংবা মশক (WORKING MEMORY)',
   masterpieceTitle: 'নুমিৎ খুদিংগী থবক',
-  masterpieceSubtitle: 'ৱাখল • মতম ক্ৰম',
+  masterpieceSubtitle: 'মতমগী ৱাখল্লোন (TEMPORAL ORIENTATION)',
+  mathWorkoutSubtitle: 'খোংজেলগী মশক (PROCESSING SPEED)',
+  languageWorkoutSubtitle: 'পুংলুকচিংবা (ATTENTION & FOCUS)',
   ebbFlowTitle: 'পুন্সিগী নীংশিংবা শৈশক',
   ebbFlowSubtitle: 'ৱাখল শিংথা • লিখন',
   trainOfThoughtTitle: 'লুচিংবা অমসুং হিদাক নীংশিংবা',

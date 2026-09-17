@@ -11,7 +11,7 @@ interface FirstLaunchOnboardingProps {
 
 export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps) {
   const { language, setLanguage } = useLanguage();
-  const { completeOnboarding } = usePatient();
+  const { completeOnboarding, seedClinicalDemo } = usePatient();
   const { speak } = useVoice();
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -206,6 +206,34 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
               <span>Next / আগবাঢ়ক</span>
               <ArrowRight size={20} />
             </button>
+
+            {/* Quick Demo Mode for SIH Judges & Evaluators */}
+            <div style={{ marginTop: '14px', textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={async () => {
+                  await seedClinicalDemo();
+                  onComplete();
+                }}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.08)',
+                  border: '1px dashed #38BDF8',
+                  borderRadius: '12px',
+                  padding: '12px 14px',
+                  color: '#38BDF8',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
+                <span>✨ SIH Judge Mode: Load 14-Day Clinical Profiles & Signals</span>
+              </button>
+            </div>
           </div>
         )}
 
