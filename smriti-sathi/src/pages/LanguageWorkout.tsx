@@ -4,6 +4,7 @@ import { ArrowLeft, Volume2, RotateCcw, Home, Award, BookOpen, Check } from 'luc
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
+import { useInactivityScaffold } from '../hooks/useInactivityScaffold';
 import { db } from '../db/database';
 
 interface LanguageCard {
@@ -47,6 +48,7 @@ export function LanguageWorkout() {
   const { t, language } = useLanguage();
   const { patient, refreshStats } = usePatient();
   const { speak, playSuccessChime, playCardFlip } = useVoice();
+  const { showScaffold, resetInactivity } = useInactivityScaffold(3000);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -57,56 +59,50 @@ export function LanguageWorkout() {
   const card = LANGUAGE_DATA[currentIndex];
 
   useEffect(() => {
+    resetInactivity();
     if (card && !isComplete) {
       speak(`${card.word}. ${card.meaning}`, language);
     }
-  }, [currentIndex, isComplete, language]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentIndex, isComplete, language, resetInactivity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOptionSelect = (opt: string) => {
     if (selectedOption !== null || isComplete) return;
 
+    const isMatch = opt === card.options[0]; // first option in our array is the right answer
+    if (!isMatch) return;
+
     playCardFlip();
     setSelectedOption(opt);
+    playSuccessChime();
+    setIsCorrect(true);
+    setScore((prev) => prev + 1);
+    speak(t.greatJob, language);
 
-    const isMatch = opt === card.options[0]; // first option in our array is the right answer
-    if (isMatch) {
-      playSuccessChime();
-      setIsCorrect(true);
-      setScore((prev) => prev + 1);
-      speak(t.greatJob, language);
-
-      setTimeout(() => {
-        if (currentIndex < LANGUAGE_DATA.length - 1) {
-          setCurrentIndex((prev) => prev + 1);
-          setSelectedOption(null);
-          setIsCorrect(null);
-        } else {
-          setIsComplete(true);
-          if (patient?.id) {
-            db.gameSessions.add({
-              patientId: patient.id,
-              gameType: 'language',
-              domain: 'attentionFocus',
-              difficulty: 2,
-              score: 100,
-              accuracy: 1.0,
-              responseTimeMs: 3800,
-              distractorRejectionRate: 1.0,
-              playedAt: new Date(),
-              synced: 0,
-            }).then(() => refreshStats());
-          }
-          speak(t.gameComplete, language);
-        }
-      }, 1600);
-    } else {
-      setIsCorrect(false);
-      speak(t.tryAgain, language);
-      setTimeout(() => {
+    setTimeout(() => {
+      if (currentIndex < LANGUAGE_DATA.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
         setSelectedOption(null);
         setIsCorrect(null);
-      }, 1400);
-    }
+        resetInactivity();
+      } else {
+        setIsComplete(true);
+        if (patient?.id) {
+          db.gameSessions.add({
+            patientId: patient.id,
+            gameType: 'language',
+            domain: 'attentionFocus',
+            difficulty: 2,
+            score: 100,
+            accuracy: 1.0,
+            responseTimeMs: 3800,
+            distractorRejectionRate: 1.0,
+            playedAt: new Date(),
+            synced: 0,
+          }).then(() => refreshStats());
+        }
+        speak(t.gameComplete, language);
+      }
+    }, 1600);
   };
 
   return (
@@ -230,37 +226,38 @@ export function LanguageWorkout() {
         {/* Meaning Option Buttons */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {card.options.map((opt) => {
+            const isTarget = opt === card.options[0];
             const isSelected = selectedOption === opt;
             const isThisCorrect = isSelected && isCorrect === true;
-            const isThisWrong = isSelected && isCorrect === false;
+            const shouldPulse = isTarget && showScaffold && selectedOption === null;
 
             return (
               <button
                 key={opt}
                 onClick={() => handleOptionSelect(opt)}
-                disabled={selectedOption !== null}
+                disabled={selectedOption !== null || !isTarget}
+                className={shouldPulse ? 'scaffold-pulse-active' : ''}
                 style={{
                   padding: '16px 20px',
                   borderRadius: 'var(--radius-md)',
-                  backgroundColor: isThisCorrect
-                    ? '#064E3B'
-                    : isThisWrong
-                    ? '#7F1D1D'
-                    : '#15253B',
+                  backgroundColor: isThisCorrect ? '#064E3B' : '#15253B',
                   border: isThisCorrect
                     ? '2px solid #10B981'
-                    : isThisWrong
-                    ? '2px solid #EF4444'
+                    : shouldPulse
+                    ? '2px solid #10B981'
                     : '1px solid #223752',
                   color: '#FFFFFF',
                   fontSize: '16px',
                   fontWeight: 700,
-                  cursor: selectedOption !== null ? 'default' : 'pointer',
+                  opacity: isTarget ? 1 : 0.35,
+                  cursor: !isTarget ? 'not-allowed' : selectedOption !== null ? 'default' : 'pointer',
+                  pointerEvents: isTarget ? 'auto' : 'none',
                   transition: 'all 0.15s ease',
                   textAlign: 'left',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
+                  boxShadow: isThisCorrect ? '0 0 16px rgba(16, 185, 129, 0.4)' : 'var(--shadow-card)',
                 }}
               >
                 <span>{opt}</span>
@@ -349,6 +346,7 @@ export function LanguageWorkout() {
                   setIsCorrect(null);
                   setScore(0);
                   setIsComplete(false);
+                  resetInactivity();
                 }}
               >
                 <RotateCcw size={18} />

@@ -362,3 +362,41 @@ body {
   }
 }
 
+/* ==========================================================================
+   Errorless Learning: Scaffolding Visual Pulse
+   Inviting emerald beacon pulse for elder guidance after inactivity
+   ========================================================================== */
+@keyframes scaffoldPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 24px 8px rgba(16, 185, 129, 0.5);
+    transform: scale(1.06);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    transform: scale(1);
+  }
+}
+
+.scaffold-pulse-active,
+.scaffold-pulse {
+  animation: scaffoldPulse 1.4s infinite ease-in-out !important;
+  border-color: #10B981 !important;
+  position: relative;
+  z-index: 5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scaffold-pulse-active,
+  .scaffold-pulse {
+    animation: none !important;
+    transform: none !important;
+    outline: 4px solid #10B981 !important;
+    box-shadow: 0 0 24px 8px rgba(16, 185, 129, 0.6) !important;
+    border-color: #10B981 !important;
+  }
+}
+

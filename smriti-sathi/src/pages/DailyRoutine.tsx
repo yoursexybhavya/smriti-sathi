@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';
 import { useAdaptiveDifficulty } from '../hooks/useAdaptiveDifficulty';
 import { useVoice } from '../hooks/useVoice';
+import { useInactivityScaffold } from '../hooks/useInactivityScaffold';
 import {
   createGame,
   selectCard,
@@ -27,6 +28,7 @@ export function DailyRoutine() {
   const [gameState, setGameState] = useState<DailyRoutineState | null>(null);
   const [showHints, setShowHints] = useState(true);
   const [hasSaved, setHasSaved] = useState(false);
+  const { showScaffold, resetInactivity } = useInactivityScaffold(3000);
 
   const getActivityLabel = (key: string): string => {
     return (t as unknown as Record<string, string>)[key] || key;
@@ -37,13 +39,14 @@ export function DailyRoutine() {
     setGameState(newGame);
     setShowHints(true);
     setHasSaved(false);
+    resetInactivity();
 
     if (newGame.config.hintDurationMs > 0) {
       setTimeout(() => {
         setShowHints(false);
       }, newGame.config.hintDurationMs);
     }
-  }, []);
+  }, [resetInactivity]);
 
   useEffect(() => {
     if (!isDiffLoading && !gameState) {
@@ -60,12 +63,18 @@ export function DailyRoutine() {
   const handleSelectCard = (index: number) => {
     if (!gameState || gameState.isComplete) return;
     playCardFlip();
+    resetInactivity();
     setGameState((prev) => (prev ? selectCard(prev, index) : null));
   };
 
   const handleSlotClick = (slotIndex: number) => {
     if (!gameState || gameState.selectedCardIndex === null || gameState.isComplete) return;
 
+    // Errorless learning: prevent invalid placement in slots
+    const card = gameState.shuffledCards[gameState.selectedCardIndex];
+    if (!card || card.order !== slotIndex) return;
+
+    resetInactivity();
     const updated = placeCard(gameState, slotIndex);
     setGameState(updated);
 
@@ -81,8 +90,6 @@ export function DailyRoutine() {
         const labels = updated.placedCards.map((c) => (c ? getActivityLabel(c.label) : ''));
         speak(`${t.greatJob}! ${t.correctOrder}. ${labels.join(', ')}.`);
       }
-    } else {
-      speak(t.tryAgain);
     }
   };
 
@@ -186,12 +193,15 @@ export function DailyRoutine() {
             const isFilled = placed !== null;
             const slotNumberHint =
               gameState.config.showSlotNumbers || showHints ? `#${slotIdx + 1}` : '';
+            const isCorrectSlot = selectedCard !== null && slotIdx === selectedCard.order;
+            const shouldPulseSlot = isCorrectSlot && showScaffold;
 
             return (
               <button
                 key={slotIdx}
                 onClick={() => handleSlotClick(slotIdx)}
-                disabled={isFilled || selectedCard === null}
+                disabled={isFilled || !isCorrectSlot}
+                className={shouldPulseSlot ? 'scaffold-pulse-active' : ''}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -200,17 +210,21 @@ export function DailyRoutine() {
                   borderRadius: 'var(--radius-md)',
                   backgroundColor: isFilled
                     ? '#0F3025'
-                    : selectedCard !== null
+                    : isCorrectSlot
                     ? '#1C314E'
                     : '#15253B',
                   border: isFilled
                     ? '2px solid #10B981'
-                    : selectedCard !== null
+                    : shouldPulseSlot
+                    ? '2px solid #10B981'
+                    : isCorrectSlot
                     ? '2px dashed #FF7247'
                     : '1px solid #223752',
                   minHeight: '68px',
                   width: '100%',
-                  cursor: isFilled ? 'default' : selectedCard ? 'pointer' : 'default',
+                  cursor: isFilled ? 'default' : isCorrectSlot ? 'pointer' : 'not-allowed',
+                  pointerEvents: isFilled ? 'none' : isCorrectSlot ? 'auto' : 'none',
+                  opacity: isFilled ? 1 : selectedCard ? (isCorrectSlot ? 1 : 0.35) : 1,
                   textAlign: 'left',
                   transition: 'all 0.18s ease',
                 }}
@@ -242,7 +256,7 @@ export function DailyRoutine() {
                   </div>
                 ) : (
                   <span style={{ fontSize: 'var(--font-size-sm)', color: '#647B99' }}>
-                    {selectedCard ? `Place here (${slotNumberHint})` : `Empty Slot ${slotIdx + 1}`}
+                    {selectedCard ? (isCorrectSlot ? `Place here (${slotNumberHint})` : `Slot ${slotIdx + 1}`) : `Empty Slot ${slotIdx + 1}`}
                   </span>
                 )}
               </button>
@@ -265,46 +279,62 @@ export function DailyRoutine() {
               gap: '10px',
             }}
           >
-            {gameState.shuffledCards.map((card, idx) => {
-              const isPlaced = gameState.placedCards.some((p) => p?.id === card.id);
-              const isSelected = gameState.selectedCardIndex === idx;
+            {(() => {
+              const firstEmptySlot = gameState.placedCards.findIndex((p) => p === null);
 
-              if (isPlaced) return null;
+              return gameState.shuffledCards.map((card, idx) => {
+                const isPlaced = gameState.placedCards.some((p) => p?.id === card.id);
+                const isSelected = gameState.selectedCardIndex === idx;
 
-              return (
-                <button
-                  key={card.id}
-                  onClick={() => handleSelectCard(idx)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                    padding: '14px 10px',
-                    borderRadius: 'var(--radius-md)',
-                    backgroundColor: isSelected ? '#253E5C' : '#15253B',
-                    border: isSelected ? '2px solid #FF7247' : '1px solid #223752',
-                    boxShadow: isSelected ? '0 0 16px rgba(255, 114, 71, 0.4)' : 'var(--shadow-card)',
-                    cursor: 'pointer',
-                    minHeight: '88px',
-                    transition: 'all 0.15s ease',
-                  }}
-                >
-                  <span style={{ fontSize: '36px' }}>{card.emoji}</span>
-                  <span
+                if (isPlaced) return null;
+
+                const isNextCard = card.order === firstEmptySlot;
+                const shouldPulseCard = selectedCard === null && showScaffold && isNextCard;
+
+                return (
+                  <button
+                    key={card.id}
+                    onClick={() => handleSelectCard(idx)}
+                    className={shouldPulseCard ? 'scaffold-pulse-active' : ''}
                     style={{
-                      fontSize: '13px',
-                      fontWeight: 700,
-                      textAlign: 'center',
-                      color: '#FFFFFF',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '14px 10px',
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: isSelected ? '#253E5C' : '#15253B',
+                      border: isSelected
+                        ? '2px solid #FF7247'
+                        : shouldPulseCard
+                        ? '2px solid #10B981'
+                        : '1px solid #223752',
+                      boxShadow: isSelected
+                        ? '0 0 16px rgba(255, 114, 71, 0.4)'
+                        : shouldPulseCard
+                        ? '0 0 20px rgba(16, 185, 129, 0.4)'
+                        : 'var(--shadow-card)',
+                      cursor: 'pointer',
+                      minHeight: '88px',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    {getActivityLabel(card.label)}
-                  </span>
-                </button>
-              );
-            })}
+                    <span style={{ fontSize: '36px' }}>{card.emoji}</span>
+                    <span
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        textAlign: 'center',
+                        color: '#FFFFFF',
+                      }}
+                    >
+                      {getActivityLabel(card.label)}
+                    </span>
+                  </button>
+                );
+              });
+            })()}
           </div>
         </div>
       )}

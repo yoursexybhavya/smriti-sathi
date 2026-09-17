@@ -17,6 +17,7 @@ import { LanguageWorkout } from './pages/LanguageWorkout';
 import { Reminders } from './pages/Reminders';
 import { Settings } from './pages/Settings';
 import { CaregiverDash } from './pages/CaregiverDash';
+import { useReminderScheduler } from './hooks/useReminderScheduler';
 
 function ProtectedCaregiverRoute() {
   const { userRole } = usePatient();
@@ -74,6 +75,7 @@ function ProtectedCaregiverRoute() {
 
 function AppShell() {
   const { isLoading, setupCompleted, patients } = usePatient();
+  useReminderScheduler();
 
   if (isLoading) {
     return (

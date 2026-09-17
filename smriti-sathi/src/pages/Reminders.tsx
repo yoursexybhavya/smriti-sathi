@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Bell,
   Clock,
@@ -9,12 +9,14 @@ import {
   Pill,
   Calendar,
   Sparkles,
-  X
+  X,
+  Mic,
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
 import { db, type Reminder } from '../db/database';
+import { CaregiverAudioRecorder } from '../components/CaregiverAudioRecorder';
 
 export function Reminders() {
   const { t } = useLanguage();
@@ -24,6 +26,10 @@ export function Reminders() {
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [activeAlert, setActiveAlert] = useState<Reminder | null>(null);
+  const [activeRecordingId, setActiveRecordingId] = useState<number | null>(null);
+  const [draftAudioBlob, setDraftAudioBlob] = useState<Blob | null>(null);
+  const [draftDurationSec, setDraftDurationSec] = useState<number>(0);
+  const activeAlertAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const [newType, setNewType] = useState<'medicine' | 'water' | 'activity' | 'appointment'>('medicine');
   const [newLabel, setNewLabel] = useState('');
@@ -76,17 +82,73 @@ export function Reminders() {
     loadReminders();
   }, [loadReminders]);
 
-  const triggerVoiceAlert = (rem: Reminder) => {
-    setActiveAlert(rem);
-    playReminderChime();
+  const stopAlertAudio = useCallback(() => {
+    if (activeAlertAudioRef.current) {
+      activeAlertAudioRef.current.pause();
+      activeAlertAudioRef.current = null;
+    }
+  }, []);
 
-    let text = t.timeForMedicine;
-    if (rem.type === 'water') text = t.timeForWater;
-    if (rem.type === 'activity') text = t.timeForActivity;
-    speak(`${text}. ${rem.label}`);
+  useEffect(() => {
+    return () => {
+      stopAlertAudio();
+    };
+  }, [stopAlertAudio]);
+
+  const triggerVoiceAlert = (rem: Reminder) => {
+    stopAlertAudio();
+    setActiveAlert(rem);
+
+    if (rem.audioBlob) {
+      try {
+        const audioUrl = URL.createObjectURL(rem.audioBlob);
+        const audio = new Audio(audioUrl);
+        activeAlertAudioRef.current = audio;
+
+        audio.onended = () => {
+          URL.revokeObjectURL(audioUrl);
+          activeAlertAudioRef.current = null;
+        };
+
+        audio.onerror = () => {
+          URL.revokeObjectURL(audioUrl);
+          activeAlertAudioRef.current = null;
+          // Fallback to chime and speech synthesis
+          playReminderChime();
+          let text = t.timeForMedicine;
+          if (rem.type === 'water') text = t.timeForWater;
+          if (rem.type === 'activity') text = t.timeForActivity;
+          speak(`${text}. ${rem.label}`);
+        };
+
+        audio.play().catch((err) => {
+          console.warn('Familiar voice audio playback error:', err);
+          URL.revokeObjectURL(audioUrl);
+          activeAlertAudioRef.current = null;
+          playReminderChime();
+          let text = t.timeForMedicine;
+          if (rem.type === 'water') text = t.timeForWater;
+          if (rem.type === 'activity') text = t.timeForActivity;
+          speak(`${text}. ${rem.label}`);
+        });
+      } catch {
+        playReminderChime();
+        let text = t.timeForMedicine;
+        if (rem.type === 'water') text = t.timeForWater;
+        if (rem.type === 'activity') text = t.timeForActivity;
+        speak(`${text}. ${rem.label}`);
+      }
+    } else {
+      playReminderChime();
+      let text = t.timeForMedicine;
+      if (rem.type === 'water') text = t.timeForWater;
+      if (rem.type === 'activity') text = t.timeForActivity;
+      speak(`${text}. ${rem.label}`);
+    }
   };
 
   const handleAcknowledge = async (rem: Reminder) => {
+    stopAlertAudio();
     playSuccessChime();
 
     await db.reminderLogs.add({
@@ -118,10 +180,15 @@ export function Reminders() {
       repeatDays: [0, 1, 2, 3, 4, 5, 6],
       isActive: true,
       lastAcked: null,
+      audioBlob: draftAudioBlob || undefined,
+      audioDurationSec: draftDurationSec || undefined,
+      audioRecordedAt: draftAudioBlob ? new Date() : undefined,
     };
 
     await db.reminders.add(reminder);
     setNewLabel('');
+    setDraftAudioBlob(null);
+    setDraftDurationSec(0);
     setShowAddModal(false);
     loadReminders();
   };
@@ -211,6 +278,28 @@ export function Reminders() {
           >
             {getTypeIcon(activeAlert.type)}
           </div>
+
+          {activeAlert.audioBlob && (
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid #10B981',
+                borderRadius: '9999px',
+                padding: '4px 12px',
+                fontSize: '12px',
+                color: '#6EE7B7',
+                fontWeight: 700,
+                marginBottom: '10px',
+              }}
+            >
+              <Mic size={14} color="#10B981" />
+              <span>Playing Familiar Caregiver Voice</span>
+            </div>
+          )}
+
           <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
             {activeAlert.label}
           </h2>
@@ -234,6 +323,7 @@ export function Reminders() {
           const isAckedToday =
             rem.lastAcked &&
             new Date(rem.lastAcked).toDateString() === new Date().toDateString();
+          const isInlineRecording = activeRecordingId === rem.id;
 
           return (
             <div
@@ -241,88 +331,151 @@ export function Reminders() {
               className="lumos-card"
               style={{
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                flexDirection: 'column',
                 padding: '16px',
-                border: isAckedToday ? '1px solid #10B981' : '1px solid #223752',
+                border: isAckedToday ? '1px solid #10B981' : isInlineRecording ? '1px solid #38BDF8' : '1px solid #223752',
+                gap: '12px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '14px',
-                    backgroundColor: '#0F1D2F',
-                    border: '1px solid #1E344F',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  {getTypeIcon(rem.type)}
-                </div>
-                <div>
-                  <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
-                    {rem.label}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', flexWrap: 'wrap', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '14px',
+                      backgroundColor: '#0F1D2F',
+                      border: '1px solid #1E344F',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {getTypeIcon(rem.type)}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                    <Clock size={13} color="#647B99" />
-                    <span style={{ fontSize: '13px', color: '#94A9C4', fontWeight: 600 }}>
-                      {formatTime(rem.timeHour, rem.timeMinute)}
-                    </span>
-                    {isAckedToday && (
-                      <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 800, marginLeft: '6px' }}>
-                        &bull; DONE TODAY
+                  <div>
+                    <div style={{ fontSize: 'var(--font-size-base)', fontWeight: 700, color: '#FFFFFF' }}>
+                      {rem.label}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', flexWrap: 'wrap' }}>
+                      <Clock size={13} color="#647B99" />
+                      <span style={{ fontSize: '13px', color: '#94A9C4', fontWeight: 600 }}>
+                        {formatTime(rem.timeHour, rem.timeMinute)}
                       </span>
-                    )}
+                      {rem.audioBlob && (
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            color: '#38BDF8',
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '3px',
+                            backgroundColor: 'rgba(56, 189, 248, 0.12)',
+                            padding: '1px 7px',
+                            borderRadius: '4px',
+                          }}
+                        >
+                          <Mic size={11} color="#38BDF8" />
+                          <span>Familiar Voice ({rem.audioDurationSec || 0}s)</span>
+                        </span>
+                      )}
+                      {isAckedToday && (
+                        <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 800, marginLeft: '6px' }}>
+                          &bull; DONE TODAY
+                        </span>
+                      )}
+                    </div>
                   </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {/* Voice recording trigger button */}
+                  <button
+                    onClick={() => setActiveRecordingId(isInlineRecording ? null : (rem.id || null))}
+                    style={{
+                      background: rem.audioBlob ? 'rgba(56, 189, 248, 0.15)' : '#0F1D2F',
+                      border: rem.audioBlob ? '1px solid #38BDF8' : '1px solid #223752',
+                      borderRadius: '50%',
+                      width: '40px',
+                      height: '40px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: rem.audioBlob ? '#38BDF8' : '#94A9C4',
+                      cursor: 'pointer',
+                    }}
+                    title={rem.audioBlob ? 'Manage voice recording' : 'Record familiar voice'}
+                    aria-label={rem.audioBlob ? 'Manage voice recording' : 'Record familiar voice'}
+                  >
+                    <Mic size={18} />
+                  </button>
+
+                  {/* Voice Test button */}
+                  <button
+                    onClick={() => triggerVoiceAlert(rem)}
+                    style={{
+                      background: '#0F1D2F',
+                      border: '1px solid #223752',
+                      borderRadius: '50%',
+                      width: '40px',
+                      height: '40px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#94A9C4',
+                      cursor: 'pointer',
+                    }}
+                    title="Test spoken prompt"
+                    aria-label="Test spoken prompt"
+                  >
+                    <Volume2 size={18} />
+                  </button>
+
+                  {/* Done check button */}
+                  <button
+                    onClick={() => handleAcknowledge(rem)}
+                    style={{
+                      background: isAckedToday ? '#10B981' : '#172A43',
+                      border: isAckedToday ? 'none' : '1px solid #284469',
+                      borderRadius: 'var(--radius-pill)',
+                      padding: '8px 14px',
+                      color: '#FFFFFF',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    <CheckCircle2 size={16} />
+                    <span>{isAckedToday ? 'Done' : 'Take'}</span>
+                  </button>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {/* Voice Test button */}
-                <button
-                  onClick={() => triggerVoiceAlert(rem)}
-                  style={{
-                    background: '#0F1D2F',
-                    border: '1px solid #223752',
-                    borderRadius: '50%',
-                    width: '40px',
-                    height: '40px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#94A9C4',
-                    cursor: 'pointer',
-                  }}
-                  title="Test spoken prompt"
-                >
-                  <Volume2 size={18} />
-                </button>
-
-                {/* Done check button */}
-                <button
-                  onClick={() => handleAcknowledge(rem)}
-                  style={{
-                    background: isAckedToday ? '#10B981' : '#172A43',
-                    border: isAckedToday ? 'none' : '1px solid #284469',
-                    borderRadius: 'var(--radius-pill)',
-                    padding: '8px 14px',
-                    color: '#FFFFFF',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
-                  <CheckCircle2 size={16} />
-                  <span>{isAckedToday ? 'Done' : 'Take'}</span>
-                </button>
-              </div>
+              {/* Inline Caregiver Audio Recorder */}
+              {isInlineRecording && (
+                <div style={{ borderTop: '1px solid #1E344F', paddingTop: '12px', width: '100%' }}>
+                  <CaregiverAudioRecorder
+                    reminderId={rem.id}
+                    reminderLabel={rem.label}
+                    initialAudioBlob={rem.audioBlob}
+                    initialDurationSec={rem.audioDurationSec}
+                    onSave={async () => {
+                      await loadReminders();
+                      setActiveRecordingId(null);
+                    }}
+                    onDelete={async () => {
+                      await loadReminders();
+                    }}
+                    onCancel={() => setActiveRecordingId(null)}
+                    compact
+                  />
+                </div>
+              )}
             </div>
           );
         })}
@@ -357,7 +510,11 @@ export function Reminders() {
                 Add Care Reminder
               </h2>
               <button
-                onClick={() => setShowAddModal(false)}
+                onClick={() => {
+                  setDraftAudioBlob(null);
+                  setDraftDurationSec(0);
+                  setShowAddModal(false);
+                }}
                 style={{ background: 'none', border: 'none', color: '#94A9C4', cursor: 'pointer' }}
               >
                 <X size={20} />
@@ -457,6 +614,28 @@ export function Reminders() {
                       fontSize: '14px',
                       marginTop: '6px',
                     }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 800, color: '#647B99', textTransform: 'uppercase' }}>
+                  Familiar Voice Prompt (Optional)
+                </label>
+                <div style={{ marginTop: '6px' }}>
+                  <CaregiverAudioRecorder
+                    reminderLabel={newLabel || 'New Routine'}
+                    initialAudioBlob={draftAudioBlob}
+                    initialDurationSec={draftDurationSec}
+                    onSave={(blob, dur) => {
+                      setDraftAudioBlob(blob);
+                      setDraftDurationSec(dur);
+                    }}
+                    onDelete={() => {
+                      setDraftAudioBlob(null);
+                      setDraftDurationSec(0);
+                    }}
+                    compact
                   />
                 </div>
               </div>

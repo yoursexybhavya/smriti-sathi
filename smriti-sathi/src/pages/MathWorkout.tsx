@@ -4,6 +4,7 @@ import { ArrowLeft, Volume2, RotateCcw, Home, Award, Calculator } from 'lucide-r
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
+import { useInactivityScaffold } from '../hooks/useInactivityScaffold';
 import { db } from '../db/database';
 
 interface MathQuestion {
@@ -67,6 +68,7 @@ export function MathWorkout() {
   const { t, language } = useLanguage();
   const { patient, refreshStats } = usePatient();
   const { speak, playSuccessChime, playCardFlip } = useVoice();
+  const { showScaffold, resetInactivity } = useInactivityScaffold(3000);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -80,58 +82,53 @@ export function MathWorkout() {
   const currentPrompt = question.prompt[langKey] || question.prompt.en;
 
   useEffect(() => {
+    resetInactivity();
     if (question && !isComplete) {
       const totalText = question.items
         .map((it) => `${it.name[langKey] || it.name.en} ${it.cost}`)
         .join(', ');
       speak(`${currentPrompt}. ${totalText}.`, language);
     }
-  }, [currentIndex, isComplete, language]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentIndex, isComplete, language, resetInactivity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOptionSelect = (opt: number) => {
     if (selectedOption !== null || isComplete) return;
 
+    // Errorless learning: prevent incorrect selections entirely
+    if (opt !== question.correctAnswer) return;
+
     playCardFlip();
     setSelectedOption(opt);
+    playSuccessChime();
+    setIsCorrect(true);
+    setScore((prev) => prev + 1);
+    speak(t.greatJob, language);
 
-    if (opt === question.correctAnswer) {
-      playSuccessChime();
-      setIsCorrect(true);
-      setScore((prev) => prev + 1);
-      speak(t.greatJob, language);
-
-      setTimeout(() => {
-        if (currentIndex < MATH_QUESTIONS.length - 1) {
-          setCurrentIndex((prev) => prev + 1);
-          setSelectedOption(null);
-          setIsCorrect(null);
-        } else {
-          setIsComplete(true);
-          if (patient?.id) {
-            db.gameSessions.add({
-              patientId: patient.id,
-              gameType: 'math',
-              domain: 'processingSpeed',
-              difficulty: 1,
-              score: 100,
-              accuracy: 1.0,
-              responseTimeMs: 3500,
-              latencyMs: 3500,
-              playedAt: new Date(),
-              synced: 0,
-            }).then(() => refreshStats());
-          }
-          speak(t.gameComplete, language);
-        }
-      }, 1500);
-    } else {
-      setIsCorrect(false);
-      speak(t.tryAgain, language);
-      setTimeout(() => {
+    setTimeout(() => {
+      if (currentIndex < MATH_QUESTIONS.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
         setSelectedOption(null);
         setIsCorrect(null);
-      }, 1400);
-    }
+        resetInactivity();
+      } else {
+        setIsComplete(true);
+        if (patient?.id) {
+          db.gameSessions.add({
+            patientId: patient.id,
+            gameType: 'math',
+            domain: 'processingSpeed',
+            difficulty: 1,
+            score: 100,
+            accuracy: 1.0,
+            responseTimeMs: 3500,
+            latencyMs: 3500,
+            playedAt: new Date(),
+            synced: 0,
+          }).then(() => refreshStats());
+        }
+        speak(t.gameComplete, language);
+      }
+    }, 1500);
   };
 
   return (
@@ -273,32 +270,32 @@ export function MathWorkout() {
         {/* Option Buttons */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
           {question.options.map((opt) => {
+            const isTarget = opt === question.correctAnswer;
             const isSelected = selectedOption === opt;
             const isThisCorrect = isSelected && isCorrect === true;
-            const isThisWrong = isSelected && isCorrect === false;
+            const shouldPulse = isTarget && showScaffold && selectedOption === null;
 
             return (
               <button
                 key={opt}
                 onClick={() => handleOptionSelect(opt)}
-                disabled={selectedOption !== null}
+                disabled={selectedOption !== null || !isTarget}
+                className={shouldPulse ? 'scaffold-pulse-active' : ''}
                 style={{
                   padding: '16px 8px',
                   borderRadius: 'var(--radius-md)',
-                  backgroundColor: isThisCorrect
-                    ? '#064E3B'
-                    : isThisWrong
-                    ? '#7F1D1D'
-                    : '#15253B',
+                  backgroundColor: isThisCorrect ? '#064E3B' : '#15253B',
                   border: isThisCorrect
                     ? '2px solid #10B981'
-                    : isThisWrong
-                    ? '2px solid #EF4444'
+                    : shouldPulse
+                    ? '2px solid #10B981'
                     : '1px solid #223752',
                   color: '#FFFFFF',
                   fontSize: '22px',
                   fontWeight: 800,
-                  cursor: selectedOption !== null ? 'default' : 'pointer',
+                  opacity: isTarget ? 1 : 0.35,
+                  cursor: !isTarget ? 'not-allowed' : selectedOption !== null ? 'default' : 'pointer',
+                  pointerEvents: isTarget ? 'auto' : 'none',
                   transition: 'all 0.15s ease',
                   boxShadow: isThisCorrect ? '0 0 16px rgba(16, 185, 129, 0.4)' : 'var(--shadow-card)',
                 }}
@@ -388,6 +385,7 @@ export function MathWorkout() {
                   setIsCorrect(null);
                   setScore(0);
                   setIsComplete(false);
+                  resetInactivity();
                 }}
               >
                 <RotateCcw size={18} />

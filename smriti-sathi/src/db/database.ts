@@ -49,6 +49,10 @@ export interface Reminder {
   repeatDays: number[]; // 0=Sun, 1=Mon, ... 6=Sat. Empty = one-time
   isActive: boolean;
   lastAcked: Date | null;
+  // Familiar Voice Recording Extension (Milestone 1)
+  audioBlob?: Blob;
+  audioDurationSec?: number;
+  audioRecordedAt?: Date;
 }
 
 export interface ReminderLog {

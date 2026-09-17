@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   Zap,
   Info,
@@ -15,12 +15,21 @@ import {
   CheckCircle2,
   Sparkles,
   RefreshCw,
+  Mic,
+  Play,
+  Pause,
+  Pill,
+  Droplets,
+  Calendar,
+  Bell,
+  Trash2,
 } from 'lucide-react';
 import { usePatient } from '../contexts/PatientContext';
 import { useLanguage } from '../contexts/LanguageContext';
-import { db, type GameSession, type ReminderLog } from '../db/database';
+import { db, type GameSession, type ReminderLog, type Reminder } from '../db/database';
 import { evaluateDomainSpi, type SpiEvaluationResult } from '../engine/spiBaseline';
 import { FamilyPairingModal } from '../components/FamilyPairingModal';
+import { CaregiverAudioRecorder } from '../components/CaregiverAudioRecorder';
 
 export function CaregiverDash() {
   const { patient, patients, selectPatient, clearAllData, seedClinicalDemo, resetToFreshInstall } = usePatient();
@@ -31,6 +40,10 @@ export function CaregiverDash() {
   const [reminderLogs, setReminderLogs] = useState<ReminderLog[]>([]);
   const [showPairingModal, setShowPairingModal] = useState(false);
   const [caregiverInfo, setCaregiverInfo] = useState<{ name: string; phone: string } | null>(null);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [activeRecordingRemId, setActiveRecordingRemId] = useState<number | null>(null);
+  const [previewingAudioRemId, setPreviewingAudioRemId] = useState<number | null>(null);
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Bluetooth & Cloud Sync States
   const [bleSyncing, setBleSyncing] = useState(false);
@@ -112,7 +125,7 @@ export function CaregiverDash() {
     }, 10000);
   };
 
-  // Load patient sessions, logs, and linked caregiver
+  // Load patient sessions, logs, reminders, and linked caregiver
   const loadData = useCallback(async () => {
     if (!patient?.id) {
       setSessions([]);
@@ -128,6 +141,15 @@ export function CaregiverDash() {
     const logs = await db.reminderLogs.where('patientId').equals(patient.id).toArray();
     setReminderLogs(logs);
 
+    // Load reminders
+    const patientReminders = await db.reminders.where('patientId').equals(patient.id).toArray();
+    if (patientReminders.length > 0) {
+      setReminders(patientReminders);
+    } else {
+      const allReminders = await db.reminders.toArray();
+      setReminders(allReminders);
+    }
+
     // Load paired caregiver details
     const nameSetting = await db.settings.get('linked_caregiver_name');
     const phoneSetting = await db.settings.get('linked_caregiver_phone');
@@ -137,6 +159,115 @@ export function CaregiverDash() {
       setCaregiverInfo(null);
     }
   }, [patient?.id]);
+
+  const stopAudioPreview = useCallback(() => {
+    if (activeAudioRef.current) {
+      activeAudioRef.current.pause();
+      activeAudioRef.current = null;
+    }
+    setPreviewingAudioRemId(null);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopAudioPreview();
+    };
+  }, [stopAudioPreview]);
+
+  const handlePlayReminderAudio = (rem: Reminder) => {
+    if (previewingAudioRemId === rem.id) {
+      stopAudioPreview();
+      return;
+    }
+    stopAudioPreview();
+
+    if (!rem.audioBlob) return;
+    const url = URL.createObjectURL(rem.audioBlob);
+    const audio = new Audio(url);
+    activeAudioRef.current = audio;
+    setPreviewingAudioRemId(rem.id || null);
+
+    audio.onended = () => {
+      URL.revokeObjectURL(url);
+      setPreviewingAudioRemId(null);
+      activeAudioRef.current = null;
+    };
+    audio.onerror = () => {
+      URL.revokeObjectURL(url);
+      setPreviewingAudioRemId(null);
+      activeAudioRef.current = null;
+    };
+    audio.play().catch(() => {
+      URL.revokeObjectURL(url);
+      setPreviewingAudioRemId(null);
+      activeAudioRef.current = null;
+    });
+  };
+
+  const handleDeleteReminderAudio = async (remId?: number) => {
+    if (!remId) return;
+    stopAudioPreview();
+    await db.reminders.update(remId, {
+      audioBlob: undefined,
+      audioDurationSec: undefined,
+      audioRecordedAt: undefined,
+    });
+    await loadData();
+  };
+
+  const handleSeedDefaultReminders = async () => {
+    const defaults: Reminder[] = [
+      {
+        patientId: patient?.id || 1,
+        type: 'medicine',
+        label: 'Morning Memory & BP Tablet',
+        timeHour: 8,
+        timeMinute: 0,
+        repeatDays: [0, 1, 2, 3, 4, 5, 6],
+        isActive: true,
+        lastAcked: null,
+      },
+      {
+        patientId: patient?.id || 1,
+        type: 'water',
+        label: 'Fresh Hydration Water Glass',
+        timeHour: 10,
+        timeMinute: 30,
+        repeatDays: [0, 1, 2, 3, 4, 5, 6],
+        isActive: true,
+        lastAcked: null,
+      },
+      {
+        patientId: patient?.id || 1,
+        type: 'activity',
+        label: 'Smriti Sathi Mind Workout',
+        timeHour: 11,
+        timeMinute: 0,
+        repeatDays: [0, 1, 2, 3, 4, 5, 6],
+        isActive: true,
+        lastAcked: null,
+      },
+    ];
+    for (const d of defaults) await db.reminders.add(d);
+    await loadData();
+  };
+
+  const formatReminderTime = (hour: number, minute: number) => {
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const h12 = hour % 12 === 0 ? 12 : hour % 12;
+    const m = minute < 10 ? `0${minute}` : minute;
+    return `${h12}:${m} ${ampm}`;
+  };
+
+  const getReminderIcon = (type: string) => {
+    switch (type) {
+      case 'medicine': return <Pill size={20} color="#F59E0B" />;
+      case 'water': return <Droplets size={20} color="#38BDF8" />;
+      case 'activity': return <Sparkles size={20} color="#10B981" />;
+      case 'appointment': return <Calendar size={20} color="#A855F7" />;
+      default: return <Bell size={20} color="#FF7247" />;
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -670,6 +801,235 @@ export function CaregiverDash() {
 
       {activeTab === 'caregiver' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Familiar Voice Reminders Section (Milestone 1) */}
+          <div
+            className="lumos-card"
+            style={{
+              padding: '20px',
+              border: '1px solid #1E3A5F',
+              background: 'linear-gradient(180deg, #0F1F33 0%, #0B1726 100%)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Mic size={18} color="#38BDF8" />
+                  </div>
+                  <div style={{ fontSize: '18px', fontWeight: 800, color: '#FFFFFF' }}>
+                    Familiar Voice Reminders
+                  </div>
+                </div>
+                <div style={{ fontSize: '13px', color: '#94A9C4', marginTop: '6px', maxWidth: '580px', lineHeight: 1.5 }}>
+                  Record personalized voice prompts in a trusted family member's voice (son, daughter, spouse). Research shows hearing a familiar voice reduces anxiety, confusion, and resistance to routine care in dementia patients.
+                </div>
+              </div>
+
+              {reminders.length === 0 && (
+                <button
+                  onClick={handleSeedDefaultReminders}
+                  style={{
+                    backgroundColor: '#1E3A5F',
+                    color: '#38BDF8',
+                    border: '1px solid #38BDF8',
+                    borderRadius: '8px',
+                    padding: '8px 14px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Seed Routine Reminders
+                </button>
+              )}
+            </div>
+
+            {/* Reminders list with voice status */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {reminders.map((rem) => {
+                const isRecordingOpen = activeRecordingRemId === rem.id;
+                const isPreviewPlaying = previewingAudioRemId === rem.id;
+                const hasVoice = Boolean(rem.audioBlob);
+
+                return (
+                  <div
+                    key={rem.id}
+                    style={{
+                      backgroundColor: '#09131F',
+                      border: hasVoice ? '1px solid #10B98155' : '1px solid #1A2F49',
+                      borderRadius: '12px',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '10px',
+                            backgroundColor: '#0F1D2F',
+                            border: '1px solid #1E344F',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {getReminderIcon(rem.type)}
+                        </div>
+
+                        <div>
+                          <div style={{ fontSize: '15px', fontWeight: 700, color: '#FFFFFF' }}>
+                            {rem.label}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                            <span style={{ fontSize: '12px', color: '#8EA7C5', fontWeight: 600 }}>
+                              {formatReminderTime(rem.timeHour, rem.timeMinute)}
+                            </span>
+                            {hasVoice ? (
+                              <span
+                                style={{
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  color: '#34D399',
+                                  backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                  padding: '2px 8px',
+                                  borderRadius: '6px',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                }}
+                              >
+                                <CheckCircle2 size={12} color="#10B981" />
+                                <span>Voice Active ({rem.audioDurationSec || 0}s)</span>
+                              </span>
+                            ) : (
+                              <span
+                                style={{
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  color: '#94A9C4',
+                                  backgroundColor: 'rgba(148, 169, 196, 0.1)',
+                                  padding: '2px 8px',
+                                  borderRadius: '6px',
+                                }}
+                              >
+                                Default Chime
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {hasVoice && (
+                          <>
+                            <button
+                              onClick={() => handlePlayReminderAudio(rem)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                backgroundColor: isPreviewPlaying ? '#0284C7' : '#0F2744',
+                                color: '#38BDF8',
+                                border: '1px solid #1E4976',
+                                borderRadius: '8px',
+                                padding: '8px 12px',
+                                fontSize: '12px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                              aria-label={isPreviewPlaying ? 'Stop playback' : 'Play voice preview'}
+                            >
+                              {isPreviewPlaying ? <Pause size={14} /> : <Play size={14} />}
+                              <span>{isPreviewPlaying ? 'Playing' : 'Listen'}</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteReminderAudio(rem.id)}
+                              style={{
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                color: '#F87171',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                borderRadius: '8px',
+                                width: '34px',
+                                height: '34px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                              }}
+                              title="Delete voice recording"
+                              aria-label="Delete voice recording"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
+
+                        <button
+                          onClick={() => setActiveRecordingRemId(isRecordingOpen ? null : (rem.id || null))}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            backgroundColor: isRecordingOpen ? '#233852' : hasVoice ? '#16283F' : '#0284C7',
+                            color: '#FFFFFF',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '8px 14px',
+                            fontSize: '12px',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <Mic size={14} />
+                          <span>{isRecordingOpen ? 'Close Recorder' : hasVoice ? 'Re-record Voice' : 'Record Voice'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Embedded Recorder Panel */}
+                    {isRecordingOpen && (
+                      <div style={{ marginTop: '8px', borderTop: '1px solid #1A2F49', paddingTop: '12px' }}>
+                        <CaregiverAudioRecorder
+                          reminderId={rem.id}
+                          reminderLabel={rem.label}
+                          initialAudioBlob={rem.audioBlob}
+                          initialDurationSec={rem.audioDurationSec}
+                          onSave={async () => {
+                            await loadData();
+                            setActiveRecordingRemId(null);
+                          }}
+                          onDelete={async () => {
+                            await loadData();
+                          }}
+                          onCancel={() => setActiveRecordingRemId(null)}
+                          compact
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Caregiver & ASHA Telemetry */}
           <div
             className="lumos-card"

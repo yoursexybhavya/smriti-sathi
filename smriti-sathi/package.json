@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "node --experimental-strip-types src/engine/test_spi_baseline.js",
+    "test": "node tests/run_all_tests.js",
+    "test:e2e": "node tests/run_all_tests.js",
+    "test:baseline": "node --experimental-strip-types src/engine/test_spi_baseline.js",
     "lint": "oxlint",
     "preview": "vite preview",
     "cap:sync": "npm run build && npx cap sync android"

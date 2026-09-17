@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';
 import { useAdaptiveDifficulty } from '../hooks/useAdaptiveDifficulty';
 import { useVoice } from '../hooks/useVoice';
+import { useInactivityScaffold } from '../hooks/useInactivityScaffold';
 import {
   createGame,
   flipCard,
@@ -28,6 +29,7 @@ export function MemoryMatch() {
   const [gameState, setGameState] = useState<MemoryMatchState | null>(null);
   const [hasSaved, setHasSaved] = useState(false);
   const checkTimerRef = useRef<number | null>(null);
+  const { showScaffold, resetInactivity } = useInactivityScaffold(3000);
 
   const startNewGame = useCallback((level: number) => {
     if (checkTimerRef.current) {
@@ -37,7 +39,8 @@ export function MemoryMatch() {
     const newGame = createGame(level);
     setGameState(newGame);
     setHasSaved(false);
-  }, []);
+    resetInactivity();
+  }, [resetInactivity]);
 
   useEffect(() => {
     if (!isDiffLoading && !gameState) {
@@ -54,6 +57,13 @@ export function MemoryMatch() {
   const handleCardClick = (index: number) => {
     if (!gameState || gameState.isChecking || gameState.isComplete) return;
 
+    // Errorless learning: if first card is flipped, only allow clicking the matching pair card
+    if (gameState.firstFlipped !== null) {
+      const matchIdx = findMatchIndex(gameState, gameState.firstFlipped);
+      if (index !== matchIdx) return;
+    }
+
+    resetInactivity();
     playCardFlip();
     const updated = flipCard(gameState, index);
     setGameState(updated);
@@ -90,10 +100,12 @@ export function MemoryMatch() {
     );
   }
 
-  const hintIndex =
-    gameState.config.showHints && gameState.firstFlipped !== null && !gameState.isChecking
+  const targetMatchIndex =
+    gameState.firstFlipped !== null && !gameState.isChecking
       ? findMatchIndex(gameState, gameState.firstFlipped)
       : null;
+
+  const firstUnrevealedIndex = gameState.cards.findIndex((c) => !c.isMatched && !c.isFlipped);
 
   const gridCols = gameState.config.cols;
 
@@ -200,14 +212,29 @@ export function MemoryMatch() {
         }}
       >
         {gameState.cards.map((card, index) => {
-          const isHinted = hintIndex === index;
           const isFlippedOrMatched = card.isFlipped || card.isMatched;
+          const isTargetSecondCard = gameState.firstFlipped !== null && index === targetMatchIndex;
+
+          // In errorless learning:
+          // When no card flipped yet: any unrevealed/unmatched card can be clicked
+          // When first card is flipped: ONLY the matching pair card can be clicked
+          const isClickable = gameState.firstFlipped === null
+            ? !isFlippedOrMatched && !gameState.isChecking
+            : isTargetSecondCard && !gameState.isChecking;
+
+          // Guidance:
+          // If first card flipped: matching card is guided with emerald glow and scaffold pulse
+          // If no card flipped and 3s passed: first unrevealed card pulses
+          const shouldPulse =
+            (gameState.firstFlipped !== null && isTargetSecondCard) ||
+            (gameState.firstFlipped === null && showScaffold && index === firstUnrevealedIndex);
 
           return (
             <button
               key={card.id}
               onClick={() => handleCardClick(index)}
-              disabled={isFlippedOrMatched || gameState.isChecking}
+              disabled={!isClickable || gameState.isChecking}
+              className={shouldPulse ? 'scaffold-pulse-active' : ''}
               style={{
                 aspectRatio: '1 / 1',
                 borderRadius: 'var(--radius-md)',
@@ -219,22 +246,28 @@ export function MemoryMatch() {
                   ? card.isMatched
                     ? '#064E3B'
                     : '#1E334D'
+                  : isTargetSecondCard
+                  ? '#0F3025'
                   : '#15253B',
                 border: card.isMatched
                   ? '3px solid #10B981'
-                  : isHinted
-                  ? '3px dashed #F59E0B'
+                  : isTargetSecondCard
+                  ? '3px solid #10B981'
+                  : shouldPulse
+                  ? '3px solid #10B981'
                   : '2px solid #223752',
-                boxShadow: isHinted
-                  ? '0 0 16px rgba(245, 158, 11, 0.45)'
-                  : card.isMatched
+                boxShadow: card.isMatched
                   ? '0 0 16px rgba(16, 185, 129, 0.3)'
+                  : isTargetSecondCard
+                  ? '0 0 20px rgba(16, 185, 129, 0.45)'
                   : 'var(--shadow-card)',
                 transform: isFlippedOrMatched ? 'scale(1)' : 'scale(0.97)',
                 transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-                cursor: isFlippedOrMatched ? 'default' : 'pointer',
+                cursor: isClickable ? 'pointer' : 'default',
+                pointerEvents: isClickable ? 'auto' : 'none',
+                opacity: !isFlippedOrMatched && gameState.firstFlipped !== null && !isTargetSecondCard ? 0.35 : 1,
               }}
-              aria-label={isFlippedOrMatched ? 'Revealed card' : 'Hidden card'}
+              aria-label={isFlippedOrMatched ? 'Revealed card' : isTargetSecondCard ? 'Matching card' : 'Hidden card'}
             >
               {isFlippedOrMatched ? (
                 <span>{card.emoji}</span>
