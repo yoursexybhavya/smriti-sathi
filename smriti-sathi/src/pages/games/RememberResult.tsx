@@ -101,9 +101,15 @@ export default function RememberResult({
 
         {/* Actions */}
         <div className="space-y-3 pt-2">
-          <LargeButton onPress={onPlayAgain}>
-            Play Again
-          </LargeButton>
+          {accuracy >= 80 ? (
+            <LargeButton onPress={onPlayAgain} className="bg-[#1B5E20]">
+              Next Level
+            </LargeButton>
+          ) : (
+            <LargeButton onPress={onPlayAgain}>
+              Play Again
+            </LargeButton>
+          )}
           <LargeButton onPress={onBackToGames} variant="outline">
             Back to Games
           </LargeButton>

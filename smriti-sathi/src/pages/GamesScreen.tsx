@@ -4,29 +4,69 @@ import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
 import { useApp } from '../context/AppContext';
 import { GameStorage } from '../services/storage/GameStorage';
+import RecogniseGame from './games/RecogniseGame';
+import RememberGame from './games/RememberGame';
+import MemoryMatchGame from './games/MemoryMatchGame';
 
 interface GamesScreenProps {
   onNavigate: (screen: string) => void;
-  isOnline?: boolean;
 }
 
-export default function GamesScreen({ onNavigate, isOnline = true }: GamesScreenProps) {
+export default function GamesScreen({ onNavigate }: GamesScreenProps) {
   const { state } = useApp();
   const patientId = state.currentPatient?.id || 'default';
-  const [stats, setStats] = useState({ totalGames: 0, currentStreak: 0, averageAccuracy: 0, averageResponseTime: 0, bestScore: 0 });
+  const isOnline = state.isOnline;
+  
+  // Local state for routing within games module
+  const [activeGame, setActiveGame] = useState<string | null>(null);
+  
+  // Game stats
+  const [stats, setStats] = useState({
+    totalGames: 0,
+    currentStreak: 0,
+    averageAccuracy: 0,
+  });
+  const [recogniseGamesPlayed, setRecogniseGamesPlayed] = useState(0);
   const [rememberGamesPlayed, setRememberGamesPlayed] = useState(0);
 
+  // Load stats
   useEffect(() => {
     const loadData = async () => {
-      const statsData = await GameStorage.getPatientStats(patientId);
-      setStats(statsData);
+      // Get session stats
+      const allSessions = await GameStorage.getAllSessions(patientId);
       
-      const rememberSessions = await GameStorage.getGameSessions(patientId, 'remember');
+      let totalAcc = 0;
+      allSessions.forEach(s => totalAcc += s.accuracy);
+      const avgAcc = allSessions.length > 0 ? Math.round(totalAcc / allSessions.length) : 0;
+      
+      setStats({
+        totalGames: allSessions.length,
+        currentStreak: await GameStorage.getCurrentStreak(patientId),
+        averageAccuracy: avgAcc,
+      });
+
+      // Get game-specific counts
+      const recogniseSessions = allSessions.filter(s => s.gameType === 'recognise');
+      const rememberSessions = allSessions.filter(s => s.gameType === 'remember');
+      setRecogniseGamesPlayed(recogniseSessions.length);
       setRememberGamesPlayed(rememberSessions.length);
     };
     
     loadData();
   }, [patientId]);
+
+  // Handle local game navigation
+  if (activeGame === 'recognise-game') {
+    return <RecogniseGame onBack={() => setActiveGame(null)} />;
+  }
+
+  if (activeGame === 'remember-game') {
+    return <RememberGame onBack={() => setActiveGame(null)} />;
+  }
+
+  if (activeGame === 'memory-match') {
+    return <MemoryMatchGame onBack={() => setActiveGame(null)} />;
+  }
 
   return (
     <>
@@ -45,7 +85,7 @@ export default function GamesScreen({ onNavigate, isOnline = true }: GamesScreen
           <h3 className="text-lg font-semibold text-[#1A1A1A] px-1 md:col-span-2">Available Games</h3>
           
           {/* REMEMBER Game - Fully Working */}
-          <Card onPress={() => onNavigate('remember-game')} className="overflow-hidden">
+          <Card onPress={() => setActiveGame('remember-game')} className="overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors">
             <div className="p-5">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0">
@@ -81,18 +121,18 @@ export default function GamesScreen({ onNavigate, isOnline = true }: GamesScreen
             </div>
           </Card>
 
-          {/* Memory Match Game - Coming Soon */}
-          <Card className="overflow-hidden opacity-70">
+          {/* Memory Match Game - NOW WORKING */}
+          <Card onPress={() => setActiveGame('memory-match')} className="overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0">
-                  <Brain size={32} className="text-[#1B5E20]" />
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E3F2FD] to-[#BBDEFB] flex items-center justify-center flex-shrink-0">
+                  <Brain size={32} className="text-[#1565C0]" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-lg font-bold text-[#1A1A1A]">Memory Match</h4>
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-0.5 rounded-full">
-                      Coming Soon
+                    <span className="text-xs font-medium text-[#1565C0] bg-[#E3F2FD] px-2 py-0.5 rounded-full">
+                      Ready
                     </span>
                   </div>
                   <p className="text-sm text-[#4A4A4A] mt-1 leading-relaxed">
@@ -100,10 +140,10 @@ export default function GamesScreen({ onNavigate, isOnline = true }: GamesScreen
                   </p>
                   <div className="flex items-center gap-4 mt-3">
                     <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
-                      Level: Easy → Medium
+                      5 Levels
                     </span>
                     <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
-                      4×3 Grid
+                      Pairs
                     </span>
                   </div>
                 </div>
@@ -113,12 +153,13 @@ export default function GamesScreen({ onNavigate, isOnline = true }: GamesScreen
                   <Sparkles size={14} className="text-[#F57F17]" />
                   <span className="text-xs text-[#4A4A4A]">Adaptive difficulty</span>
                 </div>
+                <span className="text-sm font-semibold text-[#1565C0]">Start Activity →</span>
               </div>
             </div>
           </Card>
 
           {/* RECOGNISE Game - Fully Working */}
-          <Card onPress={() => onNavigate('recognise-game')} className="overflow-hidden">
+          <Card onPress={() => setActiveGame('recognise-game')} className="overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors">
             <div className="p-5">
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FFF3E0] to-[#FFE0B2] flex items-center justify-center flex-shrink-0">
