@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from 'react';
-
-import { ArrowLeft, ChevronLeft, ChevronRight, Volume2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Volume2, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { memoryBookService, MemoryCategory } from '../services/MemoryBookService';
 import { MemoryItem } from '../database/db';
 
-interface Props { onBack?: () => void; }
+interface Props {
+  onBack?: () => void;
+}
+
 export default function MemoryBookViewerScreen({ onBack }: Props) {
-  
   const { state } = useApp();
-  const userId = state.currentPatient?.id ? parseInt(state.currentPatient.id) : null;
-  const patientName = state.currentPatient?.name;
+  // Safe user ID normalization (always valid integer)
+  const userId = Number(state.currentPatient?.id) || 1;
+  const patientName = state.currentPatient?.name || 'Friend';
 
   const [selectedCategory, setSelectedCategory] = useState<MemoryCategory | 'all'>('all');
   const [memoryItems, setMemoryItems] = useState<MemoryItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [speaking, setSpeaking] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   useEffect(() => {
-    if (userId) {
-      loadMemoryItems();
-    }
+    loadMemoryItems();
   }, [userId, selectedCategory]);
 
   const loadMemoryItems = async () => {
-    if (!userId) return;
     setLoading(true);
     try {
       let items: MemoryItem[];
@@ -34,12 +34,25 @@ export default function MemoryBookViewerScreen({ onBack }: Props) {
       } else {
         items = await memoryBookService.getMemoryItemsByCategory(userId, selectedCategory);
       }
-      setMemoryItems(items);
+      setMemoryItems(items || []);
       setCurrentIndex(0);
     } catch (error) {
       console.error('Failed to load memory items:', error);
+      setMemoryItems([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLoadSampleMemories = async () => {
+    setSeeding(true);
+    try {
+      await memoryBookService.createSampleMemories(userId);
+      await loadMemoryItems();
+    } catch (error) {
+      console.error('Failed to create sample memories:', error);
+    } finally {
+      setSeeding(false);
     }
   };
 
@@ -68,165 +81,190 @@ export default function MemoryBookViewerScreen({ onBack }: Props) {
     }
   };
 
-  if (!userId) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">No patient selected</p>
-          <button
-            onClick={() => onBack?.()}
-            className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            Go to Home
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   const currentItem = memoryItems[currentIndex];
   const categories = memoryBookService.getAllCategories();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+    <div className="min-h-screen bg-[#F5F0E8] flex flex-col justify-between">
+      {/* Top Navigation Header */}
+      <header className="bg-white border-b border-[#E0D8CC] px-5 py-4 shadow-sm">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
+              type="button"
               onClick={() => onBack?.()}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-3 bg-[#FDF8F0] hover:bg-[#E0D8CC] rounded-2xl transition-colors border border-[#E0D8CC] active:scale-95"
+              aria-label="Back to home"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-600" />
+              <ArrowLeft className="w-6 h-6 text-[#1A1A1A]" />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Memory Book</h1>
-              <p className="text-gray-600 mt-1">Your personal memories</p>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-[#1A1A1A]">Memory Book</h1>
+              <p className="text-sm md:text-base text-[#7A7A7A] font-medium">Personal Memories & Familiar Faces</p>
             </div>
           </div>
 
-          {/* Category Filter */}
-          <div className="flex gap-2 mt-6 overflow-x-auto pb-2">
+          {memoryItems.length > 0 && (
+            <span className="text-sm md:text-base font-bold text-[#1B5E20] bg-[#E8F5E9] px-4 py-1.5 rounded-full border border-[#1B5E20]/20">
+              {currentIndex + 1} of {memoryItems.length}
+            </span>
+          )}
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="max-w-6xl mx-auto flex gap-2.5 mt-4 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            type="button"
+            onClick={() => setSelectedCategory('all')}
+            className={`px-5 py-2.5 rounded-2xl font-bold text-sm md:text-base whitespace-nowrap transition-all ${
+              selectedCategory === 'all'
+                ? 'bg-[#1B5E20] text-white shadow-md'
+                : 'bg-[#FDF8F0] text-[#4A4A4A] border border-[#E0D8CC] hover:border-[#1B5E20]'
+            }`}
+          >
+            All Categories
+          </button>
+          {categories.map((category) => (
             <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                selectedCategory === 'all'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              key={category}
+              type="button"
+              onClick={() => setSelectedCategory(category)}
+              className={`px-5 py-2.5 rounded-2xl font-bold text-sm md:text-base whitespace-nowrap transition-all flex items-center gap-2 ${
+                selectedCategory === category
+                  ? 'bg-[#1B5E20] text-white shadow-md'
+                  : 'bg-[#FDF8F0] text-[#4A4A4A] border border-[#E0D8CC] hover:border-[#1B5E20]'
               }`}
             >
-              All
+              <span>{memoryBookService.getCategoryIcon(category)}</span>
+              <span>{memoryBookService.getCategoryDisplayName(category)}</span>
             </button>
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors flex items-center gap-2 ${
-                  selectedCategory === category
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <span>{memoryBookService.getCategoryIcon(category)}</span>
-                <span>{memoryBookService.getCategoryDisplayName(category)}</span>
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Main Memory Viewer */}
+      <main className="flex-1 max-w-6xl mx-auto px-5 py-6 w-full flex flex-col justify-center">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="text-gray-600 mt-4">Loading memories...</p>
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-14 w-14 border-4 border-[#1B5E20] border-t-transparent mx-auto"></div>
+            <p className="text-[#4A4A4A] text-lg font-medium mt-4">Opening your Memory Book...</p>
           </div>
         ) : memoryItems.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📸</div>
-            <p className="text-gray-600 text-lg">No memories yet</p>
-            <p className="text-gray-500 mt-2">Ask a caregiver to add memories for you</p>
+          <div className="bg-white rounded-3xl border-2 border-[#E0D8CC] p-8 max-w-xl mx-auto text-center shadow-md space-y-5">
+            <div className="w-20 h-20 bg-[#E8F5E9] rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
+              📸
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-[#1A1A1A]">No Memories Added Yet</h2>
+              <p className="text-[#555555] text-base mt-2 leading-relaxed">
+                Add sample family anchors to experience how Smriti Sathi speaks and displays personal memories.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleLoadSampleMemories}
+              disabled={seeding}
+              className="w-full py-4 px-6 bg-[#1B5E20] hover:bg-[#144718] text-white text-lg font-bold rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <Sparkles size={20} />
+              <span>{seeding ? 'Generating Sample Anchors...' : 'Add Sample Memories Now'}</span>
+            </button>
           </div>
         ) : currentItem ? (
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            {/* Image */}
-            {currentItem.imageData ? (
-              <img
-                src={currentItem.imageData}
-                alt={currentItem.title}
-                className="w-full h-96 object-cover"
-              />
-            ) : (
-              <div className="w-full h-96 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-8xl mb-4">{memoryBookService.getCategoryIcon(currentItem.category)}</div>
-                  <p className="text-gray-600 text-lg">No photo</p>
+          <div className="bg-white rounded-3xl shadow-lg border-2 border-[#E0D8CC] overflow-hidden md:grid md:grid-cols-2 md:items-stretch">
+            {/* Left: Memory Photo or Cultural Icon Placeholder */}
+            <div className="relative bg-[#FDF8F0] min-h-[260px] md:min-h-[420px] flex items-center justify-center p-4 border-b-2 md:border-b-0 md:border-r-2 border-[#E0D8CC]">
+              {currentItem.imageData ? (
+                <img
+                  src={currentItem.imageData}
+                  alt={currentItem.title}
+                  className="w-full h-full object-cover rounded-2xl max-h-[380px]"
+                />
+              ) : (
+                <div className="text-center p-6 space-y-4">
+                  <div className="text-7xl md:text-8xl drop-shadow-sm">
+                    {memoryBookService.getCategoryIcon(currentItem.category)}
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 bg-white/80 border border-[#E0D8CC] px-3.5 py-1 rounded-full text-xs font-semibold text-[#7A7A7A]">
+                    <ImageIcon size={14} />
+                    <span>Memory Anchor</span>
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {/* Content */}
-            <div className="p-8">
-              <div className="text-center mb-6">
-                <div className="text-4xl mb-3">{memoryBookService.getCategoryIcon(currentItem.category)}</div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">{currentItem.title}</h2>
-                <p className="text-xl text-gray-700 font-medium">{currentItem.subject}</p>
-                {currentItem.date && (
-                  <p className="text-sm text-gray-500 mt-2">{currentItem.date}</p>
-                )}
-              </div>
-
-              <div className="bg-gray-50 rounded-xl p-6 mb-6">
-                <p className="text-lg text-gray-800 leading-relaxed text-center">
-                  {currentItem.description}
-                </p>
-              </div>
-
-              {/* Hear Description Button */}
-              <button
-                onClick={handleHearDescription}
-                disabled={speaking}
-                className={`w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl font-semibold text-lg transition-all ${
-                  speaking
-                    ? 'bg-green-100 text-green-700 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
-                }`}
-              >
-                <Volume2 className={`w-6 h-6 ${speaking ? 'animate-pulse' : ''}`} />
-                {speaking ? 'Speaking...' : 'Hear Description'}
-              </button>
+              )}
             </div>
 
-            {/* Navigation */}
-            <div className="bg-gray-50 px-8 py-6 flex items-center justify-between">
-              <button
-                onClick={handlePrevious}
-                disabled={currentIndex === 0}
-                className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-5 h-5" />
-                Previous
-              </button>
-
-              <div className="text-center">
-                <p className="text-sm text-gray-600">
-                  {currentIndex + 1} of {memoryItems.length}
+            {/* Right: Memory Details, Speech & Navigation Controls */}
+            <div className="p-6 md:p-8 flex flex-col justify-between space-y-6">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-2xl">{memoryBookService.getCategoryIcon(currentItem.category)}</span>
+                  <span className="text-xs uppercase tracking-wider font-extrabold text-[#1B5E20] bg-[#E8F5E9] px-3 py-1 rounded-full">
+                    {memoryBookService.getCategoryDisplayName(currentItem.category)}
+                  </span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-extrabold text-[#1A1A1A] leading-tight">
+                  {currentItem.title}
+                </h2>
+                <p className="text-lg md:text-xl font-bold text-[#E65100] mt-1">
+                  {currentItem.subject}
                 </p>
+                {currentItem.date && (
+                  <p className="text-sm font-medium text-[#7A7A7A] mt-1">
+                    {currentItem.date}
+                  </p>
+                )}
+
+                {/* Description Box */}
+                <div className="mt-5 bg-[#FDF8F0] rounded-2xl p-5 border border-[#E0D8CC]">
+                  <p className="text-lg md:text-xl text-[#1A1A1A] leading-relaxed font-medium">
+                    {currentItem.description}
+                  </p>
+                </div>
               </div>
 
-              <button
-                onClick={handleNext}
-                disabled={currentIndex === memoryItems.length - 1}
-                className="flex items-center gap-2 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-                <ChevronRight className="w-5 h-5" />
-              </button>
+              {/* Action: Read Aloud & Navigation */}
+              <div className="space-y-4 pt-2">
+                <button
+                  type="button"
+                  onClick={handleHearDescription}
+                  disabled={speaking}
+                  className={`w-full flex items-center justify-center gap-3 py-4 px-6 rounded-2xl font-bold text-lg md:text-xl transition-all shadow-md active:scale-98 ${
+                    speaking
+                      ? 'bg-[#E8F5E9] text-[#1B5E20] border-2 border-[#1B5E20]'
+                      : 'bg-[#1B5E20] hover:bg-[#144718] text-white'
+                  }`}
+                >
+                  <Volume2 className={`w-6 h-6 ${speaking ? 'animate-pulse' : ''}`} />
+                  <span>{speaking ? 'Reading Memory...' : 'Hear Description Aloud'}</span>
+                </button>
+
+                {/* Prev & Next Controls */}
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handlePrevious}
+                    disabled={currentIndex === 0}
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 bg-[#FDF8F0] border-2 border-[#E0D8CC] text-[#1A1A1A] font-bold rounded-2xl hover:border-[#1B5E20] transition-colors disabled:opacity-40 disabled:pointer-events-none active:scale-95"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                    <span>Previous</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    disabled={currentIndex === memoryItems.length - 1}
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 bg-[#FDF8F0] border-2 border-[#E0D8CC] text-[#1A1A1A] font-bold rounded-2xl hover:border-[#1B5E20] transition-colors disabled:opacity-40 disabled:pointer-events-none active:scale-95"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         ) : null}
-      </div>
+      </main>
     </div>
   );
 }

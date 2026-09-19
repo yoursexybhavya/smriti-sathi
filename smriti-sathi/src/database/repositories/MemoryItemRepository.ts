@@ -28,23 +28,41 @@ export class MemoryItemRepository {
    * Get all memory items for a user
    */
   async getByUserId(userId: number): Promise<MemoryItem[]> {
-    return await db.memoryItems
-      .where('userId')
-      .equals(userId)
-      .reverse()
-      .sortBy('createdAt');
+    const validUserId = Number(userId) || 1;
+    try {
+      const items = await db.memoryItems
+        .where('userId')
+        .equals(validUserId)
+        .toArray();
+      return items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    } catch (err) {
+      console.warn('Failed to query memoryItems by index, falling back to toArray()', err);
+      const all = await db.memoryItems.toArray();
+      return all
+        .filter(item => !item.userId || item.userId === validUserId)
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    }
   }
 
   /**
    * Get memory items by category
    */
   async getByCategory(userId: number, category: MemoryItem['category']): Promise<MemoryItem[]> {
-    return await db.memoryItems
-      .where('userId')
-      .equals(userId)
-      .and(item => item.category === category)
-      .reverse()
-      .sortBy('createdAt');
+    const validUserId = Number(userId) || 1;
+    try {
+      const items = await db.memoryItems
+        .where('userId')
+        .equals(validUserId)
+        .and(item => item.category === category)
+        .toArray();
+      return items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    } catch (err) {
+      console.warn('Failed to query memoryItems by category, falling back to toArray()', err);
+      const all = await db.memoryItems.toArray();
+      return all
+        .filter(item => (!item.userId || item.userId === validUserId) && item.category === category)
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    }
   }
 
   /**
@@ -71,21 +89,33 @@ export class MemoryItemRepository {
    * Get memory item count for a user
    */
   async getCount(userId: number): Promise<number> {
-    return await db.memoryItems
-      .where('userId')
-      .equals(userId)
-      .count();
+    const validUserId = Number(userId) || 1;
+    try {
+      return await db.memoryItems
+        .where('userId')
+        .equals(validUserId)
+        .count();
+    } catch {
+      const all = await db.memoryItems.toArray();
+      return all.filter(item => !item.userId || item.userId === validUserId).length;
+    }
   }
 
   /**
    * Get memory item count by category
    */
   async getCountByCategory(userId: number, category: MemoryItem['category']): Promise<number> {
-    return await db.memoryItems
-      .where('userId')
-      .equals(userId)
-      .and(item => item.category === category)
-      .count();
+    const validUserId = Number(userId) || 1;
+    try {
+      return await db.memoryItems
+        .where('userId')
+        .equals(validUserId)
+        .and(item => item.category === category)
+        .count();
+    } catch {
+      const all = await db.memoryItems.toArray();
+      return all.filter(item => (!item.userId || item.userId === validUserId) && item.category === category).length;
+    }
   }
 
   /**

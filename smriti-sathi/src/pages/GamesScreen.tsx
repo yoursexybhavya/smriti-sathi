@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Brain, Grid3X3, ArrowLeft, Sparkles, Info, Eye } from 'lucide-react';
+import { Brain, Grid3X3, ArrowLeft, Sparkles, Info, Eye, Sun } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
 import { useApp } from '../context/AppContext';
@@ -7,6 +7,7 @@ import { GameStorage } from '../services/storage/GameStorage';
 import RecogniseGame from './games/RecogniseGame';
 import RememberGame from './games/RememberGame';
 import MemoryMatchGame from './games/MemoryMatchGame';
+import DailyRoutineGame from './games/DailyRoutineGame';
 
 interface GamesScreenProps {
   onNavigate: (screen: string) => void;
@@ -67,6 +68,10 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
 
   if (activeGame === 'memory-match') {
     return <MemoryMatchGame onBack={() => setActiveGame(null)} />;
+  }
+
+  if (activeGame === 'daily-routine') {
+    return <DailyRoutineGame onBack={() => setActiveGame(null)} />;
   }
 
   return (
@@ -192,6 +197,43 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
                   <span className="text-xs text-[#4A4A4A]">Adaptive difficulty</span>
                 </div>
                 <span className="text-sm font-semibold text-[#E65100]">Start Activity →</span>
+              </div>
+            </div>
+          </Card>
+
+          {/* DAILY ROUTINE Sequencing Game */}
+          <Card onPress={() => setActiveGame('daily-routine')} className="overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors">
+            <div className="p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0">
+                  <Sun size={32} className="text-[#1B5E20]" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-lg font-bold text-[#1A1A1A]">Daily Routine</h4>
+                    <span className="text-xs font-medium text-[#1B5E20] bg-[#E8F5E9] px-2 py-0.5 rounded-full">
+                      New
+                    </span>
+                  </div>
+                  <p className="text-sm text-[#4A4A4A] mt-1 leading-relaxed">
+                    Order daily habits in sequence from morning to night.
+                  </p>
+                  <div className="flex items-center gap-4 mt-3">
+                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                      5 Levels
+                    </span>
+                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                      Temporal Focus
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles size={14} className="text-[#F57F17]" />
+                  <span className="text-xs text-[#4A4A4A]">Errorless learning</span>
+                </div>
+                <span className="text-sm font-semibold text-[#1B5E20]">Start Activity →</span>
               </div>
             </div>
           </Card>

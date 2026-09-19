@@ -10,7 +10,7 @@ interface Props { onBack?: () => void; onNavigate?: (s: string) => void; }
 export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
   
   const { state } = useApp();
-  const userId = state.currentPatient?.id ? parseInt(state.currentPatient.id) : null;
+  const userId = Number(state.currentPatient?.id) || 1;
 
   const [selectedCategory, setSelectedCategory] = useState<MemoryCategory | 'all'>('all');
   const [memoryItems, setMemoryItems] = useState<MemoryItem[]>([]);
@@ -20,7 +20,7 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
 
   // Form state
   const [formData, setFormData] = useState<MemoryItemInput>({
-    userId: userId || 0,
+    userId: userId || 1,
     category: 'family',
     title: '',
     subject: '',
@@ -30,13 +30,10 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
   });
 
   useEffect(() => {
-    if (userId) {
-      loadMemoryItems();
-    }
+    loadMemoryItems();
   }, [userId, selectedCategory]);
 
   const loadMemoryItems = async () => {
-    if (!userId) return;
     setLoading(true);
     try {
       let items: MemoryItem[];

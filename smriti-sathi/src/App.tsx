@@ -150,7 +150,7 @@ function AppContent() {
         case 'memory-book':
           return <MemoryBookScreen onBack={() => setActiveTab('home')} onNavigate={setActiveTab} />;
         case 'memory-book-viewer':
-          return <MemoryBookViewerScreen onBack={() => setActiveTab('memory-book')} />;
+          return <MemoryBookViewerScreen onBack={() => setActiveTab('home')} />;
         default:
           return <PatientHomeScreen onNavigate={setActiveTab} isOnline={isOnline} />;
       }

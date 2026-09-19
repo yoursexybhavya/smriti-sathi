@@ -12,7 +12,7 @@ export default function RecogniseIntro({ onStart, onBack }: RecogniseIntroProps)
     <div className="min-h-screen bg-[#F5F0E8]">
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white border-b border-[#E0D8CC]">
-        <div className="max-w-lg mx-auto flex items-center gap-3 px-4 py-4">
+        <div className="max-w-2xl mx-auto flex items-center gap-3 px-4 py-4">
           <button
             onClick={onBack}
             className="w-11 h-11 rounded-full flex items-center justify-center bg-[#F5F0E8] hover:bg-[#E0D8CC] transition-colors"
@@ -27,7 +27,7 @@ export default function RecogniseIntro({ onStart, onBack }: RecogniseIntroProps)
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-5 py-8 space-y-8">
+      <div className="max-w-2xl mx-auto px-5 py-8 space-y-8">
         {/* Icon */}
         <div className="flex justify-center">
           <div className="w-32 h-32 rounded-3xl bg-[#FFF3E0] flex items-center justify-center shadow-md">
@@ -62,20 +62,31 @@ export default function RecogniseIntro({ onStart, onBack }: RecogniseIntroProps)
           </div>
         </div>
 
-        {/* Example */}
-        <div className="bg-[#FDF8F0] rounded-2xl border border-[#E0D8CC] p-5">
-          <p className="text-sm font-medium text-[#4A4A4A] mb-3">Example:</p>
-          <div className="flex items-center justify-center gap-2 text-3xl">
-            <span>🍎</span>
-            <span className="text-[#7A7A7A]">→</span>
-            <span>🍌</span>
-            <span className="text-[#7A7A7A]">→</span>
-            <span>🍎</span>
-            <span className="text-[#7A7A7A]">→</span>
-            <span className="text-2xl bg-[#E8F5E9] px-3 py-1 rounded-lg">?</span>
+        {/* Example with Real Photographic Objects */}
+        <div className="bg-[#FDF8F0] rounded-3xl border-2 border-[#E0D8CC] p-5 shadow-xs">
+          <p className="text-sm font-bold text-[#1A1A1A] uppercase tracking-wider mb-3 text-center">Example Sequence:</p>
+          <div className="flex items-center justify-center gap-2 md:gap-3 flex-wrap">
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-2xl border border-[#E0D8CC] p-1.5 flex flex-col items-center justify-center shadow-xs">
+              <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6fac6?auto=format&fit=crop&w=400&q=80" alt="Apple" className="w-8 h-8 object-contain" />
+              <span className="text-[10px] font-bold text-[#4A4A4A]">Apple</span>
+            </div>
+            <span className="text-base font-bold text-[#7A7A7A]">→</span>
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-2xl border border-[#E0D8CC] p-1.5 flex flex-col items-center justify-center shadow-xs">
+              <img src="https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=400&q=80" alt="Mango" className="w-8 h-8 object-contain" />
+              <span className="text-[10px] font-bold text-[#4A4A4A]">Mango</span>
+            </div>
+            <span className="text-base font-bold text-[#7A7A7A]">→</span>
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-2xl border border-[#E0D8CC] p-1.5 flex flex-col items-center justify-center shadow-xs">
+              <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6fac6?auto=format&fit=crop&w=400&q=80" alt="Apple" className="w-8 h-8 object-contain" />
+              <span className="text-[10px] font-bold text-[#4A4A4A]">Apple</span>
+            </div>
+            <span className="text-base font-bold text-[#7A7A7A]">→</span>
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-[#FFF3E0] rounded-2xl border-2 border-dashed border-[#E65100] flex items-center justify-center shadow-xs">
+              <span className="text-xl font-extrabold text-[#E65100]">?</span>
+            </div>
           </div>
-          <p className="text-center text-sm text-[#4A4A4A] mt-3">
-            What comes next?
+          <p className="text-center text-sm font-medium text-[#4A4A4A] mt-3">
+            What comes next? (Answer: Mango)
           </p>
         </div>
 
