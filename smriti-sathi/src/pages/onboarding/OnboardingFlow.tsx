@@ -8,9 +8,10 @@ import { PatientProfile, AccessibilitySettings, useApp } from '../../context/App
 
 interface OnboardingFlowProps {
   onComplete: () => void;
+  onCancel?: () => void;
 }
 
-export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
+export default function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   const { completeOnboarding } = useApp();
   const [step, setStep] = useState(0);
   const [patient, setPatient] = useState<PatientProfile | null>(null);
@@ -46,12 +47,16 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   };
 
   const goBack = () => {
+    if (step === 0 && onCancel) {
+      onCancel();
+      return;
+    }
     setStep(prev => Math.max(0, prev - 1));
   };
 
   switch (step) {
     case 0:
-      return <OnboardingWelcome onNext={() => setStep(1)} />;
+      return <OnboardingWelcome onNext={() => setStep(1)} onBack={onCancel} />;
     case 1:
       return (
         <PatientProfileSetup

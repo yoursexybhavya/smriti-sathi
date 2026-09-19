@@ -1,36 +1,65 @@
-import { Brain, Heart, Shield } from 'lucide-react';
+import { Brain, Heart, Shield, ArrowLeft, Sun, Moon } from 'lucide-react';
 import LargeButton from '../../components/LargeButton';
 import { APP } from '../../core/constants/app';
+import { useApp } from '../../context/AppContext';
 
 interface OnboardingWelcomeProps {
   onNext: () => void;
+  onBack?: () => void;
 }
 
-export default function OnboardingWelcome({ onNext }: OnboardingWelcomeProps) {
+export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeProps) {
+  const { state, toggleTheme } = useApp();
+  const isDark = state.accessibility?.theme === 'dark';
+
   return (
-    <div className="min-h-screen bg-[#F5F0E8] flex flex-col justify-center">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-center px-4 py-8 transition-colors duration-200">
+      {/* Top Bar with Back and Theme Toggle */}
+      <div className="max-w-5xl mx-auto w-full flex items-center justify-between pb-6">
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] text-[var(--color-text)] font-semibold text-sm hover:border-[#10B981] transition-all active:scale-95 shadow-sm"
+          >
+            <ArrowLeft size={16} />
+            <span>Switch Role / Profiles</span>
+          </button>
+        ) : <div />}
+
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[#10B981] transition-all active:scale-90 shadow-sm"
+          aria-label="Toggle Theme"
+          title={isDark ? 'Light Theme' : 'Dark Theme'}
+        >
+          {isDark ? <Sun size={19} className="text-[#F59E0B]" /> : <Moon size={19} className="text-[#64748B]" />}
+        </button>
+      </div>
+
       {/* Hero & Features Container */}
-      <div className="max-w-5xl mx-auto w-full px-6 py-10 md:py-16 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+      <div className="max-w-5xl mx-auto w-full px-2 md:px-6 py-6 md:py-12 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
         {/* Left: Branding & Tagline */}
         <div className="md:col-span-6 flex flex-col items-center md:items-start text-center md:text-left">
           {/* Logo */}
-          <div className="w-28 h-28 rounded-3xl bg-[#1B5E20] flex items-center justify-center mb-6 shadow-xl ring-4 ring-[#1B5E20]/20">
-            <Brain size={58} className="text-white" />
+          <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-[#1B5E20] flex items-center justify-center mb-6 shadow-xl ring-4 ring-[#1B5E20]/20">
+            <Brain size={54} className="text-white" />
           </div>
 
           {/* App Name */}
-          <h1 className="text-3xl md:text-5xl font-extrabold text-[#1A1A1A] tracking-tight">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-[var(--color-text)] tracking-tight">
             {APP.name}
           </h1>
-          <p className="text-xl md:text-2xl font-bold text-[#1B5E20] mt-1">
+          <p className="text-xl md:text-2xl font-bold text-[#10B981] mt-1">
             স্মৃতি সাথী
           </p>
 
           {/* Tagline */}
-          <p className="text-base md:text-xl text-[#4A4A4A] mt-3 max-w-md leading-relaxed">
+          <p className="text-base md:text-xl text-[var(--color-text-secondary)] mt-3 max-w-md leading-relaxed">
             {APP.tagline}
           </p>
-          <div className="mt-4 inline-flex items-center gap-2 bg-[#E8F5E9] border border-[#1B5E20]/30 px-3 py-1.5 rounded-full text-xs font-bold text-[#1B5E20]">
+          <div className="mt-4 inline-flex items-center gap-2 bg-[#10B981]/15 border border-[#10B981]/30 px-3 py-1.5 rounded-full text-xs font-bold text-[#10B981]">
             <span>🌿 Cognitive Care & Memory Companion</span>
           </div>
         </div>
@@ -57,7 +86,16 @@ export default function OnboardingWelcome({ onNext }: OnboardingWelcomeProps) {
             <LargeButton onPress={onNext}>
               Begin Setup / আৰম্ভ কৰক →
             </LargeButton>
-            <p className="text-center text-xs md:text-sm text-[#7A7A7A]">
+            {onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="w-full py-3.5 px-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] font-semibold text-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                <span>← Switch Role / Return to Profile Selection</span>
+              </button>
+            )}
+            <p className="text-center text-xs md:text-sm text-[var(--color-text-muted)]">
               Designed for elderly users and caregivers with high-contrast accessibility.
             </p>
           </div>
@@ -69,13 +107,13 @@ export default function OnboardingWelcome({ onNext }: OnboardingWelcomeProps) {
 
 function FeatureRow({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
-    <div className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-[#E0D8CC]">
-      <div className="w-12 h-12 rounded-xl bg-[#FDF8F0] flex items-center justify-center flex-shrink-0">
+    <div className="flex items-center gap-4 p-4 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)]">
+      <div className="w-12 h-12 rounded-xl bg-[var(--color-bg-subtle)] flex items-center justify-center flex-shrink-0">
         {icon}
       </div>
       <div>
-        <h3 className="text-base font-semibold text-[#1A1A1A]">{title}</h3>
-        <p className="text-sm text-[#7A7A7A]">{description}</p>
+        <h3 className="text-base font-semibold text-[var(--color-text)]">{title}</h3>
+        <p className="text-sm text-[var(--color-text-secondary)]">{description}</p>
       </div>
     </div>
   );

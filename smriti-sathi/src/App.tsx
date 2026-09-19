@@ -115,6 +115,10 @@ function AppContent() {
       try {
         const { App: CapApp } = await import('@capacitor/app');
         backListener = await CapApp.addListener('backButton', () => {
+          if (!state.onboardingComplete && role === UserRole.PATIENT) {
+            logout();
+            return;
+          }
           const handled = handleGoBack();
           if (!handled) {
             if (isAuthenticated) {
@@ -136,14 +140,26 @@ function AppContent() {
         backListener.remove();
       }
     };
-  }, [navigationHistory, activeTab, isAuthenticated, role, logout]);
+  }, [navigationHistory, activeTab, isAuthenticated, role, logout, state.onboardingComplete]);
+
+  // If user launches the app but never completed onboarding, do not trap them away from profile selection
+  useEffect(() => {
+    if (!state.isLoading && !state.onboardingComplete && role === UserRole.PATIENT) {
+      if (!sessionStorage.getItem('smriti_in_session_login')) {
+        logout();
+      }
+    }
+  }, [state.isLoading, state.onboardingComplete, role, logout]);
 
   // Set initial tab based on role after login
   useEffect(() => {
     if (isAuthenticated) {
+      sessionStorage.setItem('smriti_in_session_login', 'true');
       const rootScreen = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
       setNavigationHistory([rootScreen]);
       setActiveTab(rootScreen);
+    } else {
+      sessionStorage.removeItem('smriti_in_session_login');
     }
   }, [isAuthenticated, role]);
 
@@ -157,6 +173,7 @@ function AppContent() {
       <ScreenContainer>
         <LoginScreen 
           onLoginSuccess={() => {
+            sessionStorage.setItem('smriti_in_session_login', 'true');
             const rootScreen = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
             setNavigationHistory([rootScreen]);
             setActiveTab(rootScreen);
@@ -170,7 +187,10 @@ function AppContent() {
   if (!state.onboardingComplete && role === UserRole.PATIENT) {
     return (
       <ScreenContainer>
-        <OnboardingFlow onComplete={() => handleNavigate('home')} />
+        <OnboardingFlow 
+          onComplete={() => handleNavigate('home')} 
+          onCancel={logout}
+        />
       </ScreenContainer>
     );
   }
