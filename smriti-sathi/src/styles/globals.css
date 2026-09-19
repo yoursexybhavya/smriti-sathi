@@ -84,17 +84,23 @@
 /* ==========================================================================
    Explicit Light Theme (Crisp, high-contrast, elder-accessible daylight palette)
    ========================================================================== */
+html.theme-light,
 body.theme-light {
   --color-bg: #F8FAFC;             /* Crisp clean light canvas */
+  --color-background: #F8FAFC;
   --color-bg-subtle: #F1F5F9;      /* Subtle slate light */
+  --color-surface: #FFFFFF;
+  --color-surface-warm: #F8FAFC;
+  --color-surface-card: #FFFFFF;
   --color-card: #FFFFFF;           /* Pure white cards */
   --color-card-hover: #F8FAFC;     /* Light hover */
   --color-card-subtle: #F1F5F9;    /* Light secondary container */
-  --color-border: #CBD5E1;         /* Clear light border */
-  --color-border-subtle: #E2E8F0;
+  --color-border: #E2E8F0;         /* Clear light border */
+  --color-border-subtle: #CBD5E1;
   --color-border-focus: #1B5E20;
 
   --color-text: #0F172A;           /* High contrast deep slate */
+  --color-text-primary: #0F172A;
   --color-text-secondary: #334155; /* Readable secondary slate */
   --color-text-muted: #64748B;     /* Muted metadata */
   --color-text-inverse: #FFFFFF;
@@ -118,16 +124,21 @@ body.theme-light {
   --shadow-glow: 0 0 20px rgba(27, 94, 32, 0.15);
   --shadow-nav: 0 -4px 16px rgba(15, 23, 42, 0.06);
 
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--color-bg) !important;
+  color: var(--color-text) !important;
 }
 
 /* ==========================================================================
    Explicit Dark Theme (Midnight navy, luminous borders, zero eye strain)
    ========================================================================== */
+html.theme-dark,
 body.theme-dark {
   --color-bg: #0A1420;             /* Deepest midnight navy */
+  --color-background: #0A1420;
   --color-bg-subtle: #0E1C2D;      /* Subtle dark elevation */
+  --color-surface: #15253B;
+  --color-surface-warm: #0E1C2D;
+  --color-surface-card: #15253B;
   --color-card: #15253B;           /* Primary card background */
   --color-card-hover: #1C314E;     /* Card hover / active */
   --color-card-subtle: #101F33;    /* Secondary container */
@@ -136,6 +147,7 @@ body.theme-dark {
   --color-border-focus: #10B981;
 
   --color-text: #FFFFFF;
+  --color-text-primary: #FFFFFF;
   --color-text-secondary: #94A9C4;
   --color-text-muted: #647B99;
   --color-text-inverse: #0A1420;
@@ -159,8 +171,40 @@ body.theme-dark {
   --shadow-glow: 0 0 24px rgba(16, 185, 129, 0.25);
   --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.6);
 
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--color-bg) !important;
+  color: var(--color-text) !important;
+}
+
+/* Automatic Dark Mode Overrides for Legacy Classes */
+body.theme-dark .bg-white {
+  background-color: var(--color-card) !important;
+  color: var(--color-text) !important;
+}
+
+body.theme-dark .bg-\[\#F5F0E8\],
+body.theme-dark .bg-\[\#FDF8F0\],
+body.theme-dark .bg-\[\#FFF8F0\],
+body.theme-dark .bg-\[\#FAF6F0\] {
+  background-color: var(--color-bg) !important;
+  color: var(--color-text) !important;
+}
+
+body.theme-dark .text-\[\#1A1A1A\],
+body.theme-dark .text-\[\#1B1B1B\],
+body.theme-dark .text-\[\#2D3748\] {
+  color: var(--color-text) !important;
+}
+
+body.theme-dark .text-\[\#4A4A4A\],
+body.theme-dark .text-\[\#5C5C5C\],
+body.theme-dark .text-\[\#7A7A7A\] {
+  color: var(--color-text-secondary) !important;
+}
+
+body.theme-dark .border-\[\#E0D8CC\],
+body.theme-dark .border-\[\#E2E8F0\],
+body.theme-dark .border-\[\#D4C5B0\] {
+  border-color: var(--color-border) !important;
 }
 
 @media (min-width: 768px) {

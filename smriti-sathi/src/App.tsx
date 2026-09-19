@@ -57,15 +57,22 @@ function AppContent() {
     };
   }, []);
 
-  // Sync theme class to document.body
+  // Sync theme class to document.body and html
   useEffect(() => {
     const isDark = state.accessibility?.theme === 'dark';
+    const rootEl = document.documentElement;
+    const bodyEl = document.body;
+
     if (isDark) {
-      document.body.classList.add('theme-dark');
-      document.body.classList.remove('theme-light');
+      rootEl.classList.add('theme-dark');
+      rootEl.classList.remove('theme-light');
+      bodyEl.classList.add('theme-dark');
+      bodyEl.classList.remove('theme-light');
     } else {
-      document.body.classList.add('theme-light');
-      document.body.classList.remove('theme-dark');
+      rootEl.classList.add('theme-light');
+      rootEl.classList.remove('theme-dark');
+      bodyEl.classList.add('theme-light');
+      bodyEl.classList.remove('theme-dark');
     }
   }, [state.accessibility?.theme]);
 
@@ -142,24 +149,12 @@ function AppContent() {
     };
   }, [navigationHistory, activeTab, isAuthenticated, role, logout, state.onboardingComplete]);
 
-  // If user launches the app but never completed onboarding, do not trap them away from profile selection
-  useEffect(() => {
-    if (!state.isLoading && !state.onboardingComplete && role === UserRole.PATIENT) {
-      if (!sessionStorage.getItem('smriti_in_session_login')) {
-        logout();
-      }
-    }
-  }, [state.isLoading, state.onboardingComplete, role, logout]);
-
   // Set initial tab based on role after login
   useEffect(() => {
     if (isAuthenticated) {
-      sessionStorage.setItem('smriti_in_session_login', 'true');
       const rootScreen = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
       setNavigationHistory([rootScreen]);
       setActiveTab(rootScreen);
-    } else {
-      sessionStorage.removeItem('smriti_in_session_login');
     }
   }, [isAuthenticated, role]);
 

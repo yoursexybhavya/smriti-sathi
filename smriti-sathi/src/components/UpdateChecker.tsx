@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Download, Sparkles, X } from 'lucide-react';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { useLanguage } from '../contexts/LanguageContext';
+
+interface NativeAppUpdatePlugin {
+  downloadAndInstall(options: { url: string }): Promise<{ success: boolean; message?: string }>;
+  addListener(
+    eventName: 'downloadProgress',
+    listenerFunc: (info: { progress: number }) => void
+  ): Promise<{ remove: () => void }>;
+}
+
+const NativeAppUpdate = registerPlugin<NativeAppUpdatePlugin>('AppUpdate');
 
 export const CURRENT_APP_VERSION = 'v2.3.0';
 const GITHUB_REPO = 'yoursexybhavya/smriti-sathi';
@@ -115,20 +126,47 @@ export function UpdateNotifier() {
     });
   }, []);
 
-  const handleInstall = () => {
+  const handleInstall = async () => {
     if (!update?.downloadUrl) return;
 
     setDownloading(true);
-    setDownloadProgress(10);
+    setDownloadProgress(8);
 
-    // Simulate steady in-app direct download progression
+    // Native in-app download and installation on Android
+    if (Capacitor.isNativePlatform()) {
+      try {
+        let listener: any = null;
+        try {
+          listener = await NativeAppUpdate.addListener('downloadProgress', (data: { progress: number }) => {
+            if (data && typeof data.progress === 'number') {
+              setDownloadProgress(Math.min(99, Math.max(8, Math.round(data.progress))));
+            }
+          });
+        } catch (e) {
+          console.warn('Could not attach native progress listener', e);
+        }
+
+        await NativeAppUpdate.downloadAndInstall({ url: update.downloadUrl });
+        setDownloadProgress(100);
+        setDownloading(false);
+        setDownloadDone(true);
+
+        if (listener && listener.remove) {
+          listener.remove();
+        }
+        return;
+      } catch (nativeErr) {
+        console.error('Native in-app install failed, attempting fallback', nativeErr);
+      }
+    }
+
+    // Web fallback for browser testing
     const interval = setInterval(() => {
       setDownloadProgress((prev) => {
         if (prev >= 95) {
           clearInterval(interval);
           setDownloading(false);
           setDownloadDone(true);
-          // Trigger the direct download on the Android device
           try {
             const link = document.createElement('a');
             link.href = update.downloadUrl;
