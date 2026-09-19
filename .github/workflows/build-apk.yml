@@ -7,6 +7,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build Native Android APK
@@ -29,9 +32,6 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install Dependencies
         working-directory: smriti-sathi
         run: npm ci
@@ -50,10 +50,29 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
 
+      - name: Prepare Release Asset
+        run: |
+          cp smriti-sathi/android/app/build/outputs/apk/debug/app-debug.apk smriti-sathi/SmritiSathi-latest.apk
+
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smriti-sathi-debug-apk
-          path: smriti-sathi/android/app/build/outputs/apk/debug/app-debug.apk
+          path: smriti-sathi/SmritiSathi-latest.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish / Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: latest
+          name: "Smriti Sathi Latest Build"
+          body: |
+            ## Smriti Sathi — Latest Android Release
+            
+            - **Download Link**: [SmritiSathi-latest.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk)
+          files: smriti-sathi/SmritiSathi-latest.apk
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
