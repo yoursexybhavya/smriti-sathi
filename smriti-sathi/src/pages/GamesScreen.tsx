@@ -82,6 +82,8 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
         isOnline={isOnline} 
         showBack 
         onBack={() => onNavigate('home')} 
+        showSettings
+        onSettingsPress={() => onNavigate('settings')}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         {/* Interactive Info Banner */}

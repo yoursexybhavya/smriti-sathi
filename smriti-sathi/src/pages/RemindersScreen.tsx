@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pill, Calendar, Clock, Bell, Check, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Pill, Calendar, Clock, Bell, Check, Edit2, Trash2, Volume2 } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
 import { useApp } from '../context/AppContext';
 import { reminderService } from '../services/ReminderService';
+import { notificationService } from '../services/NotificationService';
 import { Reminder } from '../database/db';
 import { formatTime, formatDate, isToday } from '../utils/dateUtils';
 
@@ -198,16 +199,33 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
         isOnline={isOnline} 
         showBack 
         onBack={() => onNavigate('home')} 
+        showSettings
+        onSettingsPress={() => onNavigate('settings')}
       />
-      <div className="px-5 py-6 pb-28 space-y-6">
-        {/* Add Reminder Button */}
-        <button
-          onClick={() => setShowCreateForm(true)}
-          className="w-full flex items-center justify-center gap-3 bg-[#1B5E20] text-white font-semibold text-base py-4 px-6 rounded-2xl shadow-md active:scale-[0.98] transition-transform"
-        >
-          <Plus size={22} />
-          Add New Reminder
-        </button>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+        {/* Action Buttons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="w-full flex items-center justify-center gap-2.5 bg-[#10B981] hover:bg-[#059669] text-white font-bold text-base py-3.5 px-5 rounded-2xl shadow-md active:scale-[0.98] transition-all min-h-[52px]"
+          >
+            <Plus size={20} />
+            <span>Add New Reminder</span>
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              await notificationService.triggerBuzzer(
+                '🔔 Care Schedule Test Alarm',
+                'Testing the audible chime and vibration for scheduled care routines.'
+              );
+            }}
+            className="w-full flex items-center justify-center gap-2.5 bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[#F59E0B] font-semibold text-base py-3.5 px-5 rounded-2xl shadow-sm active:scale-[0.98] transition-all min-h-[52px]"
+          >
+            <Volume2 size={20} className="text-[#F59E0B]" />
+            <span>Test Care Alarm & Buzzer</span>
+          </button>
+        </div>
 
         {/* Create/Edit Form */}
         {showCreateForm && (

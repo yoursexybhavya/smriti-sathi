@@ -69,8 +69,10 @@ export default function ProgressScreen({ onNavigate, isOnline = true }: Progress
         isOnline={isOnline} 
         showBack 
         onBack={() => onNavigate('home')} 
+        showSettings
+        onSettingsPress={() => onNavigate('settings')}
       />
-      <div className="px-5 py-6 pb-28 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         {/* Today's Activity */}
         <Card elevated className="p-5">
           <div className="flex items-center gap-3 mb-4">
