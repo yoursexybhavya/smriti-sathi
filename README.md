@@ -18,22 +18,24 @@
 
 ---
 
-## 📱 Download & Install Android APK (Direct Link)
+## 📱 Download & Install Android APK
 
-> **Ready for Testing on Android Tablets & Phones:**
-> You can download the compiled production APK directly from GitHub onto your tablet browser in one tap:
+> **Ready for Testing on Android Tablets & Phones**
 
-[![Download APK](https://img.shields.io/badge/Download%20APK-SmritiSathi--v1.0.apk-brightgreen?style=for-the-badge&logo=android)](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-v1.0.apk)
+There is **only one** official download link for the Smriti Sathi app. This link will always securely provide the latest compiled Android version directly to your device. 
 
-**Direct Download URL:**  
-🔗 **[https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-v1.0.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-v1.0.apk)**
+[![Download APK](https://img.shields.io/badge/Download%20APK-SmritiSathi--latest.apk-brightgreen?style=for-the-badge&logo=android)](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk)
+
+🔗 **[Direct Download: https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk)**
 
 ### Quick Tablet Installation Steps:
 1. Open Chrome or any browser on your Android tablet/phone.
-2. Tap the download link above (or go to [Releases](https://github.com/yoursexybhavya/smriti-sathi/releases)).
+2. Tap the **Direct Download** link above.
 3. Once downloaded, tap the file in your notification bar or **Files &rarr; Downloads**.
 4. Tap **Install** (if prompted *"Allow installs from this source"*, tap **Settings** & toggle **Allow**).
 5. Open **Smriti Sathi** — it runs 100% offline immediately!
+
+*Note: The app contains an automatic in-app updater. Once installed, it will automatically notify you of future updates and download them directly inside the app.*
 
 ---
 
@@ -44,89 +46,50 @@ In the **North Eastern Region (NER)** of India, elderly patients suffering from 
 2. **Rural Connectivity Gaps:** Unstable cellular and Wi-Fi networks in rural hill communities disrupt cloud-dependent healthcare platforms.
 3. **Digital Illiteracy & Tremors:** Traditional mobile UIs with tiny text and complex navigation cause frustration, cognitive fatigue, and resistance in dementia patients.
 
-**Smriti Sathi** bridges these divides by coupling **Bhashini's speech infrastructure** with an offline-first **Lumosity-grade design system**, clinically grounded cognitive stimulation, and a novel **offline Bluetooth Low Energy (BLE) parent-child sync**.
+**Smriti Sathi** bridges these divides by coupling **Bhashini's speech infrastructure** with an offline-first accessible UI design, clinically grounded cognitive stimulation, and a novel offline parent-child synchronization system.
 
 ---
 
 ## 🌟 Key Features
 
 ### 🧠 1. Evidence-Based Cognitive Stimulation Games
-Designed specifically for seniors, featuring high-contrast dark surfaces (`#0A1420`, `#15253B`), 72px+ touch targets, and non-punitive gameplay:
-- **Speed Match (`/games/memory-match`):** Working memory pair-matching with pulsating gold errorless cues at Level 1 to prevent frustration.
-- **Masterpiece Routine Sequencing (`/games/daily-routine`):** Drag-and-drop chronological daily scheduling to reinforce daily orientation and combat temporal disorientation.
-- **Market Math & Currency (`/games/math`):** Real-world estimation and shopping arithmetic based on North Eastern markets (Assam tea stalls, fruit bazaars).
-- **Language & Cultural Proverbs (`/games/language`):** Native folk proverbs and vocabulary recall with Bhashini audio pronunciation.
+Designed specifically for seniors, featuring high-contrast environments, 72px+ touch targets, and non-punitive gameplay:
+- **Memory Match (`/games/memory-match`):** Working memory visual pair-matching with errorless cues at early stages.
+- **Recognise (`/games/recognise-game`):** Visual pattern recognition testing spatial memory with adaptive tiered levelling.
+- **Remember (`/games/remember-game`):** Timed object recall exercises utilizing real-world photography (no abstract emojis).
 
 ### 🗣️ 2. Bhashini AI Multilingual Speech Integration
-- **Text-to-Speech (TTS):** Speaks exercise instructions, daily routines, and medication alarms aloud in Assamese, Bodo, and Manipuri.
-- **Automatic Speech Recognition (ASR):** Allows elders with motor tremors or arthritis to respond verbally to cognitive quizzes.
+- **Text-to-Speech (TTS):** Speaks exercise instructions, daily routines, and medication alarms aloud in local languages.
 - **Neural Machine Translation (NMT):** Bridges regional elder dialect logs with English/Hindi clinical dashboards for family members and ASHA workers.
 
-### 🔄 3. Dual-Channel Parent-Child Synchronization
-```
-[ Bedside Elder Tablet (Samsung SM-T290) ]
-        │
-        ├── (1) Direct Offline BLE P2P (No Internet) ────► [ Child Companion Phone (Pixel / OnePlus) ]
-        │       GATT Service: 0xFE26                             │
-        │       Transfers encrypted cognitive scores & med logs  │
-        │                                                        │
-        └── (2) Wi-Fi / Mobile Data (When Connected) ────────────┴─► [ Cloud REST Server (/api/sync) ]
-                                                                         │
-                                                                         ├── Family Web Dashboard
-                                                                         └── ASHA Worker Health Portal
-```
-- **Zero-Internet Bluetooth Sync:** When the child returns home in the evening, tapping "Sync BLE" transfers all day-long memory scores and medication logs over Bluetooth LE in < 3 seconds.
+### 🔄 3. Parent-Child Synchronization
+- **Zero-Internet Bluetooth Sync:** Allows family members to securely pair their caregiver accounts to the patient's tablet.
+- **WhatsApp Integration:** One-tap export of daily memory scores and medical logs to local caregivers via WhatsApp.
 - **Opportunistic Cloud Sync:** Encrypted telemetry backs up to the REST server whenever internet is restored.
-
-### ⏰ 4. Offline Health Reminders & Emergency SOS
-- **Voice-First Care Schedule:** Gentle native voice alarms for **Medicine 💊**, **Hydration 💧**, and **Brain Workouts 🎯**.
-- **Bedside Emergency SOS Beacon:** One-tap emergency alarm with haptic vibration, GPS location dispatch (`26.1445° N, 91.7362° E`), and emergency SMS notifications to designated family members and local ASHA health workers.
-
----
-
-## 📱 Download & Install Android APK
-
-The pre-compiled native Android APK is ready for deployment on Android tablets and smartphones:
-
-| File | Size | Platform | Link |
-|---|---|---|---|
-| **`SmritiSathi-v1.0.apk`** | **4.1 MB** | Android 7.0+ (API 24 to 36) | [📥 Download Latest APK](SmritiSathi-v1.0.apk) |
-
-### Quick Installation:
-1. Transfer `SmritiSathi-v1.0.apk` to your Android device (via WhatsApp, Google Drive, or USB).
-2. Tap the file in your device's **Files / Downloads** app and select **Install**.
-3. Launch **Smriti Sathi**—the application is 100% unlocked and functional completely offline!
 
 ---
 
 ## 🔬 Clinical Validation & CST
 
 Smriti Sathi's gameplay and telemetry are grounded in:
-1. **Cognitive Stimulation Therapy (CST):** Evaluated by Cochrane systematic reviews as an effective non-pharmacological treatment for mild-to-moderate dementia, promoting neuroplasticity and daily functional independence.
-2. **Errorless Learning Framework:** Highlighting matching pairs and providing audio-visual guidance during initial stages to bypass impaired explicit episodic memory without embedding errors.
-3. **Digital Personal Data Protection (DPDP) Act 2023:** All patient identity records and telemetry remain encrypted locally (AES-GCM in IndexedDB). No biometric voice recordings are permanently retained.
+1. **Cognitive Stimulation Therapy (CST):** Evaluated by Cochrane systematic reviews as an effective non-pharmacological treatment for mild-to-moderate dementia.
+2. **Errorless Learning Framework:** Highlighting matching pairs and providing guidance during initial stages to bypass impaired explicit episodic memory without embedding errors.
+3. **Digital Personal Data Protection (DPDP) Act 2023:** All patient identity records and telemetry remain encrypted locally (AES-GCM in IndexedDB). 
 
 ---
 
 ## 🏗️ System Architecture
 
-```
+```text
 smriti-sathi/
-├── android/                   # Capacitor Native Android project & Gradle wrapper
-│   ├── app/src/main/          # AndroidManifest (BLE, Haptics, Internet permissions)
-│   └── build/outputs/apk/     # Compiled native APK (app-debug.apk)
+├── android/                   # Capacitor Native Android project
 ├── src/
-│   ├── components/            # Lumosity-grade accessible UI (TopHeader, BottomNav, BigButton)
+│   ├── components/            # Accessible UI (TopHeader, BottomNav, BigButton, UpdateNotifier)
 │   ├── contexts/              # Multilingual context (LanguageContext, PatientContext)
-│   ├── db/                    # Offline-first IndexedDB database layer (Dexie.js)
-│   ├── hooks/                 # Adaptive staircase difficulty & Web Speech synthesis hooks
-│   ├── i18n/                  # Native translations (Assamese, Bodo, Manipuri, English)
-│   ├── pages/                 # Home, MemoryMatch, DailyRoutine, MathWorkout, LanguageWorkout
-│   └── styles/                # Lumosity dark theme (#0A1420, #15253B, #FF7247)
+│   ├── services/              # Adaptive Engine & Offline-first IndexedDB database layer (Dexie.js)
+│   ├── pages/                 # Home, MemoryMatch, Recognise, SettingsScreen
+│   └── styles/                # CSS Theme
 ├── server/                    # Lightweight Express sync backend for remote testing
-│   ├── index.js               # REST endpoints (/api/sync, /api/telemetry, /api/sos)
-│   └── package.json           # Standalone dependencies for 1-click cloud deploy
-├── .github/workflows/         # Cloud CI workflow (build-apk.yml) for auto-compilation
 └── build-apk.sh               # 1-Click native compilation script for local machines
 ```
 
@@ -146,48 +109,17 @@ cd smriti-sathi/smriti-sathi
 npm install
 ```
 
-### 2. Run Local Development Server
+### 2. Build Web Bundle & Sync Android Assets
 ```bash
-npm run dev
+npm run build
+npx cap sync android
 ```
 
-### 3. Build Web Bundle & Sync Android Assets
-```bash
-npm run cap:sync
-```
-
-### 4. Compile Fresh Native Android APK
+### 3. Compile Native Android APK
 ```bash
 # From the project root
 ./build-apk.sh
 ```
-
-### 5. Run the Cloud Testing & Telemetry Server
-```bash
-cd smriti-sathi/server
-npm install
-npm start
-# Server listens on port 4000: http://localhost:4000
-```
-
----
-
-## 🌐 Free Cloud Hosting (Step-by-Step for Render.com)
-
-To host the companion sync server and telemetry dashboard online for free (takes 3 minutes):
-1. Sign up or log into [Render.com](https://render.com) using your GitHub account (`yoursexybhavya`).
-2. Click **New +** &rarr; **Web Service**.
-3. Select and connect `smriti-sathi`.
-4. Enter these exact fields:
-   - **Name:** `smriti-sathi-api`
-   - **Root Directory:** `smriti-sathi/server`
-   - **Environment:** `Node`
-   - **Build Command:** `npm install`
-   - **Start Command:** `node index.js`
-   - **Plan:** `Free` ($0/month)
-5. Click **Create Web Service**.
-6. Render will deploy your server and provide a public URL like `https://smriti-sathi-api.onrender.com`.
-7. In the Android app, go to **Caregiver Dashboard** &rarr; **PARENT-CHILD SYNC 📲**, paste your Render URL, and tap **Trigger Cloud Sync** to back up patient data!
 
 ---
 
@@ -205,6 +137,6 @@ Contributions to expand language models, regional cultural folk content, or elde
 
 ## 📄 License & Acknowledgments
 
-- Distributed under the **MIT License**. See `LICENSE` for more information.
+- Distributed under the **MIT License**.
 - Developed for **Smart India Hackathon 2026 (SIH26003)** under the **Ministry of Development of North Eastern Region (MDoNER)**.
 - Powered by the **Bhashini National Language Translation Mission (MeitY)**.
