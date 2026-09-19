@@ -192,7 +192,13 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
 
   return (
     <>
-      <AppHeader title="Reminders" subtitle="Never miss what matters" isOnline={isOnline} />
+      <AppHeader 
+        title="Reminders" 
+        subtitle="Never miss what matters" 
+        isOnline={isOnline} 
+        showBack 
+        onBack={() => onNavigate('home')} 
+      />
       <div className="px-5 py-6 pb-28 space-y-6">
         {/* Add Reminder Button */}
         <button

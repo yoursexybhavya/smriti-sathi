@@ -35,8 +35,9 @@ import { UpdateNotifier } from './components/UpdateChecker';
 
 function AppContent() {
   const { state } = useApp();
-  const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, role, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
+  const [navigationHistory, setNavigationHistory] = useState<string[]>(['home']);
   const [showSplash, setShowSplash] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -56,6 +57,18 @@ function AppContent() {
     };
   }, []);
 
+  // Sync theme class to document.body
+  useEffect(() => {
+    const isDark = state.accessibility?.theme === 'dark';
+    if (isDark) {
+      document.body.classList.add('theme-dark');
+      document.body.classList.remove('theme-light');
+    } else {
+      document.body.classList.add('theme-light');
+      document.body.classList.remove('theme-dark');
+    }
+  }, [state.accessibility?.theme]);
+
   useEffect(() => {
     if (state.accessibility) {
       if (state.accessibility.highContrast) {
@@ -69,14 +82,68 @@ function AppContent() {
     }
   }, [state.accessibility]);
 
+  // Navigate forward and track history
+  const handleNavigate = (screen: string) => {
+    setNavigationHistory(prev => [...prev, screen]);
+    setActiveTab(screen);
+  };
+
+  // Navigate backward
+  const handleGoBack = () => {
+    if (navigationHistory.length > 1) {
+      const nextHistory = [...navigationHistory];
+      nextHistory.pop();
+      const prevScreen = nextHistory[nextHistory.length - 1];
+      setNavigationHistory(nextHistory);
+      setActiveTab(prevScreen);
+      return true;
+    }
+    if (activeTab !== 'home' && activeTab !== 'caregiver-home') {
+      const defaultRoot = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
+      setNavigationHistory([defaultRoot]);
+      setActiveTab(defaultRoot);
+      return true;
+    }
+    return false;
+  };
+
+  // Hardware and Gesture Back Button Listener (Capacitor Android)
+  useEffect(() => {
+    let backListener: any = null;
+
+    const initBackHandler = async () => {
+      try {
+        const { App: CapApp } = await import('@capacitor/app');
+        backListener = await CapApp.addListener('backButton', () => {
+          const handled = handleGoBack();
+          if (!handled) {
+            if (isAuthenticated) {
+              logout();
+            } else {
+              CapApp.exitApp();
+            }
+          }
+        });
+      } catch (err) {
+        console.warn('Capacitor backButton listener unavailable', err);
+      }
+    };
+
+    initBackHandler();
+
+    return () => {
+      if (backListener && backListener.remove) {
+        backListener.remove();
+      }
+    };
+  }, [navigationHistory, activeTab, isAuthenticated, role, logout]);
+
   // Set initial tab based on role after login
   useEffect(() => {
     if (isAuthenticated) {
-      if (role === UserRole.CAREGIVER) {
-        setActiveTab('caregiver-home');
-      } else {
-        setActiveTab('home');
-      }
+      const rootScreen = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
+      setNavigationHistory([rootScreen]);
+      setActiveTab(rootScreen);
     }
   }, [isAuthenticated, role]);
 
@@ -90,11 +157,9 @@ function AppContent() {
       <ScreenContainer>
         <LoginScreen 
           onLoginSuccess={() => {
-            if (role === UserRole.CAREGIVER) {
-              setActiveTab('caregiver-home');
-            } else {
-              setActiveTab('home');
-            }
+            const rootScreen = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
+            setNavigationHistory([rootScreen]);
+            setActiveTab(rootScreen);
           }}
         />
       </ScreenContainer>
@@ -105,7 +170,7 @@ function AppContent() {
   if (!state.onboardingComplete && role === UserRole.PATIENT) {
     return (
       <ScreenContainer>
-        <OnboardingFlow onComplete={() => setActiveTab('home')} />
+        <OnboardingFlow onComplete={() => handleNavigate('home')} />
       </ScreenContainer>
     );
   }
@@ -116,25 +181,25 @@ function AppContent() {
     if (role === UserRole.PATIENT) {
       switch (activeTab) {
         case 'home':
-          return <PatientHomeScreen onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <PatientHomeScreen onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'games':
-          return <GamesScreen onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <GamesScreen onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'remember-game':
-          return <RememberGame onBack={() => setActiveTab('games')} />;
+          return <RememberGame onBack={handleGoBack} />;
         case 'recognise-game':
-          return <RecogniseGame onBack={() => setActiveTab('games')} />;
+          return <RecogniseGame onBack={handleGoBack} />;
         case 'reminders':
-          return <RemindersScreen onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <RemindersScreen onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'progress':
-          return <ProgressScreen onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <ProgressScreen onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'settings':
-          return <SettingsScreen onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <SettingsScreen onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'memory-book':
-          return <MemoryBookScreen onBack={() => setActiveTab('home')} onNavigate={setActiveTab} />;
+          return <MemoryBookScreen onBack={handleGoBack} onNavigate={handleNavigate} />;
         case 'memory-book-viewer':
-          return <MemoryBookViewerScreen onBack={() => setActiveTab('home')} />;
+          return <MemoryBookViewerScreen onBack={handleGoBack} />;
         default:
-          return <PatientHomeScreen onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <PatientHomeScreen onNavigate={handleNavigate} isOnline={isOnline} />;
       }
     }
 
@@ -142,29 +207,29 @@ function AppContent() {
     if (role === UserRole.CAREGIVER) {
       switch (activeTab) {
         case 'caregiver-home':
-          return <CaregiverHome onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <CaregiverHome onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'caregiver-reminders':
-          return <RemindersScreen onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <RemindersScreen onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'caregiver-memory':
-          return <MemoryBookScreen onBack={() => setActiveTab('home')} onNavigate={setActiveTab} />;
+          return <MemoryBookScreen onBack={handleGoBack} onNavigate={handleNavigate} />;
         case 'caregiver-settings':
-          return <SettingsScreen onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <SettingsScreen onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'safety-dashboard':
-          return <SafetyDashboard onBack={() => setActiveTab('caregiver-home')} />;
+          return <SafetyDashboard onBack={handleGoBack} />;
         case 'sync-tests':
-          return <SyncTestScreen onBack={() => setActiveTab('caregiver-home')} />;
+          return <SyncTestScreen onBack={handleGoBack} />;
         case 'security-tests':
-          return <SecurityTestScreen onBack={() => setActiveTab('caregiver-settings')} />;
+          return <SecurityTestScreen onBack={handleGoBack} />;
         case 'adaptive-tests':
-          return <AdaptiveEngineTestScreen onBack={() => setActiveTab('caregiver-settings')} />;
+          return <AdaptiveEngineTestScreen onBack={handleGoBack} />;
         case 'database-tests':
           return <DatabaseTestScreen />;
         case 'reminder-tests':
-          return <ReminderTestScreen onNavigate={setActiveTab} />;
+          return <ReminderTestScreen onNavigate={handleNavigate} />;
         case 'voice-language-tests':
-          return <VoiceLanguageTestScreen onBack={() => setActiveTab('caregiver-settings')} />;
+          return <VoiceLanguageTestScreen onBack={handleGoBack} />;
         default:
-          return <CaregiverHome onNavigate={setActiveTab} isOnline={isOnline} />;
+          return <CaregiverHome onNavigate={handleNavigate} isOnline={isOnline} />;
       }
     }
 

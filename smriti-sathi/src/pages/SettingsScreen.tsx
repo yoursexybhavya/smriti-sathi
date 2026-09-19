@@ -1,4 +1,4 @@
-import { ArrowLeft, Globe, Volume2, Type, Bell, Shield, Database, Smartphone, Info, User, RefreshCw, ChevronRight, BookOpen, LogOut, Sparkles } from 'lucide-react';
+import { ArrowLeft, Globe, Volume2, Type, Bell, Shield, Database, Smartphone, Info, User, RefreshCw, ChevronRight, BookOpen, LogOut, Sparkles, Sun, Moon } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
 import { LANGUAGES, APP } from '../core/constants/app';
@@ -16,7 +16,7 @@ interface SettingsScreenProps {
 }
 
 export default function SettingsScreen({ onNavigate, isOnline = true }: SettingsScreenProps) {
-  const { state, resetOnboarding, updateAccessibility } = useApp();
+  const { state, resetOnboarding, updateAccessibility, toggleTheme } = useApp();
   const { role, logout, session } = useAuth();
   const patient = state.currentPatient;
   const isCaregiver = role === UserRole.CAREGIVER;
@@ -46,7 +46,13 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
 
   return (
     <>
-      <AppHeader title="Settings" subtitle="Customize your experience" isOnline={isOnline} />
+      <AppHeader 
+        title="Settings" 
+        subtitle="Customize your experience" 
+        isOnline={isOnline} 
+        showBack 
+        onBack={() => onNavigate('home')} 
+      />
       <div className="max-w-5xl mx-auto px-5 py-6 pb-28 space-y-6">
         {/* Patient Profile */}
         {patient && (
@@ -171,6 +177,83 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
           </div>
         )}
 
+
+        {/* Visual Theme (Light & Dark) */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-[var(--color-text)] px-1 flex items-center gap-2">
+            <Sun size={18} className="text-[#F59E0B]" />
+            Visual Theme
+          </h3>
+          <Card className="p-4 space-y-3">
+            <p className="text-xs text-[var(--color-text-secondary)]">
+              Choose between Daylight Mode (clean high contrast) or Dark Mode (soothing midnight navy).
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (state.accessibility?.theme === 'dark') toggleTheme();
+                }}
+                className={`p-3.5 rounded-2xl border-2 flex items-center gap-3 transition-all ${
+                  state.accessibility?.theme !== 'dark'
+                    ? 'border-[#10B981] bg-[var(--color-bg-subtle)] font-bold'
+                    : 'border-[var(--color-border)] bg-[var(--color-card)]'
+                }`}
+              >
+                <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                  <Sun size={20} />
+                </div>
+                <div className="text-left">
+                  <div className="text-sm text-[var(--color-text)]">Light Theme</div>
+                  <div className="text-xs text-[var(--color-text-muted)]">Daylight</div>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (state.accessibility?.theme !== 'dark') toggleTheme();
+                }}
+                className={`p-3.5 rounded-2xl border-2 flex items-center gap-3 transition-all ${
+                  state.accessibility?.theme === 'dark'
+                    ? 'border-[#10B981] bg-[var(--color-bg-subtle)] font-bold'
+                    : 'border-[var(--color-border)] bg-[var(--color-card)]'
+                }`}
+              >
+                <div className="w-9 h-9 rounded-xl bg-slate-800 text-slate-200 flex items-center justify-center">
+                  <Moon size={20} />
+                </div>
+                <div className="text-left">
+                  <div className="text-sm text-[var(--color-text)]">Dark Theme</div>
+                  <div className="text-xs text-[var(--color-text-muted)]">Midnight</div>
+                </div>
+              </button>
+            </div>
+          </Card>
+        </div>
+
+        {/* Switch Profile / Session */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-[var(--color-text)] px-1 flex items-center gap-2">
+            <LogOut size={18} className="text-red-500" />
+            Switch Active Profile
+          </h3>
+          <Card className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-[var(--color-text)]">Active User Session</p>
+                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">Return to profile selection to test caregiver or health worker</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="px-4 py-2.5 bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-sm font-bold transition-all active:scale-95"
+              >
+                Switch Role
+              </button>
+            </div>
+          </Card>
+        </div>
 
         {/* Voice & Accessibility */}
         <div className="space-y-3">

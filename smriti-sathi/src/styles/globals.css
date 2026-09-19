@@ -81,6 +81,88 @@
   --transition-normal: 250ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ==========================================================================
+   Explicit Light Theme (Crisp, high-contrast, elder-accessible daylight palette)
+   ========================================================================== */
+body.theme-light {
+  --color-bg: #F8FAFC;             /* Crisp clean light canvas */
+  --color-bg-subtle: #F1F5F9;      /* Subtle slate light */
+  --color-card: #FFFFFF;           /* Pure white cards */
+  --color-card-hover: #F8FAFC;     /* Light hover */
+  --color-card-subtle: #F1F5F9;    /* Light secondary container */
+  --color-border: #CBD5E1;         /* Clear light border */
+  --color-border-subtle: #E2E8F0;
+  --color-border-focus: #1B5E20;
+
+  --color-text: #0F172A;           /* High contrast deep slate */
+  --color-text-secondary: #334155; /* Readable secondary slate */
+  --color-text-muted: #64748B;     /* Muted metadata */
+  --color-text-inverse: #FFFFFF;
+
+  --color-primary: #1B5E20;        /* Deep healthcare forest green */
+  --color-primary-hover: #2E7D32;
+  --color-primary-glow: rgba(27, 94, 32, 0.2);
+
+  --color-accent-teal: #059669;
+  --color-accent-blue: #0284C7;
+  --color-accent-purple: #7C3AED;
+  --color-accent-amber: #D97706;
+  --color-accent-rose: #DB2777;
+
+  --color-success: #059669;
+  --color-success-bg: rgba(5, 150, 105, 0.12);
+  --color-warning: #D97706;
+  --color-warning-bg: rgba(217, 119, 6, 0.12);
+
+  --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 0 20px rgba(27, 94, 32, 0.15);
+  --shadow-nav: 0 -4px 16px rgba(15, 23, 42, 0.06);
+
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ==========================================================================
+   Explicit Dark Theme (Midnight navy, luminous borders, zero eye strain)
+   ========================================================================== */
+body.theme-dark {
+  --color-bg: #0A1420;             /* Deepest midnight navy */
+  --color-bg-subtle: #0E1C2D;      /* Subtle dark elevation */
+  --color-card: #15253B;           /* Primary card background */
+  --color-card-hover: #1C314E;     /* Card hover / active */
+  --color-card-subtle: #101F33;    /* Secondary container */
+  --color-border: #223752;         /* Crisp card border */
+  --color-border-subtle: #192C44;
+  --color-border-focus: #10B981;
+
+  --color-text: #FFFFFF;
+  --color-text-secondary: #94A9C4;
+  --color-text-muted: #647B99;
+  --color-text-inverse: #0A1420;
+
+  --color-primary: #10B981;
+  --color-primary-hover: #34D399;
+  --color-primary-glow: rgba(16, 185, 129, 0.35);
+
+  --color-accent-teal: #10B981;
+  --color-accent-blue: #0EA5E9;
+  --color-accent-purple: #A855F7;
+  --color-accent-amber: #F59E0B;
+  --color-accent-rose: #EC4899;
+
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+
+  --shadow-card: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 24px rgba(16, 185, 129, 0.25);
+  --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.6);
+
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
 @media (min-width: 768px) {
   :root {
     --max-width: 1120px;

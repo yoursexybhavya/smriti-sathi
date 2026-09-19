@@ -16,9 +16,9 @@ export default function LargeActionCard({
   variant = 'neutral',
 }: LargeActionCardProps) {
   const variantClasses = {
-    primary: 'bg-[#E8F5E9] border-[#C8E6C9] hover:bg-[#C8E6C9]',
-    secondary: 'bg-[#FFF3E0] border-[#FFE0B2] hover:bg-[#FFE0B2]',
-    neutral: 'bg-white border-[#E0D8CC] hover:bg-[#FDF8F0]',
+    primary: 'bg-[var(--color-card)] border-[#10B981]/40 hover:border-[#10B981] shadow-sm',
+    secondary: 'bg-[var(--color-card)] border-[#F59E0B]/40 hover:border-[#F59E0B] shadow-sm',
+    neutral: 'bg-[var(--color-card)] border-[var(--color-border)] hover:border-[var(--color-border-focus)] shadow-sm',
   };
 
   return (
@@ -27,13 +27,13 @@ export default function LargeActionCard({
       className={`w-full p-5 rounded-2xl border-2 transition-all active:scale-[0.98] flex items-center gap-4 ${variantClasses[variant]}`}
       aria-label={title}
     >
-      <div className="w-16 h-16 rounded-2xl bg-white/80 flex items-center justify-center flex-shrink-0 shadow-sm">
+      <div className="w-16 h-16 rounded-2xl bg-[var(--color-bg-subtle)] flex items-center justify-center flex-shrink-0 shadow-sm border border-[var(--color-border-subtle)]">
         {icon}
       </div>
       <div className="flex-1 text-left">
-        <h3 className="text-lg font-semibold text-[#1A1A1A]">{title}</h3>
+        <h3 className="text-lg font-semibold text-[var(--color-text)]">{title}</h3>
         {subtitle && (
-          <p className="text-sm text-[#4A4A4A] mt-1">{subtitle}</p>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">{subtitle}</p>
         )}
       </div>
     </button>

@@ -22,7 +22,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ONLINE',
     platform: 'Smriti Sathi Cloud Production Platform',
-    version: '2.2.0',
+    version: '2.3.0',
     recordsStored: telemetryDatabase.sessions.length,
     lastSync: telemetryDatabase.lastSyncedAt,
   });
@@ -73,24 +73,28 @@ app.get('/api/telemetry', (req, res) => {
 app.post('/api/sos', (req, res) => {
   const { deviceId, coordinates, timestamp } = req.body;
   const alert = {
-    id: Date.now(),
-    deviceId: deviceId || 'Bedside Tablet SM-T290',
-    coordinates: coordinates || { lat: 26.1445, lng: 91.7362 },
+    id: `sos_${Date.now()}`,
+    deviceId: deviceId || 'Elder-Tablet',
+    coordinates: coordinates || { latitude: 26.1445, longitude: 91.7362 },
     timestamp: timestamp || new Date().toISOString(),
-    status: 'DISPATCHED_TO_ASHA',
+    status: 'DISPATCHED_TO_ASHA_WORKER',
   };
-
   telemetryDatabase.sosAlerts.push(alert);
-  console.warn(`[EMERGENCY SOS ALERT] Bedside beacon triggered! Dispatching SMS to Caregiver & ASHA...`);
+  res.json({ success: true, alertId: alert.id, message: 'Emergency response alert dispatched' });
+});
 
-  res.status(200).json({
-    dispatched: true,
-    alert,
-    contactsNotified: ['Caregiver (+91 98765 43210)', 'ASHA Worker (+91 98765 11223)'],
+// 5. In-App Auto-Update & Version Authority (Render Cloud Backend)
+app.get('/api/version', (req, res) => {
+  res.json({
+    latestVersion: 'v2.3.0',
+    versionCode: 230,
+    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk',
+    releaseNotes: 'Smriti Sathi v2.3.0: Hardware back button navigation, Light & Dark themes, interactive cognitive cards, role-switching escape hatch, and in-app self-updater.',
+    publishedAt: new Date().toISOString(),
   });
 });
 
-// 5. Host the compiled Android/PWA web assets for tablet testing
+// 6. Host the compiled Android/PWA web assets for tablet testing
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));

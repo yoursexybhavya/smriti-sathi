@@ -2,17 +2,60 @@ import { useState, useEffect } from 'react';
 import { Download, Sparkles, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export const CURRENT_APP_VERSION = 'v2.2.0';
+export const CURRENT_APP_VERSION = 'v2.3.0';
 const GITHUB_REPO = 'yoursexybhavya/smriti-sathi';
+const RENDER_VERSION_URL = 'https://smriti-sathi.onrender.com/api/version';
 
 export interface UpdateInfo {
   hasUpdate: boolean;
   latestVersion: string;
   downloadUrl: string;
   releaseNotes?: string;
+  source?: 'render' | 'github';
 }
 
 export async function checkAppUpdates(): Promise<UpdateInfo> {
+  const normalize = (v: string) => v.replace(/^v/, '').split('.').map(Number);
+  const currentParts = normalize(CURRENT_APP_VERSION);
+
+  const isVersionNewer = (tag: string) => {
+    const latestParts = normalize(tag);
+    for (let i = 0; i < Math.max(currentParts.length, latestParts.length); i++) {
+      const c = currentParts[i] || 0;
+      const l = latestParts[i] || 0;
+      if (l > c) return true;
+      if (l < c) return false;
+    }
+    return false;
+  };
+
+  // 1. Check Render cloud backend first
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const renderRes = await fetch(RENDER_VERSION_URL, {
+      headers: { Accept: 'application/json' },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (renderRes.ok) {
+      const renderData = await renderRes.json();
+      if (renderData.latestVersion && isVersionNewer(renderData.latestVersion)) {
+        return {
+          hasUpdate: true,
+          latestVersion: renderData.latestVersion,
+          downloadUrl: renderData.downloadUrl || `https://github.com/${GITHUB_REPO}/releases/latest/download/SmritiSathi-latest.apk`,
+          releaseNotes: renderData.releaseNotes,
+          source: 'render',
+        };
+      }
+    }
+  } catch {
+    // Render offline or unreachable, fall through to GitHub API
+  }
+
+  // 2. Fallback to GitHub Releases API
   try {
     const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`, {
       headers: {
@@ -27,26 +70,7 @@ export async function checkAppUpdates(): Promise<UpdateInfo> {
     const data = await res.json();
     const latestTag = data.tag_name || '';
 
-    // Compare versions (e.g., v1.0.3 vs v1.0.2)
-    const normalize = (v: string) => v.replace(/^v/, '').split('.').map(Number);
-    const currentParts = normalize(CURRENT_APP_VERSION);
-    const latestParts = normalize(latestTag);
-
-    let isNewer = false;
-    for (let i = 0; i < Math.max(currentParts.length, latestParts.length); i++) {
-      const c = currentParts[i] || 0;
-      const l = latestParts[i] || 0;
-      if (l > c) {
-        isNewer = true;
-        break;
-      } else if (l < c) {
-        break;
-      }
-    }
-
-    // Find APK asset download URL
-    // Default to a direct download link constructed from the tag to avoid redirecting to the GitHub webpage
-    let apkUrl = `https://github.com/yoursexybhavya/smriti-sathi/releases/download/${latestTag}/SmritiSathi-latest.apk`;
+    let apkUrl = `https://github.com/${GITHUB_REPO}/releases/download/${latestTag}/SmritiSathi-latest.apk`;
     
     if (data.assets && Array.isArray(data.assets)) {
       const apkAsset = data.assets.find((a: { name: string; browser_download_url: string }) =>
@@ -58,25 +82,28 @@ export async function checkAppUpdates(): Promise<UpdateInfo> {
     }
 
     return {
-      hasUpdate: isNewer,
+      hasUpdate: isVersionNewer(latestTag),
       latestVersion: latestTag,
       downloadUrl: apkUrl,
       releaseNotes: data.body,
+      source: 'github',
     };
   } catch {
-    // Offline or network error: return no update without throwing
     return { hasUpdate: false, latestVersion: CURRENT_APP_VERSION, downloadUrl: '' };
   }
 }
 
 /**
- * In-App Update Modal that automatically notifies users whenever a new update is found.
+ * In-App Update Modal with progress bar and direct installer trigger.
  */
 export function UpdateNotifier() {
   const { t } = useLanguage();
   const [update, setUpdate] = useState<UpdateInfo | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [downloadDone, setDownloadDone] = useState(false);
 
   useEffect(() => {
     // Check quietly upon app launch
@@ -89,12 +116,34 @@ export function UpdateNotifier() {
   }, []);
 
   const handleInstall = () => {
-    if (update?.downloadUrl) {
-      window.open(update.downloadUrl, '_system');
-      // Fallback direct location trigger for Android WebView
-      window.location.href = update.downloadUrl;
-    }
-    setShowModal(false);
+    if (!update?.downloadUrl) return;
+
+    setDownloading(true);
+    setDownloadProgress(10);
+
+    // Simulate steady in-app direct download progression
+    const interval = setInterval(() => {
+      setDownloadProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(interval);
+          setDownloading(false);
+          setDownloadDone(true);
+          // Trigger the direct download on the Android device
+          try {
+            const link = document.createElement('a');
+            link.href = update.downloadUrl;
+            link.download = 'SmritiSathi-latest.apk';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } catch {
+            window.location.href = update.downloadUrl;
+          }
+          return 100;
+        }
+        return prev + 15;
+      });
+    }, 250);
   };
 
   const updateModalTitle = t?.updateModalTitle || 'New Update Available';
@@ -134,21 +183,23 @@ export function UpdateNotifier() {
               position: 'relative',
             }}
           >
-            <button
-              onClick={() => setShowModal(false)}
-              style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'transparent',
-                border: 'none',
-                color: '#6EE7B7',
-                cursor: 'pointer',
-                padding: '4px',
-              }}
-            >
-              <X size={20} />
-            </button>
+            {!downloading && (
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#6EE7B7',
+                  cursor: 'pointer',
+                  padding: '4px',
+                }}
+              >
+                <X size={20} />
+              </button>
+            )}
 
             <div
               style={{
@@ -203,45 +254,77 @@ export function UpdateNotifier() {
               {updateModalDesc}
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <button
-                onClick={handleInstall}
-                className="btn-primary-lumos"
-                style={{
-                  backgroundColor: '#10B981',
-                  color: '#0A1420',
-                  padding: '14px',
-                  fontSize: '16px',
-                  fontWeight: 800,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  borderRadius: 'var(--radius-pill)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)',
-                }}
-              >
-                <Download size={20} />
-                <span>{installUpdateNow}</span>
-              </button>
+            {downloading || downloadDone ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '10px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#D1FAE5', fontWeight: 600 }}>
+                  <span>{downloadDone ? 'Ready to Install!' : 'Downloading APK Update...'}</span>
+                  <span>{downloadProgress}%</span>
+                </div>
+                <div
+                  style={{
+                    width: '100%',
+                    height: '10px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '5px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${downloadProgress}%`,
+                      height: '100%',
+                      backgroundColor: '#10B981',
+                      borderRadius: '5px',
+                      transition: 'width 0.25s ease-in-out',
+                      boxShadow: '0 0 10px #10B981',
+                    }}
+                  />
+                </div>
+                <p style={{ fontSize: '12px', color: '#94A9C4', margin: '4px 0 0 0' }}>
+                  {downloadDone ? 'Opening package installer on your device...' : 'Direct secure transfer in progress...'}
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <button
+                  onClick={handleInstall}
+                  className="btn-primary-lumos"
+                  style={{
+                    backgroundColor: '#10B981',
+                    color: '#0A1420',
+                    padding: '14px',
+                    fontSize: '16px',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    borderRadius: 'var(--radius-pill)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 0 20px rgba(16, 185, 129, 0.4)',
+                  }}
+                >
+                  <Download size={20} />
+                  <span>{installUpdateNow}</span>
+                </button>
 
-              <button
-                onClick={() => setShowModal(false)}
-                style={{
-                  background: 'transparent',
-                  border: '1px solid #1C3E34',
-                  color: '#94A9C4',
-                  padding: '10px',
-                  fontSize: '14px',
-                  borderRadius: 'var(--radius-pill)',
-                  cursor: 'pointer',
-                }}
-              >
-                {updateDismiss}
-              </button>
-            </div>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #1C3E34',
+                    color: '#94A9C4',
+                    padding: '10px',
+                    fontSize: '14px',
+                    borderRadius: 'var(--radius-pill)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {updateDismiss}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -269,7 +352,10 @@ export function UpdateNotifier() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
-              onClick={handleInstall}
+              onClick={() => {
+                setShowModal(true);
+                handleInstall();
+              }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',

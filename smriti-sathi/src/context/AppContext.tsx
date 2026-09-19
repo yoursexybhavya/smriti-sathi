@@ -21,6 +21,7 @@ export interface AccessibilitySettings {
   textSize: 'normal' | 'large' | 'extra-large';
   highContrast: boolean;
   voiceGuidance: boolean;
+  theme?: 'light' | 'dark';
 }
 
 export interface AppState {
@@ -38,6 +39,7 @@ interface AppContextType {
   updatePatient: (patient: PatientProfile) => Promise<void>;
   updateAccessibility: (settings: AccessibilitySettings) => Promise<void>;
   updateLanguage: (language: string) => Promise<void>;
+  toggleTheme: () => void;
 }
 
 const defaultState: AppState = {
@@ -48,6 +50,7 @@ const defaultState: AppState = {
     textSize: 'large',
     highContrast: false,
     voiceGuidance: true,
+    theme: (typeof window !== 'undefined' && localStorage.getItem('smriti_sathi_theme') === 'dark') ? 'dark' : 'light',
   },
   isLoading: true,
 };
@@ -205,6 +208,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const toggleTheme = () => {
+    setState(prev => {
+      const nextTheme = prev.accessibility?.theme === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('smriti_sathi_theme', nextTheme);
+      } catch {}
+      return {
+        ...prev,
+        accessibility: {
+          ...prev.accessibility,
+          theme: nextTheme,
+        },
+      };
+    });
+  };
+
   return (
     <AppContext.Provider value={{
       state,
@@ -213,6 +232,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       updatePatient,
       updateAccessibility,
       updateLanguage,
+      toggleTheme,
     }}>
       {children}
     </AppContext.Provider>

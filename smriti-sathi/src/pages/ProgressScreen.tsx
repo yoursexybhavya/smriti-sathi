@@ -63,7 +63,13 @@ export default function ProgressScreen({ onNavigate, isOnline = true }: Progress
 
   return (
     <>
-      <AppHeader title="My Progress" subtitle="Your cognitive journey" isOnline={isOnline} />
+      <AppHeader 
+        title="My Progress" 
+        subtitle="Your cognitive journey" 
+        isOnline={isOnline} 
+        showBack 
+        onBack={() => onNavigate('home')} 
+      />
       <div className="px-5 py-6 pb-28 space-y-6">
         {/* Today's Activity */}
         <Card elevated className="p-5">

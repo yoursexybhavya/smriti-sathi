@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Volume2, Check } from 'lucide-react';
 
 interface ReminderCardProps {
   icon: ReactNode;
@@ -7,6 +8,7 @@ interface ReminderCardProps {
   description?: string;
   completed?: boolean;
   onPress?: () => void;
+  onToggleComplete?: () => void;
 }
 
 export default function ReminderCard({
@@ -16,42 +18,78 @@ export default function ReminderCard({
   description,
   completed = false,
   onPress,
+  onToggleComplete,
 }: ReminderCardProps) {
-  const content = (
-    <div className={`flex items-start gap-4 ${completed ? 'opacity-60' : ''}`}>
-      <div className="w-14 h-14 rounded-2xl bg-white/80 flex items-center justify-center flex-shrink-0 shadow-sm">
-        {icon}
-      </div>
-      <div className="flex-1">
-        <h4 className="text-base font-semibold text-[#1A1A1A]">{title}</h4>
-        <p className="text-sm text-[#4A4A4A] mt-0.5">{time}</p>
-        {description && (
-          <p className="text-sm text-[#7A7A7A] mt-1">{description}</p>
-        )}
-      </div>
-      {completed && (
-        <div className="w-8 h-8 rounded-full bg-[#2E7D32] flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-sm font-bold">✓</span>
-        </div>
-      )}
-    </div>
-  );
+  const speakReminder = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const textToSpeak = `Reminder: ${title}. Scheduled for ${time}. ${description || ''}`;
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.rate = 0.85;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
-  if (onPress) {
-    return (
-      <button
-        onClick={onPress}
-        className="w-full p-4 bg-white rounded-2xl border border-[#E0D8CC] text-left transition-all active:scale-[0.98]"
-        aria-label={`${title} at ${time}`}
-      >
-        {content}
-      </button>
-    );
-  }
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onToggleComplete) {
+      onToggleComplete();
+    } else if (onPress) {
+      onPress();
+    }
+  };
 
   return (
-    <div className="p-4 bg-white rounded-2xl border border-[#E0D8CC]">
-      {content}
+    <div
+      onClick={onPress}
+      className={`w-full p-4 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] flex items-center justify-between gap-4 transition-all duration-200 ${
+        completed ? 'opacity-70 bg-[var(--color-bg-subtle)]' : 'hover:border-[var(--color-border-focus)] shadow-sm'
+      } ${onPress ? 'cursor-pointer active:scale-[0.99]' : ''}`}
+      aria-label={`${title} at ${time}`}
+    >
+      <div className="flex items-center gap-3.5 flex-1 min-w-0">
+        <div className="w-12 h-12 rounded-2xl bg-[var(--color-bg-subtle)] border border-[var(--color-border-subtle)] flex items-center justify-center flex-shrink-0 shadow-sm">
+          {icon}
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <h4 className={`text-base font-semibold text-[var(--color-text)] truncate ${completed ? 'line-through' : ''}`}>
+            {title}
+          </h4>
+          <p className="text-sm text-[var(--color-text-secondary)] font-medium mt-0.5">{time}</p>
+          {description && (
+            <p className="text-xs text-[var(--color-text-muted)] truncate mt-0.5">{description}</p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Speak button */}
+        <button
+          type="button"
+          onClick={speakReminder}
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)] hover:text-[#10B981] hover:bg-[var(--color-card-hover)] transition-colors border border-[var(--color-border-subtle)] active:scale-90"
+          title="Listen to reminder"
+          aria-label="Speak reminder aloud"
+        >
+          <Volume2 size={18} />
+        </button>
+
+        {/* Complete Checkbox button */}
+        <button
+          type="button"
+          onClick={handleToggle}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all border ${
+            completed
+              ? 'bg-[#10B981] border-[#10B981] text-white shadow-sm'
+              : 'border-[var(--color-border)] hover:border-[#10B981] text-transparent hover:text-[#10B981]/50 bg-[var(--color-bg-subtle)]'
+          } active:scale-90`}
+          title={completed ? 'Mark pending' : 'Mark done'}
+          aria-label={completed ? 'Completed' : 'Mark as completed'}
+        >
+          <Check size={18} strokeWidth={completed ? 3 : 2} className={completed ? 'text-white' : 'text-current'} />
+        </button>
+      </div>
     </div>
   );
 }

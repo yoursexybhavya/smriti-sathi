@@ -1,46 +1,103 @@
-import { Settings, Wifi, WifiOff } from 'lucide-react';
+import { Settings, Wifi, WifiOff, ArrowLeft, Sun, Moon, LogOut } from 'lucide-react';
+import { useApp } from '../context/AppContext';
 
 interface AppHeaderProps {
   title: string;
   subtitle?: string;
+  showBack?: boolean;
+  onBack?: () => void;
   showSettings?: boolean;
   onSettingsPress?: () => void;
+  showThemeToggle?: boolean;
+  showLogout?: boolean;
+  onLogout?: () => void;
   isOnline?: boolean;
 }
 
 export default function AppHeader({
   title,
   subtitle,
+  showBack = false,
+  onBack,
   showSettings = false,
   onSettingsPress,
+  showThemeToggle = true,
+  showLogout = false,
+  onLogout,
   isOnline = true,
 }: AppHeaderProps) {
+  const { state, toggleTheme } = useApp();
+  const isDark = state.accessibility?.theme === 'dark';
+
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-[#E0D8CC]">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 py-4">
-        <div className="flex-1">
-          <h1 className="text-xl font-bold text-[#1A1A1A]">{title}</h1>
-          {subtitle && (
-            <p className="text-sm text-[#7A7A7A] mt-0.5">{subtitle}</p>
+    <header className="sticky top-0 z-40 bg-[var(--color-card)]/95 backdrop-blur-md border-b border-[var(--color-border)] transition-colors duration-200">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3.5 gap-3">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          {(showBack || onBack) && (
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-card-hover)] transition-all active:scale-95 flex-shrink-0"
+              aria-label="Go back"
+            >
+              <ArrowLeft size={19} />
+              <span className="text-sm font-semibold hidden sm:inline">Back</span>
+            </button>
           )}
+
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg sm:text-xl font-bold text-[var(--color-text)] truncate">{title}</h1>
+            {subtitle && (
+              <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] truncate mt-0.5">{subtitle}</p>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-2 flex-shrink-0">
           {/* Connection status indicator */}
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+          <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
             isOnline 
-              ? 'bg-[#E8F5E9] text-[#2E7D32]' 
-              : 'bg-[#EFEBE9] text-[#5D4037]'
+              ? 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/30' 
+              : 'bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/30'
           }`}>
-            {isOnline ? <Wifi size={12} /> : <WifiOff size={12} />}
+            {isOnline ? <Wifi size={13} /> : <WifiOff size={13} />}
             <span>{isOnline ? 'Online' : 'Offline'}</span>
           </div>
+
+          {/* Theme toggle */}
+          {showThemeToggle && (
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[var(--color-border-focus)] transition-all active:scale-90"
+              aria-label={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+              title={isDark ? 'Light Theme' : 'Dark Theme'}
+            >
+              {isDark ? <Sun size={19} className="text-[#F59E0B]" /> : <Moon size={19} className="text-[#64748B]" />}
+            </button>
+          )}
+
+          {/* Logout / Switch Role */}
+          {showLogout && onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-red-400 hover:text-red-500 transition-all active:scale-95"
+              aria-label="Switch Profile"
+              title="Switch Profile"
+            >
+              <LogOut size={17} />
+              <span className="text-xs font-semibold hidden md:inline">Switch Role</span>
+            </button>
+          )}
+
+          {/* Settings button */}
           {showSettings && (
             <button
               onClick={onSettingsPress}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#F5F0E8] text-[#4A4A4A] hover:bg-[#E0D8CC] transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-card-hover)] transition-all active:scale-90"
               aria-label="Settings"
             >
-              <Settings size={20} />
+              <Settings size={19} />
             </button>
           )}
         </div>

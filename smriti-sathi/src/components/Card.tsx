@@ -8,7 +8,7 @@ interface CardProps {
 }
 
 export default function Card({ children, className = '', onPress, elevated = false }: CardProps) {
-  const baseClasses = `bg-white rounded-2xl border border-[#E0D8CC] ${
+  const baseClasses = `bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] text-[var(--color-text)] transition-all duration-200 ${
     elevated ? 'shadow-md' : 'shadow-sm'
   }`;
   

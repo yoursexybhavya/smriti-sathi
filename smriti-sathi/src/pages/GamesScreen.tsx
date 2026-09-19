@@ -76,14 +76,39 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
 
   return (
     <>
-      <AppHeader title="Cognitive Games" subtitle="Keep your mind active" isOnline={isOnline} />
-      <div className="max-w-7xl mx-auto px-5 py-6 pb-28 space-y-6">
-        {/* Info Banner */}
-        <div className="flex items-start gap-3 p-4 bg-[#E3F2FD] rounded-2xl border border-[#BBDEFB]">
-          <Info size={20} className="text-[#1565C0] mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-[#1565C0] leading-relaxed">
-            These games are designed for cognitive engagement and enjoyment. Difficulty adapts to your comfort level.
-          </p>
+      <AppHeader 
+        title="Cognitive Games" 
+        subtitle="Stimulate memory, focus, and routine" 
+        isOnline={isOnline} 
+        showBack 
+        onBack={() => onNavigate('home')} 
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+        {/* Interactive Info Banner */}
+        <div className="flex items-center justify-between gap-3 p-4 bg-[var(--color-card)] rounded-2xl border border-[#0EA5E9]/30 shadow-sm">
+          <div className="flex items-start gap-3 min-w-0">
+            <Info size={20} className="text-[#0EA5E9] mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+              Gentle cognitive exercises designed for elder engagement and enjoyment. Difficulty automatically adapts to your comfort.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance("These games are designed for cognitive engagement and enjoyment. Choose any game below to keep your mind active.");
+                u.rate = 0.85;
+                window.speechSynthesis.speak(u);
+              }
+            }}
+            className="flex-shrink-0 p-2.5 rounded-xl bg-[var(--color-bg-subtle)] text-[#0EA5E9] hover:bg-[#0EA5E9]/10 transition-colors border border-[var(--color-border-subtle)]"
+            title="Listen to guidance"
+            aria-label="Listen to guidance"
+          >
+            <Sun size={18} className="hidden" />
+            <span className="text-xs font-bold">🔊 Listen</span>
+          </button>
         </div>
 
         {/* Game Cards */}
