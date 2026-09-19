@@ -25,7 +25,7 @@ interface CardItem {
 export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
   const { state } = useApp();
   const patientId = state.currentPatient?.id || 'default';
-  const isOnline = state.isOnline;
+  const isOnline = navigator.onLine;
 
   const [phase, setPhase] = useState<Phase>('intro');
   const [difficulty, setDifficulty] = useState(1);
@@ -86,20 +86,24 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
       const card1 = cards.find(c => c.id === newFlipped[0]);
       const card2 = cards.find(c => c.id === newFlipped[1]);
 
-      if (card1?.objectId === card2?.objectId) {
+      if (card1 && card2 && card1.objectId === card2.objectId) {
         // Match!
+        const id1 = card1.id;
+        const id2 = card2.id;
         setTimeout(() => {
           setCards(prev => prev.map(c => 
-            (c.id === card1.id || c.id === card2.id) ? { ...c, isMatched: true } : c
+            (c.id === id1 || c.id === id2) ? { ...c, isMatched: true } : c
           ));
           setFlippedIds([]);
           setIsLocked(false);
         }, 500);
       } else {
         // No match
+        const id1 = card1?.id;
+        const id2 = card2?.id;
         setTimeout(() => {
           setCards(prev => prev.map(c => 
-            (c.id === card1?.id || c.id === card2?.id) ? { ...c, isFlipped: false } : c
+            (c.id === id1 || c.id === id2) ? { ...c, isFlipped: false } : c
           ));
           setFlippedIds([]);
           setIsLocked(false);

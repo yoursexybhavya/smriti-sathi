@@ -60,11 +60,17 @@ export class RecogniseGameEngine {
 
   /**
    * Generate an odd-one-out activity
-   * Show 4 objects, one is different category
+   * Show 4 objects, one is different category with clear semantic clue
    */
   static generateOddOneOutActivity(difficulty: number): RecogniseActivity {
-    // Select objects from different categories
-    const categories = ['fruit', 'animal', 'daily', 'nature'];
+    // Select objects from distinct categories
+    const categories = ['fruit', 'animal', 'daily', 'vehicle'];
+    const categoryLabels: Record<string, string> = {
+      fruit: 'Fruits',
+      animal: 'Animals',
+      daily: 'Household Items',
+      vehicle: 'Vehicles',
+    };
     const mainCategory = categories[Math.floor(Math.random() * categories.length)];
     
     // Get 3 objects from main category
@@ -84,9 +90,12 @@ export class RecogniseGameEngine {
     const options = shuffledObjects.map((o: RememberObject) => o.imageUrl);
     const correctAnswer = oddOne.imageUrl;
     
+    const mainCatLabel = categoryLabels[mainCategory] || 'Items';
+    const question = `3 are ${mainCatLabel}. Tap the one that does NOT belong:`;
+    
     return {
       type: 'odd-one-out',
-      question: 'Which one is different?',
+      question,
       options,
       correctAnswer,
       objects: shuffledObjects,

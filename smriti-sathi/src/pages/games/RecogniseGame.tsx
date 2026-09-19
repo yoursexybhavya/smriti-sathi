@@ -101,12 +101,35 @@ export default function RecogniseGame({ onBack }: RecogniseGameProps) {
     }
   };
 
-  // Play again
+  // Play again at same level
   const handlePlayAgain = () => {
     setPhase('intro');
     setQuestionNumber(1);
     setCorrectCount(0);
     setTotalTime(0);
+  };
+
+  // Advance to next difficulty level directly
+  const handleNextLevel = () => {
+    const nextDiff = Math.min(5, difficulty + 1);
+    setDifficulty(nextDiff);
+    const activity = RecogniseGameEngine.generateActivity(nextDiff);
+    setCurrentActivity(activity);
+    setQuestionNumber(1);
+    setCorrectCount(0);
+    setTotalTime(0);
+    setPhase('play');
+  };
+
+  // Jump to specific level
+  const handleSelectLevel = (lvl: number) => {
+    setDifficulty(lvl);
+    const activity = RecogniseGameEngine.generateActivity(lvl);
+    setCurrentActivity(activity);
+    setQuestionNumber(1);
+    setCorrectCount(0);
+    setTotalTime(0);
+    setPhase('play');
   };
 
   // Back to games
@@ -134,12 +157,12 @@ export default function RecogniseGame({ onBack }: RecogniseGameProps) {
       return currentActivity ? (
         <div>
           <div className="bg-white border-b border-[#E0D8CC] px-5 py-2">
-            <div className="max-w-lg mx-auto flex items-center justify-between">
-              <span className="text-sm text-[#7A7A7A]">
+            <div className="max-w-4xl mx-auto flex items-center justify-between">
+              <span className="text-sm font-semibold text-[#7A7A7A]">
                 Question {questionNumber} of {totalQuestions}
               </span>
-              <span className="text-sm font-medium text-[#E65100]">
-                Level {difficulty}
+              <span className="text-sm font-bold text-[#E65100] bg-[#FFF3E0] px-3 py-0.5 rounded-full border border-[#E65100]/30">
+                Level {difficulty} of 5
               </span>
             </div>
           </div>
@@ -161,6 +184,8 @@ export default function RecogniseGame({ onBack }: RecogniseGameProps) {
           totalQuestions={totalQuestions}
           correctCount={correctCount}
           onPlayAgain={handlePlayAgain}
+          onNextLevel={handleNextLevel}
+          onSelectLevel={handleSelectLevel}
           onBackToGames={handleBackToGames}
         />
       );

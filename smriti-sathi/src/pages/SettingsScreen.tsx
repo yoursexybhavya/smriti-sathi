@@ -47,7 +47,7 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
   return (
     <>
       <AppHeader title="Settings" subtitle="Customize your experience" isOnline={isOnline} />
-      <div className="px-5 py-6 pb-28 space-y-6">
+      <div className="max-w-5xl mx-auto px-5 py-6 pb-28 space-y-6">
         {/* Patient Profile */}
         {patient && (
           <div className="space-y-3">
@@ -179,30 +179,98 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
             Voice & Accessibility
           </h3>
           <Card className="p-4 space-y-4">
-            <SettingToggle label="Voice Instructions" description="Read instructions aloud" value={state.accessibility.voiceGuidance} onChange={(v) => updateAccessibility({...state.accessibility, voiceGuidance: v})} />
-            <SettingToggle label="Large Text" description="Use bigger fonts throughout" value={true} />
-            <SettingToggle label="High Contrast" description="Increase color contrast" value={state.accessibility.highContrast} onChange={(v) => updateAccessibility({...state.accessibility, highContrast: v})} />
-            <SettingToggle label="Sound Effects" description="Play sounds during games" value={true} />
+            <SettingToggle
+              label="Voice Instructions"
+              description="Read instructions aloud"
+              value={state.accessibility.voiceGuidance}
+              onChange={(v) => updateAccessibility({...state.accessibility, voiceGuidance: v})}
+            />
+            <SettingToggle
+              label="High Contrast"
+              description="Deep black & yellow WCAG AAA contrast"
+              value={state.accessibility.highContrast}
+              onChange={(v) => updateAccessibility({...state.accessibility, highContrast: v})}
+            />
           </Card>
         </div>
 
-        {/* Display */}
+        {/* Display & Text Size */}
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-[#1A1A1A] px-1 flex items-center gap-2">
             <Type size={18} className="text-[#7B1FA2]" />
-            Display
+            Text Size & Visual Preview
           </h3>
-          <Card className="p-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-base text-[#1A1A1A]">Text Size</span>
-                <div className="flex items-center gap-2">
-                  <span onClick={() => updateAccessibility({...state.accessibility, textSize: 'normal'})} className="cursor-pointer text-xs text-[#7A7A7A] hover:text-[#1B5E20]">A</span>
-                  <span onClick={() => updateAccessibility({...state.accessibility, textSize: 'large'})} className="cursor-pointer text-base text-[#7A7A7A] hover:text-[#1B5E20]">A</span>
-                  <span onClick={() => updateAccessibility({...state.accessibility, textSize: 'extra-large'})} className="cursor-pointer text-lg text-[#7A7A7A] hover:text-[#1B5E20]">A</span>
-                  <div className="ml-2 text-sm text-[#1B5E20] font-medium">{state.accessibility.textSize}</div>
-                </div>
+          <Card className="p-5 space-y-4">
+            <div>
+              <span className="text-base text-[#1A1A1A] font-semibold block mb-2">Select Text Size</span>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => updateAccessibility({...state.accessibility, textSize: 'normal'})}
+                  className={`py-3 px-2 rounded-xl text-center border-2 transition-all ${
+                    state.accessibility.textSize === 'normal'
+                      ? 'bg-[#E8F5E9] border-[#1B5E20] text-[#1B5E20] font-bold'
+                      : 'bg-[#FDF8F0] border-[#E0D8CC] text-[#4A4A4A]'
+                  }`}
+                >
+                  <span className="text-base block">Normal</span>
+                  <span className="text-xs opacity-70">18px</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateAccessibility({...state.accessibility, textSize: 'large'})}
+                  className={`py-3 px-2 rounded-xl text-center border-2 transition-all ${
+                    state.accessibility.textSize === 'large'
+                      ? 'bg-[#E8F5E9] border-[#1B5E20] text-[#1B5E20] font-bold'
+                      : 'bg-[#FDF8F0] border-[#E0D8CC] text-[#4A4A4A]'
+                  }`}
+                >
+                  <span className="text-lg block font-semibold">Large</span>
+                  <span className="text-xs opacity-70">24px</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateAccessibility({...state.accessibility, textSize: 'extra-large'})}
+                  className={`py-3 px-2 rounded-xl text-center border-2 transition-all ${
+                    state.accessibility.textSize === 'extra-large'
+                      ? 'bg-[#E8F5E9] border-[#1B5E20] text-[#1B5E20] font-bold'
+                      : 'bg-[#FDF8F0] border-[#E0D8CC] text-[#4A4A4A]'
+                  }`}
+                >
+                  <span className="text-xl block font-bold">Extra Large</span>
+                  <span className="text-xs opacity-70">30px</span>
+                </button>
               </div>
+            </div>
+
+            {/* Live Preview Inside Settings */}
+            <div className={`p-4 rounded-2xl border transition-all ${
+              state.accessibility.highContrast
+                ? 'bg-[#0A0A0A] border-2 border-yellow-400 text-white'
+                : 'bg-[#FDF8F0] border border-[#E0D8CC] text-[#1A1A1A]'
+            }`}>
+              <div className="flex items-center justify-between mb-1 opacity-70 text-xs font-bold uppercase">
+                <span>Live Preview</span>
+                <span>{state.accessibility.textSize.toUpperCase()}</span>
+              </div>
+              <p className={`font-bold ${
+                state.accessibility.textSize === 'extra-large'
+                  ? 'text-2xl'
+                  : state.accessibility.textSize === 'large'
+                  ? 'text-xl'
+                  : 'text-lg'
+              } ${state.accessibility.highContrast ? 'text-yellow-400' : 'text-[#1B5E20]'}`}>
+                Good Morning, Kamala Baa!
+              </p>
+              <p className={`mt-1 opacity-90 ${
+                state.accessibility.textSize === 'extra-large'
+                  ? 'text-lg'
+                  : state.accessibility.textSize === 'large'
+                  ? 'text-base'
+                  : 'text-sm'
+              }`}>
+                This is how text and buttons appear on your screen.
+              </p>
             </div>
           </Card>
         </div>
@@ -456,7 +524,12 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
         </button>
       </div>
       
-      {showPairingModal && <FamilyPairingModal onClose={() => setShowPairingModal(false)} />}
+      {showPairingModal && (
+        <FamilyPairingModal
+          isOpen={showPairingModal}
+          onClose={() => setShowPairingModal(false)}
+        />
+      )}
     </>
   );
 }

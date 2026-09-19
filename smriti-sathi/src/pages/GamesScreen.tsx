@@ -10,12 +10,12 @@ import MemoryMatchGame from './games/MemoryMatchGame';
 
 interface GamesScreenProps {
   onNavigate: (screen: string) => void;
+  isOnline?: boolean;
 }
 
-export default function GamesScreen({ onNavigate }: GamesScreenProps) {
+export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }: GamesScreenProps) {
   const { state } = useApp();
   const patientId = state.currentPatient?.id || 'default';
-  const isOnline = state.isOnline;
   
   // Local state for routing within games module
   const [activeGame, setActiveGame] = useState<string | null>(null);
@@ -33,7 +33,8 @@ export default function GamesScreen({ onNavigate }: GamesScreenProps) {
   useEffect(() => {
     const loadData = async () => {
       // Get session stats
-      const allSessions = await GameStorage.getAllSessions(patientId);
+      const allSessions = await GameStorage.getPatientSessions(patientId);
+      const patientStats = await GameStorage.getPatientStats(patientId);
       
       let totalAcc = 0;
       allSessions.forEach(s => totalAcc += s.accuracy);
@@ -41,7 +42,7 @@ export default function GamesScreen({ onNavigate }: GamesScreenProps) {
       
       setStats({
         totalGames: allSessions.length,
-        currentStreak: await GameStorage.getCurrentStreak(patientId),
+        currentStreak: patientStats.currentStreak,
         averageAccuracy: avgAcc,
       });
 

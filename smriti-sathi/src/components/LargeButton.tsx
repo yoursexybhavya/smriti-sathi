@@ -7,6 +7,7 @@ interface LargeButtonProps {
   icon?: ReactNode;
   fullWidth?: boolean;
   disabled?: boolean;
+  className?: string;
 }
 
 export default function LargeButton({
@@ -16,6 +17,7 @@ export default function LargeButton({
   icon,
   fullWidth = true,
   disabled = false,
+  className = '',
 }: LargeButtonProps) {
   const variantClasses = {
     primary: 'bg-[#1B5E20] text-white hover:bg-[#0D3B12] shadow-md',

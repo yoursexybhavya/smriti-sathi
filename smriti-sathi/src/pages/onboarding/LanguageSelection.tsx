@@ -25,8 +25,8 @@ export default function LanguageSelection({
   return (
     <div className="min-h-screen bg-[#F5F0E8]">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-white border-b border-[#E0D8CC]">
-        <div className="max-w-lg mx-auto flex items-center gap-3 px-4 py-4">
+      <header className="sticky top-0 z-40 bg-white border-b border-[#E0D8CC]">
+        <div className="max-w-5xl mx-auto flex items-center gap-3 px-5 py-4">
           <button
             onClick={onBack}
             className="w-11 h-11 rounded-full flex items-center justify-center bg-[#F5F0E8] hover:bg-[#E0D8CC] transition-colors"
@@ -35,63 +35,73 @@ export default function LanguageSelection({
             <ChevronLeft size={22} />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-[#1A1A1A]">Choose Language</h1>
-            <p className="text-sm text-[#7A7A7A]">Step 2 of 4</p>
+            <h1 className="text-xl font-bold text-[#1A1A1A]">Choose Language / ভাষা নিৰ্বাচন</h1>
+            <p className="text-sm text-[#7A7A7A]">Step 2 of 4: Primary interface language</p>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-lg mx-auto px-5 py-6 space-y-6 pb-32">
-        {/* Instruction */}
-        <div className="p-4 bg-[#E3F2FD] rounded-2xl border border-[#BBDEFB]">
-          <p className="text-base text-[#1565C0] leading-relaxed">
-            Select the language you are most comfortable with. You can change this later in Settings.
-          </p>
-        </div>
+      <main className="max-w-5xl mx-auto px-5 py-6 pb-32">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          
+          {/* Left Column: Context & Guidelines */}
+          <div className="md:col-span-5 space-y-4">
+            <div className="p-5 bg-[#E3F2FD] rounded-2xl border border-[#BBDEFB]">
+              <h3 className="text-base font-bold text-[#1565C0] mb-1">
+                Your Language, Your Comfort
+              </h3>
+              <p className="text-sm md:text-base text-[#1565C0] leading-relaxed">
+                Smriti Sathi provides native localized memory prompts and speech audio. You can change this anytime later in Settings.
+              </p>
+            </div>
 
-        {/* Language Options */}
-        <div className="space-y-3">
-          <SectionHeader title="Available Languages" />
-          <div className="space-y-2">
-            {languages.map(lang => (
-              <button
-                key={lang.code}
-                onClick={() => onSelect(lang.code)}
-                className={`w-full p-5 rounded-2xl border-2 text-left transition-all flex items-center gap-4 min-h-[72px] ${
-                  selectedLanguage === lang.code
-                    ? 'bg-[#E8F5E9] border-[#1B5E20] shadow-sm'
-                    : 'bg-white border-[#E0D8CC] hover:border-[#C0B8A8]'
-                }`}
-              >
-                <span className="text-3xl">{lang.flag}</span>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-[#1A1A1A]">{lang.name}</h3>
-                  <p className="text-base text-[#4A4A4A]">{lang.nativeName}</p>
-                </div>
-                {selectedLanguage === lang.code && (
-                  <div className="w-8 h-8 rounded-full bg-[#1B5E20] flex items-center justify-center">
-                    <Check size={18} className="text-white" />
+            <div className="p-4 bg-[#FDF8F0] rounded-2xl border border-[#E0D8CC]">
+              <span className="text-xs font-bold text-[#1B5E20] uppercase tracking-wider block mb-1">
+                North Eastern Regional Support
+              </span>
+              <p className="text-sm text-[#4A4A4A] leading-relaxed">
+                Tailored for Assamese, Bodo, Manipuri, and Indian English with authentic dialect phrasing.
+              </p>
+            </div>
+          </div>
+
+          {/* Right Column: Language Selection Cards & Next */}
+          <div className="md:col-span-7 space-y-4">
+            <SectionHeader title="Available Languages" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {languages.map(lang => (
+                <button
+                  key={lang.code}
+                  onClick={() => onSelect(lang.code)}
+                  className={`w-full p-4 rounded-2xl border-2 text-left transition-all flex items-center gap-3 min-h-[72px] ${
+                    selectedLanguage === lang.code
+                      ? 'bg-[#E8F5E9] border-[#1B5E20] shadow-md ring-2 ring-[#1B5E20]/20'
+                      : 'bg-white border-[#E0D8CC] hover:border-[#C0B8A8]'
+                  }`}
+                >
+                  <span className="text-3xl flex-shrink-0">{lang.flag}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-bold text-[#1A1A1A] truncate">{lang.name}</h3>
+                    <p className="text-sm text-[#4A4A4A] truncate">{lang.nativeName}</p>
                   </div>
-                )}
-              </button>
-            ))}
+                  {selectedLanguage === lang.code && (
+                    <div className="w-7 h-7 rounded-full bg-[#1B5E20] flex items-center justify-center flex-shrink-0">
+                      <Check size={16} className="text-white stroke-[3]" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-4">
+              <LargeButton onPress={onNext}>
+                Continue to Accessibility →
+              </LargeButton>
+            </div>
           </div>
-        </div>
 
-        {/* Note */}
-        <div className="p-4 bg-[#FDF8F0] rounded-2xl border border-[#E0D8CC]">
-          <p className="text-sm text-[#4A4A4A] leading-relaxed">
-            More languages from the North Eastern region will be added soon.
-          </p>
         </div>
-
-        {/* Continue Button */}
-        <div className="pt-4">
-          <LargeButton onPress={onNext}>
-            Continue
-          </LargeButton>
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -28,7 +28,7 @@ export class GameSessionRepository {
   }
 
   // Get sessions by game type
-  async getByGameType(userId: number, gameType: 'remember' | 'recognise'): Promise<GameSession[]> {
+  async getByGameType(userId: number, gameType: 'remember' | 'recognise' | 'test' | 'memory_match'): Promise<GameSession[]> {
     return await db.gameSessions
       .where('userId')
       .equals(userId)

@@ -82,6 +82,33 @@ export default function RememberGame({ onBack }: RememberGameProps) {
     setResponseTime(0);
   };
 
+  // Explicit advance to next level
+  const handleNextLevel = () => {
+    const nextDiff = Math.min(5, difficulty + 1);
+    setDifficulty(nextDiff);
+    const config = DifficultyEngine.getConfig(nextDiff);
+    const objects = DifficultyEngine.selectObjects(config.objectCount);
+    const recall = DifficultyEngine.createRecallSet(objects, config.distractorCount);
+    setTargetObjects(objects);
+    setRecallSet(recall);
+    setSelectedObjects([]);
+    setResponseTime(0);
+    setPhase('memorize');
+  };
+
+  // Direct level selection
+  const handleSelectLevel = (lvl: number) => {
+    setDifficulty(lvl);
+    const config = DifficultyEngine.getConfig(lvl);
+    const objects = DifficultyEngine.selectObjects(config.objectCount);
+    const recall = DifficultyEngine.createRecallSet(objects, config.distractorCount);
+    setTargetObjects(objects);
+    setRecallSet(recall);
+    setSelectedObjects([]);
+    setResponseTime(0);
+    setPhase('memorize');
+  };
+
   // Back to games
   const handleBackToGames = () => {
     onBack();
@@ -119,6 +146,8 @@ export default function RememberGame({ onBack }: RememberGameProps) {
           responseTime={responseTime}
           difficulty={difficulty}
           onPlayAgain={handlePlayAgain}
+          onNextLevel={handleNextLevel}
+          onSelectLevel={handleSelectLevel}
           onBackToGames={handleBackToGames}
         />
       );

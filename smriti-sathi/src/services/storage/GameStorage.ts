@@ -9,8 +9,8 @@ export class GameStorage {
   static async saveSession(session: GameSession): Promise<void> {
     try {
       await gameSessionRepository.create({
-        userId: parseInt(session.patientId),
-        gameType: session.gameType as 'remember' | 'recognise',
+        userId: parseInt(session.patientId) || 1,
+        gameType: session.gameType,
         difficulty: session.difficulty,
         score: session.score,
         totalObjects: session.totalObjects,
@@ -55,11 +55,11 @@ export class GameStorage {
   }
 
   // Get sessions for a specific game type (async)
-  static async getGameSessions(patientId: string, gameType: string): Promise<GameSession[]> {
+  static async getGameSessions(patientId: string, gameType: 'remember' | 'recognise' | 'test' | 'memory_match'): Promise<GameSession[]> {
     try {
       const sessions = await gameSessionRepository.getByGameType(
-        parseInt(patientId),
-        gameType as 'remember' | 'recognise'
+        parseInt(patientId) || 1,
+        gameType
       );
       return sessions.map(s => ({
         id: s.id?.toString() || '',

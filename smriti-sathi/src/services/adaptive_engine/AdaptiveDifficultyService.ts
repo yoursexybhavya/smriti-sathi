@@ -30,7 +30,7 @@ export class AdaptiveDifficultyService {
    */
   static async calculateSuggestedDifficulty(
     patientId: string,
-    gameType: string,
+    gameType: 'remember' | 'recognise' | 'test' | 'memory_match',
     currentDifficulty: number
   ): Promise<DifficultyAdjustment> {
     // Get recent sessions for this patient and game type
@@ -130,7 +130,7 @@ export class AdaptiveDifficultyService {
    */
   static async getPerformanceSummary(
     patientId: string,
-    gameType: string
+    gameType: 'remember' | 'recognise' | 'test' | 'memory_match'
   ): Promise<{
     totalSessions: number;
     averageAccuracy: number;

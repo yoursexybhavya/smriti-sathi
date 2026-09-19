@@ -19,6 +19,16 @@ This is a **HACKATHON PROTOTYPE**. It is NOT a production clinical system.
 
 ---
 
+## 📲 Official Android Application Installation
+
+> ### **Single Official Download Link (Always points to latest verified build)**
+> 
+> 📥 **[Download Smriti Sathi Android APK (`SmritiSathi-latest.apk`)](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk)**
+> 
+> *Direct APK download link — installs immediately on your Android tablet or phone without navigating to GitHub release pages. Automatically maintained by GitHub Actions CI/CD on every update.*
+
+---
+
 ## Architecture
 
 ```
