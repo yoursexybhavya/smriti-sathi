@@ -12,6 +12,7 @@ const patientTabs = [
   { id: 'games', label: 'Games', Icon: Puzzle },
   { id: 'reminders', label: 'Reminders', Icon: Bell },
   { id: 'progress', label: 'Progress', Icon: BarChart3 },
+  { id: 'settings', label: 'Settings', Icon: Settings },
 ];
 
 const caregiverTabs = [

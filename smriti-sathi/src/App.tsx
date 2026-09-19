@@ -32,6 +32,8 @@ import { LanguageProvider as SecondaryLanguageProvider } from './contexts/Langua
 import { UserRole } from './models/Role';
 import { APP } from './core/constants/app';
 import { UpdateNotifier } from './components/UpdateChecker';
+import { notificationService } from './services/NotificationService';
+import { reminderService } from './services/ReminderService';
 
 function AppContent() {
   const { state } = useApp();
@@ -122,17 +124,10 @@ function AppContent() {
       try {
         const { App: CapApp } = await import('@capacitor/app');
         backListener = await CapApp.addListener('backButton', () => {
-          if (!state.onboardingComplete && role === UserRole.PATIENT) {
-            logout();
-            return;
-          }
           const handled = handleGoBack();
           if (!handled) {
-            if (isAuthenticated) {
-              logout();
-            } else {
-              CapApp.exitApp();
-            }
+            // On root screen: exit/minimize app cleanly, never dump the elder into login
+            CapApp.exitApp();
           }
         });
       } catch (err) {
@@ -147,7 +142,22 @@ function AppContent() {
         backListener.remove();
       }
     };
-  }, [navigationHistory, activeTab, isAuthenticated, role, logout, state.onboardingComplete]);
+  }, [navigationHistory, activeTab]);
+
+  // Initialize native care alarms and channels on mount
+  useEffect(() => {
+    notificationService.initialize();
+  }, []);
+
+  // Initialize reminder schedule when patient profile is active
+  useEffect(() => {
+    if (state.currentPatient?.id) {
+      const pId = parseInt(state.currentPatient.id, 10);
+      if (!isNaN(pId)) {
+        reminderService.initialize(pId, state.currentPatient.name);
+      }
+    }
+  }, [state.currentPatient?.id, state.currentPatient?.name]);
 
   // Set initial tab based on role after login
   useEffect(() => {

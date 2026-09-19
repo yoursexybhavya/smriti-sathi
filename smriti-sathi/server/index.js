@@ -22,7 +22,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ONLINE',
     platform: 'Smriti Sathi Cloud Production Platform',
-    version: '2.3.0',
+    version: '2.4.0',
     recordsStored: telemetryDatabase.sessions.length,
     lastSync: telemetryDatabase.lastSyncedAt,
   });
@@ -86,10 +86,10 @@ app.post('/api/sos', (req, res) => {
 // 5. In-App Auto-Update & Version Authority (Render Cloud Backend)
 app.get('/api/version', (req, res) => {
   res.json({
-    latestVersion: 'v2.3.0',
-    versionCode: 230,
+    latestVersion: 'v2.4.0',
+    versionCode: 240,
     downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk',
-    releaseNotes: 'Smriti Sathi v2.3.0: Hardware back button navigation, Light & Dark themes, interactive cognitive cards, role-switching escape hatch, and in-app self-updater.',
+    releaseNotes: 'Smriti Sathi v2.4.0: Dual-orientation elder UX overhaul, background care schedule alarm notifications with audible buzzer chime, direct settings access, zero dummy data, and dedicated elder mental model.',
     publishedAt: new Date().toISOString(),
   });
 });

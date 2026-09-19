@@ -16,14 +16,14 @@ export default function ProgressCard({
   color = '#1B5E20',
 }: ProgressCardProps) {
   return (
-    <div className="p-4 bg-white rounded-2xl border border-[#E0D8CC] text-center">
-      <div className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
+    <div className="p-4 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] text-center shadow-sm transition-colors duration-200">
+      <div className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center" style={{ backgroundColor: `${color}18` }}>
         <div style={{ color }}>{icon}</div>
       </div>
-      <p className="text-2xl font-bold" style={{ color }}>{value}</p>
-      <p className="text-sm text-[#4A4A4A] mt-1 font-medium">{label}</p>
+      <p className="text-2xl font-bold tracking-tight" style={{ color }}>{value}</p>
+      <p className="text-sm text-[var(--color-text)] mt-1 font-semibold">{label}</p>
       {subtitle && (
-        <p className="text-xs text-[#7A7A7A] mt-0.5">{subtitle}</p>
+        <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{subtitle}</p>
       )}
     </div>
   );

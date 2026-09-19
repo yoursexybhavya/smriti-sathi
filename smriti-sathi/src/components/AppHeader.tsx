@@ -1,4 +1,4 @@
-import { Settings, Wifi, WifiOff, ArrowLeft, Sun, Moon, LogOut } from 'lucide-react';
+import { Settings, Wifi, WifiOff, ArrowLeft, Sun, Moon } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 interface AppHeaderProps {
@@ -9,8 +9,6 @@ interface AppHeaderProps {
   showSettings?: boolean;
   onSettingsPress?: () => void;
   showThemeToggle?: boolean;
-  showLogout?: boolean;
-  onLogout?: () => void;
   isOnline?: boolean;
 }
 
@@ -22,8 +20,6 @@ export default function AppHeader({
   showSettings = false,
   onSettingsPress,
   showThemeToggle = true,
-  showLogout = false,
-  onLogout,
   isOnline = true,
 }: AppHeaderProps) {
   const { state, toggleTheme } = useApp();
@@ -76,19 +72,7 @@ export default function AppHeader({
             </button>
           )}
 
-          {/* Logout / Switch Role */}
-          {showLogout && onLogout && (
-            <button
-              type="button"
-              onClick={onLogout}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-red-400 hover:text-red-500 transition-all active:scale-95"
-              aria-label="Switch Profile"
-              title="Switch Profile"
-            >
-              <LogOut size={17} />
-              <span className="text-xs font-semibold hidden md:inline">Switch Role</span>
-            </button>
-          )}
+
 
           {/* Settings button */}
           {showSettings && (

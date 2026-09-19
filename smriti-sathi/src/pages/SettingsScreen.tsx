@@ -5,7 +5,6 @@ import { LANGUAGES, APP } from '../core/constants/app';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../models/Role';
-import { DemoDataService } from '../services/DemoDataService';
 import { useState } from 'react';
 import { checkAppUpdates, CURRENT_APP_VERSION, type UpdateInfo } from '../components/UpdateChecker';
 import { FamilyPairingModal } from '../components/FamilyPairingModal';
@@ -232,28 +231,7 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
           </Card>
         </div>
 
-        {/* Switch Profile / Session */}
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-[var(--color-text)] px-1 flex items-center gap-2">
-            <LogOut size={18} className="text-red-500" />
-            Switch Active Profile
-          </h3>
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-[var(--color-text)]">Active User Session</p>
-                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">Return to profile selection to test caregiver or health worker</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => logout()}
-                className="px-4 py-2.5 bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-sm font-bold transition-all active:scale-95"
-              >
-                Switch Role
-              </button>
-            </div>
-          </Card>
-        </div>
+
 
         {/* Voice & Accessibility */}
         <div className="space-y-3">
@@ -470,53 +448,22 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
         </div>
         )}
 
-        {/* Demo Data Management */}
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-[#1A1A1A] px-1 flex items-center gap-2">
-            <Sparkles size={18} className="text-[#1B5E20]" />
-            Demo Data
-          </h3>
-          <Card className="p-4 space-y-3">
-            <div>
-              <p className="text-sm text-[#4A4A4A] mb-2">
-                Reset demo data to start fresh with Aai Devi's sample data.
-              </p>
+        {/* Caregiver Session Management */}
+        {isCaregiver && (
+          <div className="space-y-3">
+            <Card className="p-4">
               <button
                 onClick={async () => {
-                  if (confirm('This will reset all demo data. Continue?')) {
-                    try {
-                      await DemoDataService.resetDemoData();
-                      alert('Demo data reset successfully!');
-                      window.location.reload();
-                    } catch (error) {
-                      console.error('Failed to reset demo data:', error);
-                      alert('Failed to reset demo data. Please try again.');
-                    }
-                  }
+                  await logout();
                 }}
-                className="w-full flex items-center justify-center gap-2 py-3 min-h-[48px] bg-[#E8F5E9] text-[#1B5E20] rounded-xl font-medium hover:bg-[#C8E6C9] transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3 min-h-[48px] bg-red-50 text-red-700 rounded-xl font-medium hover:bg-red-100 transition-colors"
               >
-                <RefreshCw size={18} />
-                <span>Reset Demo Data</span>
+                <LogOut size={18} />
+                <span>Log Out (Caregiver Session)</span>
               </button>
-            </div>
-          </Card>
-        </div>
-
-        {/* Logout */}
-        <div className="space-y-3">
-          <Card className="p-4">
-            <button
-              onClick={async () => {
-                await logout();
-              }}
-              className="w-full flex items-center justify-center gap-2 py-3 min-h-[48px] bg-red-50 text-red-700 rounded-xl font-medium hover:bg-red-100 transition-colors"
-            >
-              <LogOut size={18} />
-              <span>Log Out</span>
-            </button>
-          </Card>
-        </div>
+            </Card>
+          </div>
+        )}
 
         {/* About */}
         <div className="space-y-3">
