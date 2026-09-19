@@ -1,7 +1,7 @@
 export const APP = {
   name: 'Smriti Sathi',
   tagline: 'Memory care that speaks your language — online or offline.',
-  version: '2.4.0',
+  version: '2.5.0',
   organization: 'Smriti Sathi Health Technologies',
   platform: 'Cognitive Care & Memory Assistance Platform',
   region: 'North Eastern Region, India',
@@ -23,6 +23,5 @@ export const NAV_ITEMS = [
   { id: 'games', label: 'Games', icon: 'puzzle' },
   { id: 'reminders', label: 'Reminders', icon: 'bell' },
   { id: 'progress', label: 'Progress', icon: 'chart' },
-  { id: 'caregiver', label: 'Caregiver', icon: 'users' },
   { id: 'settings', label: 'Settings', icon: 'settings' },
 ] as const;

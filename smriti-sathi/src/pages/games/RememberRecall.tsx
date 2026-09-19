@@ -29,25 +29,27 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
 
   // Determine grid columns
   const getGridCols = () => {
-    if (recallSet.length <= 6) return 'grid-cols-3';
+    if (recallSet.length <= 6) return 'grid-cols-2 sm:grid-cols-3';
     if (recallSet.length <= 9) return 'grid-cols-3';
-    return 'grid-cols-4';
+    return 'grid-cols-3 sm:grid-cols-4';
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] flex flex-col">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col transition-colors duration-200">
       {/* Header */}
-      <div className="bg-white border-b border-[#E0D8CC] px-5 py-4">
-        <div className="max-w-lg mx-auto">
-          <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">
-            Which objects did you see?
-          </h2>
-          <p className="text-base text-[#4A4A4A]">
-            Select the objects you remember
-          </p>
-          <div className="mt-3 flex items-center gap-2">
-            <span className="text-sm text-[#7A7A7A]">Selected:</span>
-            <span className="text-lg font-bold text-[#1B5E20]">
+      <div className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4">
+        <div className="max-w-xl mx-auto flex items-center justify-between">
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold text-[var(--color-text)]">
+              Which objects did you see?
+            </h2>
+            <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">
+              Select the objects you remember seeing
+            </p>
+          </div>
+          <div className="flex items-center gap-2 bg-[var(--color-bg-subtle)] px-3 py-1.5 rounded-full border border-[var(--color-border)]">
+            <span className="text-xs font-semibold text-[var(--color-text-secondary)]">Selected:</span>
+            <span className="text-base font-bold text-[#10B981]">
               {selectedIds.size}
             </span>
           </div>
@@ -55,9 +57,9 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
       </div>
 
       {/* Recall Grid */}
-      <div className="flex-1 px-5 py-6 overflow-y-auto">
-        <div className="max-w-lg mx-auto">
-          <div className={`grid ${getGridCols()} gap-3`}>
+      <div className="flex-1 px-4 sm:px-6 py-6 overflow-y-auto">
+        <div className="max-w-xl mx-auto">
+          <div className={`grid ${getGridCols()} gap-3 sm:gap-4`}>
             {recallSet.map((obj) => {
               const isSelected = selectedIds.has(obj.id);
               return (
@@ -65,23 +67,25 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
                   key={obj.id}
                   onClick={() => toggleObject(obj)}
                   className={`
-                    relative bg-white rounded-2xl border-2 p-4 flex flex-col items-center justify-center aspect-square
-                    transition-all active:scale-95
+                    relative bg-[var(--color-card)] rounded-3xl border-2 p-4 flex flex-col items-center justify-center aspect-square
+                    transition-all active:scale-95 shadow-sm
                     ${isSelected 
-                      ? 'border-[#1B5E20] bg-[#E8F5E9] shadow-md' 
-                      : 'border-[#E0D8CC] hover:border-[#C0B8A8]'
+                      ? 'border-[#10B981] bg-[#10B981]/15 shadow-md ring-4 ring-[#10B981]/25 scale-102' 
+                      : 'border-[var(--color-border)] hover:border-[#10B981]'
                     }
                   `}
                   aria-pressed={isSelected}
                   aria-label={`${obj.name} ${isSelected ? 'selected' : 'not selected'}`}
                 >
-                  <div className="mb-2 flex justify-center">{<img src={obj.imageUrl} alt={obj.name} className="w-16 h-16 object-contain" />}</div>
-                  <p className="text-base font-medium text-[#1A1A1A] text-center">
+                  <div className="mb-2 flex justify-center w-16 h-16 sm:w-20 sm:h-20 items-center bg-[var(--color-bg-subtle)] rounded-2xl p-1.5 border border-[var(--color-border)]/50">
+                    <img src={obj.imageUrl} alt={obj.name} className="w-full h-full object-contain" />
+                  </div>
+                  <p className="text-sm sm:text-base font-bold text-[var(--color-text)] text-center truncate w-full px-1">
                     {obj.name}
                   </p>
                   {isSelected && (
-                    <div className="absolute top-2 right-2 w-7 h-7 rounded-full bg-[#1B5E20] flex items-center justify-center">
-                      <Check size={16} className="text-white" />
+                    <div className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-[#10B981] flex items-center justify-center shadow-sm animate-in fade-in zoom-in duration-150">
+                      <Check size={16} className="text-white stroke-[3]" />
                     </div>
                   )}
                 </button>
@@ -92,16 +96,17 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
       </div>
 
       {/* Submit Button */}
-      <div className="bg-white border-t border-[#E0D8CC] px-5 py-4">
-        <div className="max-w-lg mx-auto">
+      <div className="bg-[var(--color-card)] border-t border-[var(--color-border)] px-4 sm:px-6 py-4">
+        <div className="max-w-xl mx-auto space-y-2">
           <LargeButton 
             onPress={handleSubmit}
             disabled={selectedIds.size === 0}
+            className={selectedIds.size > 0 ? 'bg-[#10B981] text-white hover:bg-[#059669]' : ''}
           >
-            Done
+            {selectedIds.size > 0 ? `Confirm Selection (${selectedIds.size}) ✓` : 'Tap objects to select'}
           </LargeButton>
-          <p className="text-center text-sm text-[#7A7A7A] mt-2">
-            Tap an object to select or deselect it
+          <p className="text-center text-xs text-[var(--color-text-muted)]">
+            Tap an object to select or deselect it. Take all the time you need.
           </p>
         </div>
       </div>

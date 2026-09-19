@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Volume2, CheckCircle, RotateCcw, ArrowRight, Sun, Coffee, Pill, Footprints, Moon, Utensils, Bed } from 'lucide-react';
+import { ArrowLeft, Volume2, CheckCircle, RotateCcw, ArrowRight, Sun, Coffee, Pill, Footprints, Moon, Utensils } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useVoice } from '../../hooks/useVoice';
 import { GameSession } from '../../models/GameSession';
@@ -130,11 +130,11 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
   const renderIcon = (iconName: RoutineItem['iconName'], size = 28) => {
     switch (iconName) {
       case 'sun': return <Sun size={size} className="text-[#E65100]" />;
-      case 'coffee': return <Coffee size={size} className="text-[#6D4C41]" />;
-      case 'pill': return <Pill size={size} className="text-[#0288D1]" />;
-      case 'walk': return <Footprints size={size} className="text-[#2E7D32]" />;
-      case 'lunch': return <Utensils size={size} className="text-[#C2185B]" />;
-      case 'sleep': return <Moon size={size} className="text-[#512DA8]" />;
+      case 'coffee': return <Coffee size={size} className="text-[#BC6C25]" />;
+      case 'pill': return <Pill size={size} className="text-[#0EA5E9]" />;
+      case 'walk': return <Footprints size={size} className="text-[#10B981]" />;
+      case 'lunch': return <Utensils size={size} className="text-[#EC4899]" />;
+      case 'sleep': return <Moon size={size} className="text-[#A855F7]" />;
       default: return <Sun size={size} className="text-[#E65100]" />;
     }
   };
@@ -142,72 +142,72 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
   // INTRO PHASE
   if (phase === 'intro') {
     return (
-      <div className="min-h-screen bg-[#F5F0E8] flex flex-col justify-between">
-        <header className="bg-white border-b border-[#E0D8CC] px-5 py-4 shadow-sm">
+      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between transition-colors duration-200">
+        <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4 shadow-sm sticky top-0 z-40">
           <div className="max-w-3xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={onBack}
-                className="p-3 bg-[#FDF8F0] hover:bg-[#E0D8CC] rounded-2xl transition-colors border border-[#E0D8CC]"
+                className="w-10 h-10 bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] rounded-xl flex items-center justify-center transition-colors border border-[var(--color-border)] text-[var(--color-text)]"
                 aria-label="Back"
               >
-                <ArrowLeft size={22} className="text-[#1A1A1A]" />
+                <ArrowLeft size={20} />
               </button>
               <div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-[#1A1A1A]">Daily Routine</h1>
-                <p className="text-sm md:text-base text-[#7A7A7A]">Temporal Orientation & Sequence Activity</p>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--color-text)]">Daily Routine</h1>
+                <p className="text-xs sm:text-sm text-[var(--color-text-secondary)]">Temporal Orientation & Sequence Activity</p>
               </div>
             </div>
-            <span className="text-xs md:text-sm font-bold text-[#1B5E20] bg-[#E8F5E9] px-3 py-1 rounded-full border border-[#1B5E20]/20">
-              Cognitive Engagement
+            <span className="text-xs sm:text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
+              Cognitive Focus
             </span>
           </div>
         </header>
 
-        <main className="flex-1 max-w-3xl mx-auto px-5 py-8 space-y-6 w-full flex flex-col justify-center">
-          <div className="bg-white rounded-3xl border-2 border-[#E0D8CC] p-6 md:p-8 shadow-sm space-y-6">
+        <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6 w-full flex flex-col justify-center">
+          <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-6 md:p-8 shadow-sm space-y-6">
             <div className="flex items-center justify-center">
-              <div className="w-24 h-24 rounded-3xl bg-[#E8F5E9] flex items-center justify-center border-4 border-[#1B5E20]/20 shadow-md">
-                <Sun size={48} className="text-[#1B5E20]" />
+              <div className="w-24 h-24 rounded-3xl bg-[#10B981]/15 flex items-center justify-center border-4 border-[#10B981]/30 shadow-md">
+                <Sun size={48} className="text-[#10B981]" />
               </div>
             </div>
 
             <div className="text-center space-y-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-[#1A1A1A]">Order Your Day</h2>
-              <p className="text-base md:text-lg text-[#555555] max-w-xl mx-auto leading-relaxed">
+              <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-text)]">Order Your Day</h2>
+              <p className="text-base text-[var(--color-text-secondary)] max-w-xl mx-auto leading-relaxed">
                 Connect each daily habit in the order you do it from morning until night. Strengthens focus, daily structure, and natural memory flow.
               </p>
             </div>
 
             {/* Steps Preview */}
-            <div className="bg-[#FDF8F0] rounded-2xl p-5 border border-[#E0D8CC] space-y-3">
-              <p className="text-xs font-bold text-[#7A7A7A] uppercase tracking-wider text-center">
+            <div className="bg-[var(--color-bg-subtle)] rounded-2xl p-5 border border-[var(--color-border)] space-y-3">
+              <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider text-center">
                 Example Sequence:
               </p>
-              <div className="flex items-center justify-center gap-2 flex-wrap text-sm font-bold text-[#1A1A1A]">
-                <span className="px-3 py-1.5 bg-white rounded-xl border border-[#E0D8CC] shadow-2xs flex items-center gap-1.5">
+              <div className="flex items-center justify-center gap-2 flex-wrap text-sm font-bold text-[var(--color-text)]">
+                <span className="px-3 py-1.5 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] shadow-xs flex items-center gap-1.5">
                   <Sun size={16} className="text-[#E65100]" /> Morning Wake
                 </span>
-                <span className="text-[#7A7A7A]">→</span>
-                <span className="px-3 py-1.5 bg-white rounded-xl border border-[#E0D8CC] shadow-2xs flex items-center gap-1.5">
-                  <Coffee size={16} className="text-[#6D4C41]" /> Breakfast
+                <span className="text-[var(--color-text-muted)]">→</span>
+                <span className="px-3 py-1.5 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] shadow-xs flex items-center gap-1.5">
+                  <Coffee size={16} className="text-[#BC6C25]" /> Breakfast
                 </span>
-                <span className="text-[#7A7A7A]">→</span>
-                <span className="px-3 py-1.5 bg-white rounded-xl border border-[#E0D8CC] shadow-2xs flex items-center gap-1.5">
-                  <Pill size={16} className="text-[#0288D1]" /> Medicine
+                <span className="text-[var(--color-text-muted)]">→</span>
+                <span className="px-3 py-1.5 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] shadow-xs flex items-center gap-1.5">
+                  <Pill size={16} className="text-[#0EA5E9]" /> Medicine
                 </span>
               </div>
             </div>
 
             {/* Level Picker */}
             <div className="space-y-3 pt-2">
-              <span className="block text-sm font-bold text-[#1A1A1A] text-center">Select Starting Tier:</span>
+              <span className="block text-sm font-bold text-[var(--color-text)] text-center">Select Starting Tier:</span>
               <div className="grid grid-cols-3 gap-3">
                 <button
                   type="button"
                   onClick={() => startLevel(1)}
-                  className="py-3.5 px-4 bg-[#1B5E20] hover:bg-[#144718] text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 text-center"
+                  className="py-3.5 px-4 bg-[#10B981] hover:bg-[#059669] text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 text-center"
                 >
                   <span className="block text-lg">Level 1</span>
                   <span className="text-xs opacity-90">3 Steps (Gentle)</span>
@@ -223,7 +223,7 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
                 <button
                   type="button"
                   onClick={() => startLevel(3)}
-                  className="py-3.5 px-4 bg-[#1565C0] hover:bg-[#0D47A1] text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 text-center"
+                  className="py-3.5 px-4 bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 text-center"
                 >
                   <span className="block text-lg">Level 3</span>
                   <span className="text-xs opacity-90">5 Steps</span>
@@ -243,40 +243,40 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
     );
 
     return (
-      <div className="min-h-screen bg-[#F5F0E8] flex flex-col justify-between">
-        <header className="bg-white border-b border-[#E0D8CC] px-5 py-4 shadow-sm">
+      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between transition-colors duration-200">
+        <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-3.5 shadow-sm sticky top-0 z-40">
           <div className="max-w-4xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setPhase('intro')}
-                className="p-2.5 bg-[#FDF8F0] hover:bg-[#E0D8CC] rounded-2xl transition-colors border border-[#E0D8CC]"
+                className="w-10 h-10 bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] rounded-xl flex items-center justify-center transition-colors border border-[var(--color-border)] text-[var(--color-text)]"
                 aria-label="Back"
               >
                 <ArrowLeft size={20} />
               </button>
               <div>
-                <h2 className="text-xl md:text-2xl font-bold text-[#1A1A1A]">Arrange in Chronological Order</h2>
-                <p className="text-xs md:text-sm text-[#7A7A7A]">Tap an item from below, then tap its slot</p>
+                <h2 className="text-lg sm:text-xl font-bold text-[var(--color-text)]">Arrange in Chronological Order</h2>
+                <p className="text-xs text-[var(--color-text-secondary)]">Tap an item from below, then tap its slot</p>
               </div>
             </div>
-            <span className="text-sm font-bold text-[#1B5E20] bg-[#E8F5E9] px-3.5 py-1 rounded-full border border-[#1B5E20]/20">
+            <span className="text-xs sm:text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
               Level {difficulty} ({activeItems.length} steps)
             </span>
           </div>
         </header>
 
-        <main className="flex-1 max-w-4xl mx-auto px-5 py-6 w-full flex flex-col justify-between space-y-6">
+        <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-6 w-full flex flex-col justify-between space-y-6">
           {/* Target Timeline Slots */}
-          <div className="bg-white rounded-3xl border-2 border-[#E0D8CC] p-5 md:p-6 shadow-sm">
+          <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-5 md:p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-[#7A7A7A] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider">
                 Timeline Sequence (Earlier → Later)
               </span>
               <button
                 type="button"
                 onClick={() => speak('Place morning steps on the left, and evening steps on the right.')}
-                className="p-2 text-[#1B5E20] bg-[#E8F5E9] hover:bg-[#C8E6C9] rounded-xl transition-colors"
+                className="p-2 text-[#10B981] bg-[#10B981]/15 hover:bg-[#10B981]/25 rounded-xl border border-[#10B981]/30 transition-colors"
                 title="Voice hint"
               >
                 <Volume2 size={18} />
@@ -295,31 +295,31 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
                     onClick={() => handleSlotClick(idx)}
                     className={`relative rounded-2xl border-3 p-4 flex flex-col items-center justify-center text-center min-h-[130px] transition-all ${
                       isOccupied
-                        ? 'bg-[#E8F5E9] border-[#1B5E20] shadow-sm'
+                        ? 'bg-[#10B981]/15 border-[#10B981] shadow-sm'
                         : canPlaceHere
-                        ? 'bg-[#FFF3E0] border-[#E65100] border-dashed hover:scale-102 ring-4 ring-[#E65100]/20 cursor-pointer animate-pulse'
-                        : 'bg-[#FDF8F0] border-[#E0D8CC] border-dashed'
+                        ? 'bg-[#E65100]/15 border-[#E65100] border-dashed hover:scale-102 ring-4 ring-[#E65100]/20 cursor-pointer animate-pulse'
+                        : 'bg-[var(--color-bg-subtle)] border-[var(--color-border)] border-dashed'
                     }`}
                   >
-                    <span className="absolute top-2 left-2.5 text-xs font-extrabold text-[#7A7A7A]">
+                    <span className="absolute top-2 left-2.5 text-xs font-extrabold text-[var(--color-text-muted)]">
                       #{idx + 1}
                     </span>
 
                     {isOccupied ? (
                       <>
-                        <div className="w-12 h-12 rounded-xl bg-white shadow-2xs flex items-center justify-center mb-2">
+                        <div className="w-12 h-12 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-xs flex items-center justify-center mb-2">
                           {renderIcon(slot.iconName, 26)}
                         </div>
-                        <span className="text-xs font-bold text-[#1A1A1A] leading-tight">
+                        <span className="text-xs font-bold text-[var(--color-text)] leading-tight">
                           {slot.name}
                         </span>
-                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#1B5E20] flex items-center justify-center">
+                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#10B981] flex items-center justify-center">
                           <CheckCircle size={14} className="text-white" />
                         </div>
                       </>
                     ) : (
                       <div className="flex flex-col items-center justify-center">
-                        <span className="text-xs font-bold text-[#7A7A7A] mt-2">
+                        <span className="text-xs font-bold text-[var(--color-text-secondary)] mt-2">
                           {canPlaceHere ? 'Place Here' : `Step ${idx + 1}`}
                         </span>
                       </div>
@@ -332,7 +332,7 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
 
           {/* Cards Tray (Items to Place) */}
           <div className="space-y-3">
-            <span className="block text-sm font-bold text-[#1A1A1A] px-1">
+            <span className="block text-sm font-bold text-[var(--color-text)] px-1">
               Select an activity:
             </span>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -344,20 +344,20 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
                     key={card.id}
                     type="button"
                     onClick={() => handleCardSelect(card)}
-                    className={`p-4 rounded-2xl border-3 flex items-center gap-3.5 transition-all active:scale-95 shadow-xs ${
+                    className={`p-4 rounded-2xl border-2 flex items-center gap-3.5 transition-all active:scale-95 shadow-xs ${
                       isSelected
-                        ? 'bg-[#FFF3E0] border-[#E65100] shadow-md ring-4 ring-[#E65100]/20 scale-102'
-                        : 'bg-white border-[#E0D8CC] hover:border-[#B0A695]'
+                        ? 'bg-[#E65100]/15 border-[#E65100] shadow-md ring-4 ring-[#E65100]/20 scale-102'
+                        : 'bg-[var(--color-card)] border-[var(--color-border)] hover:border-[#10B981]'
                     }`}
                   >
-                    <div className="w-12 h-12 rounded-xl bg-[#FDF8F0] border border-[#E0D8CC] flex items-center justify-center flex-shrink-0 shadow-2xs">
+                    <div className="w-12 h-12 rounded-xl bg-[var(--color-bg-subtle)] border border-[var(--color-border)] flex items-center justify-center flex-shrink-0 shadow-xs">
                       {renderIcon(card.iconName, 26)}
                     </div>
                     <div className="text-left">
-                      <span className="block text-sm font-bold text-[#1A1A1A] leading-snug">
+                      <span className="block text-sm font-bold text-[var(--color-text)] leading-snug">
                         {card.name}
                       </span>
-                      <span className="text-[11px] font-semibold text-[#7A7A7A]">
+                      <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
                         {card.period}
                       </span>
                     </div>
@@ -376,31 +376,31 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
   const canAdvance = accuracy >= 80 && difficulty < 5;
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] flex flex-col justify-between">
-      <header className="bg-white border-b border-[#E0D8CC] px-5 py-4 shadow-sm">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between transition-colors duration-200">
+      <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4 shadow-sm">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#1A1A1A]">Daily Routine Complete</h2>
-            <p className="text-sm text-[#7A7A7A]">Chronological Orientation Results</p>
+            <h2 className="text-xl font-bold text-[var(--color-text)]">Daily Routine Complete</h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">Chronological Orientation Results</p>
           </div>
-          <span className="text-sm font-bold text-[#1B5E20] bg-[#E8F5E9] px-3.5 py-1 rounded-full border border-[#1B5E20]/20">
+          <span className="text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3.5 py-1 rounded-full border border-[#10B981]/30">
             Level {difficulty} of 5
           </span>
         </div>
       </header>
 
-      <main className="flex-1 max-w-3xl mx-auto px-5 py-8 space-y-6 w-full flex flex-col justify-center">
+      <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6 w-full flex flex-col justify-center">
         <div className="flex justify-center">
-          <div className="w-24 h-24 rounded-full bg-[#E8F5E9] flex items-center justify-center shadow-lg border-4 border-[#1B5E20]/20 animate-in zoom-in-75 duration-200">
-            <CheckCircle size={52} className="text-[#1B5E20]" />
+          <div className="w-24 h-24 rounded-full bg-[#10B981]/15 flex items-center justify-center shadow-lg border-4 border-[#10B981]/30 animate-in zoom-in-75 duration-200">
+            <CheckCircle size={52} className="text-[#10B981]" />
           </div>
         </div>
 
         <div className="text-center max-w-lg mx-auto space-y-2">
-          <p className="text-2xl md:text-3xl text-[#1A1A1A] font-extrabold leading-tight">
+          <p className="text-2xl md:text-3xl text-[var(--color-text)] font-extrabold leading-tight">
             {accuracy >= 80 ? 'Wonderful Routine Mastery!' : 'Good Effort on Today’s Routine!'}
           </p>
-          <p className="text-base text-[#555555]">
+          <p className="text-base text-[var(--color-text-secondary)]">
             You arranged {activeItems.length} daily habits in chronological order.
           </p>
         </div>
@@ -411,7 +411,7 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
             icon={<CheckCircle size={22} />}
             label="Steps"
             value={`${activeItems.length}`}
-            color="#1B5E20"
+            color="#10B981"
           />
           <ProgressCard
             icon={<Sun size={22} />}
@@ -423,7 +423,7 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
             icon={<RotateCcw size={22} />}
             label="Time"
             value={`${Math.round(totalTime)}s`}
-            color="#1565C0"
+            color="#0EA5E9"
           />
         </div>
 
@@ -433,7 +433,7 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
             <button
               type="button"
               onClick={() => startLevel(difficulty + 1)}
-              className="w-full py-4 px-6 bg-[#1B5E20] hover:bg-[#144718] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
+              className="w-full py-4 px-6 bg-[#10B981] hover:bg-[#059669] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
             >
               <span>Advance to Level {difficulty + 1}</span>
               <ArrowRight size={24} />
@@ -442,7 +442,7 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
             <button
               type="button"
               onClick={() => startLevel(difficulty)}
-              className="w-full py-4 px-6 bg-[#1B5E20] hover:bg-[#144718] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
+              className="w-full py-4 px-6 bg-[#10B981] hover:bg-[#059669] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
             >
               <RotateCcw size={22} />
               <span>Practice Level {difficulty} Again</span>

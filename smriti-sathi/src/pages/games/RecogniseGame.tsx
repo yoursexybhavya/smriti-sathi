@@ -143,8 +143,8 @@ export default function RecogniseGame({ onBack }: RecogniseGameProps) {
       return (
         <div>
           {adjustmentMessage && (
-            <div className="bg-[#E3F2FD] border-b border-[#BBDEFB] px-5 py-3">
-              <p className="text-sm text-[#1565C0] text-center">
+            <div className="bg-[#10B981]/15 border-b border-[#10B981]/30 px-5 py-3">
+              <p className="text-sm text-[#10B981] font-semibold text-center">
                 {adjustmentMessage}
               </p>
             </div>
@@ -155,22 +155,14 @@ export default function RecogniseGame({ onBack }: RecogniseGameProps) {
     
     case 'play':
       return currentActivity ? (
-        <div>
-          <div className="bg-white border-b border-[#E0D8CC] px-5 py-2">
-            <div className="max-w-4xl mx-auto flex items-center justify-between">
-              <span className="text-sm font-semibold text-[#7A7A7A]">
-                Question {questionNumber} of {totalQuestions}
-              </span>
-              <span className="text-sm font-bold text-[#E65100] bg-[#FFF3E0] px-3 py-0.5 rounded-full border border-[#E65100]/30">
-                Level {difficulty} of 5
-              </span>
-            </div>
-          </div>
-          <RecognisePlay
-            activity={currentActivity}
-            onSubmit={handleAnswerSubmit}
-          />
-        </div>
+        <RecognisePlay
+          activity={currentActivity}
+          onSubmit={handleAnswerSubmit}
+          onBack={() => setPhase('intro')}
+          questionNumber={questionNumber}
+          totalQuestions={totalQuestions}
+          difficulty={difficulty}
+        />
       ) : null;
     
     case 'result':

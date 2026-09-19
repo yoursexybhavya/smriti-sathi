@@ -20,9 +20,9 @@ export default function LargeButton({
   className = '',
 }: LargeButtonProps) {
   const variantClasses = {
-    primary: 'bg-[#1B5E20] text-white hover:bg-[#0D3B12] shadow-md',
-    secondary: 'bg-[#E65100] text-white hover:bg-[#BF360C] shadow-md',
-    outline: 'bg-white text-[#1B5E20] border-2 border-[#1B5E20] hover:bg-[#E8F5E9]',
+    primary: 'bg-[#10B981] text-white hover:bg-[#059669] shadow-md',
+    secondary: 'bg-[#E65100] text-white hover:bg-[#D84315] shadow-md',
+    outline: 'bg-[var(--color-card)] text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-[#10B981] hover:bg-[var(--color-bg-subtle)]',
   };
 
   return (

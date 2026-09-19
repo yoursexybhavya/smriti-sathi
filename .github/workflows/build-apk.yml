@@ -52,13 +52,13 @@ jobs:
 
       - name: Prepare Release Asset
         run: |
-          cp smriti-sathi/android/app/build/outputs/apk/debug/app-debug.apk smriti-sathi/SmritiSathi-latest.apk
+          cp smriti-sathi/android/app/build/outputs/apk/debug/app-debug.apk smriti-sathi/SmritiSathi-v2.5.0.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smriti-sathi-debug-apk
-          path: smriti-sathi/SmritiSathi-latest.apk
+          path: smriti-sathi/SmritiSathi-v2.5.0.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -66,13 +66,13 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: latest
-          name: "Smriti Sathi Latest Build"
+          tag_name: v2.5.0
+          name: "Smriti Sathi v2.5.0 Release"
           body: |
-            ## Smriti Sathi — Latest Android Release
+            ## Smriti Sathi — v2.5.0 Android Release
             
-            - **Download Link**: [SmritiSathi-latest.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk)
-          files: smriti-sathi/SmritiSathi-latest.apk
+            - **Download Link**: [SmritiSathi-v2.5.0.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.0/SmritiSathi-v2.5.0.apk)
+          files: smriti-sathi/SmritiSathi-v2.5.0.apk
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

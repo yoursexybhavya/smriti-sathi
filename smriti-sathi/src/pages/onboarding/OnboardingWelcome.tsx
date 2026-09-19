@@ -1,4 +1,4 @@
-import { Brain, Heart, Shield, Sun, Moon } from 'lucide-react';
+import { Brain, Heart, Shield, Sun, Moon, ArrowLeft } from 'lucide-react';
 import LargeButton from '../../components/LargeButton';
 import { APP } from '../../core/constants/app';
 import { useApp } from '../../context/AppContext';
@@ -14,8 +14,19 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-center px-4 py-8 transition-colors duration-200">
-      {/* Top Bar with Theme Toggle */}
-      <div className="max-w-5xl mx-auto w-full flex items-center justify-end pb-6">
+      {/* Top Bar with Back & Theme Toggle */}
+      <div className="max-w-5xl mx-auto w-full flex items-center justify-between pb-6">
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[#10B981] transition-all active:scale-95 shadow-sm text-sm font-semibold"
+            aria-label="Back to Account Login"
+          >
+            <ArrowLeft size={18} />
+            <span>Switch Profile / Login</span>
+          </button>
+        ) : <div />}
 
         <button
           type="button"
@@ -76,6 +87,15 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
             <LargeButton onPress={onNext}>
               Begin Setup / আৰম্ভ কৰক →
             </LargeButton>
+            {onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="w-full py-3 px-4 rounded-xl border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-subtle)] text-sm font-semibold transition-colors"
+              >
+                ← Return to Profile Selection
+              </button>
+            )}
             <p className="text-center text-xs md:text-sm text-[var(--color-text-muted)]">
               Designed for elderly users and caregivers with high-contrast accessibility.
             </p>

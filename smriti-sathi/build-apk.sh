@@ -17,18 +17,16 @@ chmod +x gradlew
 cd ..
 
 APK_SOURCE="android/app/build/outputs/apk/debug/app-debug.apk"
-APK_TARGET="SmritiSathi-latest.apk"
-DESKTOP_TARGET="/Users/krishnajangid/Desktop/SmritiSathi-latest.apk"
+APK_TARGET="SmritiSathi-v2.5.0.apk"
+DESKTOP_TARGET="/Users/krishnajangid/Desktop/SmritiSathi-v2.5.0.apk"
 
 if [ -f "$APK_SOURCE" ]; then
   cp "$APK_SOURCE" "$APK_TARGET"
-  cp "$APK_SOURCE" "SmritiSathi-v2.4.0.apk"
-  echo "✓ Created $APK_TARGET and SmritiSathi-v2.4.0.apk ($(du -h "$APK_TARGET" | cut -f1))"
+  echo "✓ Created $APK_TARGET ($(du -h "$APK_TARGET" | cut -f1))"
   
   if [ -d "/Users/krishnajangid/Desktop" ]; then
     cp "$APK_SOURCE" "$DESKTOP_TARGET"
-    cp "$APK_SOURCE" "/Users/krishnajangid/Desktop/SmritiSathi-v2.4.0.apk"
-    echo "✓ Copied fresh APK to $DESKTOP_TARGET and Desktop/SmritiSathi-v2.4.0.apk"
+    echo "✓ Copied fresh APK to $DESKTOP_TARGET"
   fi
   echo "=== Build Successful! ==="
 else

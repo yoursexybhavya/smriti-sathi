@@ -14,6 +14,8 @@ import OnboardingFlow from './pages/onboarding/OnboardingFlow';
 import PatientHomeScreen from './pages/PatientHomeScreen';
 import RememberGame from './pages/games/RememberGame';
 import RecogniseGame from './pages/games/RecogniseGame';
+import MemoryMatchGame from './pages/games/MemoryMatchGame';
+import DailyRoutineGame from './pages/games/DailyRoutineGame';
 import AdaptiveEngineTestScreen from './pages/settings/AdaptiveEngineTestScreen';
 import DatabaseTestScreen from './pages/DatabaseTestScreen';
 import ReminderTestScreen from './pages/settings/ReminderTestScreen';
@@ -213,6 +215,10 @@ function AppContent() {
           return <RememberGame onBack={handleGoBack} />;
         case 'recognise-game':
           return <RecogniseGame onBack={handleGoBack} />;
+        case 'memory-match':
+          return <MemoryMatchGame onBack={handleGoBack} />;
+        case 'daily-routine':
+          return <DailyRoutineGame onBack={handleGoBack} />;
         case 'reminders':
           return <RemindersScreen onNavigate={handleNavigate} isOnline={isOnline} />;
         case 'progress':

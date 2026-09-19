@@ -47,13 +47,13 @@ jobs:
 
       - name: Prepare Release Asset
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk SmritiSathi-latest.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk SmritiSathi-v2.5.0.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smriti-sathi-latest-apk
-          path: SmritiSathi-latest.apk
+          path: SmritiSathi-v2.5.0.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -61,12 +61,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: latest
-          name: "Smriti Sathi Latest Build"
+          tag_name: v2.5.0
+          name: "Smriti Sathi v2.5.0 Release"
           body: |
-            ## Smriti Sathi — Latest Android Release
+            ## Smriti Sathi — v2.5.0 Android Release
             
-            - **Download Link**: [SmritiSathi-latest.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk)
+            - **Download Link**: [SmritiSathi-v2.5.0.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.0/SmritiSathi-v2.5.0.apk)
             - **Changelog**:
               - Responsive tablet landscape layout across all screens (Samsung SM-T290 optimized)
               - Dynamic live preview for text size scaling (18px / 24px / 30px) and WCAG AAA high contrast
@@ -74,7 +74,7 @@ jobs:
               - Visual pattern and sequence completion with live preview slot
               - Explicit Next Level progression buttons and 1-5 difficulty selection
               - Automatic in-app update notification
-          files: SmritiSathi-latest.apk
+          files: SmritiSathi-v2.5.0.apk
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

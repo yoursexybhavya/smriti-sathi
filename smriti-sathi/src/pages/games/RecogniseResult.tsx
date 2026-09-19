@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle, Clock, Target, TrendingUp, ArrowRight, RotateCcw } from 'lucide-react';
+import { CheckCircle, Clock, Target, TrendingUp, ArrowRight, RotateCcw } from 'lucide-react';
 import LargeButton from '../../components/LargeButton';
 import ProgressCard from '../../components/ProgressCard';
 
@@ -17,7 +17,6 @@ interface RecogniseResultProps {
 }
 
 export default function RecogniseResult({
-  isCorrect,
   responseTime,
   difficulty,
   totalQuestions,
@@ -43,29 +42,29 @@ export default function RecogniseResult({
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200">
       {/* Header */}
-      <header className="bg-white border-b border-[#E0D8CC] px-5 py-4">
+      <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#1A1A1A]">Activity Complete</h2>
-            <p className="text-sm text-[#7A7A7A]">Recognition Results & Level Progression</p>
+            <h2 className="text-xl font-bold text-[var(--color-text)]">Activity Complete</h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">Recognition Results & Level Progression</p>
           </div>
-          <span className="text-sm font-bold text-[#E65100] bg-[#FFF3E0] px-3 py-1 rounded-full border border-[#E65100]/20">
+          <span className="text-sm font-bold text-[#E65100] bg-[#E65100]/15 px-3 py-1 rounded-full border border-[#E65100]/30">
             Level {difficulty} of 5
           </span>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-5 py-6 space-y-6 pb-12">
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-12">
         {/* Success/Encouragement Icon */}
         <div className="flex justify-center py-2">
           {accuracy >= 80 ? (
-            <div className="w-24 h-24 rounded-full bg-[#E8F5E9] flex items-center justify-center shadow-lg border-4 border-[#1B5E20]/20 animate-in zoom-in-75 duration-200">
-              <CheckCircle size={52} className="text-[#1B5E20]" />
+            <div className="w-24 h-24 rounded-full bg-[#10B981]/15 flex items-center justify-center shadow-lg border-4 border-[#10B981]/30 animate-in zoom-in-75 duration-200">
+              <CheckCircle size={52} className="text-[#10B981]" />
             </div>
           ) : (
-            <div className="w-24 h-24 rounded-full bg-[#FFF3E0] flex items-center justify-center shadow-lg border-4 border-[#E65100]/20">
+            <div className="w-24 h-24 rounded-full bg-[#E65100]/15 flex items-center justify-center shadow-lg border-4 border-[#E65100]/30">
               <CheckCircle size={52} className="text-[#E65100]" />
             </div>
           )}
@@ -73,7 +72,7 @@ export default function RecogniseResult({
 
         {/* Supportive Message */}
         <div className="text-center max-w-lg mx-auto">
-          <p className="text-2xl text-[#1A1A1A] font-extrabold leading-tight">
+          <p className="text-2xl text-[var(--color-text)] font-extrabold leading-tight">
             {getMessage()}
           </p>
         </div>
@@ -90,21 +89,21 @@ export default function RecogniseResult({
             icon={<TrendingUp size={22} />}
             label="Accuracy"
             value={`${accuracy}%`}
-            color="#1B5E20"
+            color="#10B981"
           />
           <ProgressCard
             icon={<Clock size={22} />}
             label="Total Time"
             value={`${Math.round(responseTime)}s`}
-            color="#1565C0"
+            color="#0EA5E9"
           />
         </div>
 
         {/* Level Progression Selector */}
-        <div className="bg-white rounded-3xl border-2 border-[#E0D8CC] p-5 shadow-sm space-y-3">
+        <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-base font-bold text-[#1A1A1A]">Select Difficulty Level:</span>
-            <span className="text-sm font-semibold text-[#7A7A7A]">1 (Gentle) → 5 (Challenging)</span>
+            <span className="text-base font-bold text-[var(--color-text)]">Select Difficulty Level:</span>
+            <span className="text-sm font-semibold text-[var(--color-text-secondary)]">1 (Gentle) → 5 (Challenging)</span>
           </div>
           <div className="grid grid-cols-5 gap-2">
             {[1, 2, 3, 4, 5].map((lvl) => {
@@ -117,7 +116,7 @@ export default function RecogniseResult({
                   className={`py-3 rounded-2xl font-bold text-center border-2 transition-all ${
                     isCurrent
                       ? 'bg-[#E65100] text-white border-[#D84315] shadow-md scale-105'
-                      : 'bg-[#FDF8F0] text-[#4A4A4A] border-[#E0D8CC] hover:border-[#E65100]'
+                      : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[#E65100]'
                   }`}
                 >
                   <span className="block text-lg">L{lvl}</span>
@@ -136,7 +135,7 @@ export default function RecogniseResult({
             <button
               type="button"
               onClick={onNextLevel || onPlayAgain}
-              className="w-full py-4 px-6 bg-[#1B5E20] hover:bg-[#144718] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
+              className="w-full py-4 px-6 bg-[#10B981] hover:bg-[#059669] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
             >
               <span>Advance to Level {difficulty + 1}</span>
               <ArrowRight size={24} />
@@ -156,7 +155,7 @@ export default function RecogniseResult({
             <button
               type="button"
               onClick={onPlayAgain}
-              className="w-full py-3 px-6 bg-[#FDF8F0] hover:bg-[#E0D8CC] text-[#4A4A4A] text-base font-semibold rounded-xl border border-[#E0D8CC] transition-colors"
+              className="w-full py-3 px-6 bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] text-base font-semibold rounded-xl border border-[var(--color-border)] transition-colors"
             >
               Replay Level {difficulty}
             </button>

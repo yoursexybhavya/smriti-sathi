@@ -13,7 +13,7 @@ interface NativeAppUpdatePlugin {
 
 const NativeAppUpdate = registerPlugin<NativeAppUpdatePlugin>('AppUpdate');
 
-export const CURRENT_APP_VERSION = 'v2.4.0';
+export const CURRENT_APP_VERSION = 'v2.5.0';
 const GITHUB_REPO = 'yoursexybhavya/smriti-sathi';
 const RENDER_VERSION_URL = 'https://smriti-sathi.onrender.com/api/version';
 
@@ -56,7 +56,7 @@ export async function checkAppUpdates(): Promise<UpdateInfo> {
         return {
           hasUpdate: true,
           latestVersion: renderData.latestVersion,
-          downloadUrl: renderData.downloadUrl || `https://github.com/${GITHUB_REPO}/releases/latest/download/SmritiSathi-latest.apk`,
+          downloadUrl: renderData.downloadUrl || `https://github.com/${GITHUB_REPO}/releases/download/${renderData.latestVersion}/SmritiSathi-${renderData.latestVersion}.apk`,
           releaseNotes: renderData.releaseNotes,
           source: 'render',
         };
@@ -81,7 +81,7 @@ export async function checkAppUpdates(): Promise<UpdateInfo> {
     const data = await res.json();
     const latestTag = data.tag_name || '';
 
-    let apkUrl = `https://github.com/${GITHUB_REPO}/releases/download/${latestTag}/SmritiSathi-latest.apk`;
+    let apkUrl = `https://github.com/${GITHUB_REPO}/releases/download/${latestTag}/SmritiSathi-${latestTag}.apk`;
     
     if (data.assets && Array.isArray(data.assets)) {
       const apkAsset = data.assets.find((a: { name: string; browser_download_url: string }) =>
@@ -170,7 +170,7 @@ export function UpdateNotifier() {
           try {
             const link = document.createElement('a');
             link.href = update.downloadUrl;
-            link.download = 'SmritiSathi-latest.apk';
+            link.download = `SmritiSathi-${update.latestVersion}.apk`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

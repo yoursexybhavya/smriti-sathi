@@ -249,8 +249,15 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   icon={<Grid3X3 size={28} className="text-[#F59E0B]" />}
                   title="Memory Match"
                   subtitle="Pair matching cards with calm errorless learning"
-                  onPress={() => onNavigate('games')}
+                  onPress={() => onNavigate('memory-match')}
                   variant="secondary"
+                />
+                <LargeActionCard
+                  icon={<Sun size={28} className="text-[#E65100]" />}
+                  title="Daily Routine"
+                  subtitle="Sequence your daily habits from dawn to dusk"
+                  onPress={() => onNavigate('daily-routine')}
+                  variant="primary"
                 />
                 <LargeActionCard
                   icon={<BookOpen size={28} className="text-[#A855F7]" />}

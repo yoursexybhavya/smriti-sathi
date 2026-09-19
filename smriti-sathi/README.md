@@ -22,7 +22,7 @@ SMRITI SATHI is an elderly-friendly cognitive engagement and memory assistance p
 
 > ### **Single Official Download Link (Always points to latest verified build)**
 > 
-> 📥 **[Download Smriti Sathi Android APK (`SmritiSathi-latest.apk`)](https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk)**
+> 📥 **[Download Smriti Sathi Android APK (`SmritiSathi-v2.5.0.apk`)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.0/SmritiSathi-v2.5.0.apk)**
 > 
 > *Direct APK download link — installs immediately on your Android tablet or phone without navigating to GitHub release pages. Automatically maintained by GitHub Actions CI/CD on every update.*
 

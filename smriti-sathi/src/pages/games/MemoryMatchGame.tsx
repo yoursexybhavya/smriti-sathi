@@ -6,7 +6,7 @@ import { GameStorage } from '../../services/storage/GameStorage';
 import AppHeader from '../../components/AppHeader';
 import LargeButton from '../../components/LargeButton';
 import ProgressCard from '../../components/ProgressCard';
-import { ArrowLeft, Clock, Target, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Clock, Target, TrendingUp, CheckCircle, Sparkles, HelpCircle } from 'lucide-react';
 
 interface MemoryMatchGameProps {
   onBack: () => void;
@@ -107,7 +107,7 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
           ));
           setFlippedIds([]);
           setIsLocked(false);
-        }, 1200);
+        }, 1100);
       }
     }
   };
@@ -143,32 +143,49 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
 
   if (phase === 'intro') {
     return (
-      <div className="min-h-screen bg-[#F5F0E8] flex flex-col">
-        <AppHeader title="Memory Match" subtitle="Find the matching pairs" isOnline={isOnline} />
-        <div className="flex-1 max-w-lg mx-auto px-5 py-6 space-y-6 w-full">
-          <div className="p-6 bg-white rounded-2xl border border-[#E0D8CC] shadow-sm">
-            <h3 className="text-xl font-bold text-[#1A1A1A] mb-3">How to play</h3>
+      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col transition-colors duration-200">
+        <AppHeader 
+          title="Memory Match" 
+          subtitle="Find the matching pairs" 
+          isOnline={isOnline} 
+          showBack 
+          onBack={onBack} 
+        />
+        <div className="flex-1 max-w-lg mx-auto px-4 sm:px-6 py-6 space-y-6 w-full flex flex-col justify-center">
+          <div className="p-6 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-sm space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-[#10B981]/15 border border-[#10B981]/30 mx-auto flex items-center justify-center text-[#10B981]">
+              <Sparkles size={36} />
+            </div>
+            <h3 className="text-xl font-bold text-[var(--color-text)] text-center">How to Play</h3>
             <ul className="space-y-3">
-              <li className="flex gap-3 text-[#4A4A4A]">
-                <span className="font-bold text-[#1B5E20]">1.</span>
-                <span>Tap a card to flip it over.</span>
+              <li className="flex gap-3 text-[var(--color-text-secondary)]">
+                <span className="font-bold text-[#10B981] bg-[var(--color-bg-subtle)] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0">1</span>
+                <span className="pt-0.5">Tap any card to flip it over and see the image.</span>
               </li>
-              <li className="flex gap-3 text-[#4A4A4A]">
-                <span className="font-bold text-[#1B5E20]">2.</span>
-                <span>Try to find the matching image by tapping another card.</span>
+              <li className="flex gap-3 text-[var(--color-text-secondary)]">
+                <span className="font-bold text-[#10B981] bg-[var(--color-bg-subtle)] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0">2</span>
+                <span className="pt-0.5">Tap a second card to find its matching twin.</span>
               </li>
-              <li className="flex gap-3 text-[#4A4A4A]">
-                <span className="font-bold text-[#1B5E20]">3.</span>
-                <span>Match all the pairs to complete the level.</span>
+              <li className="flex gap-3 text-[var(--color-text-secondary)]">
+                <span className="font-bold text-[#10B981] bg-[var(--color-bg-subtle)] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0">3</span>
+                <span className="pt-0.5">Match all the pairs to complete the level. No timer pressure!</span>
               </li>
             </ul>
           </div>
           
-          <div className="pt-4 space-y-3">
-            <LargeButton onPress={() => startGame(1)} className="bg-[#2E7D32]">Start Level 1</LargeButton>
-            <LargeButton onPress={() => startGame(2)}>Start Level 2</LargeButton>
-            <LargeButton onPress={() => startGame(3)}>Start Level 3</LargeButton>
-            <LargeButton onPress={onBack} variant="outline">Back to Games</LargeButton>
+          <div className="space-y-3">
+            <LargeButton onPress={() => startGame(1)} className="bg-[#10B981] hover:bg-[#059669] text-white">
+              Start Level 1 (2 Pairs • Gentle)
+            </LargeButton>
+            <LargeButton onPress={() => startGame(2)} className="bg-[#E65100] hover:bg-[#D84315] text-white">
+              Start Level 2 (3 Pairs)
+            </LargeButton>
+            <LargeButton onPress={() => startGame(3)} className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white">
+              Start Level 3 (4 Pairs)
+            </LargeButton>
+            <LargeButton onPress={onBack} variant="outline">
+              Back to Games Hub
+            </LargeButton>
           </div>
         </div>
       </div>
@@ -178,37 +195,69 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
   if (phase === 'play') {
     const gridCols = cards.length <= 4 ? 'grid-cols-2' : cards.length <= 6 ? 'grid-cols-3' : 'grid-cols-4';
     return (
-      <div className="min-h-screen bg-[#F5F0E8] flex flex-col">
-        <div className="bg-white border-b border-[#E0D8CC] px-5 py-3 flex items-center justify-between">
-          <button onClick={onBack} className="p-2 rounded-full hover:bg-gray-100"><ArrowLeft size={20} /></button>
-          <span className="text-sm font-medium text-[#1B5E20]">Moves: {moves}</span>
-        </div>
-        <div className="flex-1 flex flex-col justify-center max-w-xl mx-auto w-full p-6">
-          <div className={`grid ${gridCols} gap-4`}>
+      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between transition-colors duration-200">
+        <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-40">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setPhase('intro')} 
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] border border-[var(--color-border)] transition-colors"
+              aria-label="Back"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <div>
+              <h2 className="text-base font-bold text-[var(--color-text)]">Memory Match</h2>
+              <span className="text-xs text-[var(--color-text-secondary)]">Level {difficulty}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs sm:text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
+              Moves: {moves}
+            </span>
+          </div>
+        </header>
+
+        <main className="flex-1 flex flex-col justify-center max-w-xl mx-auto w-full p-4 sm:p-6">
+          <div className={`grid ${gridCols} gap-3 sm:gap-4`}>
             {cards.map(card => (
-              <div 
+              <button 
                 key={card.id} 
+                type="button"
                 onClick={() => handleCardClick(card.id)}
-                className={`aspect-square rounded-2xl cursor-pointer transition-all duration-300 transform-gpu relative shadow-sm border-2 ${
-                  card.isFlipped || card.isMatched ? 'border-[#2E7D32] bg-white scale-100' : 'border-[#D4C5B0] bg-[#E8E2D9] hover:scale-105'
+                className={`aspect-square rounded-3xl cursor-pointer transition-all duration-300 transform-gpu relative shadow-sm border-3 ${
+                  card.isFlipped || card.isMatched 
+                    ? 'border-[#10B981] bg-[var(--color-card)] ring-4 ring-[#10B981]/20 scale-102' 
+                    : 'border-[var(--color-border)] bg-[var(--color-bg-subtle)] hover:border-[#10B981] hover:scale-102'
                 }`}
+                aria-label={card.isFlipped || card.isMatched ? card.object.name : 'Hidden card'}
               >
                 {(card.isFlipped || card.isMatched) ? (
-                  <div className="absolute inset-0 flex items-center justify-center p-3 animate-in fade-in zoom-in duration-300">
-                    <img src={card.object.imageUrl} alt={card.object.name} className="w-full h-full object-contain rounded-lg" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-2.5 animate-in fade-in zoom-in duration-200">
+                    <img src={card.object.imageUrl} alt={card.object.name} className="w-14 h-14 sm:w-20 sm:h-20 object-contain drop-shadow-sm" />
+                    <span className="text-xs sm:text-sm font-bold text-[var(--color-text)] mt-1 truncate w-full text-center">
+                      {card.object.name}
+                    </span>
                   </div>
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Target size={32} className="text-[#BCAEA0]" />
+                    <div className="w-12 h-12 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-muted)]">
+                      <HelpCircle size={24} />
+                    </div>
                   </div>
                 )}
                 {card.isMatched && (
-                  <div className="absolute inset-0 bg-[#E8F5E9]/50 rounded-xl pointer-events-none" />
+                  <div className="absolute inset-0 bg-[#10B981]/15 rounded-3xl pointer-events-none border-2 border-[#10B981]" />
                 )}
-              </div>
+              </button>
             ))}
           </div>
-        </div>
+        </main>
+
+        <footer className="bg-[var(--color-card)] border-t border-[var(--color-border)] px-4 py-3 text-center">
+          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)]">
+            Tap cards to find pairs. Matched pairs stay turned up!
+          </p>
+        </footer>
       </div>
     );
   }
@@ -219,53 +268,63 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
   const accuracy = Math.round((minMoves / Math.max(minMoves, moves)) * 100);
   
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
-      <div className="bg-white border-b border-[#E0D8CC] px-5 py-4">
-        <div className="max-w-lg mx-auto">
-          <h2 className="text-xl font-bold text-[#1A1A1A]">Activity Complete</h2>
-          <p className="text-sm text-[#7A7A7A]">Your results</p>
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200">
+      <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4">
+        <div className="max-w-lg mx-auto flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-[var(--color-text)]">Activity Complete</h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">Match Results & Progression</p>
+          </div>
+          <span className="text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
+            Level {difficulty}
+          </span>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-lg mx-auto px-5 py-6 space-y-6 pb-10">
-        <div className="flex justify-center py-4">
-          <div className="w-24 h-24 rounded-full bg-[#E8F5E9] flex items-center justify-center shadow-md">
-            <CheckCircle size={48} className="text-[#2E7D32]" />
+      <main className="max-w-lg mx-auto px-4 sm:px-6 py-6 space-y-6 pb-10">
+        <div className="flex justify-center py-2">
+          <div className="w-24 h-24 rounded-full bg-[#10B981]/15 flex items-center justify-center shadow-md border-4 border-[#10B981]/30">
+            <CheckCircle size={48} className="text-[#10B981]" />
           </div>
         </div>
 
         <div className="text-center">
-          <p className="text-xl text-[#1A1A1A] font-medium leading-relaxed">
-            {accuracy >= 80 ? 'Excellent memory!' : 'Good effort!'} You matched all pairs in {moves} moves.
+          <p className="text-2xl text-[var(--color-text)] font-extrabold leading-tight">
+            {accuracy >= 80 ? 'Excellent memory!' : 'Good effort!'}
+          </p>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            You matched all pairs in {moves} moves.
           </p>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
           <ProgressCard icon={<Target size={20} />} label="Moves" value={`${moves}`} color="#E65100" />
-          <ProgressCard icon={<TrendingUp size={20} />} label="Accuracy" value={`${accuracy}%`} color="#1B5E20" />
-          <ProgressCard icon={<Clock size={20} />} label="Time" value={`${Math.round(timeSpent)}s`} color="#1565C0" />
+          <ProgressCard icon={<TrendingUp size={20} />} label="Accuracy" value={`${accuracy}%`} color="#10B981" />
+          <ProgressCard icon={<Clock size={20} />} label="Time" value={`${Math.round(timeSpent)}s`} color="#0EA5E9" />
         </div>
 
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4 flex justify-between items-center">
-          <span className="text-base text-[#4A4A4A]">Difficulty Level</span>
-          <span className="text-lg font-bold text-[#E65100]">Level {difficulty}</span>
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4 flex justify-between items-center">
+          <span className="text-base text-[var(--color-text)] font-semibold">Difficulty Level</span>
+          <span className="text-base font-bold text-[#E65100] bg-[#E65100]/15 px-3 py-0.5 rounded-full border border-[#E65100]/30">
+            Level {difficulty}
+          </span>
         </div>
 
         <div className="space-y-3 pt-2">
           {accuracy >= 70 && difficulty < 5 ? (
-            <LargeButton onPress={() => startGame(difficulty + 1)} className="bg-[#2E7D32]">
-              Next Level
+            <LargeButton onPress={() => startGame(difficulty + 1)} className="bg-[#10B981] hover:bg-[#059669] text-white">
+              Advance to Level {difficulty + 1} →
             </LargeButton>
           ) : (
-            <LargeButton onPress={() => startGame(difficulty)}>
-              Play Again
+            <LargeButton onPress={() => startGame(difficulty)} className="bg-[#10B981] hover:bg-[#059669] text-white">
+              Play Level {difficulty} Again
             </LargeButton>
           )}
           <LargeButton onPress={onBack} variant="outline">
-            Back to Games
+            Back to Games Hub
           </LargeButton>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

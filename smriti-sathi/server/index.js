@@ -86,10 +86,10 @@ app.post('/api/sos', (req, res) => {
 // 5. In-App Auto-Update & Version Authority (Render Cloud Backend)
 app.get('/api/version', (req, res) => {
   res.json({
-    latestVersion: 'v2.4.0',
-    versionCode: 240,
-    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/latest/download/SmritiSathi-latest.apk',
-    releaseNotes: 'Smriti Sathi v2.4.0: Dual-orientation elder UX overhaul, background care schedule alarm notifications with audible buzzer chime, direct settings access, zero dummy data, and dedicated elder mental model.',
+    latestVersion: 'v2.5.0',
+    versionCode: 250,
+    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.0/SmritiSathi-v2.5.0.apk',
+    releaseNotes: 'Smriti Sathi v2.5.0: Complete UI/UX overhaul, elder-accessible theme tokens across all cognitive games, version-specific APK updates, instant accessibility live previews, and refined navigation.',
     publishedAt: new Date().toISOString(),
   });
 });

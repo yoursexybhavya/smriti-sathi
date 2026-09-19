@@ -115,30 +115,30 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
 
         {/* Game Cards */}
         <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-          <h3 className="text-lg font-semibold text-[#1A1A1A] px-1 md:col-span-2">Available Games</h3>
+          <h3 className="text-lg font-bold text-[var(--color-text)] px-1 md:col-span-2">Available Games</h3>
           
           {/* REMEMBER Game - Fully Working */}
-          <Card onPress={() => setActiveGame('remember-game')} className="overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors">
+          <Card onPress={() => setActiveGame('remember-game')} className="overflow-hidden cursor-pointer hover:border-[#10B981] transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0">
-                  <Eye size={32} className="text-[#1B5E20]" />
+                <div className="w-16 h-16 rounded-2xl bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 flex items-center justify-center flex-shrink-0">
+                  <Eye size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-bold text-[#1A1A1A]">Remember</h4>
-                    <span className="text-xs font-medium text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-full">
+                    <h4 className="text-lg font-bold text-[var(--color-text)]">Remember</h4>
+                    <span className="text-xs font-bold text-[#10B981] bg-[#10B981]/15 px-2 py-0.5 rounded-full border border-[#10B981]/30">
                       Ready
                     </span>
                   </div>
-                  <p className="text-sm text-[#4A4A4A] mt-1 leading-relaxed">
+                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">
                     Look at familiar objects, then recall which ones you saw.
                   </p>
-                  <div className="flex items-center gap-4 mt-3">
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                  <div className="flex items-center gap-2 mt-3">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--color-border)]">
                       5 Levels
                     </span>
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--color-border)]">
                       3-6 Objects
                     </span>
                   </div>
@@ -146,36 +146,36 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-[#F57F17]" />
-                  <span className="text-xs text-[#4A4A4A]">Adaptive difficulty</span>
+                  <Sparkles size={14} className="text-[#F59E0B]" />
+                  <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-semibold text-[#1B5E20]">Start Activity →</span>
+                <span className="text-sm font-bold text-[#10B981]">Start Activity →</span>
               </div>
             </div>
           </Card>
 
-          {/* Memory Match Game - NOW WORKING */}
-          <Card onPress={() => setActiveGame('memory-match')} className="overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors">
+          {/* Memory Match Game */}
+          <Card onPress={() => setActiveGame('memory-match')} className="overflow-hidden cursor-pointer hover:border-[#0EA5E9] transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E3F2FD] to-[#BBDEFB] flex items-center justify-center flex-shrink-0">
-                  <Brain size={32} className="text-[#1565C0]" />
+                <div className="w-16 h-16 rounded-2xl bg-[#0EA5E9]/15 text-[#0EA5E9] border border-[#0EA5E9]/30 flex items-center justify-center flex-shrink-0">
+                  <Brain size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-bold text-[#1A1A1A]">Memory Match</h4>
-                    <span className="text-xs font-medium text-[#1565C0] bg-[#E3F2FD] px-2 py-0.5 rounded-full">
+                    <h4 className="text-lg font-bold text-[var(--color-text)]">Memory Match</h4>
+                    <span className="text-xs font-bold text-[#0EA5E9] bg-[#0EA5E9]/15 px-2 py-0.5 rounded-full border border-[#0EA5E9]/30">
                       Ready
                     </span>
                   </div>
-                  <p className="text-sm text-[#4A4A4A] mt-1 leading-relaxed">
+                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">
                     Find matching pairs of images. Tests your visual memory and recall ability.
                   </p>
-                  <div className="flex items-center gap-4 mt-3">
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                  <div className="flex items-center gap-2 mt-3">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--color-border)]">
                       5 Levels
                     </span>
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--color-border)]">
                       Pairs
                     </span>
                   </div>
@@ -183,36 +183,36 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-[#F57F17]" />
-                  <span className="text-xs text-[#4A4A4A]">Adaptive difficulty</span>
+                  <Sparkles size={14} className="text-[#F59E0B]" />
+                  <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-semibold text-[#1565C0]">Start Activity →</span>
+                <span className="text-sm font-bold text-[#0EA5E9]">Start Activity →</span>
               </div>
             </div>
           </Card>
 
-          {/* RECOGNISE Game - Fully Working */}
-          <Card onPress={() => setActiveGame('recognise-game')} className="overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors">
+          {/* RECOGNISE Game */}
+          <Card onPress={() => setActiveGame('recognise-game')} className="overflow-hidden cursor-pointer hover:border-[#E65100] transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FFF3E0] to-[#FFE0B2] flex items-center justify-center flex-shrink-0">
-                  <Eye size={32} className="text-[#E65100]" />
+                <div className="w-16 h-16 rounded-2xl bg-[#E65100]/15 text-[#E65100] border border-[#E65100]/30 flex items-center justify-center flex-shrink-0">
+                  <Eye size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-bold text-[#1A1A1A]">Recognise</h4>
-                    <span className="text-xs font-medium text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-full">
+                    <h4 className="text-lg font-bold text-[var(--color-text)]">Recognise</h4>
+                    <span className="text-xs font-bold text-[#E65100] bg-[#E65100]/15 px-2 py-0.5 rounded-full border border-[#E65100]/30">
                       Ready
                     </span>
                   </div>
-                  <p className="text-sm text-[#4A4A4A] mt-1 leading-relaxed">
+                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">
                     Find patterns, sequences, and what is different.
                   </p>
-                  <div className="flex items-center gap-4 mt-3">
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                  <div className="flex items-center gap-2 mt-3">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--color-border)]">
                       5 Levels
                     </span>
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--color-border)]">
                       3 Activity Types
                     </span>
                   </div>
@@ -221,35 +221,35 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Sparkles size={14} className="text-[#F57F17]" />
-                  <span className="text-xs text-[#4A4A4A]">Adaptive difficulty</span>
+                  <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-semibold text-[#E65100]">Start Activity →</span>
+                <span className="text-sm font-bold text-[#E65100]">Start Activity →</span>
               </div>
             </div>
           </Card>
 
           {/* DAILY ROUTINE Sequencing Game */}
-          <Card onPress={() => setActiveGame('daily-routine')} className="overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors">
+          <Card onPress={() => setActiveGame('daily-routine')} className="overflow-hidden cursor-pointer hover:border-[#10B981] transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0">
-                  <Sun size={32} className="text-[#1B5E20]" />
+                <div className="w-16 h-16 rounded-2xl bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 flex items-center justify-center flex-shrink-0">
+                  <Sun size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-bold text-[#1A1A1A]">Daily Routine</h4>
-                    <span className="text-xs font-medium text-[#1B5E20] bg-[#E8F5E9] px-2 py-0.5 rounded-full">
+                    <h4 className="text-lg font-bold text-[var(--color-text)]">Daily Routine</h4>
+                    <span className="text-xs font-bold text-[#10B981] bg-[#10B981]/15 px-2 py-0.5 rounded-full border border-[#10B981]/30">
                       New
                     </span>
                   </div>
-                  <p className="text-sm text-[#4A4A4A] mt-1 leading-relaxed">
+                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">
                     Order daily habits in sequence from morning to night.
                   </p>
-                  <div className="flex items-center gap-4 mt-3">
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                  <div className="flex items-center gap-2 mt-3">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--color-border)]">
                       5 Levels
                     </span>
-                    <span className="text-xs font-medium text-[#7A7A7A] bg-[#F5F0E8] px-2 py-1 rounded-full">
+                    <span className="text-xs font-semibold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--color-border)]">
                       Temporal Focus
                     </span>
                   </div>
@@ -258,9 +258,9 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Sparkles size={14} className="text-[#F57F17]" />
-                  <span className="text-xs text-[#4A4A4A]">Errorless learning</span>
+                  <span className="text-xs text-[var(--color-text-secondary)]">Errorless learning</span>
                 </div>
-                <span className="text-sm font-semibold text-[#1B5E20]">Start Activity →</span>
+                <span className="text-sm font-bold text-[#10B981]">Start Activity →</span>
               </div>
             </div>
           </Card>

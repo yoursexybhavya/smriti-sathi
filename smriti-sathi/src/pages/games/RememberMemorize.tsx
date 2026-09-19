@@ -28,37 +28,37 @@ export default function RememberMemorize({ objects, memorizeTime, onComplete }: 
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] flex flex-col">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col transition-colors duration-200">
       {/* Header */}
-      <div className="bg-white border-b border-[#E0D8CC] px-5 py-4">
-        <div className="max-w-lg mx-auto">
-          <div className="flex items-center justify-between mb-3">
+      <div className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4">
+        <div className="max-w-xl mx-auto">
+          <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Eye size={24} className="text-[#1B5E20]" />
-              <h2 className="text-xl font-bold text-[#1A1A1A]">Look Carefully</h2>
+              <Eye size={24} className="text-[#10B981]" />
+              <h2 className="text-xl font-bold text-[var(--color-text)]">Look Carefully</h2>
             </div>
-            <div className="text-2xl font-bold text-[#E65100]">
+            <div className="text-2xl font-bold text-[#E65100] bg-[#E65100]/15 px-3 py-0.5 rounded-full border border-[#E65100]/30">
               {timeLeft}s
             </div>
           </div>
-          <p className="text-base text-[#4A4A4A]">
-            Remember these objects
+          <p className="text-sm sm:text-base text-[var(--color-text-secondary)]">
+            Remember these familiar everyday objects
           </p>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-[#E0D8CC] h-2">
+      <div className="bg-[var(--color-border)] h-2">
         <div 
-          className="h-full bg-[#1B5E20] transition-all duration-1000 ease-linear"
+          className="h-full bg-[#10B981] transition-all duration-1000 ease-linear"
           style={{ width: `${(timeLeft / memorizeTime) * 100}%` }}
         />
       </div>
 
       {/* Objects Grid */}
-      <div className="flex-1 flex items-center justify-center px-5 py-8">
-        <div className="max-w-lg mx-auto w-full">
-          <div className={`grid ${getGridCols()} gap-4`}>
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8">
+        <div className="max-w-xl mx-auto w-full">
+          <div className={`grid ${getGridCols()} gap-4 sm:gap-6`}>
             {objects.map((obj) => (
               <ObjectCard key={obj.id} object={obj} />
             ))}
@@ -67,10 +67,10 @@ export default function RememberMemorize({ objects, memorizeTime, onComplete }: 
       </div>
 
       {/* Instruction */}
-      <div className="bg-white border-t border-[#E0D8CC] px-5 py-4">
-        <div className="max-w-lg mx-auto text-center">
-          <p className="text-base text-[#4A4A4A]">
-            Look at each object carefully
+      <div className="bg-[var(--color-card)] border-t border-[var(--color-border)] px-4 sm:px-6 py-4">
+        <div className="max-w-xl mx-auto text-center">
+          <p className="text-sm sm:text-base text-[var(--color-text-secondary)]">
+            Look at each object and notice its colors and shapes
           </p>
         </div>
       </div>
@@ -80,9 +80,11 @@ export default function RememberMemorize({ objects, memorizeTime, onComplete }: 
 
 function ObjectCard({ object }: { object: RememberObject }) {
   return (
-    <div className="bg-white rounded-2xl border-2 border-[#E0D8CC] p-6 flex flex-col items-center justify-center aspect-square shadow-sm">
-      <div className="mb-3 flex justify-center">{<img src={object.imageUrl} alt={object.name} className="w-24 h-24 object-contain" />}</div>
-      <p className="text-lg font-semibold text-[#1A1A1A] text-center">
+    <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-4 sm:p-6 flex flex-col items-center justify-center aspect-square shadow-sm transition-all">
+      <div className="mb-2.5 flex justify-center w-20 h-20 sm:w-28 sm:h-28 items-center bg-[var(--color-bg-subtle)] rounded-2xl p-2 border border-[var(--color-border)]/50">
+        <img src={object.imageUrl} alt={object.name} className="w-full h-full object-contain" />
+      </div>
+      <p className="text-base sm:text-lg font-bold text-[var(--color-text)] text-center truncate">
         {object.name}
       </p>
     </div>
