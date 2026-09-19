@@ -224,8 +224,8 @@ src/
 - Reminder adherence tracking
 - Daily activity visualization
 - Follow-up signal for significant changes
-- Demo data generation for SIH demonstrations
-- Reset demo data functionality
+- Local IndexedDB persistence with cloud synchronization
+- Patient telemetry and engagement reporting
 - Non-clinical, supportive language throughout
 
 ### Phase 7: Memory Book & Personal Memory Anchors ✅

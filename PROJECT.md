@@ -1,4 +1,4 @@
-# Project: SMRITI SATHI Flutter Prototype (SIH26003)
+# Project: SMRITI SATHI Cognitive Care Platform v2.2.0
 
 ## Architecture
 - **Framework**: Flutter 3.47.4 / Dart 3.13.3 (Android-first).
