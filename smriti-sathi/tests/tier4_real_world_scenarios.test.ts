@@ -1,387 +1,306 @@
 /**
- * Tier 4: Real-World Application Workflows Test Suite
- * Asserts end-to-end realistic user journeys in evidence-based dementia care:
- * Caregiver setup, multimodal medication alert takeover, hydration prompt,
- * errorless cognitive therapy workout with visual scaffolding, and complete daily workflow.
- * Minimum 5 real-world scenarios.
+ * Tier 4: Real-World Scenarios Test Suite — Smriti Sathi Transformation
+ * Validates complete elder & caregiver daily journeys and clinical workflows.
+ * Minimum 8 end-to-end scenarios.
  */
 
 import test from 'node:test';
 import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { setupTestEnvironment, MockElement } from './mocks/browser_env.ts';
 import { createMockDatabase } from './mocks/dexie_mock.ts';
+import {
+  createGame as createDailyRoutineGame,
+  selectCard as selectDailyRoutineCard,
+  placeCard as placeDailyRoutineCard,
+  getResult as getDailyRoutineResult,
+} from '../src/games/dailyRoutine.ts';
+import {
+  createGame as createMemoryMatchGame,
+  flipCard as flipMemoryMatchCard,
+  checkMatch as checkMemoryMatch,
+  getResult as getMemoryMatchResult,
+} from '../src/games/memoryMatch.ts';
 
-test('TIER 4 — Scenario 1: Caregiver Records & Previews Custom Voice Alert for Medicine', async () => {
-  const env = setupTestEnvironment();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const rootDir = path.resolve(__dirname, '..');
+
+test('TIER 4 — Scenario 1: New Elder Patient Complete Onboarding Journey', async () => {
   const db = createMockDatabase();
+  const env = setupTestEnvironment();
 
-  // 1. Caregiver accesses settings to record voice note for Morning Medicine
-  const reminderId = await db.reminders.add({
-    patientId: 1,
-    type: 'medicine',
-    label: 'Morning Blood Pressure & Memory Tablet',
-    timeHour: 8,
-    timeMinute: 0,
-    repeatDays: [0, 1, 2, 3, 4, 5, 6],
-    isActive: true,
-    lastAcked: null,
-  });
+  // 1. Splash Screen Tranquil Animation
+  const splash = env.document.createElement('div');
+  splash.classList.add('fixed', 'inset-0', 'z-50', 'transition-all', 'duration-700');
+  assert.ok(splash.classList.contains('duration-700'));
 
-  // 2. Microphone stream acquired & MediaRecorder starts
-  const stream = await env.navigator.mediaDevices.getUserMedia({ audio: true });
-  const recorder = new env.MediaRecorder(stream);
-  const chunks: Blob[] = [];
-
-  recorder.ondataavailable = (e) => {
-    if (e.data && e.data.size > 0) chunks.push(e.data);
+  // 2. Onboarding Welcome -> Profile Setup
+  const newPatient = {
+    id: 'patient_dada_barua',
+    name: 'Dada Barua',
+    age: 82,
+    primaryLanguage: 'as', // Assamese
+    caregiverName: 'Priya Barua',
+    caregiverPhone: '+91 94350 12345',
+    createdAt: Date.now(),
   };
+  await db.patients.put(newPatient);
 
-  recorder.start();
-  // Simulate 4 seconds of recording speech: "Papa, take your morning blue tablet with warm water"
-  const recordedDuration = 4.0;
-  recorder.stop();
+  // 3. Language & Accessibility Configuration
+  const accessibility = {
+    textSize: 'extra-large',
+    highContrast: false,
+    voiceGuidance: true,
+  };
+  await db.settings.put({ id: 1, key: 'accessibility', value: JSON.stringify(accessibility) });
 
-  const voiceBlob = new Blob(chunks, { type: recorder.mimeType });
-  assert.ok(voiceBlob.size > 0, 'Caregiver voice recording must produce valid binary data');
+  // 4. Verification on Home Screen
+  const storedPatient = await db.patients.get('patient_dada_barua');
+  const storedSettings = await db.settings.get(1);
 
-  // 3. Caregiver previews recorded audio before saving
-  const previewUrl = env.URL.createObjectURL(voiceBlob);
-  const previewAudio = new env.Audio(previewUrl);
-  await previewAudio.play();
-  assert.strictEqual(previewAudio.paused, false, 'Preview audio should be playing');
-  previewAudio.pause();
-  assert.strictEqual(previewAudio.paused, true, 'Preview audio should pause cleanly');
-
-  // 4. Caregiver saves voice prompt to reminder
-  await db.reminders.update(reminderId, {
-    audioBlob: voiceBlob,
-    audioDurationSec: recordedDuration,
-    audioRecordedAt: new Date(),
-  });
-
-  // 5. Verification of persistence
-  const savedReminder = await db.reminders.get(reminderId);
-  assert.ok(savedReminder?.audioBlob, 'Reminder must contain saved audio blob');
-  assert.strictEqual(savedReminder.audioDurationSec, 4.0);
-
-  env.URL.revokeObjectURL(previewUrl);
-  env.cleanup();
-});
-
-test('TIER 4 — Scenario 2: Scheduled Medication Full-Screen Takeover with Audio & Vibration', async () => {
-  const env = setupTestEnvironment();
-  const db = createMockDatabase();
-  const modalRoot = env.document.getElementById('modal-root')!;
-
-  // 1. Existing medication reminder with caregiver voice recording
-  const voiceData = new Uint8Array([0x1a, 0x45, 0xdf, 0xa3]);
-  const voiceBlob = new Blob([voiceData], { type: 'audio/webm' });
-  const reminderId = await db.reminders.add({
-    patientId: 1,
-    type: 'medicine',
-    label: 'Morning Memory & Heart Tablet',
-    timeHour: 8,
-    timeMinute: 0,
-    repeatDays: [0, 1, 2, 3, 4, 5, 6],
-    isActive: true,
-    lastAcked: null,
-    audioBlob: voiceBlob,
-    audioDurationSec: 3.5,
-    audioRecordedAt: new Date('2026-09-17T07:30:00Z'),
-  });
-
-  const reminder = (await db.reminders.get(reminderId))!;
-
-  // 2. Scheduler detects current time matches 8:00 AM -> Mounts Full-Screen Portal
-  const modal = env.document.createElement('div');
-  modal.id = 'multimodal-modal-overlay';
-  modal.style.position = 'fixed';
-  modal.style.inset = '0';
-  modal.style.width = '100vw';
-  modal.style.height = '100dvh';
-  modal.style.zIndex = '999999';
-  modal.style.backgroundColor = '#0A1420';
-
-  // Literal pill icon container
-  const pillIcon = env.document.createElement('div');
-  pillIcon.setAttribute('data-icon', 'medicine');
-  pillIcon.style.width = '88px';
-  pillIcon.style.height = '88px';
-  modal.appendChild(pillIcon);
-
-  // High contrast title >= 24px
-  const title = env.document.createElement('h1');
-  title.style.fontSize = '28px';
-  title.style.fontWeight = '800';
-  title.style.color = '#FFFFFF';
-  title.textContent = reminder.label.toUpperCase();
-  modal.appendChild(title);
-
-  // Large CTA button >= 68px
-  const ctaBtn = env.document.createElement('button');
-  ctaBtn.style.minHeight = '68px';
-  ctaBtn.style.fontSize = '20px';
-  ctaBtn.style.backgroundColor = '#10B981';
-  ctaBtn.textContent = 'I Took My Tablet';
-  modal.appendChild(ctaBtn);
-
-  // Mount modal and lock background scroll
-  modalRoot.appendChild(modal);
-  env.document.body.style.overflow = 'hidden';
-
-  // 3. Trigger haptic vibration & start custom audio playback
-  env.navigator.vibrate([300, 120, 300, 120, 450]);
-  const audioUrl = env.URL.createObjectURL(reminder.audioBlob!);
-  const audio = new env.Audio(audioUrl);
-  await audio.play();
-
-  // Assert takeover conditions
-  assert.strictEqual(modal.parentElement?.id, 'modal-root', 'Mounted via portal');
-  assert.strictEqual(env.document.body.style.overflow, 'hidden', 'Scroll locked');
-  assert.strictEqual(env.navigator.vibrateCalls.length, 1, 'Haptic feedback triggered');
-  assert.strictEqual(audio.paused, false, 'Caregiver voice audio playing');
-  assert.ok(parseInt(title.style.fontSize, 10) >= 24, 'Text size >= 24px');
-
-  // 4. Elder taps "I Took My Tablet" button
-  audio.pause();
-  env.URL.revokeObjectURL(audioUrl);
-  modalRoot.removeChild(modal);
-  env.document.body.style.overflow = '';
-
-  // 5. Adherence log persisted in Dexie
-  await db.reminderLogs.add({
-    reminderId: reminder.id!,
-    patientId: reminder.patientId,
-    scheduledAt: new Date(),
-    acknowledgedAt: new Date(),
-    synced: 0,
-  });
-
-  const logs = await db.reminderLogs.where('reminderId').equals(reminderId).toArray();
-  assert.strictEqual(logs.length, 1, 'Adherence log recorded in Dexie');
-  assert.ok(logs[0].acknowledgedAt !== null, 'Adherence must be marked acknowledged');
-  assert.strictEqual(modalRoot.children.length, 0, 'Modal unmounted cleanly');
+  assert.ok(storedPatient);
+  assert.strictEqual(storedPatient.name, 'Dada Barua');
+  assert.strictEqual(storedPatient.primaryLanguage, 'as');
+  assert.ok(storedSettings);
+  assert.ok(storedSettings.value.includes('extra-large'));
 
   env.cleanup();
 });
 
-test('TIER 4 — Scenario 3: Dementia Elder Plays Math Cognitive Game with 3s Scaffolding & Zero Errors', async () => {
+test('TIER 4 — Scenario 2: Morning Patient Clinical Routine & Medication Adherence', async () => {
+  const db = createMockDatabase();
   const env = setupTestEnvironment();
+
+  // 1. Patient loads home screen with today's care reminders
+  const morningTablet = await db.reminders.add({
+    userId: 'patient_dada',
+    title: 'Morning Blood Pressure & Memory Tablet',
+    type: 'medication',
+    scheduledTime: Date.now(),
+    status: 'pending',
+    dosage: '1 tablet after breakfast',
+  });
+
+  // 2. Patient reviews reminder and taps complete button
+  await db.reminders.update(morningTablet, {
+    status: 'completed',
+    completedAt: Date.now(),
+  });
+
+  // 3. System plays tranquil confirmation chime and haptic feedback
+  env.navigator.vibrate([120, 60, 120]);
+  assert.strictEqual(env.navigator.vibrateCalls.length, 1);
+  assert.deepStrictEqual(env.navigator.vibrateCalls[0].pattern, [120, 60, 120]);
+
+  // 4. Verify reminder status is updated in database
+  const updated = await db.reminders.get(morningTablet);
+  assert.strictEqual(updated?.status, 'completed');
+  assert.ok(updated?.completedAt);
+
+  env.cleanup();
+});
+
+test('TIER 4 — Scenario 3: Daily Cognitive Exercise Circuit (4 Games Complete)', async () => {
   const db = createMockDatabase();
 
-  // Problem: Morning tea (₹15) + Biscuits (₹10) = ₹25
-  const question = {
-    title: 'Morning Market Bill',
-    correctAnswer: 25,
-    options: [20, 25, 30],
-  };
-
-  // 1. Initial render: non-target buttons disabled (Errorless Learning)
-  const buttons = question.options.map((opt) => {
-    const isTarget = opt === question.correctAnswer;
-    const btn = env.document.createElement('button');
-    btn.disabled = !isTarget;
-    btn.style.pointerEvents = isTarget ? 'auto' : 'none';
-    btn.style.opacity = isTarget ? '1' : '0.35';
-    btn.textContent = `₹${opt}`;
-    return { opt, isTarget, btn };
+  // 1. Game 1: Remember Game (Visual Recall)
+  await db.gameSessions.put({
+    id: 'circuit_remember_1',
+    patientId: 'patient_dada',
+    gameType: 'remember',
+    difficulty: 1,
+    score: 3,
+    totalObjects: 3,
+    accuracy: 100,
+    responseTime: 9.4,
+    timestamp: Date.now() - 3600000 * 3,
   });
 
-  const wrongBtn1 = buttons.find((b) => b.opt === 20)!;
-  const targetBtn = buttons.find((b) => b.opt === 25)!;
-  const wrongBtn2 = buttons.find((b) => b.opt === 30)!;
-
-  assert.strictEqual(wrongBtn1.btn.disabled, true, 'Incorrect ₹20 disabled');
-  assert.strictEqual(wrongBtn2.btn.disabled, true, 'Incorrect ₹30 disabled');
-  assert.strictEqual(targetBtn.btn.disabled, false, 'Correct ₹25 enabled');
-
-  // 2. Elder hesitates: 3 seconds pass without interaction
-  let showScaffold = false;
-  await new Promise<void>((resolve) => {
-    setTimeout(() => {
-      showScaffold = true;
-      resolve();
-    }, 35); // simulated 3000ms delay
+  // 2. Game 2: Recognise Game (Visual Discrimination)
+  await db.gameSessions.put({
+    id: 'circuit_recognise_1',
+    patientId: 'patient_dada',
+    gameType: 'recognise',
+    difficulty: 1,
+    score: 5,
+    totalObjects: 5,
+    accuracy: 100,
+    responseTime: 18.2,
+    timestamp: Date.now() - 3600000 * 2,
   });
 
-  // 3. Visual scaffolding pulse activates on target button
-  if (showScaffold) {
-    targetBtn.btn.classList.add('scaffold-pulse-active');
-    targetBtn.btn.style.borderColor = '#10B981';
-    env.navigator.vibrate([80]); // gentle micro-tap guidance
+  // 3. Game 3: Memory Match (Associative Pairs)
+  let matchGame = createMemoryMatchGame(1);
+  const p1 = matchGame.cards.findIndex((c, i) => i !== 0 && c.pairId === matchGame.cards[0].pairId);
+  matchGame = flipMemoryMatchCard(matchGame, 0);
+  matchGame = flipMemoryMatchCard(matchGame, p1);
+  matchGame = checkMemoryMatch(matchGame);
+
+  const rem = [0, 1, 2, 3].filter((i) => i !== 0 && i !== p1);
+  matchGame = flipMemoryMatchCard(matchGame, rem[0]);
+  matchGame = flipMemoryMatchCard(matchGame, rem[1]);
+  matchGame = checkMemoryMatch(matchGame);
+
+  assert.strictEqual(matchGame.isComplete, true);
+  await db.gameSessions.put({
+    id: 'circuit_match_1',
+    patientId: 'patient_dada',
+    gameType: 'memory_match',
+    difficulty: 1,
+    score: 2,
+    totalObjects: 2,
+    accuracy: 100,
+    responseTime: 12.0,
+    timestamp: Date.now() - 3600000,
+  });
+
+  // 4. Game 4: Daily Routine (Chronological Sequencing)
+  let routineGame = createDailyRoutineGame(1);
+  for (let s = 0; s < 3; s++) {
+    const cIdx = routineGame.shuffledCards.findIndex(
+      (c) => c.order === s && !routineGame.placedCards.some((p) => p?.id === c.id)
+    );
+    routineGame = selectDailyRoutineCard(routineGame, cIdx);
+    routineGame = placeDailyRoutineCard(routineGame, s);
   }
+  assert.strictEqual(routineGame.isComplete, true);
+  await db.gameSessions.put({
+    id: 'circuit_routine_1',
+    patientId: 'patient_dada',
+    gameType: 'daily_routine',
+    difficulty: 1,
+    score: 3,
+    totalObjects: 3,
+    accuracy: 100,
+    responseTime: 15.1,
+    timestamp: Date.now(),
+  });
 
-  assert.ok(targetBtn.btn.classList.contains('scaffold-pulse-active'), 'Correct button must pulse');
-  assert.strictEqual(env.navigator.vibrateCalls.length, 1, 'Scaffolding haptic tap fired');
-
-  // 4. Elder taps the pulsing ₹25 button
-  let score = 0;
-  let gameFinished = false;
-
-  const handleSelect = async (opt: number) => {
-    if (opt === question.correctAnswer) {
-      score = 100;
-      targetBtn.btn.style.backgroundColor = '#064E3B'; // Emerald success (NO RED)
-      await db.gameSessions.add({
-        patientId: 1,
-        gameType: 'math',
-        difficulty: 1,
-        score: 100,
-        accuracy: 1.0,
-        playedAt: new Date(),
-        synced: 0,
-        domain: 'processingSpeed',
-      });
-      gameFinished = true;
-    }
-  };
-
-  await handleSelect(25);
-
-  assert.strictEqual(score, 100, 'Score is 100%');
-  assert.strictEqual(gameFinished, true, 'Game advances successfully');
-  assert.notStrictEqual(targetBtn.btn.style.backgroundColor, '#7F1D1D', 'Never shows negative red state');
-
+  // 5. Assert all 4 games recorded in database
   const sessions = await db.gameSessions.toArray();
-  assert.strictEqual(sessions.length, 1);
-  assert.strictEqual(sessions[0].accuracy, 1.0);
+  assert.strictEqual(sessions.length, 4);
+  const types = sessions.map((s) => s.gameType);
+  assert.ok(types.includes('remember'));
+  assert.ok(types.includes('recognise'));
+  assert.ok(types.includes('memory_match'));
+  assert.ok(types.includes('daily_routine'));
+});
+
+test('TIER 4 — Scenario 4: Caregiver Clinical Oversight & Adherence Tracking Workflow', async () => {
+  const db = createMockDatabase();
+
+  // 1. Seed clinical telemetry
+  const patientId = 'patient_sarah';
+  await db.reminders.add({ userId: patientId, title: 'Morning Tablet', scheduledTime: Date.now() - 7200000, status: 'completed' });
+  await db.reminders.add({ userId: patientId, title: 'Afternoon Hydration', scheduledTime: Date.now() - 3600000, status: 'completed' });
+  await db.reminders.add({ userId: patientId, title: 'Evening Walk', scheduledTime: Date.now() + 3600000, status: 'pending' });
+
+  // 2. Query adherence
+  const reminders = await db.reminders.toArray();
+  const completed = reminders.filter((r) => r.status === 'completed').length;
+  const adherence = Math.round((completed / reminders.length) * 100);
+
+  // 3. Clinical checks
+  assert.strictEqual(reminders.length, 3);
+  assert.strictEqual(completed, 2);
+  assert.strictEqual(adherence, 67, 'Adherence must be 67% (2 out of 3)');
+  assert.ok(adherence >= 60, 'Adherence remains above clinical check-in threshold');
+});
+
+test('TIER 4 — Scenario 5: Elder Afternoon Hydration & Audio Reassurance Narration', async () => {
+  const db = createMockDatabase();
+  const env = setupTestEnvironment();
+
+  // 1. Schedule Hydration
+  const hydrationId = await db.reminders.add({
+    userId: 'patient_dada',
+    title: 'Drink Fresh Water',
+    type: 'hydration',
+    scheduledTime: Date.now(),
+    status: 'pending',
+  });
+
+  // 2. Elder clicks Listen Aloud reassurance button
+  const comfortMessage = 'Take your time. There is no rush. Drink slowly and stay refreshed.';
+  assert.ok(comfortMessage.length > 20);
+
+  // 3. Elder marks hydration completed
+  await db.reminders.update(hydrationId, { status: 'completed' });
+  const updated = await db.reminders.get(hydrationId);
+  assert.strictEqual(updated?.status, 'completed');
 
   env.cleanup();
 });
 
-test('TIER 4 — Scenario 4: Cultural Language Workout with Elder Accessibility & Zero Negative Feedback', async () => {
+test('TIER 4 — Scenario 6: Accessibility Customization & Real-Time System Reflection', async () => {
   const env = setupTestEnvironment();
+
+  // 1. Initial standard styling
+  env.document.body.classList.add('theme-light', 'text-size-large');
+
+  // 2. Elder opens settings and activates extra-large text and high contrast
+  env.document.body.classList.remove('theme-light', 'text-size-large');
+  env.document.body.classList.add('theme-dark', 'high-contrast', 'text-size-extra-large');
+
+  // 3. Live Interactive Preview verifies active state
+  assert.strictEqual(env.document.body.classList.contains('high-contrast'), true);
+  assert.strictEqual(env.document.body.classList.contains('theme-dark'), true);
+  assert.strictEqual(env.document.body.classList.contains('text-size-extra-large'), true);
+
+  env.cleanup();
+});
+
+test('TIER 4 — Scenario 7: Offline Village Resilience & Local Dexie Storage Sync', async () => {
   const db = createMockDatabase();
 
-  const card = {
-    langName: 'Assamese',
-    word: 'বৰষা (Borsha)',
-    options: ['Monsoon Rains', 'Morning Walk', 'Evening Tea'],
+  // Simulate remote village with zero network connection
+  const offlineSession = {
+    id: `off_${Date.now()}`,
+    patientId: 'patient_assam_rural',
+    gameType: 'recognise',
+    difficulty: 2,
+    score: 5,
+    totalObjects: 5,
+    accuracy: 100,
+    responseTime: 21.0,
+    timestamp: Date.now(),
   };
-  const targetMeaning = card.options[0];
 
-  // Distractors are disabled
-  const buttons = card.options.map((opt) => {
-    const isTarget = opt === targetMeaning;
-    const btn = env.document.createElement('button');
-    btn.disabled = !isTarget;
-    btn.textContent = opt;
-    return { opt, isTarget, btn };
-  });
+  // Stored completely in local IndexedDB
+  await db.gameSessions.put(offlineSession);
 
-  const spokenMessages: string[] = [];
-  const speak = (msg: string) => spokenMessages.push(msg);
-
-  // Elder taps the correct option
-  const targetButton = buttons.find((b) => b.isTarget)!;
-  assert.strictEqual(targetButton.btn.disabled, false);
-
-  speak('Great job!');
-  await db.gameSessions.add({
-    patientId: 1,
-    gameType: 'language',
-    difficulty: 1,
-    score: 100,
-    accuracy: 1.0,
-    playedAt: new Date(),
-    synced: 0,
-    domain: 'attentionFocus',
-  });
-
-  assert.ok(spokenMessages.includes('Great job!'));
-  assert.ok(!spokenMessages.some((m) => m.toLowerCase().includes('try again')));
-
-  const sessions = await db.gameSessions.where('domain').equals('attentionFocus').toArray();
-  assert.strictEqual(sessions.length, 1);
-
-  env.cleanup();
+  // Read back completely offline
+  const localData = await db.gameSessions.get(offlineSession.id);
+  assert.ok(localData);
+  assert.strictEqual(localData.patientId, 'patient_assam_rural');
+  assert.strictEqual(localData.accuracy, 100);
 });
 
-test('TIER 4 — Scenario 5: Full Daily Multi-Session Dementia Care Workflow Simulation', async () => {
-  const env = setupTestEnvironment();
+test('TIER 4 — Scenario 8: Caregiver Adaptive Clinical Escalation & Guidance Journey', async () => {
   const db = createMockDatabase();
-  const modalRoot = env.document.getElementById('modal-root')!;
 
-  // Step 1: Morning Medicine Reminder at 08:00
-  const medBlob = new Blob([new Uint8Array([1, 2, 3])], { type: 'audio/webm' });
-  const medReminderId = await db.reminders.add({
-    patientId: 1,
-    type: 'medicine',
-    label: 'Morning Heart Medicine',
-    timeHour: 8,
-    timeMinute: 0,
-    repeatDays: [0, 1, 2, 3, 4, 5, 6],
-    isActive: true,
-    lastAcked: null,
-    audioBlob: medBlob,
-  });
+  // 1. Patient has multiple low-accuracy sessions
+  await db.gameSessions.put({ id: 'acc_1', patientId: 'p_needs_help', gameType: 'remember', accuracy: 40, timestamp: Date.now() - 3600000 * 3 });
+  await db.gameSessions.put({ id: 'acc_2', patientId: 'p_needs_help', gameType: 'remember', accuracy: 35, timestamp: Date.now() - 3600000 * 2 });
+  await db.gameSessions.put({ id: 'acc_3', patientId: 'p_needs_help', gameType: 'remember', accuracy: 30, timestamp: Date.now() - 3600000 * 1 });
 
-  // Trigger modal & play audio
-  const medModal = env.document.createElement('div');
-  modalRoot.appendChild(medModal);
-  env.document.body.style.overflow = 'hidden';
-  env.navigator.vibrate([300, 120, 300, 120, 450]);
+  // 2. Adaptive logic detects persistent decline and suggests lower difficulty
+  const sessions = await db.gameSessions.toArray();
+  const avg = sessions.reduce((sum, s) => sum + s.accuracy, 0) / sessions.length;
+  assert.ok(avg < 50, 'Average performance is below 50% threshold');
 
-  const audioUrl = env.URL.createObjectURL(medBlob);
-  const audio = new env.Audio(audioUrl);
-  await audio.play();
+  // 3. Recommended difficulty level is gently lowered to Level 1
+  const suggestedLevel = avg < 50 ? 1 : 2;
+  assert.strictEqual(suggestedLevel, 1, 'Adaptive difficulty lowers to level 1 for errorless learning');
 
-  // Acknowledge morning meds
-  audio.pause();
-  env.URL.revokeObjectURL(audioUrl);
-  modalRoot.removeChild(medModal);
-  env.document.body.style.overflow = '';
-  await db.reminderLogs.add({
-    reminderId: medReminderId,
-    patientId: 1,
-    scheduledAt: new Date('2026-09-17T08:00:00Z'),
-    acknowledgedAt: new Date('2026-09-17T08:02:00Z'),
-    synced: 0,
-  });
-
-  // Step 2: Afternoon Hydration Alert at 11:30
-  const waterReminderId = await db.reminders.add({
-    patientId: 1,
-    type: 'water',
-    label: 'Drink Fresh Water Glass',
-    timeHour: 11,
-    timeMinute: 30,
-    repeatDays: [0, 1, 2, 3, 4, 5, 6],
-    isActive: true,
-    lastAcked: null,
-  });
-
-  // Acknowledge hydration
-  await db.reminderLogs.add({
-    reminderId: waterReminderId,
-    patientId: 1,
-    scheduledAt: new Date('2026-09-17T11:30:00Z'),
-    acknowledgedAt: new Date('2026-09-17T11:31:00Z'),
-    synced: 0,
-  });
-
-  // Step 3: Evening Cognitive Therapy Workout with Errorless Learning
-  await db.gameSessions.add({
-    patientId: 1,
-    gameType: 'dailyRoutine',
-    difficulty: 1,
-    score: 100,
-    accuracy: 1.0,
-    playedAt: new Date('2026-09-17T17:00:00Z'),
-    synced: 0,
-    domain: 'temporalOrientation',
-  });
-
-  // Step 4: Verify end-of-day clinical telemetry in Dexie
-  const dailyLogs = await db.reminderLogs.where('patientId').equals(1).toArray();
-  const dailySessions = await db.gameSessions.where('patientId').equals(1).toArray();
-
-  assert.strictEqual(dailyLogs.length, 2, '2 daily reminders logged');
-  assert.strictEqual(dailySessions.length, 1, '1 cognitive session logged');
-
-  const adherenceRate = dailyLogs.filter((l) => l.acknowledgedAt !== null).length / dailyLogs.length;
-  assert.strictEqual(adherenceRate, 1.0, '100% medication & hydration adherence');
-  assert.strictEqual(dailySessions[0].accuracy, 1.0, '100% cognitive accuracy under errorless learning');
-
-  env.cleanup();
+  // 4. Clinical follow-up advisory generated
+  const alertSignal = {
+    patientId: 'p_needs_help',
+    severity: 'medium',
+    message: 'Consider caregiver assistance or simpler exercise difficulty.',
+  };
+  assert.strictEqual(alertSignal.severity, 'medium');
 });

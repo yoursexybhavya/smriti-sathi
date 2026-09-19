@@ -1,47 +1,52 @@
 /* ==========================================================================
-   Smriti Sathi — Lumosity-Grade Design System
-   Inspired by award-winning cognitive training UI (Lumosity / Smriti Sathi Design System)
+   Smriti Sathi — Modern Scandinavian Clarity Design System
    Adapted for elderly cognitive care with high contrast & accessibility
    ========================================================================== */
 
-/* Typography fallback to system sans-serif if offline */
-
 :root {
-  /* Lumosity Dark Palette */
-  --color-bg: #0A1420;             /* Deepest midnight navy */
-  --color-bg-subtle: #0E1C2D;      /* Subtle dark elevation */
-  --color-card: #15253B;           /* Primary card background */
-  --color-card-hover: #1C314E;     /* Card hover / active */
-  --color-card-subtle: #101F33;    /* Secondary container */
-  --color-border: #223752;         /* Crisp card border */
-  --color-border-subtle: #192C44;
-  --color-border-focus: #FF7247;
+  /* Modern Scandinavian Light Palette (Default) */
+  --color-bg: #F8FAFC;             /* Clean soft neutral canvas (slate-50) */
+  --color-background: #F8FAFC;
+  --color-bg-subtle: #F1F5F9;      /* Subtle slate light (slate-100) */
+  --color-surface: #FFFFFF;        /* Pure white card surface */
+  --color-surface-warm: #F8FAFC;
+  --color-surface-card: #FFFFFF;
+  --color-card: #FFFFFF;
+  --color-card-hover: #F8FAFC;
+  --color-card-subtle: #F1F5F9;
+  --color-border: #E2E8F0;         /* Slate-200 hairline border */
+  --color-border-subtle: #E2E8F0;
+  --color-border-focus: #4F46E5;
 
   /* Typography Colors */
-  --color-text: #FFFFFF;
-  --color-text-secondary: #94A9C4;
-  --color-text-muted: #647B99;
-  --color-text-inverse: #0A1420;
+  --color-text: #0F172A;           /* High contrast deep slate (slate-900) */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #334155; /* Slate-700 */
+  --color-text-muted: #64748B;     /* Slate-500 */
+  --color-text-inverse: #FFFFFF;
 
-  /* Lumosity Vibrant Accents */
-  --color-primary: #FF7247;        /* Lumosity warm coral/orange */
-  --color-primary-hover: #FF855F;
-  --color-primary-glow: rgba(255, 114, 71, 0.35);
+  /* Brand Accents */
+  --color-primary: #4F46E5;        /* Crisp modern indigo */
+  --color-primary-hover: #4338CA;  /* Indigo-700 */
+  --color-primary-glow: rgba(79, 70, 229, 0.2);
 
-  --color-accent-teal: #10B981;    /* Emerald / health green */
-  --color-accent-blue: #0EA5E9;    /* Speed / memory cyan */
-  --color-accent-purple: #A855F7;  /* Flexibility / reasoning */
-  --color-accent-amber: #F59E0B;   /* Attention amber */
-  --color-accent-rose: #EC4899;    /* Language / math pink */
+  --color-accent: #3B82F6;         /* Cobalt blue */
+  --color-accent-teal: #10B981;    /* Emerald */
+  --color-accent-blue: #3B82F6;    /* Cobalt */
+  --color-accent-purple: #8B5CF6;  /* Purple */
+  --color-accent-amber: #F59E0B;   /* Amber */
+  --color-accent-rose: #F43F5E;    /* Rose */
 
   /* Status Colors */
-  --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.15);
-  --color-warning: #F59E0B;
-  --color-warning-bg: rgba(245, 158, 11, 0.15);
+  --color-success: #10B981;        /* Emerald */
+  --color-success-bg: rgba(16, 185, 129, 0.12);
+  --color-warning: #F59E0B;        /* Amber */
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-error: #EF4444;          /* Red/Rose */
+  --color-error-bg: rgba(239, 68, 68, 0.12);
 
   /* Typography */
-  --font-family: 'Plus Jakarta Sans', 'Noto Sans Bengali', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-size-xs: 13px;
   --font-size-sm: 15px;
   --font-size-base: 18px;
@@ -61,20 +66,22 @@
   --space-xl: 28px;
   --space-2xl: 36px;
 
-  /* Geometry */
+  /* Geometry & Tactile Standards */
   --radius-sm: 12px;
   --radius-md: 16px;
-  --radius-lg: 22px;
+  --radius-lg: 20px;
   --radius-xl: 28px;
   --radius-pill: 9999px;
 
   --touch-min: 56px;
+  --touch-target-min: 56px;
+  --touch-target-large: 64px;
   --max-width: 640px;
 
   /* Elevation */
-  --shadow-card: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 24px rgba(255, 114, 71, 0.25);
-  --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.06);
+  --shadow-glow: 0 0 24px rgba(79, 70, 229, 0.2);
+  --shadow-nav: 0 -4px 16px rgba(15, 23, 42, 0.04);
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -82,7 +89,7 @@
 }
 
 /* ==========================================================================
-   Explicit Light Theme (Crisp, high-contrast, elder-accessible daylight palette)
+   Explicit Light Theme (Crisp, high-contrast, Scandinavian daylight canvas)
    ========================================================================== */
 html.theme-light,
 body.theme-light {
@@ -95,9 +102,9 @@ body.theme-light {
   --color-card: #FFFFFF;           /* Pure white cards */
   --color-card-hover: #F8FAFC;     /* Light hover */
   --color-card-subtle: #F1F5F9;    /* Light secondary container */
-  --color-border: #E2E8F0;         /* Clear light border */
-  --color-border-subtle: #CBD5E1;
-  --color-border-focus: #1B5E20;
+  --color-border: #E2E8F0;         /* Clear light border (slate-200) */
+  --color-border-subtle: #E2E8F0;
+  --color-border-focus: #4F46E5;
 
   --color-text: #0F172A;           /* High contrast deep slate */
   --color-text-primary: #0F172A;
@@ -105,106 +112,82 @@ body.theme-light {
   --color-text-muted: #64748B;     /* Muted metadata */
   --color-text-inverse: #FFFFFF;
 
-  --color-primary: #1B5E20;        /* Deep healthcare forest green */
-  --color-primary-hover: #2E7D32;
-  --color-primary-glow: rgba(27, 94, 32, 0.2);
+  --color-primary: #4F46E5;        /* Crisp modern indigo */
+  --color-primary-hover: #4338CA;
+  --color-primary-glow: rgba(79, 70, 229, 0.2);
+  --color-accent: #3B82F6;         /* Cobalt blue */
 
-  --color-accent-teal: #059669;
-  --color-accent-blue: #0284C7;
-  --color-accent-purple: #7C3AED;
-  --color-accent-amber: #D97706;
-  --color-accent-rose: #DB2777;
+  --color-accent-teal: #10B981;
+  --color-accent-blue: #3B82F6;
+  --color-accent-purple: #8B5CF6;
+  --color-accent-amber: #F59E0B;
+  --color-accent-rose: #F43F5E;
 
-  --color-success: #059669;
-  --color-success-bg: rgba(5, 150, 105, 0.12);
-  --color-warning: #D97706;
-  --color-warning-bg: rgba(217, 119, 6, 0.12);
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.12);
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-error: #EF4444;
+  --color-error-bg: rgba(239, 68, 68, 0.12);
 
-  --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.08);
-  --shadow-glow: 0 0 20px rgba(27, 94, 32, 0.15);
-  --shadow-nav: 0 -4px 16px rgba(15, 23, 42, 0.06);
+  --shadow-card: 0 4px 16px -2px rgba(15, 23, 42, 0.06);
+  --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.15);
+  --shadow-nav: 0 -4px 16px rgba(15, 23, 42, 0.04);
 
   background-color: var(--color-bg) !important;
   color: var(--color-text) !important;
 }
 
 /* ==========================================================================
-   Explicit Dark Theme (Midnight navy, luminous borders, zero eye strain)
+   Explicit Dark Theme (Deep Scandinavian slate, luminous accents, zero eye strain)
    ========================================================================== */
+html.dark,
 html.theme-dark,
+body.dark,
 body.theme-dark {
-  --color-bg: #0A1420;             /* Deepest midnight navy */
-  --color-background: #0A1420;
-  --color-bg-subtle: #0E1C2D;      /* Subtle dark elevation */
-  --color-surface: #15253B;
-  --color-surface-warm: #0E1C2D;
-  --color-surface-card: #15253B;
-  --color-card: #15253B;           /* Primary card background */
-  --color-card-hover: #1C314E;     /* Card hover / active */
-  --color-card-subtle: #101F33;    /* Secondary container */
-  --color-border: #223752;         /* Crisp card border */
-  --color-border-subtle: #192C44;
-  --color-border-focus: #10B981;
+  --color-bg: #0B0F17;             /* Ultra-deep modern slate canvas */
+  --color-background: #0B0F17;
+  --color-bg-subtle: #111827;      /* Subtle dark elevation */
+  --color-surface: #1E293B;        /* Slate-800 card */
+  --color-surface-warm: #1E293B;
+  --color-surface-card: #1E293B;
+  --color-card: #1E293B;           /* Primary card background */
+  --color-card-hover: #334155;     /* Card hover / active */
+  --color-card-subtle: #141E30;    /* Secondary container */
+  --color-border: #334155;         /* Crisp card border (slate-800 / slate-700) */
+  --color-border-subtle: #1E293B;
+  --color-border-focus: #6366F1;
 
-  --color-text: #FFFFFF;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #94A9C4;
-  --color-text-muted: #647B99;
-  --color-text-inverse: #0A1420;
+  --color-text: #F8FAFC;           /* High contrast slate-50 */
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #CBD5E1; /* Slate-300 */
+  --color-text-muted: #94A3B8;     /* Slate-400 */
+  --color-text-inverse: #0B0F17;
 
-  --color-primary: #10B981;
-  --color-primary-hover: #34D399;
-  --color-primary-glow: rgba(16, 185, 129, 0.35);
+  --color-primary: #6366F1;        /* Luminous indigo */
+  --color-primary-hover: #4F46E5;
+  --color-primary-glow: rgba(99, 102, 241, 0.25);
+  --color-accent: #3B82F6;         /* Cobalt blue */
 
   --color-accent-teal: #10B981;
-  --color-accent-blue: #0EA5E9;
+  --color-accent-blue: #38BDF8;
   --color-accent-purple: #A855F7;
   --color-accent-amber: #F59E0B;
-  --color-accent-rose: #EC4899;
+  --color-accent-rose: #FB7185;
 
   --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-success-bg: rgba(16, 185, 129, 0.2);
   --color-warning: #F59E0B;
-  --color-warning-bg: rgba(245, 158, 11, 0.15);
+  --color-warning-bg: rgba(245, 158, 11, 0.2);
+  --color-error: #F87171;
+  --color-error-bg: rgba(239, 68, 68, 0.2);
 
   --shadow-card: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 24px rgba(16, 185, 129, 0.25);
+  --shadow-glow: 0 0 24px rgba(99, 102, 241, 0.25);
   --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.6);
 
   background-color: var(--color-bg) !important;
   color: var(--color-text) !important;
-}
-
-/* Automatic Dark Mode Overrides for Legacy Classes */
-body.theme-dark .bg-white {
-  background-color: var(--color-card) !important;
-  color: var(--color-text) !important;
-}
-
-body.theme-dark .bg-\[\#F5F0E8\],
-body.theme-dark .bg-\[\#FDF8F0\],
-body.theme-dark .bg-\[\#FFF8F0\],
-body.theme-dark .bg-\[\#FAF6F0\] {
-  background-color: var(--color-bg) !important;
-  color: var(--color-text) !important;
-}
-
-body.theme-dark .text-\[\#1A1A1A\],
-body.theme-dark .text-\[\#1B1B1B\],
-body.theme-dark .text-\[\#2D3748\] {
-  color: var(--color-text) !important;
-}
-
-body.theme-dark .text-\[\#4A4A4A\],
-body.theme-dark .text-\[\#5C5C5C\],
-body.theme-dark .text-\[\#7A7A7A\] {
-  color: var(--color-text-secondary) !important;
-}
-
-body.theme-dark .border-\[\#E0D8CC\],
-body.theme-dark .border-\[\#E2E8F0\],
-body.theme-dark .border-\[\#D4C5B0\] {
-  border-color: var(--color-border) !important;
 }
 
 @media (min-width: 768px) {
@@ -249,8 +232,7 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at 50% 0%, #15273F 0%, #0A1420 55%);
-  background-attachment: fixed;
+  background-color: var(--color-bg);
 }
 
 /* Focus styles */
@@ -322,27 +304,27 @@ body {
 }
 
 .pill-memory {
-  background: rgba(14, 165, 233, 0.15);
-  color: #38BDF8;
-  border: 1px solid rgba(14, 165, 233, 0.3);
+  background: rgba(59, 130, 246, 0.15);
+  color: #3B82F6;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
 .pill-routine {
   background: rgba(16, 185, 129, 0.15);
-  color: #34D399;
+  color: #10B981;
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .pill-health {
   background: rgba(245, 158, 11, 0.15);
-  color: #FBBF24;
+  color: #F59E0B;
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .pill-reasoning {
-  background: rgba(168, 85, 247, 0.15);
-  color: #C084FC;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: rgba(139, 92, 246, 0.15);
+  color: #8B5CF6;
+  border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 /* Card Styles */
@@ -358,7 +340,7 @@ body {
   transform: scale(0.985);
 }
 
-/* Primary CTA Button (Lumosity Start style) */
+/* Primary CTA Button */
 .btn-primary-lumos {
   background: var(--color-primary);
   color: #FFFFFF;
@@ -383,7 +365,7 @@ body {
 .btn-primary-lumos:hover {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 0 32px rgba(255, 114, 71, 0.45);
+  box-shadow: 0 0 32px rgba(79, 70, 229, 0.35);
 }
 
 .btn-primary-lumos:active {
@@ -399,7 +381,7 @@ body {
   font-size: var(--font-size-base);
   font-weight: 600;
   padding: 14px 24px;
-  min-height: 52px;
+  min-height: 56px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -525,4 +507,3 @@ body {
     border-color: #10B981 !important;
   }
 }
-

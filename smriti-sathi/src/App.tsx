@@ -268,7 +268,7 @@ function AppContent() {
   };
 
   // Bottom nav visibility based on role
-  const patientNavTabs = ['home', 'games', 'reminders', 'progress'];
+  const patientNavTabs = ['home', 'games', 'reminders', 'progress', 'settings'];
   const caregiverNavTabs = ['caregiver-home', 'caregiver-reminders', 'caregiver-memory', 'caregiver-settings'];
   
   const currentNavTabs = role === UserRole.PATIENT ? patientNavTabs : caregiverNavTabs;

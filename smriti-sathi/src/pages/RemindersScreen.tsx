@@ -165,26 +165,26 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
   const getReminderIcon = (reminderType: Reminder['type']) => {
     switch (reminderType) {
       case 'medicine':
-        return <Pill size={20} className="text-[#7B1FA2]" />;
+        return <Pill size={20} className="text-[var(--color-accent-purple)]" />;
       case 'hydration':
-        return <Pill size={20} className="text-[#1565C0]" />;
+        return <Pill size={20} className="text-[var(--color-accent-blue)]" />;
       case 'activity':
-        return <Calendar size={20} className="text-[#2E7D32]" />;
+        return <Calendar size={20} className="text-[var(--color-success)]" />;
       case 'appointment':
-        return <Calendar size={20} className="text-[#E65100]" />;
+        return <Calendar size={20} className="text-[var(--color-accent-amber)]" />;
     }
   };
 
   const getReminderBgColor = (reminderType: Reminder['type']) => {
     switch (reminderType) {
       case 'medicine':
-        return 'bg-[#F3E5F5]';
+        return 'bg-[var(--color-accent-purple)/15]';
       case 'hydration':
-        return 'bg-[#E3F2FD]';
+        return 'bg-[var(--color-accent-blue)/15]';
       case 'activity':
-        return 'bg-[#E8F5E9]';
+        return 'bg-[var(--color-success-bg)]';
       case 'appointment':
-        return 'bg-[#FFF3E0]';
+        return 'bg-[var(--color-warning-bg)]';
     }
   };
 
@@ -230,25 +230,25 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
         {/* Create/Edit Form */}
         {showCreateForm && (
           <Card className="p-5 space-y-4">
-            <h3 className="text-lg font-semibold text-[#1A1A1A]">
+            <h3 className="text-lg font-semibold text-[var(--color-text)]">
               {editingReminder ? 'Edit Reminder' : 'Create Reminder'}
             </h3>
 
             {/* Title */}
             <div>
-              <label className="block text-sm font-medium text-[#4A4A4A] mb-2">Title</label>
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Title</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Morning Medicine"
-                className="w-full px-4 py-3 border border-[#E0D8CC] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#1B5E20]"
+                className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
               />
             </div>
 
             {/* Type */}
             <div>
-              <label className="block text-sm font-medium text-[#4A4A4A] mb-2">Type</label>
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Type</label>
               <div className="grid grid-cols-2 gap-2">
                 {(['medicine', 'hydration', 'activity', 'appointment'] as const).map((t) => (
                   <button
@@ -256,8 +256,8 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                     onClick={() => setType(t)}
                     className={`p-3 rounded-xl border-2 transition-all ${
                       type === t
-                        ? 'border-[#1B5E20] bg-[#E8F5E9]'
-                        : 'border-[#E0D8CC] bg-white'
+                        ? 'border-[var(--color-success)] bg-[var(--color-success-bg)]'
+                        : 'border-[var(--color-border)] bg-[var(--color-card)]'
                     }`}
                   >
                     <span className="text-sm font-medium capitalize">{t}</span>
@@ -268,12 +268,12 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
 
             {/* Time */}
             <div>
-              <label className="block text-sm font-medium text-[#4A4A4A] mb-2">Time</label>
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Time</label>
               <div className="flex gap-2">
                 <select
                   value={hour}
                   onChange={(e) => setHour(parseInt(e.target.value))}
-                  className="flex-1 px-4 py-3 border border-[#E0D8CC] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#1B5E20]"
+                  className="flex-1 px-4 py-3 border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
                 >
                   {Array.from({ length: 24 }, (_, i) => (
                     <option key={i} value={i}>
@@ -284,7 +284,7 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                 <select
                   value={minute}
                   onChange={(e) => setMinute(parseInt(e.target.value))}
-                  className="flex-1 px-4 py-3 border border-[#E0D8CC] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#1B5E20]"
+                  className="flex-1 px-4 py-3 border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
                 >
                   {Array.from({ length: 60 }, (_, i) => (
                     <option key={i} value={i}>
@@ -297,7 +297,7 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
 
             {/* Repeat Pattern */}
             <div>
-              <label className="block text-sm font-medium text-[#4A4A4A] mb-2">Repeat</label>
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Repeat</label>
               <div className="flex gap-2">
                 {(['none', 'daily', 'weekly'] as const).map((pattern) => (
                   <button
@@ -305,8 +305,8 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                     onClick={() => setRepeatPattern(pattern)}
                     className={`flex-1 p-3 rounded-xl border-2 transition-all ${
                       repeatPattern === pattern
-                        ? 'border-[#1B5E20] bg-[#E8F5E9]'
-                        : 'border-[#E0D8CC] bg-white'
+                        ? 'border-[var(--color-success)] bg-[var(--color-success-bg)]'
+                        : 'border-[var(--color-border)] bg-[var(--color-card)]'
                     }`}
                   >
                     <span className="text-sm font-medium capitalize">
@@ -319,13 +319,13 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-[#4A4A4A] mb-2">Description (optional)</label>
+              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Description (optional)</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Add notes..."
                 rows={2}
-                className="w-full px-4 py-3 border border-[#E0D8CC] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[#1B5E20]"
+                className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
               />
             </div>
 
@@ -333,14 +333,14 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
             <div className="flex gap-2">
               <button
                 onClick={resetForm}
-                className="flex-1 py-3 px-4 border border-[#E0D8CC] rounded-xl text-base font-medium text-[#4A4A4A] hover:bg-[#F5F0E8]"
+                className="flex-1 py-3 px-4 border border-[var(--color-border)] rounded-xl text-base font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)]"
               >
                 Cancel
               </button>
               <button
                 onClick={editingReminder ? handleUpdate : handleCreate}
                 disabled={!title.trim()}
-                className="flex-1 py-3 px-4 bg-[#1B5E20] text-white rounded-xl text-base font-medium hover:bg-[#0D3B12] disabled:opacity-50"
+                className="flex-1 py-3 px-4 bg-[var(--color-success)] text-white rounded-xl text-base font-medium hover:bg-[var(--color-success)]/90 disabled:opacity-50"
               >
                 {editingReminder ? 'Update' : 'Create'}
               </button>
@@ -351,7 +351,7 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
         {/* Today's Reminders */}
         {todayReminders.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-[#1A1A1A] px-1">Today</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-text)] px-1">Today</h3>
             {todayReminders.map((reminder) => (
               <Card key={reminder.id} className="p-4">
                 <div className="flex items-start gap-3">
@@ -359,51 +359,51 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                     {getReminderIcon(reminder.type)}
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-base font-semibold text-[#1A1A1A]">{reminder.title}</h4>
+                    <h4 className="text-base font-semibold text-[var(--color-text)]">{reminder.title}</h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <Clock size={13} className="text-[#7A7A7A]" />
-                      <span className="text-sm text-[#4A4A4A]">{formatTime(reminder.scheduledTime)}</span>
+                      <Clock size={13} className="text-[var(--color-text-muted)]" />
+                      <span className="text-sm text-[var(--color-text-secondary)]">{formatTime(reminder.scheduledTime)}</span>
                       {reminder.repeatPattern && reminder.repeatPattern !== 'none' && (
-                        <span className="text-xs text-[#7A7A7A] bg-[#F5F0E8] px-2 py-0.5 rounded">
+                        <span className="text-xs text-[var(--color-text-muted)] bg-[var(--color-bg-subtle)] px-2 py-0.5 rounded">
                           {reminder.repeatPattern}
                         </span>
                       )}
                     </div>
                     {reminder.description && (
-                      <p className="text-xs text-[#7A7A7A] mt-1">{reminder.description}</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mt-1">{reminder.description}</p>
                     )}
                     {reminder.status === 'pending' && (
                       <div className="flex gap-2 mt-3">
                         <button
                           onClick={() => handleComplete(reminder.id!)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-[#2E7D32] text-white rounded-lg text-xs font-medium hover:bg-[#1B5E20]"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-[var(--color-success)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-success)]/90"
                         >
                           <Check size={14} />
                           Complete
                         </button>
                         <button
                           onClick={() => handleSnooze(reminder.id!)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-[#F57F17] text-white rounded-lg text-xs font-medium hover:bg-[#E65100]"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-[var(--color-accent-amber)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-warning)]"
                         >
                           <Clock size={14} />
                           Snooze
                         </button>
                         <button
                           onClick={() => startEdit(reminder)}
-                          className="p-1.5 text-[#4A4A4A] hover:bg-[#F5F0E8] rounded-lg"
+                          className="p-1.5 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] rounded-lg"
                         >
                           <Edit2 size={14} />
                         </button>
                         <button
                           onClick={() => handleDelete(reminder.id!)}
-                          className="p-1.5 text-[#C62828] hover:bg-[#FFEBEE] rounded-lg"
+                          className="p-1.5 text-[var(--color-error)] hover:bg-[var(--color-error-bg)] rounded-lg"
                         >
                           <Trash2 size={14} />
                         </button>
                       </div>
                     )}
                     {reminder.status === 'completed' && (
-                      <div className="mt-2 flex items-center gap-1 text-[#2E7D32] text-xs font-medium">
+                      <div className="mt-2 flex items-center gap-1 text-[var(--color-success)] text-xs font-medium">
                         <Check size={14} />
                         Completed
                       </div>
@@ -418,7 +418,7 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
         {/* Upcoming Reminders */}
         {upcomingReminders.length > 0 && (
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-[#1A1A1A] px-1">Upcoming</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-text)] px-1">Upcoming</h3>
             {upcomingReminders.map((reminder) => (
               <Card key={reminder.id} className="p-4">
                 <div className="flex items-start gap-3">
@@ -426,13 +426,13 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                     {getReminderIcon(reminder.type)}
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-base font-semibold text-[#1A1A1A]">{reminder.title}</h4>
+                    <h4 className="text-base font-semibold text-[var(--color-text)]">{reminder.title}</h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <Calendar size={13} className="text-[#7A7A7A]" />
-                      <span className="text-sm text-[#4A4A4A]">{formatDate(reminder.scheduledTime)}</span>
+                      <Calendar size={13} className="text-[var(--color-text-muted)]" />
+                      <span className="text-sm text-[var(--color-text-secondary)]">{formatDate(reminder.scheduledTime)}</span>
                     </div>
                     {reminder.description && (
-                      <p className="text-xs text-[#7A7A7A] mt-1">{reminder.description}</p>
+                      <p className="text-xs text-[var(--color-text-muted)] mt-1">{reminder.description}</p>
                     )}
                   </div>
                 </div>
@@ -444,16 +444,16 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
         {/* Empty State */}
         {!loading && reminders.length === 0 && !showCreateForm && (
           <div className="text-center py-12">
-            <Bell size={48} className="text-[#C0B8A8] mx-auto mb-4" />
-            <p className="text-[#7A7A7A] text-base">No reminders yet</p>
-            <p className="text-[#7A7A7A] text-sm mt-1">Tap "Add New Reminder" to get started</p>
+            <Bell size={48} className="text-[var(--color-border)] mx-auto mb-4" />
+            <p className="text-[var(--color-text-muted)] text-base">No reminders yet</p>
+            <p className="text-[var(--color-text-muted)] text-sm mt-1">Tap "Add New Reminder" to get started</p>
           </div>
         )}
 
         {/* Offline Notice */}
-        <div className="flex items-start gap-3 p-4 bg-[#EFEBE9] rounded-2xl border border-[#D7CCC8]">
-          <Bell size={18} className="text-[#5D4037] mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-[#5D4037] leading-relaxed">
+        <div className="flex items-start gap-3 p-4 bg-[var(--color-bg-subtle)] rounded-2xl border border-[var(--color-border)]">
+          <Bell size={18} className="text-[var(--color-text-secondary)] mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
             Reminders work offline. They'll sync when you're back online.
           </p>
         </div>

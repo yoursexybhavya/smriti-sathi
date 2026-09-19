@@ -87,9 +87,9 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         {/* Interactive Info Banner */}
-        <div className="flex items-center justify-between gap-3 p-4 bg-[var(--color-card)] rounded-2xl border border-[#0EA5E9]/30 shadow-sm">
+        <div className="flex items-center justify-between gap-3 p-4 bg-[var(--color-card)] rounded-2xl border border-[var(--color-accent-blue)]/30 shadow-sm">
           <div className="flex items-start gap-3 min-w-0">
-            <Info size={20} className="text-[#0EA5E9] mt-0.5 flex-shrink-0" />
+            <Info size={20} className="text-[var(--color-accent-blue)] mt-0.5 flex-shrink-0" />
             <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
               Gentle cognitive exercises designed for elder engagement and enjoyment. Difficulty automatically adapts to your comfort.
             </p>
@@ -104,7 +104,7 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
                 window.speechSynthesis.speak(u);
               }
             }}
-            className="flex-shrink-0 p-2.5 rounded-xl bg-[var(--color-bg-subtle)] text-[#0EA5E9] hover:bg-[#0EA5E9]/10 transition-colors border border-[var(--color-border-subtle)]"
+            className="flex-shrink-0 p-2.5 rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-accent-blue)] hover:bg-[var(--color-accent-blue)]/10 transition-colors border border-[var(--color-border-subtle)]"
             title="Listen to guidance"
             aria-label="Listen to guidance"
           >
@@ -118,16 +118,16 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
           <h3 className="text-lg font-bold text-[var(--color-text)] px-1 md:col-span-2">Available Games</h3>
           
           {/* REMEMBER Game - Fully Working */}
-          <Card onPress={() => setActiveGame('remember-game')} className="overflow-hidden cursor-pointer hover:border-[#10B981] transition-all active:scale-98">
+          <Card onPress={() => setActiveGame('remember-game')} className="overflow-hidden cursor-pointer hover:border-[var(--color-success)] transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--color-success)]/15 text-[var(--color-success)] border border-[var(--color-success)]/30 flex items-center justify-center flex-shrink-0">
                   <Eye size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-lg font-bold text-[var(--color-text)]">Remember</h4>
-                    <span className="text-xs font-bold text-[#10B981] bg-[#10B981]/15 px-2 py-0.5 rounded-full border border-[#10B981]/30">
+                    <span className="text-xs font-bold text-[var(--color-success)] bg-[var(--color-success)]/15 px-2 py-0.5 rounded-full border border-[var(--color-success)]/30">
                       Ready
                     </span>
                   </div>
@@ -146,25 +146,25 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-[#F59E0B]" />
+                  <Sparkles size={14} className="text-[var(--color-accent-amber)]" />
                   <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-bold text-[#10B981]">Start Activity →</span>
+                <span className="text-sm font-bold text-[var(--color-success)]">Start Activity →</span>
               </div>
             </div>
           </Card>
 
           {/* Memory Match Game */}
-          <Card onPress={() => setActiveGame('memory-match')} className="overflow-hidden cursor-pointer hover:border-[#0EA5E9] transition-all active:scale-98">
+          <Card onPress={() => setActiveGame('memory-match')} className="overflow-hidden cursor-pointer hover:border-[var(--color-accent-blue)] transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-[#0EA5E9]/15 text-[#0EA5E9] border border-[#0EA5E9]/30 flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent-blue)]/15 text-[var(--color-accent-blue)] border border-[var(--color-accent-blue)]/30 flex items-center justify-center flex-shrink-0">
                   <Brain size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-lg font-bold text-[var(--color-text)]">Memory Match</h4>
-                    <span className="text-xs font-bold text-[#0EA5E9] bg-[#0EA5E9]/15 px-2 py-0.5 rounded-full border border-[#0EA5E9]/30">
+                    <span className="text-xs font-bold text-[var(--color-accent-blue)] bg-[var(--color-accent-blue)]/15 px-2 py-0.5 rounded-full border border-[var(--color-accent-blue)]/30">
                       Ready
                     </span>
                   </div>
@@ -183,25 +183,25 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-[#F59E0B]" />
+                  <Sparkles size={14} className="text-[var(--color-accent-amber)]" />
                   <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-bold text-[#0EA5E9]">Start Activity →</span>
+                <span className="text-sm font-bold text-[var(--color-accent-blue)]">Start Activity →</span>
               </div>
             </div>
           </Card>
 
           {/* RECOGNISE Game */}
-          <Card onPress={() => setActiveGame('recognise-game')} className="overflow-hidden cursor-pointer hover:border-[#E65100] transition-all active:scale-98">
+          <Card onPress={() => setActiveGame('recognise-game')} className="overflow-hidden cursor-pointer hover:border-[var(--color-warning)] transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-[#E65100]/15 text-[#E65100] border border-[#E65100]/30 flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--color-warning)]/15 text-[var(--color-warning)] border border-[var(--color-warning)]/30 flex items-center justify-center flex-shrink-0">
                   <Eye size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-lg font-bold text-[var(--color-text)]">Recognise</h4>
-                    <span className="text-xs font-bold text-[#E65100] bg-[#E65100]/15 px-2 py-0.5 rounded-full border border-[#E65100]/30">
+                    <span className="text-xs font-bold text-[var(--color-warning)] bg-[var(--color-warning)]/15 px-2 py-0.5 rounded-full border border-[var(--color-warning)]/30">
                       Ready
                     </span>
                   </div>
@@ -220,25 +220,25 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-[#F57F17]" />
+                  <Sparkles size={14} className="text-[var(--color-accent-amber)]" />
                   <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-bold text-[#E65100]">Start Activity →</span>
+                <span className="text-sm font-bold text-[var(--color-warning)]">Start Activity →</span>
               </div>
             </div>
           </Card>
 
           {/* DAILY ROUTINE Sequencing Game */}
-          <Card onPress={() => setActiveGame('daily-routine')} className="overflow-hidden cursor-pointer hover:border-[#10B981] transition-all active:scale-98">
+          <Card onPress={() => setActiveGame('daily-routine')} className="overflow-hidden cursor-pointer hover:border-[var(--color-success)] transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--color-success)]/15 text-[var(--color-success)] border border-[var(--color-success)]/30 flex items-center justify-center flex-shrink-0">
                   <Sun size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-lg font-bold text-[var(--color-text)]">Daily Routine</h4>
-                    <span className="text-xs font-bold text-[#10B981] bg-[#10B981]/15 px-2 py-0.5 rounded-full border border-[#10B981]/30">
+                    <span className="text-xs font-bold text-[var(--color-success)] bg-[var(--color-success)]/15 px-2 py-0.5 rounded-full border border-[var(--color-success)]/30">
                       New
                     </span>
                   </div>
@@ -257,10 +257,10 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles size={14} className="text-[#F57F17]" />
+                  <Sparkles size={14} className="text-[var(--color-accent-amber)]" />
                   <span className="text-xs text-[var(--color-text-secondary)]">Errorless learning</span>
                 </div>
-                <span className="text-sm font-bold text-[#10B981]">Start Activity →</span>
+                <span className="text-sm font-bold text-[var(--color-success)]">Start Activity →</span>
               </div>
             </div>
           </Card>
@@ -268,20 +268,20 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
 
         {/* Stats Summary */}
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-[#1A1A1A] px-1">Your Progress</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-text)] px-1">Your Progress</h3>
           <Card className="p-4">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-[#1B5E20]">{stats.totalGames}</p>
-                <p className="text-xs text-[#7A7A7A] mt-1">Games Played</p>
+                <p className="text-2xl font-bold text-[var(--color-success)]">{stats.totalGames}</p>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">Games Played</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#E65100]">{stats.currentStreak}</p>
-                <p className="text-xs text-[#7A7A7A] mt-1">Day Streak</p>
+                <p className="text-2xl font-bold text-[var(--color-accent-amber)]">{stats.currentStreak}</p>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">Day Streak</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#1565C0]">{stats.averageAccuracy}%</p>
-                <p className="text-xs text-[#7A7A7A] mt-1">Avg. Accuracy</p>
+                <p className="text-2xl font-bold text-[var(--color-accent-blue)]">{stats.averageAccuracy}%</p>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">Avg. Accuracy</p>
               </div>
             </div>
           </Card>
@@ -290,7 +290,7 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
         {/* Back Button */}
         <button
           onClick={() => onNavigate('home')}
-          className="flex items-center gap-2 text-[#4A4A4A] text-base font-medium px-4 py-3 rounded-xl hover:bg-white transition-colors"
+          className="flex items-center gap-2 text-[var(--color-text-secondary)] text-base font-medium px-4 py-3 rounded-xl hover:bg-[var(--color-card-hover)] transition-colors"
         >
           <ArrowLeft size={18} />
           Back to Home

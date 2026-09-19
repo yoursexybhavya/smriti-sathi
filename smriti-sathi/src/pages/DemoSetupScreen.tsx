@@ -76,7 +76,7 @@ export default function DemoSetupScreen({ onComplete }: DemoSetupScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1B5E20] via-[#2E7D32] to-[#4CAF50] flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[var(--color-success)] via-[var(--color-success)]/90 to-[var(--color-success)]/70 flex flex-col">
       {/* Header */}
       <div className="text-white text-center px-6 py-12">
         <h1 className="text-4xl font-bold mb-3">Smriti Sathi</h1>
@@ -85,36 +85,36 @@ export default function DemoSetupScreen({ onComplete }: DemoSetupScreenProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 bg-[#F5F0E8] rounded-t-[40px] px-6 py-8 -mt-6">
+      <div className="flex-1 bg-[var(--color-bg-subtle)] rounded-t-[40px] px-6 py-8 -mt-6">
         <div className="max-w-md mx-auto space-y-6">
           {/* Demo Info */}
-          <div className="bg-white rounded-3xl p-6 shadow-lg">
+          <div className="bg-[var(--color-card)] rounded-3xl p-6 shadow-lg">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                <Sparkles size={24} className="text-[#1B5E20]" />
+              <div className="w-12 h-12 rounded-full bg-[var(--color-success-bg)] flex items-center justify-center">
+                <Sparkles size={24} className="text-[var(--color-success)]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-[#1A1A1A]">Sample Clinical Setup</h2>
-                <p className="text-sm text-[#7A7A7A]">Quick setup for device validation</p>
+                <h2 className="text-xl font-bold text-[var(--color-text)]">Sample Clinical Setup</h2>
+                <p className="text-sm text-[var(--color-text-muted)]">Quick setup for device validation</p>
               </div>
             </div>
 
-            <div className="bg-[#F5F0E8] rounded-2xl p-4 mb-4">
-              <h3 className="text-sm font-semibold text-[#4A4A4A] mb-2">Demo Patient</h3>
+            <div className="bg-[var(--color-bg-subtle)] rounded-2xl p-4 mb-4">
+              <h3 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-2">Demo Patient</h3>
               <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                  <span className="text-2xl font-bold text-[#1B5E20]">
+                <div className="w-14 h-14 rounded-full bg-[var(--color-success-bg)] flex items-center justify-center">
+                  <span className="text-2xl font-bold text-[var(--color-success)]">
                     {DEMO_PATIENT.name.charAt(0)}
                   </span>
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-[#1A1A1A]">{DEMO_PATIENT.name}</div>
-                  <div className="text-sm text-[#7A7A7A]">Age {DEMO_PATIENT.age} • Hindi</div>
+                  <div className="text-lg font-bold text-[var(--color-text)]">{DEMO_PATIENT.name}</div>
+                  <div className="text-sm text-[var(--color-text-muted)]">Age {DEMO_PATIENT.age} • Hindi</div>
                 </div>
               </div>
             </div>
 
-            <div className="text-xs text-[#7A7A7A] space-y-1">
+            <div className="text-xs text-[var(--color-text-muted)] space-y-1">
               <p>✓ 7 days of game history</p>
               <p>✓ 14 game sessions with improving performance</p>
               <p>✓ Reminder history with 80% completion</p>
@@ -125,21 +125,21 @@ export default function DemoSetupScreen({ onComplete }: DemoSetupScreenProps) {
 
           {/* Status Messages */}
           {status === 'success' && (
-            <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3">
-              <CheckCircle size={24} className="text-green-600" />
+            <div className="bg-[var(--color-success-bg)] border border-[var(--color-success)]/30 rounded-2xl p-4 flex items-center gap-3">
+              <CheckCircle size={24} className="text-[var(--color-success)]" />
               <div>
-                <div className="font-semibold text-green-800">Demo Ready!</div>
-                <div className="text-sm text-green-700">Loading application...</div>
+                <div className="font-semibold text-[var(--color-success)]">Demo Ready!</div>
+                <div className="text-sm text-[var(--color-success)]/80">Loading application...</div>
               </div>
             </div>
           )}
 
           {status === 'error' && (
-            <div className="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
-              <AlertCircle size={24} className="text-red-600" />
+            <div className="bg-[var(--color-error-bg)] border border-[var(--color-error)]/30 rounded-2xl p-4 flex items-center gap-3">
+              <AlertCircle size={24} className="text-[var(--color-error)]" />
               <div className="flex-1">
-                <div className="font-semibold text-red-800">Setup Failed</div>
-                <div className="text-sm text-red-700">{errorMessage}</div>
+                <div className="font-semibold text-[var(--color-error)]">Setup Failed</div>
+                <div className="text-sm text-[var(--color-error)]/80">{errorMessage}</div>
               </div>
             </div>
           )}
@@ -149,8 +149,8 @@ export default function DemoSetupScreen({ onComplete }: DemoSetupScreenProps) {
             <button
               onClick={handlePatientDemo}
               disabled={isInitializing}
-              className="w-full py-5 bg-[#1B5E20] text-white rounded-2xl font-bold text-lg
-                hover:bg-[#0D3B12] active:scale-[0.98] transition-all
+              className="w-full py-5 bg-[var(--color-success)] text-white rounded-2xl font-bold text-lg
+                hover:bg-[var(--color-success)]/90 active:scale-[0.98] transition-all
                 disabled:opacity-50 disabled:cursor-not-allowed
                 flex items-center justify-center gap-3 shadow-lg"
             >
@@ -170,8 +170,8 @@ export default function DemoSetupScreen({ onComplete }: DemoSetupScreenProps) {
             <button
               onClick={handleCaregiverDemo}
               disabled={isInitializing}
-              className="w-full py-5 bg-[#7B1FA2] text-white rounded-2xl font-bold text-lg
-                hover:bg-[#6A1B9A] active:scale-[0.98] transition-all
+              className="w-full py-5 bg-[var(--color-accent-purple)] text-white rounded-2xl font-bold text-lg
+                hover:bg-[var(--color-accent-purple)]/90 active:scale-[0.98] transition-all
                 disabled:opacity-50 disabled:cursor-not-allowed
                 flex items-center justify-center gap-3 shadow-lg"
             >
@@ -190,7 +190,7 @@ export default function DemoSetupScreen({ onComplete }: DemoSetupScreenProps) {
           </div>
 
           {/* Info */}
-          <div className="text-center text-xs text-[#7A7A7A] space-y-1 pt-4">
+          <div className="text-center text-xs text-[var(--color-text-muted)] space-y-1 pt-4">
             <p>This will initialize demo data and log you in automatically.</p>
             <p>You can reset demo data anytime from Settings.</p>
           </div>

@@ -23,15 +23,15 @@ export default function HomeScreen({ onNavigate, isOnline = true }: HomeScreenPr
         {/* Greeting Card */}
         <Card elevated className="p-5">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-full bg-[#E8F5E9] flex items-center justify-center flex-shrink-0">
-              <Sun size={28} className="text-[#1B5E20]" />
+            <div className="w-14 h-14 rounded-full bg-[var(--color-success-bg)] flex items-center justify-center flex-shrink-0">
+              <Sun size={28} className="text-[var(--color-success)]" />
             </div>
             <div className="flex-1">
-              <h2 className="text-lg font-semibold text-[#1A1A1A]">{greeting}</h2>
-              <p className="text-base text-[#4A4A4A] mt-1">
+              <h2 className="text-lg font-semibold text-[var(--color-text)]">{greeting}</h2>
+              <p className="text-base text-[var(--color-text-secondary)] mt-1">
                 Let's do something nice for your mind today.
               </p>
-              <p className="text-sm text-[#7A7A7A] mt-2">
+              <p className="text-sm text-[var(--color-text-muted)] mt-2">
                 You've played 3 games this week. Keep it up!
               </p>
             </div>
@@ -40,55 +40,55 @@ export default function HomeScreen({ onNavigate, isOnline = true }: HomeScreenPr
 
         {/* Quick Actions */}
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-[#1A1A1A] px-1">Quick Actions</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-text)] px-1">Quick Actions</h3>
           
           <Card onPress={() => onNavigate('games')} className="p-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#E3F2FD] flex items-center justify-center flex-shrink-0">
-                <Brain size={24} className="text-[#1565C0]" />
+              <div className="w-12 h-12 rounded-xl bg-[var(--color-accent-blue)/15] flex items-center justify-center flex-shrink-0">
+                <Brain size={24} className="text-[var(--color-accent-blue)]" />
               </div>
               <div className="flex-1">
-                <h4 className="text-base font-semibold text-[#1A1A1A]">Play a Game</h4>
-                <p className="text-sm text-[#7A7A7A]">Memory & pattern exercises</p>
+                <h4 className="text-base font-semibold text-[var(--color-text)]">Play a Game</h4>
+                <p className="text-sm text-[var(--color-text-muted)]">Memory & pattern exercises</p>
               </div>
-              <ChevronRight size={20} className="text-[#7A7A7A]" />
+              <ChevronRight size={20} className="text-[var(--color-text-muted)]" />
             </div>
           </Card>
 
           <Card onPress={() => onNavigate('reminders')} className="p-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#FFF3E0] flex items-center justify-center flex-shrink-0">
-                <Clock size={24} className="text-[#E65100]" />
+              <div className="w-12 h-12 rounded-xl bg-[var(--color-warning-bg)] flex items-center justify-center flex-shrink-0">
+                <Clock size={24} className="text-[var(--color-accent-amber)]" />
               </div>
               <div className="flex-1">
-                <h4 className="text-base font-semibold text-[#1A1A1A]">Reminders</h4>
-                <p className="text-sm text-[#7A7A7A]">Medicine, appointments & more</p>
+                <h4 className="text-base font-semibold text-[var(--color-text)]">Reminders</h4>
+                <p className="text-sm text-[var(--color-text-muted)]">Medicine, appointments & more</p>
               </div>
-              <ChevronRight size={20} className="text-[#7A7A7A]" />
+              <ChevronRight size={20} className="text-[var(--color-text-muted)]" />
             </div>
           </Card>
 
           <Card onPress={() => onNavigate('progress')} className="p-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#E8F5E9] flex items-center justify-center flex-shrink-0">
-                <TrendingUp size={24} className="text-[#2E7D32]" />
+              <div className="w-12 h-12 rounded-xl bg-[var(--color-success-bg)] flex items-center justify-center flex-shrink-0">
+                <TrendingUp size={24} className="text-[var(--color-success)]" />
               </div>
               <div className="flex-1">
-                <h4 className="text-base font-semibold text-[#1A1A1A]">My Progress</h4>
-                <p className="text-sm text-[#7A7A7A]">See how you're doing</p>
+                <h4 className="text-base font-semibold text-[var(--color-text)]">My Progress</h4>
+                <p className="text-sm text-[var(--color-text-muted)]">See how you're doing</p>
               </div>
-              <ChevronRight size={20} className="text-[#7A7A7A]" />
+              <ChevronRight size={20} className="text-[var(--color-text-muted)]" />
             </div>
           </Card>
         </div>
 
         {/* Wellbeing Note */}
-        <Card className="p-5 bg-[#FDF8F0] border-[#E0D8CC]">
+        <Card className="p-5 bg-[var(--color-card-subtle)] border-[var(--color-border)]">
           <div className="flex items-start gap-3">
-            <Heart size={22} className="text-[#E65100] mt-0.5 flex-shrink-0" />
+            <Heart size={22} className="text-[var(--color-accent-amber)] mt-0.5 flex-shrink-0" />
             <div>
-              <h4 className="text-base font-semibold text-[#1A1A1A]">A Gentle Reminder</h4>
-              <p className="text-sm text-[#4A4A4A] mt-1 leading-relaxed">
+              <h4 className="text-base font-semibold text-[var(--color-text)]">A Gentle Reminder</h4>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">
                 These activities are for cognitive engagement and enjoyment. 
                 They are not medical diagnostics. Always consult your doctor for health concerns.
               </p>
@@ -98,7 +98,7 @@ export default function HomeScreen({ onNavigate, isOnline = true }: HomeScreenPr
 
         {/* Today's Schedule Preview */}
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-[#1A1A1A] px-1">Today's Schedule</h3>
+          <h3 className="text-lg font-semibold text-[var(--color-text)] px-1">Today's Schedule</h3>
           <Card className="p-4">
             <div className="space-y-3">
               <ScheduleItem time="9:00 AM" label="Morning Medicine" done />
@@ -117,10 +117,10 @@ function ScheduleItem({ time, label, done = false }: { time: string; label: stri
   return (
     <div className={`flex items-center gap-3 ${done ? 'opacity-60' : ''}`}>
       <div className={`w-3 h-3 rounded-full border-2 ${
-        done ? 'bg-[#2E7D32] border-[#2E7D32]' : 'border-[#C0B8A8]'
+        done ? 'bg-[var(--color-success)] border-[var(--color-success)]' : 'border-[var(--color-border)]'
       }`} />
-      <span className="text-sm font-medium text-[#4A4A4A] min-w-[70px]">{time}</span>
-      <span className={`text-sm ${done ? 'line-through text-[#7A7A7A]' : 'text-[#1A1A1A]'}`}>
+      <span className="text-sm font-medium text-[var(--color-text-secondary)] min-w-[70px]">{time}</span>
+      <span className={`text-sm ${done ? 'line-through text-[var(--color-text-muted)]' : 'text-[var(--color-text)]'}`}>
         {label}
       </span>
     </div>

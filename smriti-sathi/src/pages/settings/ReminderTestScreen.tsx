@@ -190,9 +190,9 @@ export default function ReminderTestScreen({ onNavigate }: ReminderTestScreenPro
       <AppHeader title="Reminder Tests" subtitle="Test reminder functionality" />
       <div className="px-5 py-6 pb-28 space-y-6">
         {/* Info */}
-        <div className="flex items-start gap-3 p-4 bg-[#E3F2FD] rounded-2xl border border-[#BBDEFB]">
+        <div className="flex items-start gap-3 p-4 bg-[var(--color-accent-blue)/15] rounded-2xl border border-[var(--color-accent-blue)]/30">
           <div className="flex-1">
-            <p className="text-sm text-[#1565C0] leading-relaxed">
+            <p className="text-sm text-[var(--color-accent-blue)] leading-relaxed">
               This test suite verifies all reminder system functionality including creation, 
               notifications, completion, snooze, recurring reminders, and offline operation.
             </p>
@@ -204,7 +204,7 @@ export default function ReminderTestScreen({ onNavigate }: ReminderTestScreenPro
           <button
             onClick={runTests}
             disabled={running}
-            className="w-full flex items-center justify-center gap-3 bg-[#1B5E20] text-white font-semibold text-base py-4 px-6 rounded-2xl shadow-md active:scale-[0.98] transition-transform disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-3 bg-[var(--color-success)] text-white font-semibold text-base py-4 px-6 rounded-2xl shadow-md active:scale-[0.98] transition-transform disabled:opacity-50"
           >
             <Play size={22} />
             {running ? 'Running Tests...' : 'Run All Tests'}
@@ -212,7 +212,7 @@ export default function ReminderTestScreen({ onNavigate }: ReminderTestScreenPro
 
           <button
             onClick={cleanupTestData}
-            className="w-full flex items-center justify-center gap-3 bg-[#C62828] text-white font-semibold text-base py-4 px-6 rounded-2xl shadow-md active:scale-[0.98] transition-transform"
+            className="w-full flex items-center justify-center gap-3 bg-[var(--color-error)] text-white font-semibold text-base py-4 px-6 rounded-2xl shadow-md active:scale-[0.98] transition-transform"
           >
             Cleanup Test Data
           </button>
@@ -221,23 +221,23 @@ export default function ReminderTestScreen({ onNavigate }: ReminderTestScreenPro
         {/* Test Results */}
         {testResults.length > 0 && (
           <Card className="p-5">
-            <h3 className="text-lg font-semibold text-[#1A1A1A] mb-4">Test Results</h3>
+            <h3 className="text-lg font-semibold text-[var(--color-text)] mb-4">Test Results</h3>
             <div className="space-y-2 font-mono text-sm">
               {testResults.map((result, index) => (
                 <div
                   key={index}
                   className={`p-2 rounded ${
                     result.startsWith('✅')
-                      ? 'bg-[#E8F5E9] text-[#2E7D32]'
+                      ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]'
                       : result.startsWith('❌')
-                      ? 'bg-[#FFEBEE] text-[#C62828]'
+                      ? 'bg-[var(--color-error-bg)] text-[var(--color-error)]'
                       : result.startsWith('⚠️')
-                      ? 'bg-[#FFF3E0] text-[#E65100]'
+                      ? 'bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)]'
                       : result.startsWith('🧪')
-                      ? 'bg-[#E3F2FD] text-[#1565C0] font-semibold'
+                      ? 'bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] font-semibold'
                       : result.startsWith('🎉')
-                      ? 'bg-[#F3E5F5] text-[#7B1FA2] font-bold'
-                      : 'bg-[#F5F0E8] text-[#4A4A4A]'
+                      ? 'bg-[var(--color-accent-purple)/15] text-[var(--color-accent-purple)] font-bold'
+                      : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)]'
                   }`}
                 >
                   {result}
@@ -248,10 +248,10 @@ export default function ReminderTestScreen({ onNavigate }: ReminderTestScreenPro
         )}
 
         {/* Info */}
-        <div className="flex items-start gap-3 p-4 bg-[#FDF8F0] rounded-2xl border border-[#E0D8CC]">
+        <div className="flex items-start gap-3 p-4 bg-[var(--color-card-subtle)] rounded-2xl border border-[var(--color-border)]">
           <div className="flex-1">
-            <h4 className="text-sm font-semibold text-[#1A1A1A] mb-2">Test Coverage</h4>
-            <ul className="text-xs text-[#4A4A4A] space-y-1">
+            <h4 className="text-sm font-semibold text-[var(--color-text)] mb-2">Test Coverage</h4>
+            <ul className="text-xs text-[var(--color-text-secondary)] space-y-1">
               <li>• Reminder creation and retrieval</li>
               <li>• Notification permission and scheduling</li>
               <li>• Voice reminder service</li>
@@ -269,7 +269,7 @@ export default function ReminderTestScreen({ onNavigate }: ReminderTestScreenPro
         {/* Back Button */}
         <button
           onClick={() => onNavigate('settings')}
-          className="flex items-center gap-2 text-[#4A4A4A] text-base font-medium px-4 py-3 rounded-xl hover:bg-white transition-colors"
+          className="flex items-center gap-2 text-[var(--color-text-secondary)] text-base font-medium px-4 py-3 rounded-xl hover:bg-[var(--color-card-hover)] transition-colors"
         >
           <ArrowLeft size={18} />
           Back to Settings

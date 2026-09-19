@@ -50,6 +50,12 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
   const [accuracy, setAccuracy] = useState<string>('—');
   const [isSpeakingComfort, setIsSpeakingComfort] = useState(false);
   const [isBuzzerTesting, setIsBuzzerTesting] = useState(false);
+  const [gameProgress, setGameProgress] = useState({
+    remember: { doneToday: false, level: 1 },
+    recognise: { doneToday: false, level: 1 },
+    memoryMatch: { doneToday: false, level: 1 },
+    dailyRoutine: { doneToday: false, level: 1 },
+  });
 
   // Load real patient data from IndexedDB
   const loadRealData = useCallback(async (uid: number) => {
@@ -65,6 +71,33 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
       // Real activities completed today
       const todaySessions = sessions.filter(s => isToday(s.createdAt));
       setActivitiesTodayCount(todaySessions.length);
+
+      // Per-game level and daily completion
+      const getGameLevel = (type: string) => {
+        const gameSess = sessions.filter(s => (s.gameType as string) === type);
+        if (!gameSess.length) return 1;
+        const maxDiff = Math.max(...gameSess.map(s => s.difficulty || 1));
+        return Math.min(5, Math.max(1, maxDiff));
+      };
+
+      setGameProgress({
+        remember: {
+          doneToday: todaySessions.some(s => s.gameType === 'remember'),
+          level: getGameLevel('remember'),
+        },
+        recognise: {
+          doneToday: todaySessions.some(s => s.gameType === 'recognise'),
+          level: getGameLevel('recognise'),
+        },
+        memoryMatch: {
+          doneToday: todaySessions.some(s => s.gameType === 'memory_match'),
+          level: getGameLevel('memory_match'),
+        },
+        dailyRoutine: {
+          doneToday: todaySessions.some(s => (s.gameType as string) === 'daily_routine'),
+          level: getGameLevel('daily_routine'),
+        },
+      });
 
       // Real calculated streak
       const streak = calculateStreak(sessions.map(s => s.createdAt));
@@ -224,49 +257,209 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
               </button>
             </div>
 
-            {/* Cognitive Exercises Grid */}
+            {/* Cognitive Exercises Grid - Strict 2x2 Layout */}
             <div className="space-y-3.5">
-              <SectionHeader
-                title="Cognitive Exercises"
-                icon={<Brain size={20} className="text-[#10B981]" />}
-              />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <LargeActionCard
-                  icon={<Eye size={28} className="text-[#10B981]" />}
-                  title="Remember Game"
-                  subtitle="Look at real-life objects, then recall them"
-                  onPress={() => onNavigate('remember-game')}
-                  variant="primary"
+              <div className="flex items-center justify-between">
+                <SectionHeader
+                  title="Cognitive Exercises"
+                  icon={<Brain size={20} className="text-indigo-600 dark:text-indigo-400" />}
                 />
-                <LargeActionCard
-                  icon={<Brain size={28} className="text-[#0EA5E9]" />}
-                  title="Recognise Game"
-                  subtitle="Spot patterns and find what is different"
-                  onPress={() => onNavigate('recognise-game')}
-                  variant="secondary"
-                />
-                <LargeActionCard
-                  icon={<Grid3X3 size={28} className="text-[#F59E0B]" />}
-                  title="Memory Match"
-                  subtitle="Pair matching cards with calm errorless learning"
-                  onPress={() => onNavigate('memory-match')}
-                  variant="secondary"
-                />
-                <LargeActionCard
-                  icon={<Sun size={28} className="text-[#E65100]" />}
-                  title="Daily Routine"
-                  subtitle="Sequence your daily habits from dawn to dusk"
-                  onPress={() => onNavigate('daily-routine')}
-                  variant="primary"
-                />
-                <LargeActionCard
-                  icon={<BookOpen size={28} className="text-[#A855F7]" />}
-                  title="Personal Memory Book"
-                  subtitle="Explore cherished photos and family stories"
-                  onPress={() => onNavigate('memory-book-viewer')}
-                  variant="neutral"
-                />
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-700">
+                  4 Active Games
+                </span>
               </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* 1. Remember Game */}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('remember-game')}
+                  className="w-full min-h-[64px] p-4 sm:p-5 rounded-2xl border transition-all duration-200 active:scale-[0.98] flex items-start gap-3.5 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 bg-white dark:bg-slate-800/90 border-indigo-200/80 dark:border-indigo-900/60 hover:border-indigo-500 dark:hover:border-indigo-400 shadow-sm hover:shadow-md cursor-pointer"
+                  aria-label="Remember Game"
+                >
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center flex-shrink-0 shadow-sm bg-indigo-50 dark:bg-indigo-950/60 border-indigo-100 dark:border-indigo-900/40 text-indigo-600 dark:text-indigo-400">
+                    <Eye size={28} />
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate">
+                        Remember Game
+                      </h3>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex-shrink-0">
+                        Level {gameProgress.remember.level}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug line-clamp-2">
+                      Look at real-life objects, then recall them
+                    </p>
+                    <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                      {gameProgress.remember.doneToday ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                          <CheckCircle2 size={12} /> Completed Today
+                        </span>
+                      ) : (
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/60 px-2 py-0.5 rounded-full">
+                          Ready to Play
+                        </span>
+                      )}
+                      {currentStreak > 0 && (
+                        <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                          🔥 {currentStreak}d Streak
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </button>
+
+                {/* 2. Recognise Game */}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('recognise-game')}
+                  className="w-full min-h-[64px] p-4 sm:p-5 rounded-2xl border transition-all duration-200 active:scale-[0.98] flex items-start gap-3.5 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/30 bg-white dark:bg-slate-800/90 border-blue-200/80 dark:border-blue-900/60 hover:border-blue-500 dark:hover:border-blue-400 shadow-sm hover:shadow-md cursor-pointer"
+                  aria-label="Recognise Game"
+                >
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center flex-shrink-0 shadow-sm bg-blue-50 dark:bg-blue-950/60 border-blue-100 dark:border-blue-900/40 text-blue-600 dark:text-blue-400">
+                    <Brain size={28} />
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate">
+                        Recognise Game
+                      </h3>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 flex-shrink-0">
+                        Level {gameProgress.recognise.level}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug line-clamp-2">
+                      Spot patterns and find what is different
+                    </p>
+                    <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                      {gameProgress.recognise.doneToday ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                          <CheckCircle2 size={12} /> Completed Today
+                        </span>
+                      ) : (
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/60 px-2 py-0.5 rounded-full">
+                          Ready to Play
+                        </span>
+                      )}
+                      {currentStreak > 0 && (
+                        <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                          🔥 {currentStreak}d Streak
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </button>
+
+                {/* 3. Memory Match */}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('memory-match')}
+                  className="w-full min-h-[64px] p-4 sm:p-5 rounded-2xl border transition-all duration-200 active:scale-[0.98] flex items-start gap-3.5 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-500/30 bg-white dark:bg-slate-800/90 border-amber-200/80 dark:border-amber-900/60 hover:border-amber-500 dark:hover:border-amber-400 shadow-sm hover:shadow-md cursor-pointer"
+                  aria-label="Memory Match"
+                >
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center flex-shrink-0 shadow-sm bg-amber-50 dark:bg-amber-950/60 border-amber-100 dark:border-amber-900/40 text-amber-600 dark:text-amber-400">
+                    <Grid3X3 size={28} />
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate">
+                        Memory Match
+                      </h3>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex-shrink-0">
+                        Level {gameProgress.memoryMatch.level}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug line-clamp-2">
+                      Pair matching cards with calm errorless learning
+                    </p>
+                    <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                      {gameProgress.memoryMatch.doneToday ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                          <CheckCircle2 size={12} /> Completed Today
+                        </span>
+                      ) : (
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/60 px-2 py-0.5 rounded-full">
+                          Ready to Play
+                        </span>
+                      )}
+                      {currentStreak > 0 && (
+                        <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                          🔥 {currentStreak}d Streak
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </button>
+
+                {/* 4. Daily Routine */}
+                <button
+                  type="button"
+                  onClick={() => onNavigate('daily-routine')}
+                  className="w-full min-h-[64px] p-4 sm:p-5 rounded-2xl border transition-all duration-200 active:scale-[0.98] flex items-start gap-3.5 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-500/30 bg-white dark:bg-slate-800/90 border-orange-200/80 dark:border-orange-900/60 hover:border-orange-500 dark:hover:border-orange-400 shadow-sm hover:shadow-md cursor-pointer"
+                  aria-label="Daily Routine"
+                >
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center flex-shrink-0 shadow-sm bg-orange-50 dark:bg-orange-950/60 border-orange-100 dark:border-orange-900/40 text-orange-600 dark:text-orange-400">
+                    <Sun size={28} />
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight truncate">
+                        Daily Routine
+                      </h3>
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-800 flex-shrink-0">
+                        Level {gameProgress.dailyRoutine.level}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug line-clamp-2">
+                      Sequence your daily habits from dawn to dusk
+                    </p>
+                    <div className="mt-2.5 flex items-center gap-2 flex-wrap">
+                      {gameProgress.dailyRoutine.doneToday ? (
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                          <CheckCircle2 size={12} /> Completed Today
+                        </span>
+                      ) : (
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/60 px-2 py-0.5 rounded-full">
+                          Ready to Play
+                        </span>
+                      )}
+                      {currentStreak > 0 && (
+                        <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                          🔥 {currentStreak}d Streak
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Featured Anchor Card: Personal Memory Book (Dedicated Featured Slot) */}
+            <div className="p-5 sm:p-6 bg-gradient-to-br from-indigo-50/70 via-purple-50/40 to-white dark:from-slate-800 dark:via-purple-950/20 dark:to-slate-800 rounded-3xl border border-indigo-200/80 dark:border-indigo-900/50 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <BookOpen size={28} />
+                </div>
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+                    Featured Family Sanctuary
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Personal Memory Book</h3>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                    Explore cherished photos, familiar places, and family voice stories
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => onNavigate('memory-book-viewer')}
+                className="w-full sm:w-auto min-h-[56px] px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-sm sm:text-base shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 flex-shrink-0 cursor-pointer"
+                aria-label="Open Personal Memory Book"
+              >
+                <span>Explore Album →</span>
+              </button>
             </div>
 
             {/* Daily Comfort & Audio Anchor Card */}

@@ -406,9 +406,12 @@ export function CaregiverAudioRecorder({
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <button
                 onClick={handleTogglePlay}
+                className="min-w-[56px] min-h-[56px]"
                 style={{
-                  width: '42px',
-                  height: '42px',
+                  width: '56px',
+                  height: '56px',
+                  minWidth: '56px',
+                  minHeight: '56px',
                   borderRadius: '50%',
                   backgroundColor: '#38BDF8',
                   color: '#07101B',
@@ -421,7 +424,7 @@ export function CaregiverAudioRecorder({
                 }}
                 aria-label={isPlaying ? 'Pause preview' : 'Play preview'}
               >
-                {isPlaying ? <Pause size={18} /> : <Play size={18} style={{ marginLeft: '2px' }} />}
+                {isPlaying ? <Pause size={20} /> : <Play size={20} style={{ marginLeft: '2px' }} />}
               </button>
               <div>
                 <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
@@ -517,9 +520,12 @@ export function CaregiverAudioRecorder({
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <button
                   onClick={handleTogglePlay}
+                  className="min-w-[56px] min-h-[56px]"
                   style={{
-                    width: '38px',
-                    height: '38px',
+                    width: '56px',
+                    height: '56px',
+                    minWidth: '56px',
+                    minHeight: '56px',
                     borderRadius: '50%',
                     backgroundColor: '#10B981',
                     color: '#FFFFFF',
@@ -531,7 +537,7 @@ export function CaregiverAudioRecorder({
                   }}
                   aria-label={isPlaying ? 'Pause preview' : 'Play preview'}
                 >
-                  {isPlaying ? <Pause size={16} /> : <Play size={16} style={{ marginLeft: '2px' }} />}
+                  {isPlaying ? <Pause size={20} /> : <Play size={20} style={{ marginLeft: '2px' }} />}
                 </button>
                 <div>
                   <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>

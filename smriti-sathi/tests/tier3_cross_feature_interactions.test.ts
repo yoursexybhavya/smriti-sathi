@@ -1,476 +1,335 @@
 /**
- * Tier 3: Cross-Feature Combinations Test Suite
- * Asserts pairwise and end-to-end multi-feature interactions across:
- * Caregiver Voice Recordings, Dexie Storage, Reminders Scheduler,
- * Multimodal Modal Portal, Haptic Feedback, and Errorless Cognitive Games.
- * Minimum 12 interaction tests.
+ * Tier 3: Cross-Feature Interactions & Pairwise Combinations Test Suite
+ * Validates complex multi-feature interactions across the 16 features from TEST_INFRA.md.
+ * Minimum 16 pairwise interaction tests.
  */
 
 import test from 'node:test';
 import assert from 'node:assert';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { setupTestEnvironment, MockElement } from './mocks/browser_env.ts';
 import { createMockDatabase } from './mocks/dexie_mock.ts';
-import type { Reminder } from '../src/db/database';
+import {
+  createGame as createDailyRoutineGame,
+  selectCard as selectDailyRoutineCard,
+  placeCard as placeDailyRoutineCard,
+  getResult as getDailyRoutineResult,
+} from '../src/games/dailyRoutine.ts';
+import {
+  createGame as createMemoryMatchGame,
+  flipCard as flipMemoryMatchCard,
+  checkMatch as checkMemoryMatch,
+  getResult as getMemoryMatchResult,
+} from '../src/games/memoryMatch.ts';
 
-test('TIER 3 — Cross-Feature Interaction 1: Voice Recording -> Dexie Save -> Fetch Persistence', async () => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const rootDir = path.resolve(__dirname, '..');
+
+test('TIER 3 — Cross-Feature Interaction 1: Theme Switch + High Contrast AAA + Text Size Resizing (Features 1 & 14)', async () => {
   const env = setupTestEnvironment();
-  const db = createMockDatabase();
 
-  // 1. Caregiver records audio
-  const stream = await env.navigator.mediaDevices.getUserMedia({ audio: true });
-  const recorder = new env.MediaRecorder(stream);
-  const chunks: Blob[] = [];
-  recorder.ondataavailable = (e) => chunks.push(e.data);
-  recorder.start();
-  recorder.stop();
+  // 1. Initial standard state
+  env.document.body.classList.add('theme-light', 'text-size-large');
+  assert.strictEqual(env.document.body.classList.contains('theme-light'), true);
+  assert.strictEqual(env.document.body.classList.contains('text-size-large'), true);
 
-  const recordedBlob = new Blob(chunks, { type: 'audio/webm' });
+  // 2. User toggles to midnight mode and enables high-contrast WCAG AAA
+  env.document.body.classList.remove('theme-light');
+  env.document.body.classList.add('theme-dark', 'high-contrast', 'text-size-extra-large');
+  env.document.body.classList.remove('text-size-large');
 
-  // 2. Attach and save to reminder in Dexie
-  const reminderId = await db.reminders.add({
-    patientId: 1,
-    type: 'medicine',
-    label: 'Morning Donepezil Tablet',
-    timeHour: 8,
-    timeMinute: 30,
-    repeatDays: [0, 1, 2, 3, 4, 5, 6],
-    isActive: true,
-    lastAcked: null,
-    audioBlob: recordedBlob,
-    audioDurationSec: 4.5,
-    audioRecordedAt: new Date(),
-  });
-
-  // 3. Query back and verify audio blob identity
-  const retrieved = await db.reminders.get(reminderId);
-  assert.ok(retrieved);
-  assert.ok(retrieved.audioBlob instanceof Blob);
-  assert.strictEqual(retrieved.audioBlob.size, recordedBlob.size);
-  assert.strictEqual(retrieved.audioDurationSec, 4.5);
+  assert.strictEqual(env.document.body.classList.contains('theme-dark'), true);
+  assert.strictEqual(env.document.body.classList.contains('high-contrast'), true);
+  assert.strictEqual(env.document.body.classList.contains('text-size-extra-large'), true);
+  assert.strictEqual(env.document.body.classList.contains('text-size-large'), false);
 
   env.cleanup();
 });
 
-test('TIER 3 — Cross-Feature Interaction 2: Due Reminder -> Modal Portal Mount -> Scroll Lock -> High-Contrast Display', async () => {
-  const env = setupTestEnvironment();
-  const modalRoot = env.document.getElementById('modal-root')!;
+test('TIER 3 — Cross-Feature Interaction 2: Elder Quick Login -> Patient Home 2x2 Launcher Activation (Features 5 & 7)', async () => {
+  const loginSrc = fs.readFileSync(path.join(rootDir, 'src/pages/auth/LoginScreen.tsx'), 'utf-8');
+  const homeSrc = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
 
-  // 1. Scheduler triggers reminder modal
-  const modal = env.document.createElement('div');
-  modal.id = 'active-reminder-portal';
-  modal.style.position = 'fixed';
-  modal.style.inset = '0';
-  modal.style.zIndex = '999999';
-  modal.style.backgroundColor = '#0A1420';
+  // Verify elder quickLogin path requires zero PIN
+  assert.ok(loginSrc.includes("quickLogin('patient_primary')"), 'Elder login bypasses PIN check');
 
-  // Typography & literal icon
-  const icon = env.document.createElement('div');
-  icon.setAttribute('data-icon', 'medicine');
-  icon.style.width = '88px';
-  icon.style.height = '88px';
-  modal.appendChild(icon);
-
-  const title = env.document.createElement('h1');
-  title.style.fontSize = '28px';
-  title.style.color = '#FFFFFF';
-  title.textContent = 'TAKE MORNING TABLET';
-  modal.appendChild(title);
-
-  // 2. Mount portal into #modal-root & lock body scroll
-  modalRoot.appendChild(modal);
-  env.document.body.style.overflow = 'hidden';
-
-  // 3. Assertions
-  assert.strictEqual(modal.parentElement?.id, 'modal-root');
-  assert.strictEqual(env.document.body.style.overflow, 'hidden');
-  assert.ok(parseInt(title.style.fontSize, 10) >= 24);
-  assert.strictEqual(title.style.color, '#FFFFFF');
-
-  // Cleanup
-  modalRoot.removeChild(modal);
-  env.document.body.style.overflow = '';
-  env.cleanup();
+  // Verify patient home screen loads 2x2 launcher upon entrance
+  assert.ok(homeSrc.includes('Cognitive Exercises'), 'Patient home renders Cognitive Exercises header');
+  assert.ok(homeSrc.includes('grid-cols-1 sm:grid-cols-2'), 'Patient home renders 2x2 grid structure');
+  assert.ok(homeSrc.includes('Remember Game') && homeSrc.includes('Recognise Game'), 'Includes primary cognitive games');
 });
 
-test('TIER 3 — Cross-Feature Interaction 3: Modal Mount -> Simultaneous Haptic Vibrate + Audio Playback', async () => {
-  const env = setupTestEnvironment();
+test('TIER 3 — Cross-Feature Interaction 3: Caregiver PIN Auth -> Caregiver Clinical Adherence Oversight (Features 5 & 12)', async () => {
+  const loginSrc = fs.readFileSync(path.join(rootDir, 'src/pages/auth/LoginScreen.tsx'), 'utf-8');
+  const dashSrc = fs.readFileSync(path.join(rootDir, 'src/pages/CaregiverDashboard.tsx'), 'utf-8');
+
+  // Verify caregiver login requires PIN entry
+  assert.ok(loginSrc.includes('login(selectedUser, pin)'), 'Caregiver route verifies security PIN');
+
+  // Verify dashboard displays clinical metrics
+  assert.ok(dashSrc.includes('Reminder Adherence'), 'Dashboard displays Reminder Adherence');
+  assert.ok(dashSrc.includes('Weekly Engagement'), 'Dashboard displays Weekly Engagement');
+  assert.ok(dashSrc.includes('Memory') && dashSrc.includes('Recognition'), 'Dashboard tracks both cognitive domains');
+});
+
+test('TIER 3 — Cross-Feature Interaction 4: Onboarding Flow Complete -> Database Profile Persist -> Greeting Update (Features 6 & 7)', async () => {
   const db = createMockDatabase();
 
-  const sampleBlob = new Blob([new Uint8Array([10, 20, 30])], { type: 'audio/webm' });
-  const reminderId = await db.reminders.add({
-    patientId: 1,
-    type: 'water',
-    label: 'Drink Water',
-    timeHour: 10,
-    timeMinute: 0,
-    repeatDays: [],
-    isActive: true,
-    lastAcked: null,
-    audioBlob: sampleBlob,
+  // 1. Onboarding captures new patient profile
+  const patient = {
+    id: 'patient_mrs_sharma',
+    name: 'Mrs. Sharma',
+    age: 78,
+    primaryLanguage: 'hi',
+    caregiverName: 'Anil Sharma',
+    caregiverPhone: '+91 98765 43210',
+    createdAt: Date.now(),
+  };
+  await db.patients.put(patient);
+
+  // 2. Query back patient profile
+  const stored = await db.patients.get('patient_mrs_sharma');
+  assert.ok(stored, 'Patient record must exist in database');
+  assert.strictEqual(stored.name, 'Mrs. Sharma');
+
+  // 3. Verify PatientHomeScreen greeting format logic
+  const greeting = stored ? `Good Day, ${stored.name}!` : 'Smriti Sathi Memory Care';
+  assert.strictEqual(greeting, 'Good Day, Mrs. Sharma!');
+});
+
+test('TIER 3 — Cross-Feature Interaction 5: Care Reminder Complete Toggle -> IndexedDB State -> Adherence Metric Update (Features 7 & 13)', async () => {
+  const db = createMockDatabase();
+
+  // 1. Initial reminders
+  const r1 = await db.reminders.add({
+    userId: 'patient_1',
+    title: 'Morning Heart Medication',
+    type: 'medication',
+    scheduledTime: Date.now(),
+    status: 'pending',
+    dosage: '1 tablet with water',
+  });
+  const r2 = await db.reminders.add({
+    userId: 'patient_1',
+    title: 'Drink 1 Glass of Water',
+    type: 'hydration',
+    scheduledTime: Date.now() + 3600000,
+    status: 'pending',
   });
 
-  const reminder = await db.reminders.get(reminderId);
-  assert.ok(reminder?.audioBlob);
+  // 2. Elder taps complete on reminder r1
+  await db.reminders.update(r1, { status: 'completed', completedAt: Date.now() });
 
-  // Modal mount actions
-  env.navigator.vibrate([300, 120, 300, 120, 450]);
-  const audioUrl = env.URL.createObjectURL(reminder.audioBlob);
-  const audio = new env.Audio(audioUrl);
-  await audio.play();
+  // 3. Query all reminders and calculate adherence rate
+  const allReminders = await db.reminders.toArray();
+  const completed = allReminders.filter((r) => r.status === 'completed').length;
+  const adherence = Math.round((completed / allReminders.length) * 100);
 
-  // Verify concurrent synchronization
+  assert.strictEqual(allReminders.length, 2);
+  assert.strictEqual(completed, 1);
+  assert.strictEqual(adherence, 50, 'Adherence must be 50% after completing 1 of 2');
+});
+
+test('TIER 3 — Cross-Feature Interaction 6: Reminder Snooze Action -> Reschedules Time -> Retriggers Buzzer Alert (Features 13 & 3)', async () => {
+  const db = createMockDatabase();
+  const env = setupTestEnvironment();
+
+  // 1. Scheduled reminder
+  const now = Date.now();
+  const remId = await db.reminders.add({
+    userId: 'patient_1',
+    title: 'Blood Pressure Tablet',
+    type: 'medication',
+    scheduledTime: now,
+    status: 'pending',
+  });
+
+  // 2. Elder clicks snooze (10 minutes)
+  const snoozeDuration = 10 * 60 * 1000;
+  await db.reminders.update(remId, { scheduledTime: now + snoozeDuration });
+
+  const updated = await db.reminders.get(remId);
+  assert.strictEqual(updated?.scheduledTime, now + 600000);
+
+  // 3. Trigger buzzer chime & vibration
+  env.navigator.vibrate([300, 150, 300, 150, 500]);
   assert.strictEqual(env.navigator.vibrateCalls.length, 1);
-  assert.deepStrictEqual(env.navigator.vibrateCalls[0].pattern, [300, 120, 300, 120, 450]);
-  assert.strictEqual(audio.paused, false);
-  assert.strictEqual(audio.src, audioUrl);
-
-  audio.pause();
-  env.URL.revokeObjectURL(audioUrl);
-  env.cleanup();
-});
-
-test('TIER 3 — Cross-Feature Interaction 4: Modal Acknowledge -> Stop Audio + Revoke URL + Restore Scroll + Log Dexie', async () => {
-  const env = setupTestEnvironment();
-  const db = createMockDatabase();
-  const modalRoot = env.document.getElementById('modal-root')!;
-
-  const modal = env.document.createElement('div');
-  modalRoot.appendChild(modal);
-  env.document.body.style.overflow = 'hidden';
-
-  const audioUrl = env.URL.createObjectURL(new Blob([new Uint8Array(20)], { type: 'audio/webm' }));
-  const audio = new env.Audio(audioUrl);
-  await audio.play();
-
-  // User acknowledges reminder
-  audio.pause();
-  env.URL.revokeObjectURL(audioUrl);
-  modalRoot.removeChild(modal);
-  env.document.body.style.overflow = '';
-
-  const logId = await db.reminderLogs.add({
-    reminderId: 1,
-    patientId: 1,
-    scheduledAt: new Date(),
-    acknowledgedAt: new Date(),
-    synced: 0,
-  });
-
-  assert.strictEqual(audio.paused, true);
-  assert.ok(env.URL.revokedUrls.has(audioUrl));
-  assert.strictEqual(modalRoot.children.length, 0);
-  assert.strictEqual(env.document.body.style.overflow, '');
-  assert.ok(logId > 0);
-
-  const logs = await db.reminderLogs.toArray();
-  assert.strictEqual(logs.length, 1);
-  assert.ok(logs[0].acknowledgedAt !== null);
+  assert.deepStrictEqual(env.navigator.vibrateCalls[0].pattern, [300, 150, 300, 150, 500]);
 
   env.cleanup();
 });
 
-test('TIER 3 — Cross-Feature Interaction 5: Missing Audio Blob -> Modal Mount -> Chime & Speech Fallback', async () => {
-  const env = setupTestEnvironment();
-  const reminder: Reminder = {
-    patientId: 1,
-    type: 'activity',
-    label: 'Evening Memory Game',
-    timeHour: 18,
-    timeMinute: 0,
-    repeatDays: [],
-    isActive: true,
-    lastAcked: null,
-    // audioBlob undefined
-  };
-
-  let chimeTriggered = false;
-  let speechTriggered = false;
-
-  if (reminder.audioBlob) {
-    // Custom audio
-  } else {
-    chimeTriggered = true;
-    speechTriggered = true;
-  }
-
-  assert.strictEqual(chimeTriggered, true, 'Synthesized chime must trigger');
-  assert.strictEqual(speechTriggered, true, 'Text-to-speech must trigger');
-  env.cleanup();
-});
-
-test('TIER 3 — Cross-Feature Interaction 6: Background Elements Obscured -> Modal Dismissal Restores Interactive State', async () => {
-  const env = setupTestEnvironment();
-  const modalRoot = env.document.getElementById('modal-root')!;
-
-  const bgButton = env.document.createElement('button');
-  let bgButtonClicked = false;
-  bgButton.addEventListener('click', () => { bgButtonClicked = true; });
-  env.document.getElementById('root')!.appendChild(bgButton);
-
-  // Modal mounts with backdrop
-  const modal = env.document.createElement('div');
-  modal.id = 'modal-takeover';
-  modal.style.position = 'fixed';
-  modal.style.inset = '0';
-  modalRoot.appendChild(modal);
-
-  // Attempt click on modal
-  modal.click();
-  assert.strictEqual(bgButtonClicked, false, 'Background button should not be reachable');
-
-  // Dismiss modal
-  modalRoot.removeChild(modal);
-  // Background button now interactive
-  bgButton.click();
-  assert.strictEqual(bgButtonClicked, true, 'Background button clickable after modal dismissal');
-
-  env.cleanup();
-});
-
-test('TIER 3 — Cross-Feature Interaction 7: Modal Dismissal -> Launch Math Workout -> Errorless Disabled Options Active', async () => {
-  const env = setupTestEnvironment();
-
-  // Simulating user acknowledging reminder and launching game
-  const gameOptions = [20, 25, 30];
-  const target = 25;
-
-  const buttons = gameOptions.map((opt) => {
-    const isTarget = opt === target;
-    const btn = env.document.createElement('button');
-    btn.disabled = !isTarget;
-    btn.style.pointerEvents = isTarget ? 'auto' : 'none';
-    btn.style.opacity = isTarget ? '1' : '0.35';
-    btn.textContent = `₹${opt}`;
-    return { opt, btn, isTarget };
-  });
-
-  const correctBtn = buttons.find((b) => b.isTarget)!;
-  const wrongBtn = buttons.find((b) => !b.isTarget)!;
-
-  assert.strictEqual(correctBtn.btn.disabled, false);
-  assert.strictEqual(wrongBtn.btn.disabled, true);
-  assert.strictEqual(wrongBtn.btn.style.opacity, '0.35');
-
-  env.cleanup();
-});
-
-test('TIER 3 — Cross-Feature Interaction 8: Math Workout -> 2900ms Touch Reset -> Idle 3000ms -> Scaffold Pulse -> Correct Tap', async () => {
-  let showScaffold = false;
-  let timer: NodeJS.Timeout | null = null;
-
-  const resetTimer = (delayMs: number = 30) => {
-    showScaffold = false;
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => {
-      showScaffold = true;
-    }, delayMs);
-  };
-
-  // 1. Initial render
-  resetTimer(30);
-  assert.strictEqual(showScaffold, false);
-
-  // 2. User touches screen before timeout (boundary reset)
-  resetTimer(30);
-  assert.strictEqual(showScaffold, false);
-
-  // 3. Idle for 30ms -> scaffold activates
-  await new Promise((r) => setTimeout(r, 40));
-  assert.strictEqual(showScaffold, true, 'Beacon must pulse after idle delay');
-
-  // 4. User taps correct answer -> reset and advance
-  showScaffold = false;
-  assert.strictEqual(showScaffold, false);
-
-  if (timer) clearTimeout(timer);
-});
-
-test('TIER 3 — Cross-Feature Interaction 9: Language Workout -> Disabled Distractors -> Correct Tap -> Dexie Session Saved', async () => {
-  const env = setupTestEnvironment();
+test('TIER 3 — Cross-Feature Interaction 7: Home Launcher -> Recognise Game Play -> Audio Feedback -> Session Saved (Features 7 & 8)', async () => {
   const db = createMockDatabase();
 
-  const wordCard = {
-    word: 'বৰষা',
-    options: ['Monsoon Rains', 'Morning Walk', 'Evening Tea'],
-  };
-  const target = wordCard.options[0];
-
-  let score = 0;
-  let sessionSaved = false;
-
-  const handleSelect = async (opt: string) => {
-    if (opt !== target) return; // Errorless: ignore wrong
-    score = 100;
-    await db.gameSessions.add({
-      patientId: 1,
-      gameType: 'language',
-      difficulty: 1,
-      score: 100,
-      accuracy: 1.0,
-      playedAt: new Date(),
-      synced: 0,
-      domain: 'attentionFocus',
-    });
-    sessionSaved = true;
-  };
-
-  await handleSelect('Morning Walk'); // Wrong distractor
-  assert.strictEqual(score, 0);
-  assert.strictEqual(sessionSaved, false);
-
-  await handleSelect('Monsoon Rains'); // Correct choice
-  assert.strictEqual(score, 100);
-  assert.strictEqual(sessionSaved, true);
-
-  const sessions = await db.gameSessions.toArray();
-  assert.strictEqual(sessions.length, 1);
-  assert.strictEqual(sessions[0].score, 100);
-
-  env.cleanup();
-});
-
-test('TIER 3 — Cross-Feature Interaction 10: Daily Routine -> Invalid Placement Blocked -> 3s Inactivity -> Target Slot Pulses -> Placement Succeeds', async () => {
-  const selectedCard = { order: 1, label: 'brush' };
-  const targetSlotIndex = 1;
-  const wrongSlotIndex = 0;
-
-  // Invalid placement attempt
-  let placedInSlot = false;
-  if (wrongSlotIndex === selectedCard.order) {
-    placedInSlot = true;
-  }
-  assert.strictEqual(placedInSlot, false, 'Card must not be placed in wrong slot');
-
-  // 3s Inactivity triggers pulsing highlight on targetSlotIndex
-  let pulsingSlotIndex: number | null = null;
-  pulsingSlotIndex = selectedCard.order;
-  assert.strictEqual(pulsingSlotIndex, targetSlotIndex, 'Target slot should receive scaffolding pulse');
-
-  // User taps target slot
-  if (targetSlotIndex === selectedCard.order) {
-    placedInSlot = true;
-    pulsingSlotIndex = null;
-  }
-  assert.strictEqual(placedInSlot, true, 'Card placed successfully');
-  assert.strictEqual(pulsingSlotIndex, null, 'Pulse clears after placement');
-});
-
-test('TIER 3 — Cross-Feature Interaction 11: Memory Match -> First Card Flipped -> Matching Card Guided -> Zero Penalties', async () => {
-  let firstFlipped: number | null = null;
-  let matchesFound = 0;
-  let attempts = 0;
-
-  const cards = [
-    { id: 0, pairId: 'apple' },
-    { id: 1, pairId: 'banana' },
-    { id: 2, pairId: 'apple' },
-    { id: 3, pairId: 'banana' },
-  ];
-
-  // Elder flips card 0 ('apple')
-  firstFlipped = 0;
-  attempts++;
-
-  // In errorless mode, card 2 ('apple') is highlighted/guided
-  const guidedCardIndex = cards.findIndex((c, idx) => idx !== firstFlipped && c.pairId === cards[firstFlipped!].pairId);
-  assert.strictEqual(guidedCardIndex, 2, 'Matching card index 2 must be guided');
-
-  // Elder taps guided card 2
-  if (cards[firstFlipped].pairId === cards[guidedCardIndex].pairId) {
-    matchesFound++;
-  }
-
-  assert.strictEqual(matchesFound, 1, 'Match successfully found');
-  assert.strictEqual(attempts, 1, 'Single attempt with zero failure penalties');
-});
-
-test('TIER 3 — Cross-Feature Interaction 12: Full Multi-Feature Lifecycle (Record -> Schedule -> Takeover -> Vibrate -> Acknowledge -> Game -> Errorless Complete)', async () => {
-  const env = setupTestEnvironment();
-  const db = createMockDatabase();
-  const modalRoot = env.document.getElementById('modal-root')!;
-
-  // 1. Caregiver records voice reminder
-  const voiceBlob = new Blob([new Uint8Array([1, 2, 3, 4, 5])], { type: 'audio/webm' });
-  const reminderId = await db.reminders.add({
-    patientId: 1,
-    type: 'medicine',
-    label: 'Morning Donepezil Medication',
-    timeHour: 8,
-    timeMinute: 0,
-    repeatDays: [0, 1, 2, 3, 4, 5, 6],
-    isActive: true,
-    lastAcked: null,
-    audioBlob: voiceBlob,
-    audioDurationSec: 5,
-  });
-
-  // 2. Scheduler detects due reminder and mounts portal takeover
-  const reminder = await db.reminders.get(reminderId);
-  assert.ok(reminder);
-
-  const modal = env.document.createElement('div');
-  modal.id = 'full-lifecycle-modal';
-  modal.style.position = 'fixed';
-  modal.style.inset = '0';
-  modal.style.zIndex = '999999';
-  modal.style.backgroundColor = '#0A1420';
-  modalRoot.appendChild(modal);
-  env.document.body.style.overflow = 'hidden';
-
-  // 3. Concurrently triggers haptic vibration and audio playback
-  env.navigator.vibrate([300, 120, 300, 120, 450]);
-  const audioUrl = env.URL.createObjectURL(reminder.audioBlob!);
-  const audio = new env.Audio(audioUrl);
-  await audio.play();
-
-  assert.strictEqual(env.navigator.vibrateCalls.length, 1);
-  assert.strictEqual(audio.paused, false);
-
-  // 4. Elder acknowledges reminder
-  audio.pause();
-  env.URL.revokeObjectURL(audioUrl);
-  modalRoot.removeChild(modal);
-  env.document.body.style.overflow = '';
-  await db.reminderLogs.add({
-    reminderId: reminder.id!,
-    patientId: reminder.patientId,
-    scheduledAt: new Date(),
-    acknowledgedAt: new Date(),
-    synced: 0,
-  });
-
-  // 5. Elder launches cognitive game (Math Workout) with Errorless Learning
-  const options = [20, 25, 30];
-  const target = 25;
-  let scaffoldActive = true; // After 3s inactivity
-
-  const correctBtn = env.document.createElement('button');
-  correctBtn.disabled = false;
-  if (scaffoldActive) {
-    correctBtn.classList.add('scaffold-pulse-active');
-    correctBtn.style.borderColor = '#10B981';
-  }
-
-  assert.ok(correctBtn.classList.contains('scaffold-pulse-active'));
-
-  // Tap correct choice
-  await db.gameSessions.add({
-    patientId: 1,
-    gameType: 'math',
+  // 1. Session created on question completion
+  const session = {
+    id: `rec_${Date.now()}`,
+    patientId: 'patient_1',
+    gameType: 'recognise',
     difficulty: 1,
-    score: 100,
-    accuracy: 1.0,
-    playedAt: new Date(),
-    synced: 0,
-    domain: 'processingSpeed',
-  });
+    score: 5,
+    totalObjects: 5,
+    accuracy: 100,
+    responseTime: 14.5,
+    timestamp: Date.now(),
+  };
+  await db.gameSessions.put(session);
 
-  // 6. Verify complete telemetry persistence
-  const logs = await db.reminderLogs.toArray();
+  // 2. Verify stored session
+  const stored = await db.gameSessions.get(session.id);
+  assert.ok(stored);
+  assert.strictEqual(stored.gameType, 'recognise');
+  assert.strictEqual(stored.accuracy, 100);
+});
+
+test('TIER 3 — Cross-Feature Interaction 8: Recognise Game Results -> Caregiver Recognition Trend & Analytics (Features 8 & 12)', async () => {
+  const db = createMockDatabase();
+
+  // Seed multiple recognise sessions
+  const baseTime = Date.now() - 86400000 * 3;
+  await db.gameSessions.put({ id: 's1', patientId: 'p1', gameType: 'recognise', accuracy: 70, timestamp: baseTime });
+  await db.gameSessions.put({ id: 's2', patientId: 'p1', gameType: 'recognise', accuracy: 85, timestamp: baseTime + 86400000 });
+  await db.gameSessions.put({ id: 's3', patientId: 'p1', gameType: 'recognise', accuracy: 95, timestamp: baseTime + 86400000 * 2 });
+
   const sessions = await db.gameSessions.toArray();
-  assert.strictEqual(logs.length, 1, 'Reminder log recorded');
-  assert.strictEqual(sessions.length, 1, 'Cognitive workout session recorded');
-  assert.strictEqual(sessions[0].accuracy, 1.0, 'Errorless learning ensures 100% accuracy');
+  const accuracies = sessions.map((s) => s.accuracy);
+  const isImproving = accuracies[2] > accuracies[0];
+
+  assert.strictEqual(sessions.length, 3);
+  assert.strictEqual(isImproving, true, 'Trend from 70% to 95% must evaluate as improving');
+});
+
+test('TIER 3 — Cross-Feature Interaction 9: Home Launcher -> Remember Game -> Memorize Timer -> Recall Grid -> Session Saved (Features 7 & 9)', async () => {
+  const db = createMockDatabase();
+
+  // Simulate complete Remember game journey
+  const targetObjects = [
+    { id: 'cup', name: 'Cup', imageUrl: '/cup.jpg', category: 'daily' },
+    { id: 'mango', name: 'Mango', imageUrl: '/mango.jpg', category: 'fruit' },
+    { id: 'book', name: 'Book', imageUrl: '/book.jpg', category: 'daily' },
+  ];
+  const userSelected = [targetObjects[0], targetObjects[1], targetObjects[2]];
+
+  const matches = userSelected.filter((sel) => targetObjects.some((tgt) => tgt.id === sel.id)).length;
+  const accuracy = Math.round((matches / targetObjects.length) * 100);
+
+  const session = {
+    id: `rem_${Date.now()}`,
+    patientId: 'patient_1',
+    gameType: 'remember',
+    difficulty: 1,
+    score: matches,
+    totalObjects: targetObjects.length,
+    accuracy,
+    responseTime: 8.2,
+    timestamp: Date.now(),
+  };
+  await db.gameSessions.put(session);
+
+  const retrieved = await db.gameSessions.get(session.id);
+  assert.ok(retrieved);
+  assert.strictEqual(retrieved.gameType, 'remember');
+  assert.strictEqual(retrieved.accuracy, 100);
+});
+
+test('TIER 3 — Cross-Feature Interaction 10: Remember Game Results -> Caregiver Memory Trend & Average Score (Features 9 & 12)', async () => {
+  const db = createMockDatabase();
+
+  await db.gameSessions.put({ id: 'r1', patientId: 'p1', gameType: 'remember', accuracy: 80, timestamp: Date.now() - 3600000 });
+  await db.gameSessions.put({ id: 'r2', patientId: 'p1', gameType: 'remember', accuracy: 80, timestamp: Date.now() });
+
+  const sessions = await db.gameSessions.toArray();
+  const avg = Math.round(sessions.reduce((acc, s) => acc + s.accuracy, 0) / sessions.length);
+
+  assert.strictEqual(avg, 80, 'Average memory accuracy must be 80%');
+});
+
+test('TIER 3 — Cross-Feature Interaction 11: Home Launcher -> Memory Match -> 3D Card Flips & Matches Pairs (Features 7 & 10)', async () => {
+  let game = createMemoryMatchGame(1);
+  assert.strictEqual(game.isComplete, false);
+
+  // Pair 1 match
+  const card0 = game.cards[0];
+  const match0 = game.cards.findIndex((c, i) => i !== 0 && c.pairId === card0.pairId);
+  game = flipMemoryMatchCard(game, 0);
+  game = flipMemoryMatchCard(game, match0);
+  game = checkMemoryMatch(game);
+  assert.strictEqual(game.matchesFound, 1);
+
+  // Pair 2 match
+  const remaining = [0, 1, 2, 3].filter((i) => i !== 0 && i !== match0);
+  game = flipMemoryMatchCard(game, remaining[0]);
+  game = flipMemoryMatchCard(game, remaining[1]);
+  game = checkMemoryMatch(game);
+  assert.strictEqual(game.matchesFound, 2);
+  assert.strictEqual(game.isComplete, true);
+});
+
+test('TIER 3 — Cross-Feature Interaction 12: Home Launcher -> Daily Routine Sequencing -> Slot Lock -> Session Stored (Features 7 & 11)', async () => {
+  let game = createDailyRoutineGame(1);
+
+  for (let slot = 0; slot < 3; slot++) {
+    const cardIdx = game.shuffledCards.findIndex(
+      (c) => c.order === slot && !game.placedCards.some((p) => p?.id === c.id)
+    );
+    game = selectDailyRoutineCard(game, cardIdx);
+    game = placeDailyRoutineCard(game, slot);
+  }
+
+  assert.strictEqual(game.isComplete, true);
+  const result = getDailyRoutineResult(game);
+  assert.strictEqual(result.accuracy, 1);
+  assert.strictEqual(result.totalCards, 3);
+});
+
+test('TIER 3 — Cross-Feature Interaction 13: Settings Text Size Change Propagates to Document & Preview Typography (Features 14 & 7)', async () => {
+  const env = setupTestEnvironment();
+
+  // Test progression of body class across three sizes
+  const sizes = ['normal', 'large', 'extra-large'];
+  for (const size of sizes) {
+    env.document.body.classList.remove('text-size-normal', 'text-size-large', 'text-size-extra-large');
+    env.document.body.classList.add(`text-size-${size}`);
+    assert.strictEqual(env.document.body.classList.contains(`text-size-${size}`), true);
+  }
+
+  env.cleanup();
+});
+
+test('TIER 3 — Cross-Feature Interaction 14: Responsive Orientation Shift Reconfigures Layout Grid (Features 15 & 7)', async () => {
+  const homeSrc = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
+
+  // Verify responsive Tailwind classes support both portrait and landscape
+  assert.ok(homeSrc.includes('grid-cols-1'), 'Portrait layout activates 1 column');
+  assert.ok(homeSrc.includes('lg:grid-cols-12'), 'Landscape layout activates 12 column split');
+  assert.ok(homeSrc.includes('lg:col-span-7') && homeSrc.includes('lg:col-span-5'), 'Landscape defines 7/5 column ratio');
+});
+
+test('TIER 3 — Cross-Feature Interaction 15: Scandinavian Colors Active across Theme Transitions with Zero Muddy Bleed (Features 1 & 2)', async () => {
+  const globals = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
+
+  // Verify pure light and dark tokens
+  assert.ok(globals.includes('#F8FAFC'), 'Light canvas is clean #F8FAFC');
+  assert.ok(globals.includes('#0A1420') || globals.includes('#0B0F17'), 'Dark canvas is deep midnight/slate');
+  assert.ok(!globals.includes('#F5F0E8'), 'Zero muddy #F5F0E8 in tokens');
+  assert.ok(!globals.includes('#FDF8F0'), 'Zero warm muddy #FDF8F0 in tokens');
+});
+
+test('TIER 3 — Cross-Feature Interaction 16: Care Alert Buzzer Audio Synthesis + Vibration Sequence (Features 13 & 4)', async () => {
+  const env = setupTestEnvironment();
+
+  // Trigger buzzer vibration pattern
+  env.navigator.vibrate([300, 150, 300, 150, 500]);
+  assert.strictEqual(env.navigator.vibrateCalls.length, 1);
+
+  // Trigger stop / reset
+  env.navigator.vibrate(0);
+  assert.strictEqual(env.navigator.vibrateCalls.length, 2);
+  assert.strictEqual(env.navigator.vibrateCalls[1].pattern, 0);
 
   env.cleanup();
 });

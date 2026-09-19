@@ -1,25 +1,30 @@
 @import "tailwindcss";
 @import "./styles/globals.css";
 
+@custom-variant dark (&:where(.dark, .dark *, .theme-dark, .theme-dark *));
+
 @theme {
-  --color-primary: #1B5E20;
-  --color-primary-light: #4CAF50;
-  --color-primary-dark: #0D3B12;
-  --color-secondary: #E65100;
-  --color-secondary-light: #FF8A50;
-  --color-accent: #1565C0;
+  --color-bg: #F8FAFC;
+  --color-background: #F8FAFC;
+  --color-card: #FFFFFF;
+  --color-border: #E2E8F0;
+  --color-text: #0F172A;
+  --color-text-muted: #64748B;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #334155;
+  --color-primary: #4F46E5;
+  --color-primary-light: #6366F1;
+  --color-primary-dark: #3730A3;
+  --color-secondary: #3B82F6;
+  --color-secondary-light: #60A5FA;
+  --color-accent: #3B82F6;
   --color-surface: #FFFFFF;
-  --color-surface-warm: #FDF8F0;
+  --color-surface-warm: #F8FAFC;
   --color-surface-card: #FFFFFF;
-  --color-background: #F5F0E8;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #4A4A4A;
-  --color-text-muted: #7A7A7A;
-  --color-border: #E0D8CC;
-  --color-success: #2E7D32;
-  --color-warning: #F57F17;
-  --color-error: #C62828;
-  --color-offline: #5D4037;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-offline: #64748B;
 }
 
 * {
@@ -27,9 +32,9 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--color-bg, #0A1420);
-  color: var(--color-text, #FFFFFF);
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--color-bg, #F8FAFC);
+  color: var(--color-text, #0F172A);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -44,7 +49,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C0B8A8;
+  background: #CBD5E1;
   border-radius: 2px;
 }
 
@@ -55,7 +60,7 @@ html {
 
 /* Focus styles for accessibility */
 *:focus-visible {
-  outline: 3px solid #1565C0;
+  outline: 3px solid #4F46E5;
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -66,8 +71,8 @@ body.high-contrast {
   --color-text-primary: #000000;
   --color-background: #FFFFFF;
   --color-surface-warm: #FFFFFF;
-  background-color: #FFFFFF;
-  color: #000000;
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
   filter: contrast(1.2);
 }
 

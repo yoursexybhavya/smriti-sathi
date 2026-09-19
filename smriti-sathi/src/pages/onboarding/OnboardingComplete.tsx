@@ -4,27 +4,28 @@ import LargeButton from '../../components/LargeButton';
 interface OnboardingCompleteProps {
   patientName: string;
   onFinish: () => void;
+  onBack?: () => void;
 }
 
-export default function OnboardingComplete({ patientName, onFinish }: OnboardingCompleteProps) {
+export default function OnboardingComplete({ patientName, onFinish, onBack }: OnboardingCompleteProps) {
   return (
-    <div className="min-h-screen bg-[#F5F0E8] flex flex-col justify-center px-6 py-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col justify-center px-6 py-12 transition-colors duration-200">
       <div className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
         {/* Left: Congratulatory Banner */}
         <div className="md:col-span-6 flex flex-col items-center md:items-start text-center md:text-left">
-          <div className="w-28 h-28 rounded-full bg-[#E8F5E9] flex items-center justify-center mb-6 shadow-xl border-4 border-[#1B5E20]/20 animate-in zoom-in-75 duration-200">
-            <CheckCircle size={60} className="text-[#1B5E20]" />
+          <div className="w-28 h-28 rounded-full bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center mb-6 shadow-xl border-4 border-emerald-500/30 animate-in zoom-in-75 duration-200">
+            <CheckCircle size={60} className="text-emerald-600 dark:text-emerald-400" />
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-extrabold text-[#1A1A1A]">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
             Setup Complete! / প্ৰস্তুতি সম্পূৰ্ণ!
           </h1>
 
-          <p className="text-xl md:text-2xl text-[#1B5E20] font-bold mt-2">
+          <p className="text-xl md:text-2xl text-indigo-600 dark:text-indigo-400 font-bold mt-2">
             Welcome, {patientName}.
           </p>
 
-          <p className="text-base md:text-lg text-[#4A4A4A] mt-2 leading-relaxed">
+          <p className="text-base md:text-lg text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
             Your personal cognitive memory care companion is ready to assist you every day.
           </p>
         </div>
@@ -42,7 +43,16 @@ export default function OnboardingComplete({ patientName, onFinish }: Onboarding
             <LargeButton onPress={onFinish}>
               Start Using Smriti Sathi →
             </LargeButton>
-            <p className="text-center text-xs md:text-sm text-[#7A7A7A]">
+            {onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                className="w-full min-h-[48px] py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-semibold transition-colors cursor-pointer"
+              >
+                ← Review Settings
+              </button>
+            )}
+            <p className="text-center text-xs md:text-sm text-slate-500 dark:text-slate-400">
               Caregivers can adjust reminders or settings anytime from the Settings tab.
             </p>
           </div>
@@ -54,9 +64,9 @@ export default function OnboardingComplete({ patientName, onFinish }: Onboarding
 
 function SummaryItem({ icon, text }: { icon: string; text: string }) {
   return (
-    <div className="flex items-center gap-3 p-4 bg-white rounded-2xl border border-[#E0D8CC]">
+    <div className="flex items-center gap-3.5 p-4 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
       <span className="text-2xl">{icon}</span>
-      <span className="text-base text-[#1A1A1A] font-medium">{text}</span>
+      <span className="text-base text-slate-800 dark:text-slate-200 font-medium">{text}</span>
     </div>
   );
 }

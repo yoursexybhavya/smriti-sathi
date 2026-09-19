@@ -51,21 +51,26 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-[#E0D8CC]">
-        <div className="max-w-5xl mx-auto flex items-center gap-3 px-5 py-4">
-          <button
-            onClick={onBack}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-[#F5F0E8] hover:bg-[#E0D8CC] transition-colors"
-            aria-label="Go back"
-          >
-            <ChevronLeft size={22} />
-          </button>
-          <div>
-            <h1 className="text-xl font-bold text-[#1A1A1A]">Patient Profile</h1>
-            <p className="text-sm text-[#7A7A7A]">Step 1 of 4: Personalized Elder Information</p>
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700">
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-5 py-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="w-11 h-11 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+              aria-label="Go back"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">Patient Profile</h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Step 1 of 4: Personalized Elder Information</p>
+            </div>
           </div>
+          <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+            Step 1 / 4
+          </span>
         </div>
       </header>
 
@@ -75,13 +80,13 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
           {/* Left Column: Basic Info & Photo */}
           <div className="md:col-span-6 space-y-6">
             {/* Profile Image */}
-            <div className="flex flex-col items-center bg-white p-6 rounded-3xl border border-[#E0D8CC] shadow-xs">
-              <div className="w-28 h-28 rounded-full bg-[#E8F5E9] flex items-center justify-center border-4 border-white shadow-md">
-                <User size={52} className="text-[#1B5E20]" />
+            <div className="flex flex-col items-center bg-white dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
+              <div className="w-28 h-28 rounded-full bg-indigo-50 dark:bg-indigo-950/60 flex items-center justify-center border-4 border-white dark:border-slate-700 shadow-md">
+                <User size={52} className="text-indigo-600 dark:text-indigo-400" />
               </div>
               <button
                 type="button"
-                className="mt-3 flex items-center gap-2 text-base font-bold text-[#1B5E20] px-4 py-2 rounded-xl hover:bg-[#E8F5E9] transition-colors min-h-[48px]"
+                className="mt-3 flex items-center gap-2 text-base font-bold text-indigo-600 dark:text-indigo-400 px-4 py-2 rounded-xl hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors min-h-[48px] cursor-pointer"
               >
                 <Camera size={20} />
                 <span>Add Photo / ফটো দিয়ক</span>
@@ -90,7 +95,7 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
 
             {/* Name */}
             <div className="space-y-2">
-              <label className="text-base font-bold text-[#1A1A1A] block px-1">
+              <label className="text-base font-bold text-slate-800 dark:text-slate-200 block px-1">
                 Patient's Name (বা নাম)
               </label>
               <input
@@ -98,13 +103,13 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Kamala Baa, Deka Koka, Mohan"
-                className="w-full px-5 py-4 text-lg bg-white border-2 border-[#E0D8CC] rounded-2xl focus:border-[#1B5E20] focus:outline-none transition-colors shadow-xs"
+                className="w-full px-5 py-4 text-lg bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-slate-100 transition-colors shadow-xs"
               />
             </div>
 
             {/* Age */}
             <div className="space-y-2">
-              <label className="text-base font-bold text-[#1A1A1A] block px-1">
+              <label className="text-base font-bold text-slate-800 dark:text-slate-200 block px-1">
                 Age (বয়স)
               </label>
               <input
@@ -112,7 +117,7 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
                 placeholder="e.g. 72"
-                className="w-full px-5 py-4 text-lg bg-white border-2 border-[#E0D8CC] rounded-2xl focus:border-[#1B5E20] focus:outline-none transition-colors shadow-xs"
+                className="w-full px-5 py-4 text-lg bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:border-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-900 dark:text-slate-100 transition-colors shadow-xs"
               />
             </div>
 
@@ -125,16 +130,16 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
                     key={option.id}
                     type="button"
                     onClick={() => toggleRoutine(option.id)}
-                    className={`w-full p-4 rounded-2xl border-2 text-left transition-all flex items-center gap-3 min-h-[56px] ${
+                    className={`w-full p-4 rounded-2xl border-2 text-left transition-all flex items-center gap-3 min-h-[56px] cursor-pointer ${
                       selectedRoutine.includes(option.id)
-                        ? 'bg-[#E8F5E9] border-[#1B5E20] shadow-xs'
-                        : 'bg-white border-[#E0D8CC] hover:border-[#C0B8A8]'
+                        ? 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-600 dark:border-indigo-500 shadow-xs ring-2 ring-indigo-500/20'
+                        : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
                     }`}
                   >
                     <span className="text-2xl">{option.emoji}</span>
-                    <span className="text-base font-semibold text-[#1A1A1A]">{option.label}</span>
+                    <span className="text-base font-semibold text-slate-900 dark:text-slate-100">{option.label}</span>
                     {selectedRoutine.includes(option.id) && (
-                      <span className="ml-auto text-[#1B5E20] font-bold">✓</span>
+                      <span className="ml-auto text-indigo-600 dark:text-indigo-400 font-bold">✓</span>
                     )}
                   </button>
                 ))}
@@ -146,7 +151,7 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
           <div className="md:col-span-6 space-y-6">
             <div className="space-y-3">
               <SectionHeader title="Reminders & Alerts" />
-              <div className="bg-white rounded-3xl border border-[#E0D8CC] p-5 space-y-4 shadow-xs">
+              <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 p-5 space-y-4 shadow-sm">
                 <ReminderToggle
                   label="Medicine Reminders"
                   description="Sound & visual alerts for morning/evening doses"
@@ -175,10 +180,17 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
             </div>
 
             {/* Continue Button */}
-            <div className="pt-4">
+            <div className="pt-4 space-y-3">
               <LargeButton onPress={handleNext} disabled={!canProceed}>
                 Continue to Language →
               </LargeButton>
+              <button
+                type="button"
+                onClick={onBack}
+                className="w-full min-h-[48px] py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-semibold transition-colors cursor-pointer"
+              >
+                ← Back to Welcome
+              </button>
             </div>
           </div>
 
@@ -201,15 +213,16 @@ function ReminderToggle({
 }) {
   return (
     <button
+      type="button"
       onClick={onToggle}
-      className="w-full flex items-center justify-between py-2 min-h-[48px]"
+      className="w-full flex items-center justify-between py-2 min-h-[48px] cursor-pointer"
     >
-      <div className="text-left">
-        <span className="text-base font-medium text-[#1A1A1A]">{label}</span>
-        <p className="text-sm text-[#7A7A7A]">{description}</p>
+      <div className="text-left pr-4">
+        <span className="text-base font-semibold text-slate-900 dark:text-slate-100">{label}</span>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
       </div>
-      <div className={`w-14 h-8 rounded-full relative transition-colors ${
-        enabled ? 'bg-[#1B5E20]' : 'bg-[#C0B8A8]'
+      <div className={`w-14 h-8 rounded-full relative transition-colors flex-shrink-0 ${
+        enabled ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-600'
       }`}>
         <div className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow-sm transition-transform ${
           enabled ? 'translate-x-7' : 'translate-x-1'

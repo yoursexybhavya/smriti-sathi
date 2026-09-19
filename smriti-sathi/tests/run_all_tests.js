@@ -16,23 +16,23 @@ const rootDir = path.resolve(__dirname, '..');
 
 const testSuites = [
   {
-    name: 'Tier 1: Feature Coverage (12 Features x >=5 tests)',
+    name: 'Tier 1: Feature Coverage (16 Features x 6 tests = 96 tests)',
     path: 'tests/tier1_feature_coverage.test.ts',
   },
   {
-    name: 'Tier 2: Boundary & Corner Cases (12 Features x >=5 boundary tests)',
+    name: 'Tier 2: Boundary & Corner Cases (16 Features x 6 tests = 96 tests)',
     path: 'tests/tier2_boundary_corner_cases.test.ts',
   },
   {
-    name: 'Tier 3: Cross-Feature Pairwise Interactions (>=12 scenarios)',
+    name: 'Tier 3: Cross-Feature Pairwise Interactions (16 scenarios)',
     path: 'tests/tier3_cross_feature_interactions.test.ts',
   },
   {
-    name: 'Tier 4: Real-World Application Workflows (>=5 workflows)',
+    name: 'Tier 4: Real-World Application Workflows (8 clinical journeys)',
     path: 'tests/tier4_real_world_scenarios.test.ts',
   },
   {
-    name: 'Tier 5A: Adversarial Hardening (Errorless Learning Stress Tests)',
+    name: 'Tier 5A: Adversarial Hardening (Errorless Learning & Shield Tests, 31 tests)',
     path: 'tests/tier5_adversarial_errorless_learning.test.ts',
   },
   {
@@ -40,7 +40,7 @@ const testSuites = [
     path: 'tests/adversarial_stress_challenge.test.ts',
   },
   {
-    name: 'Clinical Baseline: Stability Performance Index (SPI Engine)',
+    name: 'Clinical Baseline: Stability Performance Index (SPI Engine, 3 tests)',
     path: 'src/engine/test_spi_baseline.js',
   },
 ];

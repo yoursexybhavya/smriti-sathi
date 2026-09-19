@@ -14,26 +14,26 @@ export default function StatusIndicator({
   const config = {
     online: {
       icon: <Wifi size={compact ? 12 : 14} />,
-      bg: 'bg-[#E8F5E9]',
-      text: 'text-[#2E7D32]',
+      bg: 'bg-emerald-100 dark:bg-emerald-950/60',
+      text: 'text-emerald-800 dark:text-emerald-300',
       defaultLabel: 'Online',
     },
     offline: {
       icon: <WifiOff size={compact ? 12 : 14} />,
-      bg: 'bg-[#EFEBE9]',
-      text: 'text-[#5D4037]',
+      bg: 'bg-slate-200 dark:bg-slate-800',
+      text: 'text-slate-700 dark:text-slate-300',
       defaultLabel: 'Offline',
     },
     success: {
       icon: <CheckCircle size={compact ? 12 : 14} />,
-      bg: 'bg-[#E8F5E9]',
-      text: 'text-[#2E7D32]',
+      bg: 'bg-emerald-100 dark:bg-emerald-950/60',
+      text: 'text-emerald-800 dark:text-emerald-300',
       defaultLabel: 'Complete',
     },
     warning: {
       icon: <AlertCircle size={compact ? 12 : 14} />,
-      bg: 'bg-[#FFF3E0]',
-      text: 'text-[#E65100]',
+      bg: 'bg-amber-100 dark:bg-amber-950/60',
+      text: 'text-amber-800 dark:text-amber-300',
       defaultLabel: 'Attention',
     },
   };

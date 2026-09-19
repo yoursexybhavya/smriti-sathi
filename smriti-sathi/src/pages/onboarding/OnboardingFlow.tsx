@@ -87,6 +87,7 @@ export default function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowP
         <OnboardingComplete
           patientName={patient?.name || 'Friend'}
           onFinish={handleFinish}
+          onBack={goBack}
         />
       );
     default:

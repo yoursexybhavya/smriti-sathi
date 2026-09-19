@@ -267,85 +267,85 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'syncing': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-      case 'synced': return 'bg-green-100 text-green-800 border-green-200';
-      case 'failed': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'pending': return 'bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] border-[var(--color-accent-blue)]/30';
+      case 'syncing': return 'bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] border-[var(--color-accent-blue)]/30';
+      case 'synced': return 'bg-[var(--color-success-bg)] text-[var(--color-success)] border-[var(--color-success)]/30';
+      case 'failed': return 'bg-[var(--color-error-bg)] text-[var(--color-error)] border-[var(--color-error)]/30';
+      default: return 'bg-[var(--color-bg-subtle)] text-[var(--color-text-muted)] border-[var(--color-border)]';
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] pb-8">
+    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-8">
       {/* Header */}
-      <div className="bg-white border-b border-[#E0D8CC] px-4 py-4 sticky top-0 z-10">
+      <div className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <button
             onClick={onBack}
-            className="text-[#1B5E20] font-semibold text-lg flex items-center gap-2"
+            className="text-[var(--color-success)] font-semibold text-lg flex items-center gap-2"
           >
             ← Back
           </button>
-          <h1 className="text-lg font-bold text-[#1A1A1A]">Sync Test</h1>
+          <h1 className="text-lg font-bold text-[var(--color-text)]">Sync Test</h1>
           <div className="w-16" />
         </div>
       </div>
 
       <div className="px-4 py-4 space-y-4">
         {/* Current Status */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Activity size={16} />
             Current Sync Status
           </h2>
           <div className="grid grid-cols-2 gap-3">
             <div className={`p-3 rounded-xl border ${
               syncState.connectivityState === 'online' 
-                ? 'bg-green-50 border-green-200' 
-                : 'bg-amber-50 border-amber-200'
+                ? 'bg-[var(--color-success-bg)] border-[var(--color-success)]/30' 
+                : 'bg-[var(--color-warning-bg)] border-[var(--color-accent-amber)]/30'
             }`}>
               <div className="flex items-center gap-2 mb-1">
                 {syncState.connectivityState === 'online' 
-                  ? <Wifi size={16} className="text-green-700" />
-                  : <WifiOff size={16} className="text-amber-700" />
+                  ? <Wifi size={16} className="text-[var(--color-success)]" />
+                  : <WifiOff size={16} className="text-[var(--color-accent-amber)]" />
                 }
                 <span className={`text-xs font-medium ${
-                  syncState.connectivityState === 'online' ? 'text-green-700' : 'text-amber-700'
+                  syncState.connectivityState === 'online' ? 'text-[var(--color-success)]' : 'text-[var(--color-accent-amber)]'
                 }`}>
                   Connectivity
                 </span>
               </div>
               <span className={`text-lg font-bold ${
-                syncState.connectivityState === 'online' ? 'text-green-800' : 'text-amber-800'
+                syncState.connectivityState === 'online' ? 'text-[var(--color-success)]' : 'text-[var(--color-accent-amber)]'
               }`}>
                 {syncState.connectivityState.toUpperCase()}
               </span>
             </div>
 
             <div className={`p-3 rounded-xl border ${
-              syncState.status === 'synced' ? 'bg-green-50 border-green-200' :
-              syncState.status === 'syncing' ? 'bg-indigo-50 border-indigo-200' :
-              syncState.status === 'pending' ? 'bg-blue-50 border-blue-200' :
-              syncState.status === 'error' ? 'bg-red-50 border-red-200' :
-              syncState.status === 'offline' ? 'bg-amber-50 border-amber-200' :
-              'bg-gray-50 border-gray-200'
+              syncState.status === 'synced' ? 'bg-[var(--color-success-bg)] border-[var(--color-success)]/30' :
+              syncState.status === 'syncing' ? 'bg-[var(--color-accent-blue)/15] border-[var(--color-accent-blue)]/30' :
+              syncState.status === 'pending' ? 'bg-[var(--color-accent-blue)/15] border-[var(--color-accent-blue)]/30' :
+              syncState.status === 'error' ? 'bg-[var(--color-error-bg)] border-[var(--color-error)]/30' :
+              syncState.status === 'offline' ? 'bg-[var(--color-warning-bg)] border-[var(--color-accent-amber)]/30' :
+              'bg-[var(--color-bg-subtle)] border-[var(--color-border)]'
             }`}>
               <div className="flex items-center gap-2 mb-1">
                 <Cloud size={16} className={
-                  syncState.status === 'synced' ? 'text-green-700' :
-                  syncState.status === 'syncing' ? 'text-indigo-700' :
-                  syncState.status === 'pending' ? 'text-blue-700' :
-                  syncState.status === 'error' ? 'text-red-700' :
-                  'text-gray-700'
+                  syncState.status === 'synced' ? 'text-[var(--color-success)]' :
+                  syncState.status === 'syncing' ? 'text-[var(--color-accent-blue)]' :
+                  syncState.status === 'pending' ? 'text-[var(--color-accent-blue)]' :
+                  syncState.status === 'error' ? 'text-[var(--color-error)]' :
+                  'text-[var(--color-text-muted)]'
                 } />
-                <span className="text-xs font-medium text-[#4A4A4A]">Sync</span>
+                <span className="text-xs font-medium text-[var(--color-text-secondary)]">Sync</span>
               </div>
               <span className={`text-lg font-bold ${
-                syncState.status === 'synced' ? 'text-green-800' :
-                syncState.status === 'syncing' ? 'text-indigo-800' :
-                syncState.status === 'pending' ? 'text-blue-800' :
-                syncState.status === 'error' ? 'text-red-800' :
-                'text-gray-800'
+                syncState.status === 'synced' ? 'text-[var(--color-success)]' :
+                syncState.status === 'syncing' ? 'text-[var(--color-accent-blue)]' :
+                syncState.status === 'pending' ? 'text-[var(--color-accent-blue)]' :
+                syncState.status === 'error' ? 'text-[var(--color-error)]' :
+                'text-[var(--color-text-muted)]'
               }`}>
                 {syncState.status.toUpperCase()}
               </span>
@@ -354,45 +354,45 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
 
           {/* Counters */}
           <div className="flex gap-2 mt-3">
-            <div className="flex-1 text-center p-2 bg-blue-50 rounded-lg">
-              <div className="text-lg font-bold text-blue-800">{syncState.pendingCount}</div>
-              <div className="text-xs text-blue-600">Pending</div>
+            <div className="flex-1 text-center p-2 bg-[var(--color-accent-blue)/15] rounded-lg">
+              <div className="text-lg font-bold text-[var(--color-accent-blue)]">{syncState.pendingCount}</div>
+              <div className="text-xs text-[var(--color-accent-blue)]/80">Pending</div>
             </div>
-            <div className="flex-1 text-center p-2 bg-green-50 rounded-lg">
-              <div className="text-lg font-bold text-green-800">{syncState.syncedCount}</div>
-              <div className="text-xs text-green-600">Synced</div>
+            <div className="flex-1 text-center p-2 bg-[var(--color-success-bg)] rounded-lg">
+              <div className="text-lg font-bold text-[var(--color-success)]">{syncState.syncedCount}</div>
+              <div className="text-xs text-[var(--color-success)]/80">Synced</div>
             </div>
-            <div className="flex-1 text-center p-2 bg-red-50 rounded-lg">
-              <div className="text-lg font-bold text-red-800">{syncState.failedCount}</div>
-              <div className="text-xs text-red-600">Failed</div>
+            <div className="flex-1 text-center p-2 bg-[var(--color-error-bg)] rounded-lg">
+              <div className="text-lg font-bold text-[var(--color-error)]">{syncState.failedCount}</div>
+              <div className="text-xs text-[var(--color-error)]/80">Failed</div>
             </div>
           </div>
         </div>
 
         {/* Connectivity Controls */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Wifi size={16} />
             Connectivity Control
           </h2>
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={goOnline}
-              className="flex items-center justify-center gap-1 px-3 py-3 bg-green-100 text-green-800 rounded-xl font-medium text-sm hover:bg-green-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-1 px-3 py-3 bg-[var(--color-success-bg)] text-[var(--color-success)] rounded-xl font-medium text-sm hover:bg-[var(--color-success-bg)]/80 active:scale-95 transition-all"
             >
               <Wifi size={16} />
               Online
             </button>
             <button
               onClick={goOffline}
-              className="flex items-center justify-center gap-1 px-3 py-3 bg-amber-100 text-amber-800 rounded-xl font-medium text-sm hover:bg-amber-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-1 px-3 py-3 bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)] rounded-xl font-medium text-sm hover:bg-[var(--color-warning-bg)]/80 active:scale-95 transition-all"
             >
               <WifiOff size={16} />
               Offline
             </button>
             <button
               onClick={releaseConnectivity}
-              className="flex items-center justify-center gap-1 px-3 py-3 bg-gray-100 text-gray-800 rounded-xl font-medium text-sm hover:bg-gray-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-1 px-3 py-3 bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)] rounded-xl font-medium text-sm hover:bg-[var(--color-border)] active:scale-95 transition-all"
             >
               <RotateCcw size={16} />
               Auto
@@ -401,29 +401,29 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
         </div>
 
         {/* Data Creation */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Database size={16} />
             Create Data (triggers sync events)
           </h2>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={createGameResult}
-              className="flex items-center justify-center gap-2 px-3 py-3 bg-[#1B5E20] text-white rounded-xl font-medium text-sm hover:bg-[#0D3B12] active:scale-95 transition-all"
+              className="flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-success)] text-white rounded-xl font-medium text-sm hover:bg-[var(--color-success)]/90 active:scale-95 transition-all"
             >
               <Plus size={16} />
               Game Result
             </button>
             <button
               onClick={createReminder}
-              className="flex items-center justify-center gap-2 px-3 py-3 bg-[#E65100] text-white rounded-xl font-medium text-sm hover:bg-[#BF360C] active:scale-95 transition-all"
+              className="flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-accent-amber)] text-white rounded-xl font-medium text-sm hover:bg-[var(--color-accent-amber)]/90 active:scale-95 transition-all"
             >
               <Plus size={16} />
               Reminder
             </button>
             <button
               onClick={() => createMultipleRecords(5)}
-              className="col-span-2 flex items-center justify-center gap-2 px-3 py-3 bg-[#1565C0] text-white rounded-xl font-medium text-sm hover:bg-[#0D47A1] active:scale-95 transition-all"
+              className="col-span-2 flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-accent-blue)] text-white rounded-xl font-medium text-sm hover:bg-[var(--color-accent-blue)]/90 active:scale-95 transition-all"
             >
               <Plus size={16} />
               Create 5 Records
@@ -432,8 +432,8 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
         </div>
 
         {/* Sync Actions */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <RefreshCw size={16} />
             Sync Actions
           </h2>
@@ -441,7 +441,7 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
             <button
               onClick={triggerSync}
               disabled={syncState.isSyncing || ConnectivityService.isOffline()}
-              className="flex items-center justify-center gap-2 px-3 py-3 bg-indigo-600 text-white rounded-xl font-medium text-sm hover:bg-indigo-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-accent-blue)] text-white rounded-xl font-medium text-sm hover:bg-[var(--color-accent-blue)]/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RefreshCw size={16} className={syncState.isSyncing ? 'animate-spin' : ''} />
               Sync Now
@@ -449,21 +449,21 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
             <button
               onClick={retryFailed}
               disabled={syncState.failedCount === 0}
-              className="flex items-center justify-center gap-2 px-3 py-3 bg-orange-600 text-white rounded-xl font-medium text-sm hover:bg-orange-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-accent-amber)] text-white rounded-xl font-medium text-sm hover:bg-[var(--color-accent-amber)]/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RotateCcw size={16} />
               Retry Failed
             </button>
             <button
               onClick={clearSynced}
-              className="flex items-center justify-center gap-2 px-3 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)] rounded-xl font-medium text-sm hover:bg-[var(--color-border)] active:scale-95 transition-all"
             >
               <Trash2 size={16} />
               Clear Synced
             </button>
             <button
               onClick={resetAll}
-              className="flex items-center justify-center gap-2 px-3 py-3 bg-red-100 text-red-700 rounded-xl font-medium text-sm hover:bg-red-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-error-bg)] text-[var(--color-error)] rounded-xl font-medium text-sm hover:bg-[var(--color-error-bg)]/80 active:scale-95 transition-all"
             >
               <Trash2 size={16} />
               Reset All
@@ -472,35 +472,35 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
         </div>
 
         {/* Cloud Simulation */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Server size={16} />
             Cloud Simulation
           </h2>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={enableFailures}
-              className="flex items-center justify-center gap-2 px-3 py-3 bg-red-100 text-red-700 rounded-xl font-medium text-sm hover:bg-red-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-error-bg)] text-[var(--color-error)] rounded-xl font-medium text-sm hover:bg-[var(--color-error-bg)]/80 active:scale-95 transition-all"
             >
               <AlertTriangle size={16} />
               Force Fail
             </button>
             <button
               onClick={disableFailures}
-              className="flex items-center justify-center gap-2 px-3 py-3 bg-green-100 text-green-700 rounded-xl font-medium text-sm hover:bg-green-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-2 px-3 py-3 bg-[var(--color-success-bg)] text-[var(--color-success)] rounded-xl font-medium text-sm hover:bg-[var(--color-success-bg)]/80 active:scale-95 transition-all"
             >
               <CheckCircle2 size={16} />
               Allow Success
             </button>
             <button
               onClick={() => setFailureRate(0.3)}
-              className="flex items-center justify-center gap-1 px-3 py-3 bg-amber-100 text-amber-700 rounded-xl font-medium text-sm hover:bg-amber-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-1 px-3 py-3 bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)] rounded-xl font-medium text-sm hover:bg-[var(--color-warning-bg)]/80 active:scale-95 transition-all"
             >
               30% Fail
             </button>
             <button
               onClick={() => setFailureRate(0)}
-              className="flex items-center justify-center gap-1 px-3 py-3 bg-green-100 text-green-700 rounded-xl font-medium text-sm hover:bg-green-200 active:scale-95 transition-all"
+              className="flex items-center justify-center gap-1 px-3 py-3 bg-[var(--color-success-bg)] text-[var(--color-success)] rounded-xl font-medium text-sm hover:bg-[var(--color-success-bg)]/80 active:scale-95 transition-all"
             >
               0% Fail
             </button>
@@ -508,15 +508,15 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
         </div>
 
         {/* Automated Test */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Zap size={16} />
             Automated Test
           </h2>
           <button
             onClick={runFullTest}
             disabled={isRunningTest}
-            className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-[#1B5E20] to-[#4CAF50] text-white rounded-xl font-bold text-base hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-4 py-4 bg-gradient-to-r from-[var(--color-success)] to-[var(--color-success)]/80 text-white rounded-xl font-bold text-base hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50"
           >
             {isRunningTest ? (
               <>
@@ -530,19 +530,19 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
               </>
             )}
           </button>
-          <p className="text-xs text-[#7A7A7A] mt-2 text-center">
+          <p className="text-xs text-[var(--color-text-muted)] mt-2 text-center">
             Tests: online→create→offline→create→pending→reconnect→sync→verify→fail→verify safe
           </p>
         </div>
 
         {/* Sync Events List */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Clock size={16} />
             Sync Events ({events.length})
           </h2>
           {events.length === 0 ? (
-            <p className="text-sm text-[#7A7A7A] text-center py-4">No sync events yet</p>
+            <p className="text-sm text-[var(--color-text-muted)] text-center py-4">No sync events yet</p>
           ) : (
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {events.slice(0, 20).map((event) => (
@@ -561,7 +561,7 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
                       {event.syncStatus}
                     </span>
                     {event.retryCount > 0 && (
-                      <span className="text-xs text-red-600">×{event.retryCount}</span>
+                      <span className="text-xs text-[var(--color-error)]">×{event.retryCount}</span>
                     )}
                   </div>
                 </div>
@@ -571,50 +571,50 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
         </div>
 
         {/* Data Safety Verification */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Shield size={16} />
             Data Safety
           </h2>
-          <div className="bg-green-50 border border-green-200 rounded-xl p-3">
+          <div className="bg-[var(--color-success-bg)] border border-[var(--color-success)]/30 rounded-xl p-3">
             <div className="flex items-center gap-2 mb-2">
-              <Shield size={16} className="text-green-700" />
-              <span className="text-sm font-medium text-green-800">Local data is NEVER deleted until sync confirmed</span>
+              <Shield size={16} className="text-[var(--color-success)]" />
+              <span className="text-sm font-medium text-[var(--color-success)]">Local data is NEVER deleted until sync confirmed</span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-white rounded-lg p-2">
-                <span className="text-green-700 font-bold">{stats?.synced || 0}</span>
-                <span className="text-green-600 ml-1">confirmed in cloud</span>
+              <div className="bg-[var(--color-card)] rounded-lg p-2">
+                <span className="text-[var(--color-success)] font-bold">{stats?.synced || 0}</span>
+                <span className="text-[var(--color-success)]/80 ml-1">confirmed in cloud</span>
               </div>
-              <div className="bg-white rounded-lg p-2">
-                <span className="text-blue-700 font-bold">{stats?.pending || 0}</span>
-                <span className="text-blue-600 ml-1">safe locally</span>
+              <div className="bg-[var(--color-card)] rounded-lg p-2">
+                <span className="text-[var(--color-accent-blue)] font-bold">{stats?.pending || 0}</span>
+                <span className="text-[var(--color-accent-blue)]/80 ml-1">safe locally</span>
               </div>
-              <div className="bg-white rounded-lg p-2">
-                <span className="text-red-700 font-bold">{stats?.failed || 0}</span>
-                <span className="text-red-600 ml-1">preserved locally</span>
+              <div className="bg-[var(--color-card)] rounded-lg p-2">
+                <span className="text-[var(--color-error)] font-bold">{stats?.failed || 0}</span>
+                <span className="text-[var(--color-error)]/80 ml-1">preserved locally</span>
               </div>
-              <div className="bg-white rounded-lg p-2">
-                <span className="text-purple-700 font-bold">{stats?.cloudStats.totalSynced || 0}</span>
-                <span className="text-purple-600 ml-1">cloud records</span>
+              <div className="bg-[var(--color-card)] rounded-lg p-2">
+                <span className="text-[var(--color-accent-purple)] font-bold">{stats?.cloudStats.totalSynced || 0}</span>
+                <span className="text-[var(--color-accent-purple)]/80 ml-1">cloud records</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Idempotency Info */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Activity size={16} />
             Idempotency
           </h2>
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-3">
-            <p className="text-xs text-indigo-800">
+          <div className="bg-[var(--color-accent-blue)/15] border border-[var(--color-accent-blue)]/30 rounded-xl p-3">
+            <p className="text-xs text-[var(--color-accent-blue)]">
               Each sync event has a unique UUID. The cloud checks if a UUID was already processed 
               before syncing, preventing duplicate operations.
             </p>
             {stats && (
-              <div className="mt-2 text-xs text-indigo-700">
+              <div className="mt-2 text-xs text-[var(--color-accent-blue)]/90">
                 Cloud records: {stats.cloudStats.totalAttempts} attempts, 
                 {stats.cloudStats.totalSynced} unique synced
               </div>
@@ -624,14 +624,14 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
 
         {/* Test Log */}
         {testLog.length > 0 && (
-          <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-            <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+          <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
               <Activity size={16} />
               Test Log
             </h2>
-            <div className="bg-[#1A1A1A] rounded-xl p-3 max-h-64 overflow-y-auto">
+            <div className="bg-[var(--color-bg)] rounded-xl p-3 max-h-64 overflow-y-auto">
               {testLog.map((log, i) => (
-                <div key={i} className="text-xs font-mono text-green-400 leading-5">
+                <div key={i} className="text-xs font-mono text-[var(--color-success)] leading-5">
                   {log}
                 </div>
               ))}
@@ -640,30 +640,30 @@ export default function SyncTestScreen({ onBack }: SyncTestScreenProps) {
         )}
 
         {/* Architecture Info */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3">Architecture Flow</h2>
-          <div className="flex flex-col items-center gap-1 text-xs text-[#4A4A4A]">
-            <div className="flex items-center gap-2 bg-blue-50 px-3 py-2 rounded-lg w-full justify-center">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Architecture Flow</h2>
+          <div className="flex flex-col items-center gap-1 text-xs text-[var(--color-text-secondary)]">
+            <div className="flex items-center gap-2 bg-[var(--color-accent-blue)/15] px-3 py-2 rounded-lg w-full justify-center">
               <Database size={14} /> Local SQLite (Dexie)
             </div>
             <ArrowRight size={14} className="rotate-90" />
-            <div className="flex items-center gap-2 bg-amber-50 px-3 py-2 rounded-lg w-full justify-center">
+            <div className="flex items-center gap-2 bg-[var(--color-warning-bg)] px-3 py-2 rounded-lg w-full justify-center">
               <Clock size={14} /> Pending Sync Queue
             </div>
             <ArrowRight size={14} className="rotate-90" />
-            <div className="flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg w-full justify-center">
+            <div className="flex items-center gap-2 bg-[var(--color-success-bg)] px-3 py-2 rounded-lg w-full justify-center">
               <Wifi size={14} /> Connectivity Check
             </div>
             <ArrowRight size={14} className="rotate-90" />
-            <div className="flex items-center gap-2 bg-indigo-50 px-3 py-2 rounded-lg w-full justify-center">
+            <div className="flex items-center gap-2 bg-[var(--color-accent-blue)/15] px-3 py-2 rounded-lg w-full justify-center">
               <RefreshCw size={14} /> SyncService (retry, idempotency)
             </div>
             <ArrowRight size={14} className="rotate-90" />
-            <div className="flex items-center gap-2 bg-purple-50 px-3 py-2 rounded-lg w-full justify-center">
+            <div className="flex items-center gap-2 bg-[var(--color-accent-purple)/15] px-3 py-2 rounded-lg w-full justify-center">
               <Server size={14} /> Cloud (Mock → FastAPI/PostgreSQL)
             </div>
             <ArrowRight size={14} className="rotate-90" />
-            <div className="flex items-center gap-2 bg-green-50 px-3 py-2 rounded-lg w-full justify-center">
+            <div className="flex items-center gap-2 bg-[var(--color-success-bg)] px-3 py-2 rounded-lg w-full justify-center">
               <CheckCircle2 size={14} /> Synced ✓
             </div>
           </div>

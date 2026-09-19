@@ -70,10 +70,10 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'low': return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'high': return 'bg-[var(--color-error-bg)] text-[var(--color-error)] border-[var(--color-error)]/30';
+      case 'medium': return 'bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)] border-[var(--color-accent-amber)]/30';
+      case 'low': return 'bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] border-[var(--color-accent-blue)]/30';
+      default: return 'bg-[var(--color-bg-subtle)] text-[var(--color-text-muted)] border-[var(--color-border)]';
     }
   };
 
@@ -89,19 +89,19 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F5F0E8] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg-subtle)] flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw size={32} className="animate-spin text-[#1B5E20] mx-auto mb-3" />
-          <p className="text-[#4A4A4A]">Loading dashboard...</p>
+          <RefreshCw size={32} className="animate-spin text-[var(--color-success)] mx-auto mb-3" />
+          <p className="text-[var(--color-text-secondary)]">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] pb-8">
+    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-8">
       {/* Header */}
-      <div className="bg-[#1B5E20] text-white px-5 py-5">
+      <div className="bg-[var(--color-success)] text-white px-5 py-5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -132,9 +132,9 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
       <div className="px-5 py-4 space-y-4">
         {/* Follow-up Signals */}
         {signals.length > 0 && (
-          <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-            <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
-              <AlertTriangle size={16} className="text-amber-600" />
+          <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
+              <AlertTriangle size={16} className="text-[var(--color-accent-amber)]" />
               Follow-up Signals ({signals.length})
             </h2>
             <div className="space-y-2">
@@ -159,7 +159,7 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
 
         {/* Patient Cards */}
         <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] px-1 flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] px-1 flex items-center gap-2">
             <Users size={16} />
             Patients
           </h2>
@@ -168,45 +168,45 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
             return (
               <div
                 key={patient.id}
-                className="bg-white rounded-2xl border border-[#E0D8CC] p-4"
+                className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                      <span className="text-lg font-bold text-[#1B5E20]">
+                    <div className="w-12 h-12 rounded-full bg-[var(--color-success-bg)] flex items-center justify-center">
+                      <span className="text-lg font-bold text-[var(--color-success)]">
                         {patient.name.charAt(0)}
                       </span>
                     </div>
                     <div>
-                      <h3 className="text-base font-semibold text-[#1A1A1A]">{patient.name}</h3>
-                      <p className="text-xs text-[#7A7A7A]">Age: {patient.age}</p>
+                      <h3 className="text-base font-semibold text-[var(--color-text)]">{patient.name}</h3>
+                      <p className="text-xs text-[var(--color-text-muted)]">Age: {patient.age}</p>
                     </div>
                   </div>
                   <button
                     onClick={() => onNavigate(`caregiver-patient-${patient.id}`)}
-                    className="p-2 rounded-lg bg-[#F5F0E8] hover:bg-[#E0D8CC] transition-colors"
+                    className="p-2 rounded-lg bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] transition-colors"
                   >
-                    <ChevronRight size={18} className="text-[#4A4A4A]" />
+                    <ChevronRight size={18} className="text-[var(--color-text-secondary)]" />
                   </button>
                 </div>
 
                 {summary && (
                   <div className="grid grid-cols-4 gap-2">
-                    <div className="text-center p-2 bg-blue-50 rounded-lg">
-                      <div className="text-lg font-bold text-blue-800">{summary.totalGames}</div>
-                      <div className="text-xs text-blue-600">Games</div>
+                    <div className="text-center p-2 bg-[var(--color-accent-blue)/15] rounded-lg">
+                      <div className="text-lg font-bold text-[var(--color-accent-blue)]">{summary.totalGames}</div>
+                      <div className="text-xs text-[var(--color-accent-blue)]/80">Games</div>
                     </div>
-                    <div className="text-center p-2 bg-green-50 rounded-lg">
-                      <div className="text-lg font-bold text-green-800">{summary.avgAccuracy}%</div>
-                      <div className="text-xs text-green-600">Accuracy</div>
+                    <div className="text-center p-2 bg-[var(--color-success-bg)] rounded-lg">
+                      <div className="text-lg font-bold text-[var(--color-success)]">{summary.avgAccuracy}%</div>
+                      <div className="text-xs text-[var(--color-success)]/80">Accuracy</div>
                     </div>
-                    <div className="text-center p-2 bg-amber-50 rounded-lg">
-                      <div className="text-lg font-bold text-amber-800">{summary.pendingReminders}</div>
-                      <div className="text-xs text-amber-600">Pending</div>
+                    <div className="text-center p-2 bg-[var(--color-warning-bg)] rounded-lg">
+                      <div className="text-lg font-bold text-[var(--color-accent-amber)]">{summary.pendingReminders}</div>
+                      <div className="text-xs text-[var(--color-accent-amber)]/80">Pending</div>
                     </div>
-                    <div className="text-center p-2 bg-purple-50 rounded-lg">
-                      <div className="text-lg font-bold text-purple-800">{summary.gamesThisWeek}</div>
-                      <div className="text-xs text-purple-600">This Week</div>
+                    <div className="text-center p-2 bg-[var(--color-accent-purple)/15] rounded-lg">
+                      <div className="text-lg font-bold text-[var(--color-accent-purple)]">{summary.gamesThisWeek}</div>
+                      <div className="text-xs text-[var(--color-accent-purple)]/80">This Week</div>
                     </div>
                   </div>
                 )}
@@ -216,43 +216,43 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3">Quick Actions</h2>
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => onNavigate('caregiver-reminders')}
-              className="flex flex-col items-center gap-2 p-4 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors"
+              className="flex flex-col items-center gap-2 p-4 bg-[var(--color-warning-bg)] rounded-xl hover:bg-[var(--color-warning-bg)]/80 transition-colors"
             >
-              <Bell size={24} className="text-amber-700" />
-              <span className="text-xs font-medium text-amber-800">Manage Reminders</span>
+              <Bell size={24} className="text-[var(--color-accent-amber)]" />
+              <span className="text-xs font-medium text-[var(--color-accent-amber)]">Manage Reminders</span>
             </button>
             <button
               onClick={() => onNavigate('caregiver-memory')}
-              className="flex flex-col items-center gap-2 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors"
+              className="flex flex-col items-center gap-2 p-4 bg-[var(--color-accent-purple)/15] rounded-xl hover:bg-[var(--color-accent-purple)]/25 transition-colors"
             >
-              <Users size={24} className="text-purple-700" />
-              <span className="text-xs font-medium text-purple-800">Memory Book</span>
+              <Users size={24} className="text-[var(--color-accent-purple)]" />
+              <span className="text-xs font-medium text-[var(--color-accent-purple)]">Memory Book</span>
             </button>
             <button
               onClick={() => onNavigate('safety-dashboard')}
-              className="flex flex-col items-center gap-2 p-4 bg-red-50 rounded-xl hover:bg-red-100 transition-colors"
+              className="flex flex-col items-center gap-2 p-4 bg-[var(--color-error-bg)] rounded-xl hover:bg-[var(--color-error-bg)]/80 transition-colors"
             >
-              <Shield size={24} className="text-red-700" />
-              <span className="text-xs font-medium text-red-800">Safety Features</span>
+              <Shield size={24} className="text-[var(--color-error)]" />
+              <span className="text-xs font-medium text-[var(--color-error)]">Safety Features</span>
             </button>
             <button
               onClick={() => onNavigate('sync-tests')}
-              className="flex flex-col items-center gap-2 p-4 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors"
+              className="flex flex-col items-center gap-2 p-4 bg-[var(--color-accent-blue)/15] rounded-xl hover:bg-[var(--color-accent-blue)]/25 transition-colors"
             >
-              <RefreshCw size={24} className="text-indigo-700" />
-              <span className="text-xs font-medium text-indigo-800">Sync Status</span>
+              <RefreshCw size={24} className="text-[var(--color-accent-blue)]" />
+              <span className="text-xs font-medium text-[var(--color-accent-blue)]">Sync Status</span>
             </button>
             <button
               onClick={() => onNavigate('caregiver-settings')}
-              className="col-span-2 flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+              className="col-span-2 flex flex-col items-center gap-2 p-4 bg-[var(--color-bg-subtle)] rounded-xl hover:bg-[var(--color-border)] transition-colors"
             >
-              <Shield size={24} className="text-gray-700" />
-              <span className="text-xs font-medium text-gray-800">Settings</span>
+              <Shield size={24} className="text-[var(--color-text-secondary)]" />
+              <span className="text-xs font-medium text-[var(--color-text-secondary)]">Settings</span>
             </button>
           </div>
         </div>

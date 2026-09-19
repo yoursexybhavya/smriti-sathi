@@ -43,51 +43,51 @@ export default function ReminderCard({
   return (
     <div
       onClick={onPress}
-      className={`w-full p-4 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] flex items-center justify-between gap-4 transition-all duration-200 ${
-        completed ? 'opacity-70 bg-[var(--color-bg-subtle)]' : 'hover:border-[var(--color-border-focus)] shadow-sm'
+      className={`w-full p-4 sm:p-5 bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-4 transition-all duration-200 ${
+        completed ? 'opacity-65 bg-slate-50 dark:bg-slate-900/50' : 'hover:border-slate-300 dark:hover:border-slate-700 shadow-sm'
       } ${onPress ? 'cursor-pointer active:scale-[0.99]' : ''}`}
       aria-label={`${title} at ${time}`}
     >
       <div className="flex items-center gap-3.5 flex-1 min-w-0">
-        <div className="w-12 h-12 rounded-2xl bg-[var(--color-bg-subtle)] border border-[var(--color-border-subtle)] flex items-center justify-center flex-shrink-0 shadow-sm">
+        <div className="w-14 h-14 min-w-[56px] min-h-[56px] rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center flex-shrink-0 text-slate-700 dark:text-slate-300 shadow-sm">
           {icon}
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <h4 className={`text-base font-semibold text-[var(--color-text)] truncate ${completed ? 'line-through' : ''}`}>
+          <h4 className={`text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 truncate ${completed ? 'line-through text-slate-400 dark:text-slate-500' : ''}`}>
             {title}
           </h4>
-          <p className="text-sm text-[var(--color-text-secondary)] font-medium mt-0.5">{time}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium mt-0.5">{time}</p>
           {description && (
-            <p className="text-xs text-[var(--color-text-muted)] truncate mt-0.5">{description}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">{description}</p>
           )}
         </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0">
-        {/* Speak button */}
+      <div className="flex items-center gap-2.5 flex-shrink-0">
+        {/* Speak button (>=56px touch target) */}
         <button
           type="button"
           onClick={speakReminder}
-          className="w-10 h-10 rounded-full flex items-center justify-center bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)] hover:text-[#10B981] hover:bg-[var(--color-card-hover)] transition-colors border border-[var(--color-border-subtle)] active:scale-90"
+          className="w-14 h-14 min-w-[56px] min-h-[56px] rounded-2xl flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30"
           title="Listen to reminder"
           aria-label="Speak reminder aloud"
         >
-          <Volume2 size={18} />
+          <Volume2 size={22} />
         </button>
 
-        {/* Complete Checkbox button */}
+        {/* Complete Checkbox button (>=56px touch target) */}
         <button
           type="button"
           onClick={handleToggle}
-          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all border ${
+          className={`w-14 h-14 min-w-[56px] min-h-[56px] rounded-2xl flex items-center justify-center transition-all border ${
             completed
-              ? 'bg-[#10B981] border-[#10B981] text-white shadow-sm'
-              : 'border-[var(--color-border)] hover:border-[#10B981] text-transparent hover:text-[#10B981]/50 bg-[var(--color-bg-subtle)]'
-          } active:scale-90`}
+              ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
+              : 'border-slate-300 dark:border-slate-700 hover:border-emerald-500 text-transparent hover:text-emerald-500/50 bg-slate-100 dark:bg-slate-800'
+          } active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500/30`}
           title={completed ? 'Mark pending' : 'Mark done'}
           aria-label={completed ? 'Completed' : 'Mark as completed'}
         >
-          <Check size={18} strokeWidth={completed ? 3 : 2} className={completed ? 'text-white' : 'text-current'} />
+          <Check size={24} strokeWidth={completed ? 3 : 2} className={completed ? 'text-white' : 'text-current'} />
         </button>
       </div>
     </div>

@@ -79,20 +79,20 @@ export default function AccessibilitySetup({
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${
-      settings.highContrast ? 'bg-[#000000] text-white' : 'bg-[#F5F0E8] text-[#1A1A1A]'
+      settings.highContrast ? 'bg-black text-white' : 'bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100'
     }`}>
       {/* Top Header */}
       <header className={`sticky top-0 z-40 border-b transition-colors ${
-        settings.highContrast ? 'bg-[#111111] border-[#333333]' : 'bg-white border-[#E0D8CC]'
+        settings.highContrast ? 'bg-zinc-900 border-zinc-800' : 'bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-slate-200 dark:border-slate-700'
       }`}>
         <div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-4">
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
-              className={`w-11 h-11 rounded-full flex items-center justify-center transition-colors ${
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors cursor-pointer ${
                 settings.highContrast
-                  ? 'bg-[#222222] hover:bg-[#333333] text-white border border-[#444444]'
-                  : 'bg-[#F5F0E8] hover:bg-[#E0D8CC] text-[#1A1A1A]'
+                  ? 'bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700'
+                  : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200'
               }`}
               aria-label="Go back"
             >
@@ -100,15 +100,17 @@ export default function AccessibilitySetup({
             </button>
             <div>
               <h1 className="text-xl font-bold">Accessibility & Display</h1>
-              <p className={`text-sm ${settings.highContrast ? 'text-yellow-400' : 'text-[#7A7A7A]'}`}>
+              <p className={`text-sm ${settings.highContrast ? 'text-yellow-400' : 'text-slate-500 dark:text-slate-400'}`}>
                 Step 3 of 4: Tailor to your comfort
               </p>
             </div>
           </div>
           <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
-            settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-[#E8F5E9] text-[#1B5E20]'
+            settings.highContrast 
+              ? 'bg-yellow-400 text-black' 
+              : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
           }`}>
-            {settings.highContrast ? 'High Contrast Mode' : 'Standard Warm Theme'}
+            {settings.highContrast ? 'High Contrast Mode' : 'Standard Scandinavian Theme'}
           </span>
         </div>
       </header>
@@ -124,22 +126,23 @@ export default function AccessibilitySetup({
             <div className="space-y-3">
               <SectionHeader
                 title="1. Choose Text Size"
-                icon={<Type size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-[#1B5E20]'} />}
+                icon={<Type size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />}
               />
               <div className={`rounded-2xl border p-4 space-y-3 ${
-                settings.highContrast ? 'bg-[#111111] border-[#333333]' : 'bg-white border-[#E0D8CC]'
+                settings.highContrast ? 'bg-zinc-900 border-zinc-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm'
               }`}>
                 {/* Normal */}
                 <button
+                  type="button"
                   onClick={() => updateTextSize('normal')}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition-all min-h-[64px] flex items-center justify-between ${
+                  className={`w-full p-4 rounded-xl border-2 text-left transition-all min-h-[64px] flex items-center justify-between cursor-pointer ${
                     settings.textSize === 'normal'
                       ? settings.highContrast
-                        ? 'bg-[#1F2937] border-yellow-400 text-white'
-                        : 'bg-[#E8F5E9] border-[#1B5E20] text-[#1A1A1A]'
+                        ? 'bg-zinc-800 border-yellow-400 text-white'
+                        : 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-600 dark:border-indigo-500 text-slate-900 dark:text-slate-100 ring-2 ring-indigo-500/20'
                       : settings.highContrast
-                        ? 'bg-[#18181B] border-[#3F3F46] text-gray-300 hover:border-gray-400'
-                        : 'bg-[#FDF8F0] border-[#E0D8CC] text-[#1A1A1A] hover:border-[#C0B8A8]'
+                        ? 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'
+                        : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
                   <div>
@@ -147,62 +150,64 @@ export default function AccessibilitySetup({
                       <span className="text-base font-bold">Normal Size (18px)</span>
                       {settings.textSize === 'normal' && (
                         <span className={`text-xs px-2 py-0.5 rounded font-bold ${
-                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-[#1B5E20] text-white'
+                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-indigo-600 text-white'
                         }`}>Selected</span>
                       )}
                     </div>
-                    <p className="text-base mt-1 text-[#555555] dark:text-gray-300">
+                    <p className="text-base mt-1 text-slate-500 dark:text-slate-400">
                       Standard text size for easy everyday reading.
                     </p>
                   </div>
                   {settings.textSize === 'normal' && (
-                    <Check size={24} className={settings.highContrast ? 'text-yellow-400' : 'text-[#1B5E20]'} />
+                    <Check size={24} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />
                   )}
                 </button>
 
                 {/* Large */}
                 <button
+                  type="button"
                   onClick={() => updateTextSize('large')}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition-all min-h-[72px] flex items-center justify-between ${
+                  className={`w-full p-4 rounded-xl border-2 text-left transition-all min-h-[72px] flex items-center justify-between cursor-pointer ${
                     settings.textSize === 'large'
                       ? settings.highContrast
-                        ? 'bg-[#1F2937] border-yellow-400 text-white'
-                        : 'bg-[#E8F5E9] border-[#1B5E20] text-[#1A1A1A]'
+                        ? 'bg-zinc-800 border-yellow-400 text-white'
+                        : 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-600 dark:border-indigo-500 text-slate-900 dark:text-slate-100 ring-2 ring-indigo-500/20'
                       : settings.highContrast
-                        ? 'bg-[#18181B] border-[#3F3F46] text-gray-300 hover:border-gray-400'
-                        : 'bg-[#FDF8F0] border-[#E0D8CC] text-[#1A1A1A] hover:border-[#C0B8A8]'
+                        ? 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'
+                        : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-xl font-bold">Large Size (24px)</span>
-                      <span className="text-xs bg-amber-100 text-amber-900 px-2 py-0.5 rounded font-semibold">Recommended</span>
+                      <span className="text-xs bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-200 px-2 py-0.5 rounded font-semibold">Recommended</span>
                       {settings.textSize === 'large' && (
                         <span className={`text-xs px-2 py-0.5 rounded font-bold ${
-                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-[#1B5E20] text-white'
+                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-indigo-600 text-white'
                         }`}>Selected</span>
                       )}
                     </div>
-                    <p className="text-lg mt-1 font-medium text-[#444444] dark:text-gray-200">
+                    <p className="text-lg mt-1 font-medium text-slate-600 dark:text-slate-300">
                       Bigger words for comfortable, strain-free reading.
                     </p>
                   </div>
                   {settings.textSize === 'large' && (
-                    <Check size={26} className={settings.highContrast ? 'text-yellow-400' : 'text-[#1B5E20]'} />
+                    <Check size={26} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />
                   )}
                 </button>
 
                 {/* Extra Large */}
                 <button
+                  type="button"
                   onClick={() => updateTextSize('extra-large')}
-                  className={`w-full p-5 rounded-xl border-2 text-left transition-all min-h-[84px] flex items-center justify-between ${
+                  className={`w-full p-5 rounded-xl border-2 text-left transition-all min-h-[84px] flex items-center justify-between cursor-pointer ${
                     settings.textSize === 'extra-large'
                       ? settings.highContrast
-                        ? 'bg-[#1F2937] border-yellow-400 text-white'
-                        : 'bg-[#E8F5E9] border-[#1B5E20] text-[#1A1A1A]'
+                        ? 'bg-zinc-800 border-yellow-400 text-white'
+                        : 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-600 dark:border-indigo-500 text-slate-900 dark:text-slate-100 ring-2 ring-indigo-500/20'
                       : settings.highContrast
-                        ? 'bg-[#18181B] border-[#3F3F46] text-gray-300 hover:border-gray-400'
-                        : 'bg-[#FDF8F0] border-[#E0D8CC] text-[#1A1A1A] hover:border-[#C0B8A8]'
+                        ? 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'
+                        : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
                   <div>
@@ -210,16 +215,16 @@ export default function AccessibilitySetup({
                       <span className="text-2xl font-extrabold">Extra Large (30px)</span>
                       {settings.textSize === 'extra-large' && (
                         <span className={`text-xs px-2 py-0.5 rounded font-bold ${
-                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-[#1B5E20] text-white'
+                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-indigo-600 text-white'
                         }`}>Selected</span>
                       )}
                     </div>
-                    <p className="text-xl mt-1 font-bold text-[#333333] dark:text-white">
+                    <p className="text-xl mt-1 font-bold text-slate-700 dark:text-slate-200">
                       Maximum size for elders with visual difficulties.
                     </p>
                   </div>
                   {settings.textSize === 'extra-large' && (
-                    <Check size={30} className={settings.highContrast ? 'text-yellow-400' : 'text-[#1B5E20]'} />
+                    <Check size={30} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />
                   )}
                 </button>
               </div>
@@ -229,14 +234,15 @@ export default function AccessibilitySetup({
             <div className="space-y-3">
               <SectionHeader
                 title="2. High Contrast Mode"
-                icon={<Eye size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-[#E65100]'} />}
+                icon={<Eye size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />}
               />
               <div className={`rounded-2xl border p-5 ${
-                settings.highContrast ? 'bg-[#111111] border-yellow-400' : 'bg-white border-[#E0D8CC]'
+                settings.highContrast ? 'bg-zinc-900 border-yellow-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm'
               }`}>
                 <button
+                  type="button"
                   onClick={toggleHighContrast}
-                  className="w-full flex items-center justify-between min-h-[60px] text-left"
+                  className="w-full flex items-center justify-between min-h-[60px] text-left cursor-pointer"
                 >
                   <div className="pr-4">
                     <span className="text-lg font-bold flex items-center gap-2">
@@ -247,13 +253,13 @@ export default function AccessibilitySetup({
                         </span>
                       )}
                     </span>
-                    <p className={`text-base mt-1 ${settings.highContrast ? 'text-gray-300' : 'text-[#666666]'}`}>
+                    <p className={`text-base mt-1 ${settings.highContrast ? 'text-zinc-300' : 'text-slate-500 dark:text-slate-400'}`}>
                       Deep black background, stark borders, and bold yellow accents designed for maximum visibility.
                     </p>
                   </div>
 
                   <div className={`w-16 h-9 rounded-full relative transition-colors flex-shrink-0 ${
-                    settings.highContrast ? 'bg-yellow-400' : 'bg-[#C0B8A8]'
+                    settings.highContrast ? 'bg-yellow-400' : 'bg-slate-300 dark:bg-slate-600'
                   }`}>
                     <div className={`absolute top-1.5 w-6 h-6 rounded-full transition-transform ${
                       settings.highContrast
@@ -269,25 +275,26 @@ export default function AccessibilitySetup({
             <div className="space-y-3">
               <SectionHeader
                 title="3. Spoken Voice Guidance"
-                icon={<Volume2 size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-[#1565C0]'} />}
+                icon={<Volume2 size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />}
               />
               <div className={`rounded-2xl border p-5 space-y-3 ${
-                settings.highContrast ? 'bg-[#111111] border-[#333333]' : 'bg-white border-[#E0D8CC]'
+                settings.highContrast ? 'bg-zinc-900 border-zinc-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm'
               }`}>
                 <button
+                  type="button"
                   onClick={toggleVoiceGuidance}
-                  className="w-full flex items-center justify-between min-h-[56px] text-left"
+                  className="w-full flex items-center justify-between min-h-[56px] text-left cursor-pointer"
                 >
                   <div className="pr-4">
                     <span className="text-lg font-bold">Enable Voice Instructions</span>
-                    <p className={`text-base mt-1 ${settings.highContrast ? 'text-gray-300' : 'text-[#666666]'}`}>
+                    <p className={`text-base mt-1 ${settings.highContrast ? 'text-zinc-300' : 'text-slate-500 dark:text-slate-400'}`}>
                       Reads questions, medicine reminders, and instructions aloud.
                     </p>
                   </div>
                   <div className={`w-16 h-9 rounded-full relative transition-colors flex-shrink-0 ${
                     settings.voiceGuidance
-                      ? (settings.highContrast ? 'bg-yellow-400' : 'bg-[#1B5E20]')
-                      : 'bg-[#C0B8A8]'
+                      ? (settings.highContrast ? 'bg-yellow-400' : 'bg-indigo-600')
+                      : 'bg-slate-300 dark:bg-slate-600'
                   }`}>
                     <div className={`absolute top-1.5 w-6 h-6 rounded-full transition-transform ${
                       settings.voiceGuidance
@@ -302,10 +309,10 @@ export default function AccessibilitySetup({
                     type="button"
                     onClick={handleTestVoice}
                     disabled={speaking}
-                    className={`mt-2 w-full py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-bold text-base transition-colors ${
+                    className={`mt-2 w-full min-h-[52px] py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-bold text-base transition-colors cursor-pointer ${
                       settings.highContrast
-                        ? 'bg-[#222222] text-yellow-400 border border-yellow-400 hover:bg-[#333333]'
-                        : 'bg-[#E3F2FD] text-[#1565C0] hover:bg-[#BBDEFB]'
+                        ? 'bg-zinc-800 text-yellow-400 border border-yellow-400 hover:bg-zinc-700'
+                        : 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800/60'
                     }`}
                   >
                     <Volume2 size={20} className={speaking ? 'animate-pulse' : ''} />
@@ -322,12 +329,12 @@ export default function AccessibilitySetup({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className={`text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 ${
-                  settings.highContrast ? 'text-yellow-400' : 'text-[#1B5E20]'
+                  settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'
                 }`}>
                   <Sparkles size={16} />
                   Live Preview / লাইভ পূৰ্বদৰ্শন
                 </span>
-                <span className="text-xs px-2.5 py-1 rounded bg-gray-200 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 font-medium">
+                <span className="text-xs px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium">
                   {settings.textSize.toUpperCase()} • {settings.highContrast ? 'HIGH CONTRAST' : 'STANDARD'}
                 </span>
               </div>
@@ -335,8 +342,8 @@ export default function AccessibilitySetup({
               {/* Dynamic Mockup Screen Box */}
               <div className={`rounded-3xl p-6 transition-all duration-300 shadow-xl ${
                 settings.highContrast
-                  ? 'bg-[#0A0A0A] border-4 border-yellow-400 text-white'
-                  : 'bg-white border-2 border-[#1B5E20]/30 text-[#1A1A1A]'
+                  ? 'bg-zinc-950 border-4 border-yellow-400 text-white'
+                  : 'bg-white dark:bg-slate-800 border-2 border-indigo-500/30 text-slate-900 dark:text-slate-100'
               }`}>
                 {/* Mock Card Header */}
                 <div className="flex items-center justify-between border-b pb-4 mb-4 border-current opacity-70">
@@ -344,7 +351,7 @@ export default function AccessibilitySetup({
                     Smriti Sathi Preview
                   </span>
                   <span className={`text-xs px-2 py-0.5 rounded font-bold ${
-                    settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-[#E8F5E9] text-[#1B5E20]'
+                    settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
                   }`}>
                     {settings.highContrast ? 'WCAG AAA (14:1)' : 'WCAG AA'}
                   </span>
@@ -352,7 +359,7 @@ export default function AccessibilitySetup({
 
                 {/* Mock Title */}
                 <h3 className={`${headingStyles[settings.textSize]} mb-2 leading-tight ${
-                  settings.highContrast ? 'text-yellow-400' : 'text-[#1B5E20]'
+                  settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'
                 }`}>
                   Good Morning, Kamala Baa!
                 </h3>
@@ -365,8 +372,8 @@ export default function AccessibilitySetup({
                 {/* Mock Action Card */}
                 <div className={`p-4 rounded-2xl mb-5 transition-colors ${
                   settings.highContrast
-                    ? 'bg-[#18181B] border-2 border-yellow-400/80'
-                    : 'bg-[#FDF8F0] border border-[#E0D8CC]'
+                    ? 'bg-zinc-900 border-2 border-yellow-400/80'
+                    : 'bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700'
                 }`}>
                   <p className="text-xs font-bold opacity-75 uppercase tracking-wider mb-1">
                     Morning Reminder:
@@ -379,10 +386,10 @@ export default function AccessibilitySetup({
                 {/* Mock Interactive Button */}
                 <button
                   type="button"
-                  className={`w-full py-4 px-6 rounded-2xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-md ${
+                  className={`w-full min-h-[56px] py-4 px-6 rounded-2xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-md cursor-pointer ${
                     settings.highContrast
                       ? 'bg-yellow-400 text-black text-xl hover:bg-yellow-300 border-2 border-white'
-                      : 'bg-[#1B5E20] text-white text-lg hover:bg-[#144718]'
+                      : 'bg-indigo-600 text-white text-lg hover:bg-indigo-700'
                   }`}
                 >
                   <Check size={22} />
@@ -391,14 +398,25 @@ export default function AccessibilitySetup({
               </div>
             </div>
 
-            {/* Continue Button */}
-            <div className="pt-2">
+            {/* Continue & Back Buttons */}
+            <div className="pt-2 space-y-3">
               <LargeButton
                 onPress={handleNext}
-                className={settings.highContrast ? 'bg-yellow-400 text-black hover:bg-yellow-300' : 'bg-[#1B5E20] text-white'}
+                className={settings.highContrast ? 'bg-yellow-400 text-black hover:bg-yellow-300' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}
               >
                 Continue to Next Step →
               </LargeButton>
+              <button
+                type="button"
+                onClick={onBack}
+                className={`w-full min-h-[48px] py-3 px-4 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
+                  settings.highContrast
+                    ? 'border-zinc-700 text-zinc-300 hover:bg-zinc-800'
+                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                ← Back to Language
+              </button>
             </div>
           </div>
 

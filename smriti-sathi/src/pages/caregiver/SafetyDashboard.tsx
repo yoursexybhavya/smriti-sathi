@@ -101,17 +101,17 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
   const unacknowledgedAlerts = alerts.filter(a => !a.acknowledged);
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] pb-8">
+    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-8">
       {/* Header */}
-      <div className="bg-white border-b border-[#E0D8CC] px-4 py-4 sticky top-0 z-10">
+      <div className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <button onClick={onBack} className="text-[#1B5E20] font-semibold text-lg">
+          <button onClick={onBack} className="text-[var(--color-success)] font-semibold text-lg">
             ← Back
           </button>
-          <h1 className="text-lg font-bold text-[#1A1A1A]">Safety Features</h1>
+          <h1 className="text-lg font-bold text-[var(--color-text)]">Safety Features</h1>
           <button
             onClick={clearAllData}
-            className="text-sm text-red-600 font-medium"
+            className="text-sm text-[var(--color-error)] font-medium"
           >
             Clear
           </button>
@@ -120,12 +120,12 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
 
       <div className="px-4 py-4 space-y-4">
         {/* Important Notice */}
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+        <div className="bg-[var(--color-warning-bg)] border border-[var(--color-accent-amber)]/30 rounded-2xl p-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+            <AlertTriangle size={20} className="text-[var(--color-accent-amber)] flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-sm font-semibold text-amber-800">Demo & Research Features</h3>
-              <p className="text-xs text-amber-700 mt-1">
+              <h3 className="text-sm font-semibold text-[var(--color-accent-amber)]">Demo & Research Features</h3>
+              <p className="text-xs text-[var(--color-accent-amber)]/90 mt-1">
                 These features are for demonstration and testing only.
                 They are NOT medically validated and do NOT replace proper monitoring.
                 In a real emergency, call local emergency services.
@@ -136,33 +136,33 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
 
         {/* Active Alerts */}
         {unacknowledgedAlerts.length > 0 && (
-          <div className="bg-red-50 border border-red-200 rounded-2xl p-4">
-            <h2 className="text-sm font-semibold text-red-800 mb-3 flex items-center gap-2">
+          <div className="bg-[var(--color-error-bg)] border border-[var(--color-error)]/30 rounded-2xl p-4">
+            <h2 className="text-sm font-semibold text-[var(--color-error)] mb-3 flex items-center gap-2">
               <Bell size={16} />
               Active Alerts ({unacknowledgedAlerts.length})
             </h2>
             <div className="space-y-2">
               {unacknowledgedAlerts.slice(0, 3).map(alert => (
-                <div key={alert.id} className="bg-white rounded-xl p-3 border border-red-200">
+                <div key={alert.id} className="bg-[var(--color-card)] rounded-xl p-3 border border-[var(--color-error)]/20">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${
-                        alert.severity === 'critical' ? 'bg-red-100 text-red-800' :
-                        alert.severity === 'high' ? 'bg-orange-100 text-orange-800' :
-                        'bg-amber-100 text-amber-800'
+                        alert.severity === 'critical' ? 'bg-[var(--color-error-bg)] text-[var(--color-error)]' :
+                        alert.severity === 'high' ? 'bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)]' :
+                        'bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)]'
                       }`}>
                         {alert.severity}
                       </span>
-                      <span className="text-xs text-[#7A7A7A]">{alert.type}</span>
+                      <span className="text-xs text-[var(--color-text-muted)]">{alert.type}</span>
                     </div>
-                    <span className="text-xs text-[#7A7A7A]">
+                    <span className="text-xs text-[var(--color-text-muted)]">
                       {new Date(alert.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
-                  <p className="text-sm text-[#1A1A1A] mb-2">{alert.message}</p>
+                  <p className="text-sm text-[var(--color-text)] mb-2">{alert.message}</p>
                   <button
                     onClick={() => acknowledgeAlert(alert.id)}
-                    className="w-full py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
+                    className="w-full py-2 bg-[var(--color-error)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-error)]/90"
                   >
                     Acknowledge
                   </button>
@@ -173,83 +173,83 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
         )}
 
         {/* Fall Detection */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[#4A4A4A] flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-2">
               <Activity size={16} />
               Fall Detection
             </h2>
             <span className={`text-xs px-2 py-1 rounded-full ${
-              isFallMonitoring ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+              isFallMonitoring ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]' : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-muted)]'
             }`}>
               {isFallMonitoring ? 'Active' : 'Inactive'}
             </span>
           </div>
-          <p className="text-xs text-[#7A7A7A] mb-3">
+          <p className="text-xs text-[var(--color-text-muted)] mb-3">
             Demo fall detection with threshold-based algorithm.
             Not medically validated.
           </p>
           <div className="grid grid-cols-3 gap-2 mb-3">
             <button
               onClick={() => triggerDemoFall('low')}
-              className="py-2 bg-amber-100 text-amber-800 rounded-lg text-xs font-medium hover:bg-amber-200"
+              className="py-2 bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)] rounded-lg text-xs font-medium hover:bg-[var(--color-warning-bg)]/80"
             >
               Demo: Low
             </button>
             <button
               onClick={() => triggerDemoFall('medium')}
-              className="py-2 bg-orange-100 text-orange-800 rounded-lg text-xs font-medium hover:bg-orange-200"
+              className="py-2 bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)] rounded-lg text-xs font-medium hover:bg-[var(--color-accent-amber)]/25"
             >
               Demo: Medium
             </button>
             <button
               onClick={() => triggerDemoFall('high')}
-              className="py-2 bg-red-100 text-red-800 rounded-lg text-xs font-medium hover:bg-red-200"
+              className="py-2 bg-[var(--color-error-bg)] text-[var(--color-error)] rounded-lg text-xs font-medium hover:bg-[var(--color-error-bg)]/80"
             >
               Demo: High
             </button>
           </div>
           {fallEvents.length > 0 && (
-            <div className="text-xs text-[#7A7A7A]">
+            <div className="text-xs text-[var(--color-text-muted)]">
               {fallEvents.length} event{fallEvents.length !== 1 ? 's' : ''} detected
             </div>
           )}
         </div>
 
         {/* Location Safety */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[#4A4A4A] flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-2">
               <MapPin size={16} />
               Location Safety
             </h2>
             <span className={`text-xs px-2 py-1 rounded-full ${
-              isLocationMonitoring ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+              isLocationMonitoring ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]' : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-muted)]'
             }`}>
               {isLocationMonitoring ? 'Active' : 'Inactive'}
             </span>
           </div>
-          <p className="text-xs text-[#7A7A7A] mb-3">
+          <p className="text-xs text-[var(--color-text-muted)] mb-3">
             Safe zone monitoring with simulated location.
             No real GPS tracking in prototype.
           </p>
           <div className="space-y-2 mb-3">
             {zones.map(zone => (
-              <div key={zone.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+              <div key={zone.id} className="flex items-center justify-between p-2 bg-[var(--color-bg-subtle)] rounded-lg">
                 <div>
-                  <div className="text-sm font-medium text-[#1A1A1A]">{zone.name}</div>
-                  <div className="text-xs text-[#7A7A7A]">{zone.radiusMeters}m radius</div>
+                  <div className="text-sm font-medium text-[var(--color-text)]">{zone.name}</div>
+                  <div className="text-xs text-[var(--color-text-muted)]">{zone.radiusMeters}m radius</div>
                 </div>
                 <div className="flex gap-1">
                   <button
                     onClick={() => triggerDemoBoundary(zone.id, 'enter')}
-                    className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200"
+                    className="px-2 py-1 bg-[var(--color-success-bg)] text-[var(--color-success)] rounded text-xs hover:bg-[var(--color-success-bg)]/80"
                   >
                     Enter
                   </button>
                   <button
                     onClick={() => triggerDemoBoundary(zone.id, 'exit')}
-                    className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200"
+                    className="px-2 py-1 bg-[var(--color-error-bg)] text-[var(--color-error)] rounded text-xs hover:bg-[var(--color-error-bg)]/80"
                   >
                     Exit
                   </button>
@@ -258,43 +258,43 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
             ))}
           </div>
           {boundaryEvents.length > 0 && (
-            <div className="text-xs text-[#7A7A7A]">
+            <div className="text-xs text-[var(--color-text-muted)]">
               {boundaryEvents.length} boundary event{boundaryEvents.length !== 1 ? 's' : ''}
             </div>
           )}
         </div>
 
         {/* Emergency SOS */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
             <Zap size={16} />
             Emergency SOS
           </h2>
-          <p className="text-xs text-[#7A7A7A] mb-3">
+          <p className="text-xs text-[var(--color-text-muted)] mb-3">
             Manual emergency alert. Demo only — does not contact real services.
           </p>
           <button
             onClick={triggerSOS}
-            className="w-full py-3 bg-red-600 text-white rounded-xl font-semibold hover:bg-red-700"
+            className="w-full py-3 bg-[var(--color-error)] text-white rounded-xl font-semibold hover:bg-[var(--color-error)]/90"
           >
             Trigger Demo SOS
           </button>
         </div>
 
         {/* Future Research Feature */}
-        <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4">
+        <div className="bg-[var(--color-accent-purple)/10] border border-[var(--color-accent-purple)]/30 rounded-2xl p-4">
           <div className="flex items-start gap-3">
-            <Info size={20} className="text-purple-600 flex-shrink-0 mt-0.5" />
+            <Info size={20} className="text-[var(--color-accent-purple)] flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="text-sm font-semibold text-purple-800 mb-1">
+              <h3 className="text-sm font-semibold text-[var(--color-accent-purple)] mb-1">
                 Future Research Feature
               </h3>
-              <p className="text-xs text-purple-700">
+              <p className="text-xs text-[var(--color-accent-purple)]/90">
                 <strong>Emotion Recognition:</strong> Camera-based emotion analysis is being researched
                 for future versions. This is NOT implemented in the current prototype.
                 No continuous monitoring or clinical claims are made.
               </p>
-              <div className="mt-2 text-xs text-purple-600">
+              <div className="mt-2 text-xs text-[var(--color-accent-purple)]">
                 Status: Architecture-ready for future research
               </div>
             </div>
@@ -303,8 +303,8 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
 
         {/* Event History */}
         {(fallEvents.length > 0 || boundaryEvents.length > 0) && (
-          <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-            <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3 flex items-center gap-2">
+          <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
               <Clock size={16} />
               Recent Events
             </h2>
@@ -314,18 +314,18 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
                 .sort((a, b) => b.timestamp - a.timestamp)
                 .slice(0, 10)
                 .map((event, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                  <div key={i} className="flex items-center justify-between p-2 bg-[var(--color-bg-subtle)] rounded-lg">
                     <div className="flex items-center gap-2">
                       {event.type === 'fall' ? (
-                        <Activity size={14} className="text-orange-600" />
+                        <Activity size={14} className="text-[var(--color-accent-amber)]" />
                       ) : (
-                        <MapPin size={14} className="text-blue-600" />
+                        <MapPin size={14} className="text-[var(--color-accent-blue)]" />
                       )}
                       <div>
-                        <div className="text-xs font-medium text-[#1A1A1A]">
+                        <div className="text-xs font-medium text-[var(--color-text)]">
                           {event.type === 'fall' ? 'Fall detected' : `Zone ${event.eventType}`}
                         </div>
-                        <div className="text-xs text-[#7A7A7A]">
+                        <div className="text-xs text-[var(--color-text-muted)]">
                           {new Date(event.timestamp).toLocaleString()}
                         </div>
                       </div>
@@ -337,32 +337,32 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
         )}
 
         {/* Feature Status Summary */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-4">
-          <h2 className="text-sm font-semibold text-[#4A4A4A] mb-3">Feature Status</h2>
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Feature Status</h2>
           <div className="space-y-2 text-xs">
             <div className="flex items-center justify-between">
-              <span className="text-[#4A4A4A]">Fall Detection</span>
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded">SIMULATED</span>
+              <span className="text-[var(--color-text-secondary)]">Fall Detection</span>
+              <span className="px-2 py-0.5 bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)] rounded">SIMULATED</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#4A4A4A]">Location Safety</span>
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded">SIMULATED</span>
+              <span className="text-[var(--color-text-secondary)]">Location Safety</span>
+              <span className="px-2 py-0.5 bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)] rounded">SIMULATED</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#4A4A4A]">Emergency Alerts</span>
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded">SIMULATED</span>
+              <span className="text-[var(--color-text-secondary)]">Emergency Alerts</span>
+              <span className="px-2 py-0.5 bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)] rounded">SIMULATED</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#4A4A4A]">Sensor Integration</span>
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded">ARCHITECTURE-READY</span>
+              <span className="text-[var(--color-text-secondary)]">Sensor Integration</span>
+              <span className="px-2 py-0.5 bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] rounded">ARCHITECTURE-READY</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#4A4A4A]">ML Models</span>
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded">ARCHITECTURE-READY</span>
+              <span className="text-[var(--color-text-secondary)]">ML Models</span>
+              <span className="px-2 py-0.5 bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] rounded">ARCHITECTURE-READY</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#4A4A4A]">Emotion Recognition</span>
-              <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded">FUTURE RESEARCH</span>
+              <span className="text-[var(--color-text-secondary)]">Emotion Recognition</span>
+              <span className="px-2 py-0.5 bg-[var(--color-accent-purple)/15] text-[var(--color-accent-purple)] rounded">FUTURE RESEARCH</span>
             </div>
           </div>
         </div>

@@ -13,7 +13,7 @@ export default function ProgressCard({
   label,
   value,
   subtitle,
-  color = '#1B5E20',
+  color = '#4F46E5',
 }: ProgressCardProps) {
   return (
     <div className="p-4 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] text-center shadow-sm transition-colors duration-200">

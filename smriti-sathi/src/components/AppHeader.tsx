@@ -26,62 +26,60 @@ export default function AppHeader({
   const isDark = state.accessibility?.theme === 'dark';
 
   return (
-    <header className="sticky top-0 z-40 bg-[var(--color-card)]/95 backdrop-blur-md border-b border-[var(--color-border)] transition-colors duration-200">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3.5 gap-3">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-200">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {(showBack || onBack) && (
             <button
               onClick={onBack}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-card-hover)] transition-all active:scale-95 flex-shrink-0"
+              className="min-h-[56px] min-w-[56px] px-3.5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all active:scale-95 flex items-center justify-center gap-2 flex-shrink-0 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30"
               aria-label="Go back"
             >
-              <ArrowLeft size={19} />
-              <span className="text-sm font-semibold hidden sm:inline">Back</span>
+              <ArrowLeft size={22} className="stroke-[2.5]" />
+              <span className="text-base font-semibold hidden sm:inline">Back</span>
             </button>
           )}
 
           <div className="min-w-0 flex-1">
-            <h1 className="text-lg sm:text-xl font-bold text-[var(--color-text)] truncate">{title}</h1>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-50 truncate tracking-tight">{title}</h1>
             {subtitle && (
-              <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] truncate mt-0.5">{subtitle}</p>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate mt-0.5">{subtitle}</p>
             )}
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Connection status indicator */}
-          <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
+          <div className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${
             isOnline 
-              ? 'bg-[#10B981]/15 text-[#10B981] border-[#10B981]/30' 
-              : 'bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/30'
+              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
           }`}>
-            {isOnline ? <Wifi size={13} /> : <WifiOff size={13} />}
+            {isOnline ? <Wifi size={14} /> : <WifiOff size={14} />}
             <span>{isOnline ? 'Online' : 'Offline'}</span>
           </div>
 
-          {/* Theme toggle */}
+          {/* Theme toggle (>=56px touch target) */}
           {showThemeToggle && (
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[var(--color-border-focus)] transition-all active:scale-90"
+              className="w-14 h-14 min-w-[56px] min-h-[56px] flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-indigo-500/50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30"
               aria-label={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
               title={isDark ? 'Light Theme' : 'Dark Theme'}
             >
-              {isDark ? <Sun size={19} className="text-[#F59E0B]" /> : <Moon size={19} className="text-[#64748B]" />}
+              {isDark ? <Sun size={22} className="text-amber-400" /> : <Moon size={22} className="text-slate-600" />}
             </button>
           )}
 
-
-
-          {/* Settings button */}
+          {/* Settings button (>=56px touch target) */}
           {showSettings && (
             <button
               onClick={onSettingsPress}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-card-hover)] transition-all active:scale-90"
+              className="w-14 h-14 min-w-[56px] min-h-[56px] flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30"
               aria-label="Settings"
             >
-              <Settings size={19} />
+              <Settings size={22} />
             </button>
           )}
         </div>

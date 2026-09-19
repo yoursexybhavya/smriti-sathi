@@ -19,7 +19,7 @@ export default function SectionHeader({ title, icon, action }: SectionHeaderProp
       {action && (
         <button
           onClick={action.onPress}
-          className="text-base font-semibold text-[#10B981] px-3 py-1 rounded-xl hover:bg-[#10B981]/15 transition-colors min-h-[44px] flex items-center"
+          className="text-base font-semibold text-[#10B981] px-3 py-1 rounded-xl hover:bg-[#10B981]/15 transition-colors min-h-[56px] flex items-center"
         >
           {action.label}
         </button>

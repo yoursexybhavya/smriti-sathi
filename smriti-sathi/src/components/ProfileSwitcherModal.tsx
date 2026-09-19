@@ -277,7 +277,7 @@ export function ProfileSwitcherModal({ isOpen, onClose }: ProfileSwitcherModalPr
               <button
                 type="submit"
                 className="btn-primary-lumos"
-                style={{ flex: 1, padding: '12px', minHeight: '48px' }}
+                style={{ flex: 1, padding: '12px', minHeight: '56px' }}
               >
                 {t.saveProfile}
               </button>
@@ -285,7 +285,7 @@ export function ProfileSwitcherModal({ isOpen, onClose }: ProfileSwitcherModalPr
                 type="button"
                 className="btn-secondary-lumos"
                 onClick={() => setIsAdding(false)}
-                style={{ flex: 1, padding: '12px', minHeight: '48px' }}
+                style={{ flex: 1, padding: '12px', minHeight: '56px' }}
               >
                 {t.cancel}
               </button>

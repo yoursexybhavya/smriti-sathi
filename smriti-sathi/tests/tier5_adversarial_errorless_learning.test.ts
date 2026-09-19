@@ -606,3 +606,60 @@ test('TIER 5 — Suite 5: End-to-End Errorless Game Lifecycles & Telemetry Integ
     assert.strictEqual(result.attempts, 2);
   });
 });
+
+// ============================================================================
+// SUITE 6: Scandinavian Token Integrity & Redesigned UI Adversarial Shield
+// ============================================================================
+test('TIER 5 — Suite 6: Scandinavian Token Integrity & Redesigned UI Adversarial Shield', async (t) => {
+  const primaryScreens = [
+    'src/pages/PatientHomeScreen.tsx',
+    'src/pages/SplashScreen.tsx',
+    'src/pages/auth/LoginScreen.tsx',
+    'src/pages/games/RecogniseGame.tsx',
+    'src/pages/games/RecognisePlay.tsx',
+    'src/pages/games/RememberGame.tsx',
+    'src/pages/games/RememberMemorize.tsx',
+    'src/pages/games/RememberRecall.tsx',
+    'src/pages/games/MemoryMatchGame.tsx',
+    'src/pages/games/DailyRoutineGame.tsx',
+  ];
+
+  await t.test('6.1: Zero lingering #F5F0E8 across redesigned primary screens', () => {
+    for (const relPath of primaryScreens) {
+      const content = fs.readFileSync(path.join(rootDir, relPath), 'utf-8');
+      assert.ok(!content.includes('#F5F0E8'), `${relPath} must NOT contain #F5F0E8`);
+    }
+  });
+
+  await t.test('6.2: Zero lingering #FDF8F0 across redesigned primary screens', () => {
+    for (const relPath of primaryScreens) {
+      const content = fs.readFileSync(path.join(rootDir, relPath), 'utf-8');
+      assert.ok(!content.includes('#FDF8F0'), `${relPath} must NOT contain #FDF8F0`);
+    }
+  });
+
+  await t.test('6.3: Cognitive games contain zero punitive feedback words (tryAgain, game over)', () => {
+    const gameFiles = [
+      'src/pages/games/RecognisePlay.tsx',
+      'src/pages/games/RememberRecall.tsx',
+      'src/pages/games/MemoryMatchGame.tsx',
+      'src/pages/games/DailyRoutineGame.tsx',
+    ];
+    for (const relPath of gameFiles) {
+      const content = fs.readFileSync(path.join(rootDir, relPath), 'utf-8').toLowerCase();
+      assert.ok(!content.includes('game over'), `${relPath} must NOT contain 'game over'`);
+      assert.ok(!content.includes('you failed'), `${relPath} must NOT contain 'you failed'`);
+    }
+  });
+
+  await t.test('6.4: globals.css Scandinavian canvas tokens (#F8FAFC, #0B0F17) are strictly defined', () => {
+    const globals = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
+    assert.ok(globals.includes('#F8FAFC'), 'globals.css must define light canvas #F8FAFC');
+    assert.ok(globals.includes('#0B0F17'), 'globals.css must define dark canvas #0B0F17');
+  });
+
+  await t.test('6.5: Viewport meta tag in index.html prevents user scale breaking senior layout', () => {
+    const indexHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
+    assert.ok(indexHtml.includes('user-scalable=no') || indexHtml.includes('width=device-width'), 'index.html must define controlled viewport');
+  });
+});

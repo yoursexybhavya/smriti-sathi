@@ -20,7 +20,7 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[#10B981] transition-all active:scale-95 shadow-sm text-sm font-semibold"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-95 shadow-sm text-sm font-semibold cursor-pointer"
             aria-label="Back to Account Login"
           >
             <ArrowLeft size={18} />
@@ -31,7 +31,7 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
         <button
           type="button"
           onClick={toggleTheme}
-          className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[#10B981] transition-all active:scale-90 shadow-sm"
+          className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-90 shadow-sm cursor-pointer"
           aria-label="Toggle Theme"
           title={isDark ? 'Light Theme' : 'Dark Theme'}
         >
@@ -44,15 +44,15 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
         {/* Left: Branding & Tagline */}
         <div className="md:col-span-6 flex flex-col items-center md:items-start text-center md:text-left">
           {/* Logo */}
-          <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-[#1B5E20] flex items-center justify-center mb-6 shadow-xl ring-4 ring-[#1B5E20]/20">
-            <Brain size={54} className="text-white" />
+          <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-slate-900 border border-slate-700/80 flex items-center justify-center mb-6 shadow-xl ring-4 ring-indigo-500/20">
+            <Brain size={54} className="text-indigo-400" />
           </div>
 
           {/* App Name */}
           <h1 className="text-3xl md:text-5xl font-extrabold text-[var(--color-text)] tracking-tight">
             {APP.name}
           </h1>
-          <p className="text-xl md:text-2xl font-bold text-[#10B981] mt-1">
+          <p className="text-xl md:text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">
             স্মৃতি সাথী
           </p>
 
@@ -60,7 +60,7 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
           <p className="text-base md:text-xl text-[var(--color-text-secondary)] mt-3 max-w-md leading-relaxed">
             {APP.tagline}
           </p>
-          <div className="mt-4 inline-flex items-center gap-2 bg-[#10B981]/15 border border-[#10B981]/30 px-3 py-1.5 rounded-full text-xs font-bold text-[#10B981]">
+          <div className="mt-4 inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/60 px-3.5 py-1.5 rounded-full text-xs font-bold text-indigo-700 dark:text-indigo-300">
             <span>🌿 Cognitive Care & Memory Companion</span>
           </div>
         </div>
@@ -68,17 +68,17 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
         {/* Right: Feature Highlights & CTA */}
         <div className="md:col-span-6 space-y-4">
           <FeatureRow
-            icon={<Heart size={24} className="text-[#E65100]" />}
+            icon={<Heart size={24} className="text-rose-500" />}
             title="Memory Activities & Games"
             description="Gentle, culturally attuned cognitive exercises with errorless learning"
           />
           <FeatureRow
-            icon={<Shield size={24} className="text-[#1B5E20]" />}
+            icon={<Shield size={24} className="text-indigo-600 dark:text-indigo-400" />}
             title="Multimodal Reminders"
             description="Audio, picture, and family voice prompts for medicine and hydration"
           />
           <FeatureRow
-            icon={<Brain size={24} className="text-[#1565C0]" />}
+            icon={<Brain size={24} className="text-blue-500" />}
             title="100% Offline-First Architecture"
             description="Runs completely locally in remote Northeast hill areas without internet"
           />
@@ -91,7 +91,7 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
               <button
                 type="button"
                 onClick={onBack}
-                className="w-full py-3 px-4 rounded-xl border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-subtle)] text-sm font-semibold transition-colors"
+                className="w-full min-h-[48px] py-3 px-4 rounded-xl border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-subtle)] text-sm font-semibold transition-colors cursor-pointer"
               >
                 ← Return to Profile Selection
               </button>
