@@ -1,7 +1,7 @@
 /**
  * SMRITI SATHI — Demo Data Service
  * 
- * Provides realistic sample data for SIH demonstration.
+ * Provides sample data for testing and validation.
  * Creates a populated experience for patient "Aai Devi"
  */
 

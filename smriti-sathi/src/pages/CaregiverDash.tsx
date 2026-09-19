@@ -1405,31 +1405,6 @@ export function CaregiverDash() {
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-          {/* Seed Demo Profiles for SIH Judges */}
-          <button
-            onClick={async () => {
-              await seedClinicalDemo();
-              await loadData();
-              alert('✓ 14-day longitudinal trajectories loaded for Baa (Stable Care) and Ram Chandra (ASHA Review Signal)!');
-            }}
-            style={{
-              padding: '10px 16px',
-              backgroundColor: 'rgba(56, 189, 248, 0.15)',
-              border: '1px solid #38BDF8',
-              borderRadius: 'var(--radius-pill)',
-              color: '#38BDF8',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <Sparkles size={16} />
-            <span>Load 14-Day Evaluator Profiles</span>
-          </button>
-
           {/* Reset Activity Scores to 0 */}
           <button
             onClick={async () => {

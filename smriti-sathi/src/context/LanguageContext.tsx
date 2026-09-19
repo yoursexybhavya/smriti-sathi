@@ -55,7 +55,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    return {
+      currentLanguage: languageService.getLanguage(),
+      setLanguage: (lang: SupportedLanguage) => languageService.setLanguage(lang),
+      translate: (key: string, params?: Record<string, string>) => languageService.translate(key, params),
+      isLanguageAvailable: (lang: SupportedLanguage) => languageService.isLanguageAvailable(lang),
+    };
   }
   return context;
 }

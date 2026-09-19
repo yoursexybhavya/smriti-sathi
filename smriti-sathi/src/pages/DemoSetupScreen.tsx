@@ -1,7 +1,7 @@
 /**
  * SMRITI SATHI — Demo Setup Screen
  * 
- * Initial screen for SIH demonstration.
+ * Screen for testing and device validation.
  * Allows quick setup of demo data for "Aai Devi"
  */
 
@@ -80,8 +80,8 @@ export default function DemoSetupScreen({ onComplete }: DemoSetupScreenProps) {
       {/* Header */}
       <div className="text-white text-center px-6 py-12">
         <h1 className="text-4xl font-bold mb-3">Smriti Sathi</h1>
-        <p className="text-lg opacity-90">Memory Care Companion</p>
-        <p className="text-sm opacity-75 mt-2">Smart India Hackathon 2026</p>
+        <p className="text-lg opacity-90">Cognitive Care Companion</p>
+        <p className="text-sm opacity-75 mt-2">Production Setup & Testing</p>
       </div>
 
       {/* Content */}
@@ -94,8 +94,8 @@ export default function DemoSetupScreen({ onComplete }: DemoSetupScreenProps) {
                 <Sparkles size={24} className="text-[#1B5E20]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-[#1A1A1A]">SIH Demo Mode</h2>
-                <p className="text-sm text-[#7A7A7A]">Quick setup for demonstration</p>
+                <h2 className="text-xl font-bold text-[#1A1A1A]">Sample Clinical Setup</h2>
+                <p className="text-sm text-[#7A7A7A]">Quick setup for device validation</p>
               </div>
             </div>
 

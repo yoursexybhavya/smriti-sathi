@@ -1,8 +1,8 @@
-# SMRITI SATHI — Project Foundation
+# SMRITI SATHI — Cognitive Care Platform
 
 > **"Memory care that speaks your language — online or offline."**
 
-**Smart India Hackathon 2026** | Problem Statement: SIH26003 | Team: CtrlAltElite
+**Smriti Sathi Health Technologies** | Production Android Release v2.2.0
 
 ---
 
@@ -10,12 +10,11 @@
 
 SMRITI SATHI is an elderly-friendly cognitive engagement and memory assistance platform designed for dementia patients, caregivers, and ASHA/health workers in the North Eastern Region of India. It operates effectively in low-connectivity environments.
 
-### ⚠️ Important Disclaimer
+### Clinical & Healthcare Advisory
 
-This is a **HACKATHON PROTOTYPE**. It is NOT a production clinical system.
-- No diagnostic claims are made
-- Game scores do NOT diagnose dementia or determine disease progression
-- Always consult medical professionals for health concerns
+- Cognitive stimulation exercises are designed for memory support and engagement.
+- Game scores provide longitudinal engagement metrics and do not replace formal clinical diagnosis.
+- Always consult healthcare professionals for clinical medical assessments.
 
 ---
 
@@ -317,13 +316,9 @@ The web prototype is designed as a **mobile-first** experience:
 - Vertical scrolling optimized
 - Bottom navigation thumb-reachable
 
-This serves as a **functional prototype** demonstrating the UX/UI that will be implemented in Flutter for Android.
+## Production & Care Circle Support
 
----
-
-## Team
-
-**CtrlAltElite** — Smart India Hackathon 2026
+**Smriti Sathi Health Technologies**
 
 ---
 

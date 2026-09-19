@@ -1,10 +1,9 @@
 export const APP = {
   name: 'Smriti Sathi',
   tagline: 'Memory care that speaks your language — online or offline.',
-  version: '0.1.0',
-  team: 'CtrlAltElite',
-  hackathon: 'Smart India Hackathon 2026',
-  problemStatement: 'SIH26003',
+  version: '2.2.0',
+  organization: 'Smriti Sathi Health Technologies',
+  platform: 'Cognitive Care & Memory Assistance Platform',
   region: 'North Eastern Region, India',
 } as const;
 

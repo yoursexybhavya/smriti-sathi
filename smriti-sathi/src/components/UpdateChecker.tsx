@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Download, Sparkles, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export const CURRENT_APP_VERSION = 'v2.1.0';
+export const CURRENT_APP_VERSION = 'v2.2.0';
 const GITHUB_REPO = 'yoursexybhavya/smriti-sathi';
 
 export interface UpdateInfo {
@@ -97,6 +97,13 @@ export function UpdateNotifier() {
     setShowModal(false);
   };
 
+  const updateModalTitle = t?.updateModalTitle || 'New Update Available';
+  const updateModalDesc = t?.updateModalDesc || 'A fresh update is ready to install with improvements.';
+  const installUpdateNow = t?.installUpdateNow || 'Install Update Now';
+  const updateDismiss = t?.updateDismiss || 'Remind Me Later';
+  const updateAvailableBanner = t?.updateAvailableBanner || 'New update available';
+  const downloadUpdate = t?.downloadUpdate || 'Install';
+
   return (
     <>
       {/* Full In-App Modal Dialog */}
@@ -167,7 +174,7 @@ export function UpdateNotifier() {
                 marginBottom: '8px',
               }}
             >
-              {t.updateModalTitle}
+              {updateModalTitle}
             </h2>
 
             <div
@@ -193,7 +200,7 @@ export function UpdateNotifier() {
                 marginBottom: '20px',
               }}
             >
-              {t.updateModalDesc}
+              {updateModalDesc}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -217,7 +224,7 @@ export function UpdateNotifier() {
                 }}
               >
                 <Download size={20} />
-                <span>{t.installUpdateNow}</span>
+                <span>{installUpdateNow}</span>
               </button>
 
               <button
@@ -232,7 +239,7 @@ export function UpdateNotifier() {
                   cursor: 'pointer',
                 }}
               >
-                {t.updateDismiss}
+                {updateDismiss}
               </button>
             </div>
           </div>
@@ -256,7 +263,7 @@ export function UpdateNotifier() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
             <Sparkles size={18} color="#34D399" />
             <span style={{ fontSize: '13px', color: '#D1FAE5', fontWeight: 600 }}>
-              {t.updateAvailableBanner} ({update.latestVersion})
+              {updateAvailableBanner} ({update.latestVersion})
             </span>
           </div>
 
@@ -278,7 +285,7 @@ export function UpdateNotifier() {
               }}
             >
               <Download size={14} />
-              <span>{t.downloadUpdate}</span>
+              <span>{downloadUpdate}</span>
             </button>
 
             <button

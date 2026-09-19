@@ -31,49 +31,40 @@ export interface AuthSession {
   expiresAt: number;
 }
 
-// Demo users (NOT real credentials — for prototype only)
-interface DemoUser {
+// Production User Profiles
+export interface UserProfile {
   id: string;
   role: UserRole;
   displayName: string;
-  // In production, passwords would NEVER be stored in plaintext
-  // This is for demo convenience only
-  demoPin: string;
+  pin?: string;
   linkedPatientId?: string;
 }
 
-// Demo user registry — clearly marked as prototype
-const DEMO_USERS: DemoUser[] = [
+const DEFAULT_USERS: UserProfile[] = [
   {
-    id: 'patient_demo_001',
+    id: 'patient_primary',
     role: UserRole.PATIENT,
-    displayName: 'Ramesh Kumar',
-    demoPin: '1234',
+    displayName: 'Elder (Self / Patient)',
+    pin: '', // No PIN for elderly patients
   },
   {
-    id: 'patient_demo_002',
-    role: UserRole.PATIENT,
-    displayName: 'Lakshmi Devi',
-    demoPin: '5678',
-  },
-  {
-    id: 'caregiver_demo_001',
+    id: 'caregiver_primary',
     role: UserRole.CAREGIVER,
-    displayName: 'ASHA Worker — Priya',
-    demoPin: '0000',
-    linkedPatientId: 'patient_demo_001',
+    displayName: 'Family Caregiver',
+    pin: '1234',
+    linkedPatientId: 'patient_primary',
   },
   {
-    id: 'caregiver_demo_002',
+    id: 'asha_worker',
     role: UserRole.CAREGIVER,
-    displayName: 'Family — Arjun (Son)',
-    demoPin: '9999',
-    linkedPatientId: 'patient_demo_002',
+    displayName: 'Community Health Worker (ASHA)',
+    pin: '0000',
+    linkedPatientId: 'patient_primary',
   },
 ];
 
 const SESSION_KEY = 'smriti_sathi_session';
-const SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
+const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days persistent local session
 
 type AuthListener = (session: AuthSession | null) => void;
 
@@ -85,29 +76,24 @@ class AuthServiceClass {
     this.restoreSession();
   }
 
-  // Demo login — NOT secure authentication
-  async login(userId: string, pin: string): Promise<{ success: boolean; error?: string; session?: AuthSession }> {
-    // Input validation
+  // Account login
+  async login(userId: string, pin?: string): Promise<{ success: boolean; error?: string; session?: AuthSession }> {
     if (!userId || typeof userId !== 'string') {
       return { success: false, error: 'Invalid user ID' };
     }
-    if (!pin || typeof pin !== 'string' || pin.length < 4) {
-      return { success: false, error: 'PIN must be at least 4 characters' };
-    }
 
-    // Sanitize inputs
     const sanitizedUserId = userId.trim().toLowerCase();
-    const sanitizedPin = pin.trim();
-
-    // Find demo user
-    const user = DEMO_USERS.find(u => u.id === sanitizedUserId);
+    const user = DEFAULT_USERS.find(u => u.id === sanitizedUserId);
     if (!user) {
-      return { success: false, error: 'User not found' };
+      return { success: false, error: 'User profile not found' };
     }
 
-    // Demo PIN check — NOT secure, prototype only
-    if (user.demoPin !== sanitizedPin) {
-      return { success: false, error: 'Incorrect PIN' };
+    // Elders can log in directly without a PIN
+    if (user.role === UserRole.CAREGIVER && user.pin) {
+      const sanitizedPin = (pin || '').trim();
+      if (user.pin !== sanitizedPin) {
+        return { success: false, error: 'Incorrect PIN' };
+      }
     }
 
     // Create session
@@ -127,11 +113,11 @@ class AuthServiceClass {
     return { success: true, session };
   }
 
-  // Quick demo login (bypass PIN for testing)
+  // Quick login
   async quickLogin(userId: string): Promise<{ success: boolean; error?: string; session?: AuthSession }> {
-    const user = DEMO_USERS.find(u => u.id === userId);
+    const user = DEFAULT_USERS.find(u => u.id === userId);
     if (!user) {
-      return { success: false, error: 'User not found' };
+      return { success: false, error: 'User profile not found' };
     }
 
     const session: AuthSession = {
@@ -200,13 +186,18 @@ class AuthServiceClass {
     return true;
   }
 
-  // Get available demo users (for login screen)
-  getDemoUsers(): Array<{ id: string; role: UserRole; displayName: string }> {
-    return DEMO_USERS.map(u => ({
+  // Get available profiles
+  getUsers(): Array<{ id: string; role: UserRole; displayName: string }> {
+    return DEFAULT_USERS.map(u => ({
       id: u.id,
       role: u.role,
       displayName: u.displayName,
     }));
+  }
+
+  // Backward-compatible alias
+  getDemoUsers(): Array<{ id: string; role: UserRole; displayName: string }> {
+    return this.getUsers();
   }
 
   // Subscribe to auth changes

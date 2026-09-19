@@ -23,12 +23,12 @@ import SecurityTestScreen from './pages/settings/SecurityTestScreen';
 import MemoryBookScreen from './screens/MemoryBookScreen';
 import MemoryBookViewerScreen from './screens/MemoryBookViewerScreen';
 import LoginScreen from './pages/auth/LoginScreen';
-import DemoSetupScreen from './pages/DemoSetupScreen';
 import CaregiverHome from './pages/caregiver/CaregiverHome';
 import SafetyDashboard from './pages/caregiver/SafetyDashboard';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider as SecondaryLanguageProvider } from './contexts/LanguageContext';
 import { UserRole } from './models/Role';
 import { APP } from './core/constants/app';
 import { UpdateNotifier } from './components/UpdateChecker';
@@ -38,7 +38,6 @@ function AppContent() {
   const { isAuthenticated, role } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [showSplash, setShowSplash] = useState(true);
-  const [showDemoSetup, setShowDemoSetup] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -85,22 +84,6 @@ function AppContent() {
     return <SplashScreen appName={APP.name} tagline={APP.tagline} />;
   }
 
-  // Show demo setup if requested
-  if (showDemoSetup) {
-    return (
-      <ScreenContainer>
-        <DemoSetupScreen onComplete={() => {
-          setShowDemoSetup(false);
-          if (role === UserRole.CAREGIVER) {
-            setActiveTab('caregiver-home');
-          } else {
-            setActiveTab('home');
-          }
-        }} />
-      </ScreenContainer>
-    );
-  }
-
   // Show login if not authenticated
   if (!isAuthenticated) {
     return (
@@ -113,7 +96,6 @@ function AppContent() {
               setActiveTab('home');
             }
           }}
-          onStartDemo={() => setShowDemoSetup(true)}
         />
       </ScreenContainer>
     );
@@ -220,13 +202,15 @@ function AppContent() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <LanguageProvider>
-        <AuthProvider>
-          <AppProvider>
-            <AppContent />
-          </AppProvider>
-        </AuthProvider>
-      </LanguageProvider>
+      <SecondaryLanguageProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <AppProvider>
+              <AppContent />
+            </AppProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </SecondaryLanguageProvider>
     </ErrorBoundary>
   );
 }

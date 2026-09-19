@@ -31,7 +31,7 @@ export default function OnboardingWelcome({ onNext }: OnboardingWelcomeProps) {
             {APP.tagline}
           </p>
           <div className="mt-4 inline-flex items-center gap-2 bg-[#E8F5E9] border border-[#1B5E20]/30 px-3 py-1.5 rounded-full text-xs font-bold text-[#1B5E20]">
-            <span>🌿 Smart India Hackathon 2026 • SIH26003</span>
+            <span>🌿 Cognitive Care & Memory Companion</span>
           </div>
         </div>
 

@@ -43,7 +43,7 @@ export default function SplashScreen({ appName, tagline }: SplashScreenProps) {
 
         {/* Version */}
         <p className="absolute bottom-8 text-xs text-white/50">
-          v0.1.0 — Smart India Hackathon 2026
+          v2.2.0 — Cognitive Care Companion
         </p>
       </div>
     </div>

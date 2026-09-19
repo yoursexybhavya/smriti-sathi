@@ -452,13 +452,13 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
                 <span className="text-sm text-[#1A1A1A] font-medium">{APP.version}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-[#7A7A7A]">Team</span>
-                <span className="text-sm text-[#1A1A1A] font-medium">{APP.team}</span>
+                <span className="text-sm text-[#7A7A7A]">Organization</span>
+                <span className="text-sm text-[#1A1A1A] font-medium">{APP.organization}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-[#7A7A7A]">Platform</span>
                 <span className="text-sm text-[#1A1A1A] font-medium flex items-center gap-1">
-                  <Smartphone size={12} /> Android (Prototype)
+                  <Smartphone size={12} /> Android Tablet
                 </span>
               </div>
             </div>

@@ -22,7 +22,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     } catch {
       // Ignore localStorage errors (e.g. incognito/restricted)
     }
-    return 'as'; // Default to Assamese (the primary language of SIH26003 MDoNER pilot)
+    return 'as'; // Default to Assamese for regional North East care pilot
   });
 
   useEffect(() => {
@@ -62,6 +62,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext);
-  if (!context) throw new Error('useLanguage must be used within LanguageProvider');
+  if (!context) {
+    return {
+      language: 'en' as Language,
+      setLanguage: () => {},
+      t: (translations['en'] || translations['as'] || {}) as Translations,
+    };
+  }
   return context;
 }

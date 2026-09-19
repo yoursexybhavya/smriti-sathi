@@ -21,8 +21,8 @@ const telemetryDatabase = {
 app.get('/health', (req, res) => {
   res.json({
     status: 'ONLINE',
-    platform: 'Smriti Sathi Cloud Testing Server',
-    version: '1.0.0',
+    platform: 'Smriti Sathi Cloud Production Platform',
+    version: '2.2.0',
     recordsStored: telemetryDatabase.sessions.length,
     lastSync: telemetryDatabase.lastSyncedAt,
   });
@@ -30,7 +30,7 @@ app.get('/health', (req, res) => {
 
 // 2. Cloud REST Sync endpoint (called from CaregiverDash)
 app.post('/api/sync', (req, res) => {
-  const { deviceId, patientId, sessions, reminderLogs, timestamp } = req.body;
+  const { deviceId, patientId, sessions, reminderLogs, events, timestamp } = req.body;
 
   if (Array.isArray(sessions)) {
     telemetryDatabase.sessions.push(...sessions);
@@ -38,10 +38,13 @@ app.post('/api/sync', (req, res) => {
   if (Array.isArray(reminderLogs)) {
     telemetryDatabase.reminders.push(...reminderLogs);
   }
+  if (Array.isArray(events)) {
+    telemetryDatabase.sessions.push(...events);
+  }
 
   telemetryDatabase.lastSyncedAt = new Date().toISOString();
 
-  console.log(`[SYNC SUCCESS] Received ${sessions?.length || 0} sessions from device: ${deviceId || 'Bedside Tablet'}`);
+  console.log(`[SYNC SUCCESS] Received payload from device: ${deviceId || 'Patient Tablet'}`);
 
   res.json({
     success: true,
@@ -78,12 +81,12 @@ app.post('/api/sos', (req, res) => {
   };
 
   telemetryDatabase.sosAlerts.push(alert);
-  console.warn(`[EMERGENCY SOS ALERT] Bedside beacon triggered! Dispatching SMS to Son & ASHA...`);
+  console.warn(`[EMERGENCY SOS ALERT] Bedside beacon triggered! Dispatching SMS to Caregiver & ASHA...`);
 
   res.status(200).json({
     dispatched: true,
     alert,
-    contactsNotified: ['Son (+91 98765 43210)', 'ASHA Worker (+91 98765 11223)'],
+    contactsNotified: ['Caregiver (+91 98765 43210)', 'ASHA Worker (+91 98765 11223)'],
   });
 });
 
@@ -98,8 +101,8 @@ if (fs.existsSync(distPath)) {
   app.get('/', (req, res) => {
     res.json({
       status: 'ONLINE',
-      message: 'Smriti Sathi Cloud Testing Server is live & healthy!',
-      platform: 'SIH26003',
+      message: 'Smriti Sathi Cloud Production Server is live & healthy!',
+      platform: 'Smriti Sathi Cloud Platform',
       endpoints: {
         health: '/health',
         sync: 'POST /api/sync',

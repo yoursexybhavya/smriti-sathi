@@ -2,8 +2,6 @@
 
 <div align="center">
 
-[![Smart India Hackathon 2026](https://img.shields.io/badge/SIH-2026%20Problem%20Statement%20SIH26003-orange?style=for-the-badge&logo=target)](https://sih.gov.in/)
-[![Ministry of Development of North Eastern Region](https://img.shields.io/badge/Ministry-MDoNER-green?style=for-the-badge)](https://mdoner.gov.in/)
 [![Powered by Bhashini AI](https://img.shields.io/badge/AI%20Engine-Bhashini%20(MeitY)-blue?style=for-the-badge)](https://bhashini.gov.in/)
 [![Platform](https://img.shields.io/badge/Platform-Android%20Tablet%20%26%20Mobile-brightgreen?style=for-the-badge&logo=android)](https://github.com/yoursexybhavya/smriti-sathi/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -138,5 +136,5 @@ Contributions to expand language models, regional cultural folk content, or elde
 ## 📄 License & Acknowledgments
 
 - Distributed under the **MIT License**.
-- Developed for **Smart India Hackathon 2026 (SIH26003)** under the **Ministry of Development of North Eastern Region (MDoNER)**.
+- Developed for elderly cognitive care and memory assistance in the **North Eastern Region of India**.
 - Powered by the **Bhashini National Language Translation Mission (MeitY)**.

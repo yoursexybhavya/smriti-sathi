@@ -15,7 +15,7 @@
 
 import { db, SyncEvent } from '../../database/db';
 import { ConnectivityService, ConnectivityState } from './ConnectivityService';
-import { MockCloudRepository, CloudSyncResult } from './MockCloudRepository';
+import { CloudRepository, CloudSyncResult } from './CloudRepository';
 
 // Sync status states
 export type SyncStatus = 
@@ -57,6 +57,7 @@ class SyncServiceClass {
   private listeners: Set<SyncStateListener> = new Set();
   private autoSyncEnabled: boolean = true;
   private syncInProgress: boolean = false;
+  private periodicSyncInterval: any = null;
   private retryTimeouts: Map<number, ReturnType<typeof setTimeout>> = new Map();
   private unsubscribeConnectivity: (() => void) | null = null;
 
@@ -70,7 +71,19 @@ class SyncServiceClass {
     };
 
     this.setupConnectivityListener();
+    this.setupPeriodicSync();
     this.initialize();
+  }
+
+  private setupPeriodicSync(): void {
+    if (typeof window !== 'undefined') {
+      // Auto-sync pending data to Render cloud every 30 seconds when online
+      this.periodicSyncInterval = setInterval(() => {
+        if (this.autoSyncEnabled && ConnectivityService.isOnline() && !this.syncInProgress) {
+          this.triggerSync();
+        }
+      }, 30000);
+    }
   }
 
   private async initialize(): Promise<void> {
@@ -95,7 +108,7 @@ class SyncServiceClass {
 
   async getStats(): Promise<SyncStats> {
     const allEvents = await db.syncEvents.toArray();
-    const cloudStats = MockCloudRepository.getStats();
+    const cloudStats = CloudRepository.getStats();
 
     return {
       totalEvents: allEvents.length,
@@ -135,44 +148,31 @@ class SyncServiceClass {
         return { success: 0, failed: 0, skipped: 0 };
       }
 
+      // Mark all as syncing in local DB
+      for (const event of pendingEvents) {
+        if (event.id) {
+          await db.syncEvents.update(event.id, { syncStatus: 'syncing' });
+        }
+      }
+
+      // Send batch to Render Cloud Server
+      const { results } = await CloudRepository.syncBatch(pendingEvents);
+
       let success = 0;
       let failed = 0;
 
-      // Sync each event
-      for (const event of pendingEvents) {
-        // Idempotency check
-        if (MockCloudRepository.isAlreadySynced(event.uuid)) {
+      for (let i = 0; i < pendingEvents.length; i++) {
+        const event = pendingEvents[i];
+        const res = results[i];
+
+        if (res && res.success) {
           await db.syncEvents.update(event.id!, {
             syncStatus: 'synced',
             syncedAt: Date.now(),
           });
           success++;
-          continue;
-        }
-
-        // Mark as syncing
-        await db.syncEvents.update(event.id!, {
-          syncStatus: 'syncing',
-        });
-
-        try {
-          const result: CloudSyncResult = await MockCloudRepository.syncEvent(event);
-
-          if (result.success) {
-            // Mark as synced - DO NOT delete local data
-            await db.syncEvents.update(event.id!, {
-              syncStatus: 'synced',
-              syncedAt: Date.now(),
-            });
-            success++;
-          } else {
-            // Mark as failed - local data remains safe
-            await this.handleFailedSync(event, result.error || 'Unknown error');
-            failed++;
-          }
-        } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-          await this.handleFailedSync(event, errorMsg);
+        } else {
+          await this.handleFailedSync(event, res?.error || 'Cloud sync failed');
           failed++;
         }
       }
@@ -286,12 +286,9 @@ class SyncServiceClass {
     return count;
   }
 
-  // Reset all sync state (for testing)
   async resetAll(): Promise<void> {
     await db.syncEvents.clear();
-    MockCloudRepository.reset();
-    this.retryTimeouts.forEach(timeout => clearTimeout(timeout));
-    this.retryTimeouts.clear();
+    CloudRepository.reset();
     await this.refreshState();
   }
 
