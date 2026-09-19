@@ -56,6 +56,19 @@ function AppContent() {
     };
   }, []);
 
+  useEffect(() => {
+    if (state.accessibility) {
+      if (state.accessibility.highContrast) {
+        document.body.classList.add('high-contrast');
+      } else {
+        document.body.classList.remove('high-contrast');
+      }
+      
+      document.body.classList.remove('text-size-normal', 'text-size-large', 'text-size-extra-large');
+      document.body.classList.add(`text-size-${state.accessibility.textSize}`);
+    }
+  }, [state.accessibility]);
+
   // Set initial tab based on role after login
   useEffect(() => {
     if (isAuthenticated) {
@@ -134,9 +147,9 @@ function AppContent() {
         case 'settings':
           return <SettingsScreen onNavigate={setActiveTab} isOnline={isOnline} />;
         case 'memory-book':
-          return <MemoryBookScreen />;
+          return <MemoryBookScreen onBack={() => setActiveTab('home')} onNavigate={setActiveTab} />;
         case 'memory-book-viewer':
-          return <MemoryBookViewerScreen />;
+          return <MemoryBookViewerScreen onBack={() => setActiveTab('memory-book')} />;
         default:
           return <PatientHomeScreen onNavigate={setActiveTab} isOnline={isOnline} />;
       }
@@ -150,7 +163,7 @@ function AppContent() {
         case 'caregiver-reminders':
           return <RemindersScreen onNavigate={setActiveTab} isOnline={isOnline} />;
         case 'caregiver-memory':
-          return <MemoryBookScreen />;
+          return <MemoryBookScreen onBack={() => setActiveTab('home')} onNavigate={setActiveTab} />;
         case 'caregiver-settings':
           return <SettingsScreen onNavigate={setActiveTab} isOnline={isOnline} />;
         case 'safety-dashboard':

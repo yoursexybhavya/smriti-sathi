@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+const useNavigate = () => (path: string) => {};
 import { Layers, CalendarCheck, ChevronRight, Play, Calculator, BookOpen } from 'lucide-react';
 import { usePatient } from '../contexts/PatientContext';
 import { useLanguage } from '../contexts/LanguageContext';

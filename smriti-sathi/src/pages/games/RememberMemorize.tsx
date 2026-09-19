@@ -81,7 +81,7 @@ export default function RememberMemorize({ objects, memorizeTime, onComplete }: 
 function ObjectCard({ object }: { object: RememberObject }) {
   return (
     <div className="bg-white rounded-2xl border-2 border-[#E0D8CC] p-6 flex flex-col items-center justify-center aspect-square shadow-sm">
-      <div className="text-6xl mb-3">{object.emoji}</div>
+      <div className="mb-3 flex justify-center">{<img src={object.imageUrl} alt={object.name} className="w-24 h-24 object-contain" />}</div>
       <p className="text-lg font-semibold text-[#1A1A1A] text-center">
         {object.name}
       </p>

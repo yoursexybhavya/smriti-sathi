@@ -58,3 +58,22 @@ html {
   outline-offset: 2px;
   border-radius: 8px;
 }
+
+/* Accessibility overrides */
+body.high-contrast {
+  --color-primary: #000000;
+  --color-text-primary: #000000;
+  --color-background: #FFFFFF;
+  --color-surface-warm: #FFFFFF;
+  background-color: #FFFFFF;
+  color: #000000;
+  filter: contrast(1.2);
+}
+
+body.text-size-large {
+  font-size: 110%;
+}
+
+body.text-size-extra-large {
+  font-size: 125%;
+}

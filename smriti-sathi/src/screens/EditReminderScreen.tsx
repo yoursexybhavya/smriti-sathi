@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+const useNavigate = () => (path: string) => {}; const useParams = <T extends Record<string, string | undefined>>(): T => ({} as T);
 import { ArrowLeft, Save, Pill, Droplets, Activity, Calendar } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { reminderService } from '../services/ReminderService';

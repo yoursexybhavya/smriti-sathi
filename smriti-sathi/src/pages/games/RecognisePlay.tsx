@@ -31,8 +31,8 @@ export default function RecognisePlay({ activity, onSubmit }: RecognisePlayProps
           {/* Show pattern twice */}
           {[...patternObjects, ...patternObjects].map((obj, i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="w-20 h-20 bg-white rounded-2xl border-2 border-[#E0D8CC] flex items-center justify-center text-4xl shadow-sm">
-                {obj.emoji}
+              <div className="w-20 h-20 bg-white rounded-2xl border-2 border-[#E0D8CC] flex items-center justify-center text-4xl shadow-sm overflow-hidden">
+                <img src={obj.imageUrl} alt={obj.name} className="w-16 h-16 object-contain" />
               </div>
               {i < patternObjects.length * 2 - 1 && (
                 <span className="text-2xl text-[#7A7A7A]">→</span>
@@ -56,7 +56,7 @@ export default function RecognisePlay({ activity, onSubmit }: RecognisePlayProps
               key={i}
               className="w-full aspect-square bg-white rounded-2xl border-2 border-[#E0D8CC] flex items-center justify-center text-5xl shadow-sm"
             >
-              {obj.emoji}
+              <img src={obj.imageUrl} alt={obj.name} className="w-16 h-16 object-contain" />
             </div>
           ))}
         </div>
@@ -77,8 +77,8 @@ export default function RecognisePlay({ activity, onSubmit }: RecognisePlayProps
                   ?
                 </div>
               ) : (
-                <div className="w-20 h-20 bg-white rounded-2xl border-2 border-[#E0D8CC] flex items-center justify-center text-4xl shadow-sm">
-                  {obj.emoji}
+                <div className="w-20 h-20 bg-white rounded-2xl border-2 border-[#E0D8CC] flex items-center justify-center text-4xl shadow-sm overflow-hidden">
+                  <img src={obj.imageUrl} alt={obj.name} className="w-16 h-16 object-contain" />
                 </div>
               )}
               {i < sequenceObjects.length - 1 && (
@@ -135,9 +135,9 @@ export default function RecognisePlay({ activity, onSubmit }: RecognisePlayProps
                   }
                 `}
                 aria-pressed={selectedOption === option}
-                aria-label={`Option ${i + 1}: ${option}`}
+                aria-label={`Option ${i + 1}: ${option === '?' ? '?' : <img src={option} alt="" className="w-16 h-16 object-contain" />}`}
               >
-                {option}
+                {option === '?' ? '?' : <img src={option} alt="" className="w-16 h-16 object-contain" />}
                 {selectedOption === option && (
                   <div className="absolute top-2 right-2 w-7 h-7 rounded-full bg-[#E65100] flex items-center justify-center">
                     <Check size={16} className="text-white" />

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { ArrowLeft, ChevronLeft, ChevronRight, Volume2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { memoryBookService, MemoryCategory } from '../services/MemoryBookService';
 import { MemoryItem } from '../database/db';
 
-export default function MemoryBookViewerScreen() {
-  const navigate = useNavigate();
+interface Props { onBack?: () => void; }
+export default function MemoryBookViewerScreen({ onBack }: Props) {
+  
   const { state } = useApp();
   const userId = state.currentPatient?.id ? parseInt(state.currentPatient.id) : null;
   const patientName = state.currentPatient?.name;
@@ -73,7 +74,7 @@ export default function MemoryBookViewerScreen() {
         <div className="text-center">
           <p className="text-gray-600">No patient selected</p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => onBack?.()}
             className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
           >
             Go to Home
@@ -93,7 +94,7 @@ export default function MemoryBookViewerScreen() {
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => onBack?.()}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-6 h-6 text-gray-600" />

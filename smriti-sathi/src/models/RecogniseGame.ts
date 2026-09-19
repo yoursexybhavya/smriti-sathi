@@ -42,18 +42,18 @@ export class RecogniseGameEngine {
     const options = this.shuffleArray([nextInPattern, ...wrongOptions]);
     
     // Convert IDs to emoji for display
-    const optionEmojis = options.map((id: string) => {
+    const optionImageUrls = options.map((id: string) => {
       const obj = REMEMBER_OBJECTS.find((o: RememberObject) => o.id === id);
-      return obj ? obj.emoji : '?';
+      return obj ? obj.imageUrl : '?';
     });
     
-    const correctEmoji = REMEMBER_OBJECTS.find((o: RememberObject) => o.id === nextInPattern)?.emoji || '?';
+    const correctImageUrl = REMEMBER_OBJECTS.find((o: RememberObject) => o.id === nextInPattern)?.imageUrl || '?';
     
     return {
       type: 'pattern',
       question: 'What comes next in the pattern?',
-      options: optionEmojis,
-      correctAnswer: correctEmoji,
+      options: optionImageUrls,
+      correctAnswer: correctImageUrl,
       objects: selectedObjects,
     };
   }
@@ -81,8 +81,8 @@ export class RecogniseGameEngine {
     const allObjects = [...selectedMain, oddOne];
     const shuffledObjects = this.shuffleArray(allObjects);
     
-    const options = shuffledObjects.map((o: RememberObject) => o.emoji);
-    const correctAnswer = oddOne.emoji;
+    const options = shuffledObjects.map((o: RememberObject) => o.imageUrl);
+    const correctAnswer = oddOne.imageUrl;
     
     return {
       type: 'odd-one-out',
@@ -118,22 +118,22 @@ export class RecogniseGameEngine {
     
     // Shuffle options
     const options = this.shuffleArray([missingObject.id, ...wrongOptions]);
-    const optionEmojis = options.map((id: string) => {
+    const optionImageUrls = options.map((id: string) => {
       const obj = REMEMBER_OBJECTS.find((o: RememberObject) => o.id === id);
-      return obj ? obj.emoji : '?';
+      return obj ? obj.imageUrl : '?';
     });
     
-    const correctEmoji = missingObject.emoji;
+    const correctImageUrl = missingObject.imageUrl;
     
     // Create display sequence with gap
-    const displaySequence = sequence.map((o: RememberObject) => o.emoji);
+    const displaySequence = sequence.map((o: RememberObject) => o.imageUrl);
     displaySequence.splice(removeIndex, 0, '?');
     
     return {
       type: 'sequence',
       question: 'What is missing in the sequence?',
-      options: optionEmojis,
-      correctAnswer: correctEmoji,
+      options: optionImageUrls,
+      correctAnswer: correctImageUrl,
       objects: selectedObjects,
     };
   }

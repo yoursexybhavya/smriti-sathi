@@ -13,7 +13,7 @@ interface SettingsScreenProps {
 }
 
 export default function SettingsScreen({ onNavigate, isOnline = true }: SettingsScreenProps) {
-  const { state, resetOnboarding } = useApp();
+  const { state, resetOnboarding, updateAccessibility } = useApp();
   const { role, logout, session } = useAuth();
   const patient = state.currentPatient;
   const isCaregiver = role === UserRole.CAREGIVER;
@@ -128,10 +128,10 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
             Voice & Accessibility
           </h3>
           <Card className="p-4 space-y-4">
-            <SettingToggle label="Voice Instructions" description="Read instructions aloud" defaultOn />
-            <SettingToggle label="Large Text" description="Use bigger fonts throughout" defaultOn />
-            <SettingToggle label="High Contrast" description="Increase color contrast" />
-            <SettingToggle label="Sound Effects" description="Play sounds during games" defaultOn />
+            <SettingToggle label="Voice Instructions" description="Read instructions aloud" value={state.accessibility.voiceGuidance} onChange={(v) => updateAccessibility({...state.accessibility, voiceGuidance: v})} />
+            <SettingToggle label="Large Text" description="Use bigger fonts throughout" value={true} />
+            <SettingToggle label="High Contrast" description="Increase color contrast" value={state.accessibility.highContrast} onChange={(v) => updateAccessibility({...state.accessibility, highContrast: v})} />
+            <SettingToggle label="Sound Effects" description="Play sounds during games" value={true} />
           </Card>
         </div>
 
@@ -146,11 +146,10 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
               <div className="flex items-center justify-between">
                 <span className="text-base text-[#1A1A1A]">Text Size</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#7A7A7A]">A</span>
-                  <div className="w-32 h-2 bg-[#F5F0E8] rounded-full">
-                    <div className="w-20 h-full bg-[#1B5E20] rounded-full" />
-                  </div>
-                  <span className="text-lg text-[#7A7A7A]">A</span>
+                  <span onClick={() => updateAccessibility({...state.accessibility, textSize: 'normal'})} className="cursor-pointer text-xs text-[#7A7A7A] hover:text-[#1B5E20]">A</span>
+                  <span onClick={() => updateAccessibility({...state.accessibility, textSize: 'large'})} className="cursor-pointer text-base text-[#7A7A7A] hover:text-[#1B5E20]">A</span>
+                  <span onClick={() => updateAccessibility({...state.accessibility, textSize: 'extra-large'})} className="cursor-pointer text-lg text-[#7A7A7A] hover:text-[#1B5E20]">A</span>
+                  <div className="ml-2 text-sm text-[#1B5E20] font-medium">{state.accessibility.textSize}</div>
                 </div>
               </div>
             </div>
@@ -164,9 +163,9 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
             Notifications
           </h3>
           <Card className="p-4 space-y-4">
-            <SettingToggle label="Medicine Reminders" description="Alert for medication times" defaultOn />
-            <SettingToggle label="Game Reminders" description="Daily game suggestions" defaultOn />
-            <SettingToggle label="Appointment Alerts" description="Notify before appointments" defaultOn />
+            <SettingToggle label="Medicine Reminders" description="Alert for medication times" value={true} />
+            <SettingToggle label="Game Reminders" description="Daily game suggestions" value={true} />
+            <SettingToggle label="Appointment Alerts" description="Notify before appointments" value={true} />
           </Card>
         </div>
 
@@ -177,7 +176,7 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
             Data & Privacy
           </h3>
           <Card className="p-4 space-y-4">
-            <SettingToggle label="Offline Mode" description="Store data locally" defaultOn />
+            <SettingToggle label="Offline Mode" description="Store data locally" value={true} />
             <SettingToggle label="Auto-Sync" description="Sync when online" />
             <div className="flex items-center justify-between py-1">
               <div>
@@ -360,18 +359,18 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
   );
 }
 
-function SettingToggle({ label, description, defaultOn = false }: { label: string; description: string; defaultOn?: boolean }) {
+function SettingToggle({ label, description, value = false, onChange }: { label: string; description: string; value?: boolean; onChange?: (val: boolean) => void }) {
   return (
-    <div className="flex items-center justify-between py-1">
+    <div className="flex items-center justify-between py-1" onClick={() => onChange?.(!value)}>
       <div className="flex-1 mr-4">
         <span className="text-base text-[#1A1A1A] font-medium">{label}</span>
         <p className="text-xs text-[#7A7A7A] mt-0.5">{description}</p>
       </div>
       <div className={`w-12 h-7 rounded-full relative cursor-pointer transition-colors ${
-        defaultOn ? 'bg-[#1B5E20]' : 'bg-[#C0B8A8]'
+        value ? 'bg-[#1B5E20]' : 'bg-[#C0B8A8]'
       }`}>
         <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-transform ${
-          defaultOn ? 'translate-x-5' : 'translate-x-0.5'
+          value ? 'translate-x-5' : 'translate-x-0.5'
         }`} />
       </div>
     </div>

@@ -21,7 +21,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
     <div className="min-h-screen bg-[#F5F0E8]">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-[#E0D8CC]">
-        <div className="max-w-lg mx-auto flex items-center justify-between px-5 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-5 py-4">
           <div>
             <h1 className="text-xl font-bold text-[#1A1A1A]">
               {greeting}
@@ -46,7 +46,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-5 py-6 pb-28 space-y-6">
+      <div className="max-w-7xl mx-auto px-5 py-6 pb-28 space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
         {/* Today's Activities */}
         <div className="space-y-3">
           <SectionHeader

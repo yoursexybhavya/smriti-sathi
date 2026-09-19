@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+const useNavigate = () => (path: string) => {};
 import { Flame, Zap, Settings as SettingsIcon, Volume2, Users } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';

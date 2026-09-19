@@ -75,7 +75,7 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
                   aria-pressed={isSelected}
                   aria-label={`${obj.name} ${isSelected ? 'selected' : 'not selected'}`}
                 >
-                  <div className="text-5xl mb-2">{obj.emoji}</div>
+                  <div className="mb-2 flex justify-center">{<img src={obj.imageUrl} alt={obj.name} className="w-16 h-16 object-contain" />}</div>
                   <p className="text-base font-medium text-[#1A1A1A] text-center">
                     {obj.name}
                   </p>

@@ -17,7 +17,7 @@ export default function AppHeader({
 }: AppHeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-[#E0D8CC]">
-      <div className="max-w-lg mx-auto flex items-center justify-between px-5 py-4">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-5 py-4">
         <div className="flex-1">
           <h1 className="text-xl font-bold text-[#1A1A1A]">{title}</h1>
           {subtitle && (

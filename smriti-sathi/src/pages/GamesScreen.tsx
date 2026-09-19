@@ -31,7 +31,7 @@ export default function GamesScreen({ onNavigate, isOnline = true }: GamesScreen
   return (
     <>
       <AppHeader title="Cognitive Games" subtitle="Keep your mind active" isOnline={isOnline} />
-      <div className="px-5 py-6 pb-28 space-y-6">
+      <div className="max-w-7xl mx-auto px-5 py-6 pb-28 space-y-6">
         {/* Info Banner */}
         <div className="flex items-start gap-3 p-4 bg-[#E3F2FD] rounded-2xl border border-[#BBDEFB]">
           <Info size={20} className="text-[#1565C0] mt-0.5 flex-shrink-0" />
@@ -41,8 +41,8 @@ export default function GamesScreen({ onNavigate, isOnline = true }: GamesScreen
         </div>
 
         {/* Game Cards */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-[#1A1A1A] px-1">Available Games</h3>
+        <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+          <h3 className="text-lg font-semibold text-[#1A1A1A] px-1 md:col-span-2">Available Games</h3>
           
           {/* REMEMBER Game - Fully Working */}
           <Card onPress={() => onNavigate('remember-game')} className="overflow-hidden">

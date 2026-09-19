@@ -20,11 +20,14 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
 
   // Step 3 form fields
   const [elderName, setElderName] = useState('');
-  const [elderAge, setElderAge] = useState('72');
-  const [pin, setPin] = useState('1234');
+  const [elderAge, setElderAge] = useState('');
+  const [pin, setPin] = useState('');
   const [medReminder, setMedReminder] = useState(true);
   const [waterReminder, setWaterReminder] = useState(true);
   const [brainReminder, setBrainReminder] = useState(true);
+  const [medTime, setMedTime] = useState('09:00');
+  const [waterTime, setWaterTime] = useState('11:00');
+  const [brainTime, setBrainTime] = useState('16:00');
   const [error, setError] = useState('');
 
   const voicePreviews: Record<Language, string> = {
@@ -58,6 +61,11 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
         medicine: medReminder,
         hydration: waterReminder,
         brainWorkout: brainReminder,
+      },
+      reminderTimes: {
+        medicine: { hour: parseInt(medTime.split(':')[0]), minute: parseInt(medTime.split(':')[1]) },
+        hydration: { hour: parseInt(waterTime.split(':')[0]), minute: parseInt(waterTime.split(':')[1]) },
+        brainWorkout: { hour: parseInt(brainTime.split(':')[0]), minute: parseInt(brainTime.split(':')[1]) },
       },
     });
 
@@ -337,7 +345,17 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
               </button>
               <button
                 type="button"
-                onClick={() => setStep(3)}
+                onClick={() => {
+                  if (role === 'elder') {
+                    // Skip complex setup
+                    setElderAge('');
+                    setPin('');
+                    setMedReminder(false);
+                    setWaterReminder(false);
+                    setBrainReminder(false);
+                  }
+                  setStep(3);
+                }}
                 className="btn-primary-lumos"
                 style={{
                   flex: 2,
@@ -407,6 +425,7 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
               />
             </div>
 
+            {role === 'caregiver' && (<>
             {/* Age */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#94A9C4', marginBottom: '6px' }}>
@@ -454,7 +473,10 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
                     onChange={(e) => setMedReminder(e.target.checked)}
                     style={{ width: '18px', height: '18px', accentColor: '#FF7247' }}
                   />
-                  <span>💊 Morning Medicine (ৰাতিপুৱাৰ ঔষধ — 9:00 AM)</span>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>💊 Morning Medicine (ৰাতিপুৱাৰ ঔষধ)</span>
+                    <input type="time" value={medTime} onChange={(e) => setMedTime(e.target.value)} onClick={(e) => e.stopPropagation()} style={{ marginTop: '4px', background: '#0E1C2D', border: '1px solid #223A57', color: '#FFF', padding: '4px 8px', borderRadius: '6px' }} />
+                  </div>
                 </label>
 
                 <label
@@ -475,7 +497,10 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
                     onChange={(e) => setWaterReminder(e.target.checked)}
                     style={{ width: '18px', height: '18px', accentColor: '#38BDF8' }}
                   />
-                  <span>💧 Hydration Prompt (পানী খোৱা — 11:00 AM)</span>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>💧 Hydration (পানী খোৱা)</span>
+                    <input type="time" value={waterTime} onChange={(e) => setWaterTime(e.target.value)} onClick={(e) => e.stopPropagation()} style={{ marginTop: '4px', background: '#0E1C2D', border: '1px solid #223A57', color: '#FFF', padding: '4px 8px', borderRadius: '6px' }} />
+                  </div>
                 </label>
 
                 <label
@@ -496,11 +521,17 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
                     onChange={(e) => setBrainReminder(e.target.checked)}
                     style={{ width: '18px', height: '18px', accentColor: '#10B981' }}
                   />
-                  <span>🧠 Cognitive Workout (স্মৃতি পৰীক্ষা — 4:00 PM)</span>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>🧠 Memory Workout (স্মৃতি পৰীক্ষা)</span>
+                    <input type="time" value={brainTime} onChange={(e) => setBrainTime(e.target.value)} onClick={(e) => e.stopPropagation()} style={{ marginTop: '4px', background: '#0E1C2D', border: '1px solid #223A57', color: '#FFF', padding: '4px 8px', borderRadius: '6px' }} />
+                  </div>
                 </label>
               </div>
             </div>
 
+            {/* Enabled Reminders */}
+            </>)}
+            {role === 'caregiver' && (<>
             {/* 4-Digit Security PIN */}
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
@@ -532,6 +563,7 @@ export function FirstLaunchOnboarding({ onComplete }: FirstLaunchOnboardingProps
               </p>
             </div>
 
+            </>)}
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 type="button"

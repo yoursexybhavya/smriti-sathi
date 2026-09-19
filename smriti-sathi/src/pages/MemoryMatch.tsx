@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+const useNavigate = () => (path: string) => {};
 import { ArrowLeft, Volume2, RotateCcw, Home, Award } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { usePatient } from '../contexts/PatientContext';

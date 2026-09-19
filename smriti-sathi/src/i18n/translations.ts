@@ -1103,7 +1103,7 @@ export const languageNames: Record<Language, string> = {
 // Bilingual names for onboarding language selection (before user has chosen a language)
 export const languageNamesOnboarding: Record<Language, string> = {
   en: 'English',
-  as: 'অসমীয়া (Assamese)',
-  brx: 'बर\' (Bodo)',
-  mni: 'মৈতৈলোন্ (Manipuri)',
+  as: 'অসমীয়া',
+  brx: 'बर\'',
+  mni: 'মৈতৈলোন্',
 };

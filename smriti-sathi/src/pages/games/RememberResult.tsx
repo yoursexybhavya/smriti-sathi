@@ -87,62 +87,6 @@ export default function RememberResult({
           </div>
         </div>
 
-        {/* Detailed Results */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-5 space-y-4">
-          <h3 className="text-lg font-semibold text-[#1A1A1A]">Details</h3>
-          
-          {/* Correct selections */}
-          {correctSelections.length > 0 && (
-            <div>
-              <p className="text-sm font-medium text-[#2E7D32] mb-2">
-                ✓ Correctly remembered ({correctSelections.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {correctSelections.map(obj => (
-                  <span key={obj.id} className="inline-flex items-center gap-1 bg-[#E8F5E9] text-[#1B5E20] px-3 py-1 rounded-full text-sm font-medium">
-                    <span>{obj.emoji}</span>
-                    <span>{obj.name}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Incorrect selections */}
-          {incorrectSelections.length > 0 && (
-            <div>
-              <p className="text-sm font-medium text-[#C62828] mb-2">
-                ✗ Not in the original set ({incorrectSelections.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {incorrectSelections.map(obj => (
-                  <span key={obj.id} className="inline-flex items-center gap-1 bg-[#FFEBEE] text-[#C62828] px-3 py-1 rounded-full text-sm font-medium">
-                    <span>{obj.emoji}</span>
-                    <span>{obj.name}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Missed objects */}
-          {missedObjects.length > 0 && (
-            <div>
-              <p className="text-sm font-medium text-[#F57F17] mb-2">
-                ○ Missed ({missedObjects.length})
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {missedObjects.map(obj => (
-                  <span key={obj.id} className="inline-flex items-center gap-1 bg-[#FFF3E0] text-[#E65100] px-3 py-1 rounded-full text-sm font-medium">
-                    <span>{obj.emoji}</span>
-                    <span>{obj.name}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Encouragement */}
         <div className="p-4 bg-[#FDF8F0] rounded-2xl border border-[#E0D8CC]">
           <p className="text-sm text-[#4A4A4A] leading-relaxed text-center">

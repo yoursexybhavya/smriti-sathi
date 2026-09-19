@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+const useNavigate = () => (path: string) => {};
 import { Plus, Bell, Check, Clock, AlertCircle, Pill, Droplets, Activity, Calendar } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { reminderService } from '../services/ReminderService';

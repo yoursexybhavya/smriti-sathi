@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+const useNavigate = () => (path: string) => {};
 import { ArrowLeft, Save, Pill, Droplets, Activity, Calendar } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { reminderService } from '../services/ReminderService';

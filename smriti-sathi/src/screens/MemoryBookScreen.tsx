@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { ArrowLeft, Plus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { memoryBookService, MemoryCategory, MemoryItemInput } from '../services/MemoryBookService';
 import { MemoryItem } from '../database/db';
 import { formatDate } from '../utils/dateUtils';
 
-export default function MemoryBookScreen() {
-  const navigate = useNavigate();
+interface Props { onBack?: () => void; onNavigate?: (s: string) => void; }
+export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
+  
   const { state } = useApp();
   const userId = state.currentPatient?.id ? parseInt(state.currentPatient.id) : null;
 
@@ -150,7 +151,7 @@ export default function MemoryBookScreen() {
         <div className="text-center">
           <p className="text-gray-600">No patient selected</p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => onNavigate?.('home')}
             className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
           >
             Go to Home
@@ -170,7 +171,7 @@ export default function MemoryBookScreen() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => onNavigate?.('home')}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-6 h-6 text-gray-600" />

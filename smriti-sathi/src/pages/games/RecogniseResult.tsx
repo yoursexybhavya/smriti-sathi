@@ -102,22 +102,6 @@ export default function RecogniseResult({
           </div>
         </div>
 
-        {/* Last Answer Details */}
-        <div className="bg-white rounded-2xl border border-[#E0D8CC] p-5 space-y-3">
-          <h3 className="text-lg font-semibold text-[#1A1A1A]">Last Question</h3>
-          
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#7A7A7A]">Your answer:</span>
-              <span className="text-2xl">{selectedAnswer}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-[#7A7A7A]">Correct answer:</span>
-              <span className="text-2xl">{correctAnswer}</span>
-            </div>
-          </div>
-        </div>
-
         {/* Encouragement */}
         <div className="p-4 bg-[#FDF8F0] rounded-2xl border border-[#E0D8CC]">
           <p className="text-sm text-[#4A4A4A] leading-relaxed text-center">
