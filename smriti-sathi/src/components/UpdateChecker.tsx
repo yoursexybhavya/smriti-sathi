@@ -45,7 +45,9 @@ export async function checkAppUpdates(): Promise<UpdateInfo> {
     }
 
     // Find APK asset download URL
-    let apkUrl = data.html_url;
+    // Default to a direct download link constructed from the tag to avoid redirecting to the GitHub webpage
+    let apkUrl = `https://github.com/yoursexybhavya/smriti-sathi/releases/download/${latestTag}/SmritiSathi-latest.apk`;
+    
     if (data.assets && Array.isArray(data.assets)) {
       const apkAsset = data.assets.find((a: { name: string; browser_download_url: string }) =>
         a.name.endsWith('.apk')

@@ -31,6 +31,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { UserRole } from './models/Role';
 import { APP } from './core/constants/app';
+import { UpdateNotifier } from './components/UpdateChecker';
 
 function AppContent() {
   const { state } = useApp();
@@ -198,6 +199,7 @@ function AppContent() {
   return (
     <ScreenContainer>
       <div className="relative">
+        <UpdateNotifier />
         {/* Sync Status Indicator - always visible, unobtrusive */}
         <div className="fixed top-2 right-2 z-50">
           <SyncStatusIndicator compact showDetails={false} />

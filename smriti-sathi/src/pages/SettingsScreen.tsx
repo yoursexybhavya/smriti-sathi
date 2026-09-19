@@ -6,6 +6,9 @@ import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { UserRole } from '../models/Role';
 import { DemoDataService } from '../services/DemoDataService';
+import { useState } from 'react';
+import { checkAppUpdates, CURRENT_APP_VERSION, type UpdateInfo } from '../components/UpdateChecker';
+import { FamilyPairingModal } from '../components/FamilyPairingModal';
 
 interface SettingsScreenProps {
   onNavigate: (screen: string) => void;
@@ -17,6 +20,29 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
   const { role, logout, session } = useAuth();
   const patient = state.currentPatient;
   const isCaregiver = role === UserRole.CAREGIVER;
+
+  // Modals state
+  const [showPairingModal, setShowPairingModal] = useState(false);
+
+  // Update check states
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const [updateResult, setUpdateResult] = useState<UpdateInfo | null>(null);
+  const [updateCheckedOnce, setUpdateCheckedOnce] = useState(false);
+
+  const handleCheckUpdates = async () => {
+    setCheckingUpdate(true);
+    setUpdateResult(null);
+    try {
+      const res = await checkAppUpdates();
+      setUpdateResult(res);
+      setUpdateCheckedOnce(true);
+    } catch {
+      setUpdateResult({ hasUpdate: false, latestVersion: CURRENT_APP_VERSION, downloadUrl: '' });
+      setUpdateCheckedOnce(true);
+    } finally {
+      setCheckingUpdate(false);
+    }
+  };
 
   return (
     <>
@@ -120,6 +146,31 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
             </div>
           </Card>
         </div>
+
+        {/* Family Pairing */}
+        {!isCaregiver && (
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-[#1A1A1A] px-1 flex items-center gap-2">
+              <Smartphone size={18} className="text-[#10B981]" />
+              Family Pairing
+            </h3>
+            <Card className="p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-base text-[#1A1A1A] font-medium">Link with Caregiver</p>
+                  <p className="text-sm text-[#7A7A7A] mt-1">Connect your account with a family member</p>
+                </div>
+                <button
+                  onClick={() => setShowPairingModal(true)}
+                  className="px-4 py-2 bg-[#E8F5E9] text-[#1B5E20] rounded-xl font-medium border border-[#2E7D32]"
+                >
+                  Connect
+                </button>
+              </div>
+            </Card>
+          </div>
+        )}
+
 
         {/* Voice & Accessibility */}
         <div className="space-y-3">
@@ -346,6 +397,55 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
           </Card>
         </div>
 
+        {/* App Updates */}
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-[#1A1A1A] px-1 flex items-center gap-2">
+            <RefreshCw size={18} className="text-[#1565C0]" />
+            App Updates
+          </h3>
+          <Card className="p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-base text-[#1A1A1A] font-medium">Current Version</p>
+                <p className="text-sm text-[#7A7A7A] mt-1">{CURRENT_APP_VERSION}</p>
+              </div>
+            </div>
+
+            {updateResult?.hasUpdate ? (
+              <div className="mt-4 space-y-3">
+                <div className="p-3 bg-[#E8F5E9] border border-[#2E7D32] rounded-xl text-[#1B5E20] text-sm font-medium">
+                  Update Available: {updateResult.latestVersion}
+                </div>
+                <a
+                  href={updateResult.downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-center gap-2 bg-[#2E7D32] text-white py-3 px-4 rounded-xl font-medium"
+                >
+                  <RefreshCw size={18} />
+                  Download Update
+                </a>
+              </div>
+            ) : (
+              <div className="mt-4">
+                {updateCheckedOnce && (
+                  <div className="mb-3 text-sm text-[#2E7D32] font-medium">
+                    Your app is up to date.
+                  </div>
+                )}
+                <button
+                  onClick={handleCheckUpdates}
+                  disabled={checkingUpdate}
+                  className="w-full flex items-center justify-center gap-2 bg-[#F5F0E8] text-[#4A4A4A] py-3 px-4 rounded-xl font-medium border border-[#D4C5B0] hover:bg-white transition-colors disabled:opacity-50"
+                >
+                  <RefreshCw size={18} className={checkingUpdate ? 'animate-spin' : ''} />
+                  {checkingUpdate ? 'Checking...' : 'Check for Updates'}
+                </button>
+              </div>
+            )}
+          </Card>
+        </div>
+
         {/* Back Button */}
         <button
           onClick={() => onNavigate('home')}
@@ -355,6 +455,8 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
           Back to Home
         </button>
       </div>
+      
+      {showPairingModal && <FamilyPairingModal onClose={() => setShowPairingModal(false)} />}
     </>
   );
 }
