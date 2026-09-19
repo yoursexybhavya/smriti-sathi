@@ -22,11 +22,13 @@ DESKTOP_TARGET="/Users/krishnajangid/Desktop/SmritiSathi-latest.apk"
 
 if [ -f "$APK_SOURCE" ]; then
   cp "$APK_SOURCE" "$APK_TARGET"
-  echo "✓ Created $APK_TARGET ($(du -h "$APK_TARGET" | cut -f1))"
+  cp "$APK_SOURCE" "SmritiSathi-v2.1.0.apk"
+  echo "✓ Created $APK_TARGET and SmritiSathi-v2.1.0.apk ($(du -h "$APK_TARGET" | cut -f1))"
   
   if [ -d "/Users/krishnajangid/Desktop" ]; then
     cp "$APK_SOURCE" "$DESKTOP_TARGET"
-    echo "✓ Copied fresh APK to $DESKTOP_TARGET"
+    cp "$APK_SOURCE" "/Users/krishnajangid/Desktop/SmritiSathi-v2.1.0.apk"
+    echo "✓ Copied fresh APK to $DESKTOP_TARGET and Desktop/SmritiSathi-v2.1.0.apk"
   fi
   echo "=== Build Successful! ==="
 else
