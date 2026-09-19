@@ -17,11 +17,12 @@ import { usePatient } from '../contexts/PatientContext';
 import { useVoice } from '../hooks/useVoice';
 import { db, type Reminder } from '../db/database';
 import { CaregiverAudioRecorder } from '../components/CaregiverAudioRecorder';
+import { MultimodalReminderModal } from '../components/MultimodalReminderModal';
 
 export function Reminders() {
   const { t } = useLanguage();
   const { patient } = usePatient();
-  const { speak, playReminderChime, playSuccessChime } = useVoice();
+  const { speak, playSuccessChime } = useVoice();
 
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -98,69 +99,25 @@ export function Reminders() {
   const triggerVoiceAlert = (rem: Reminder) => {
     stopAlertAudio();
     setActiveAlert(rem);
-
-    if (rem.audioBlob) {
-      try {
-        const audioUrl = URL.createObjectURL(rem.audioBlob);
-        const audio = new Audio(audioUrl);
-        activeAlertAudioRef.current = audio;
-
-        audio.onended = () => {
-          URL.revokeObjectURL(audioUrl);
-          activeAlertAudioRef.current = null;
-        };
-
-        audio.onerror = () => {
-          URL.revokeObjectURL(audioUrl);
-          activeAlertAudioRef.current = null;
-          // Fallback to chime and speech synthesis
-          playReminderChime();
-          let text = t.timeForMedicine;
-          if (rem.type === 'water') text = t.timeForWater;
-          if (rem.type === 'activity') text = t.timeForActivity;
-          speak(`${text}. ${rem.label}`);
-        };
-
-        audio.play().catch((err) => {
-          console.warn('Familiar voice audio playback error:', err);
-          URL.revokeObjectURL(audioUrl);
-          activeAlertAudioRef.current = null;
-          playReminderChime();
-          let text = t.timeForMedicine;
-          if (rem.type === 'water') text = t.timeForWater;
-          if (rem.type === 'activity') text = t.timeForActivity;
-          speak(`${text}. ${rem.label}`);
-        });
-      } catch {
-        playReminderChime();
-        let text = t.timeForMedicine;
-        if (rem.type === 'water') text = t.timeForWater;
-        if (rem.type === 'activity') text = t.timeForActivity;
-        speak(`${text}. ${rem.label}`);
-      }
-    } else {
-      playReminderChime();
-      let text = t.timeForMedicine;
-      if (rem.type === 'water') text = t.timeForWater;
-      if (rem.type === 'activity') text = t.timeForActivity;
-      speak(`${text}. ${rem.label}`);
-    }
   };
 
-  const handleAcknowledge = async (rem: Reminder) => {
+  const handleAcknowledge = async (rem?: Reminder) => {
+    const target = rem || activeAlert;
     stopAlertAudio();
     playSuccessChime();
 
-    await db.reminderLogs.add({
-      reminderId: rem.id || 0,
-      patientId: patient?.id || 1,
-      scheduledAt: new Date(),
-      acknowledgedAt: new Date(),
-      synced: 0,
-    });
+    if (target) {
+      await db.reminderLogs.add({
+        reminderId: target.id || 0,
+        patientId: patient?.id || 1,
+        scheduledAt: new Date(),
+        acknowledgedAt: new Date(),
+        synced: 0,
+      });
 
-    if (rem.id) {
-      await db.reminders.update(rem.id, { lastAcked: new Date() });
+      if (target.id) {
+        await db.reminders.update(target.id, { lastAcked: new Date() });
+      }
     }
 
     setActiveAlert(null);
@@ -252,69 +209,16 @@ export function Reminders() {
         </button>
       </div>
 
-      {/* Active Spoken Alert Banner */}
+      {/* Full-Screen Multimodal Reminder Modal Portal */}
       {activeAlert && (
-        <div
-          className="lumos-card"
-          style={{
-            padding: '20px',
-            border: '2px solid #FF7247',
-            background: 'linear-gradient(180deg, #261D22 0%, #15253B 100%)',
-            textAlign: 'center',
-            boxShadow: '0 0 30px rgba(255, 114, 71, 0.35)',
+        <MultimodalReminderModal
+          reminder={activeAlert}
+          onAcknowledge={handleAcknowledge}
+          onDismiss={() => {
+            stopAlertAudio();
+            setActiveAlert(null);
           }}
-        >
-          <div
-            style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(255, 114, 71, 0.2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 12px auto',
-            }}
-          >
-            {getTypeIcon(activeAlert.type)}
-          </div>
-
-          {activeAlert.audioBlob && (
-            <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                border: '1px solid #10B981',
-                borderRadius: '9999px',
-                padding: '4px 12px',
-                fontSize: '12px',
-                color: '#6EE7B7',
-                fontWeight: 700,
-                marginBottom: '10px',
-              }}
-            >
-              <Mic size={14} color="#10B981" />
-              <span>Playing Familiar Caregiver Voice</span>
-            </div>
-          )}
-
-          <h2 style={{ fontSize: 'var(--font-size-lg)', fontWeight: 800, color: '#FFFFFF', marginBottom: '4px' }}>
-            {activeAlert.label}
-          </h2>
-          <p style={{ fontSize: 'var(--font-size-sm)', color: '#FF7247', fontWeight: 700, marginBottom: '16px' }}>
-            Scheduled for {formatTime(activeAlert.timeHour, activeAlert.timeMinute)}
-          </p>
-
-          <button
-            className="btn-primary-lumos"
-            onClick={() => handleAcknowledge(activeAlert)}
-          >
-            <CheckCircle2 size={20} />
-            <span>Completed ({t.dismiss})</span>
-          </button>
-        </div>
+        />
       )}
 
       {/* Reminders List */}

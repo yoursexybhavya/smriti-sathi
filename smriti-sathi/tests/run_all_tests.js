@@ -32,6 +32,14 @@ const testSuites = [
     path: 'tests/tier4_real_world_scenarios.test.ts',
   },
   {
+    name: 'Tier 5A: Adversarial Hardening (Errorless Learning Stress Tests)',
+    path: 'tests/tier5_adversarial_errorless_learning.test.ts',
+  },
+  {
+    name: 'Tier 5B: Adversarial Stress & Vulnerability Challenge (Voice & Modals, 35 tests)',
+    path: 'tests/adversarial_stress_challenge.test.ts',
+  },
+  {
     name: 'Clinical Baseline: Stability Performance Index (SPI Engine)',
     path: 'src/engine/test_spi_baseline.js',
   },

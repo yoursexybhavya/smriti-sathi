@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1B5E20;
+  --color-primary-light: #4CAF50;
+  --color-primary-dark: #0D3B12;
+  --color-secondary: #E65100;
+  --color-secondary-light: #FF8A50;
+  --color-accent: #1565C0;
+  --color-surface: #FFFFFF;
+  --color-surface-warm: #FDF8F0;
+  --color-surface-card: #FFFFFF;
+  --color-background: #F5F0E8;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #4A4A4A;
+  --color-text-muted: #7A7A7A;
+  --color-border: #E0D8CC;
+  --color-success: #2E7D32;
+  --color-warning: #F57F17;
+  --color-error: #C62828;
+  --color-offline: #5D4037;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #F5F0E8;
+  color: #1A1A1A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar styling for a clean look */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C0B8A8;
+  border-radius: 2px;
+}
+
+/* Ensure smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 3px solid #1565C0;
+  outline-offset: 2px;
+  border-radius: 8px;
+}

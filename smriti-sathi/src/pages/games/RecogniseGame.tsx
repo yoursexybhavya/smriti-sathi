@@ -1,0 +1,171 @@
+import { useState, useEffect } from 'react';
+import { useApp } from '../../context/AppContext';
+import { GameSession } from '../../models/GameSession';
+import { RecogniseGameEngine, RecogniseActivity } from '../../models/RecogniseGame';
+import { GameStorage } from '../../services/storage/GameStorage';
+import { AdaptiveDifficultyService } from '../../services/adaptive_engine/AdaptiveDifficultyService';
+import RecogniseIntro from './RecogniseIntro';
+import RecognisePlay from './RecognisePlay';
+import RecogniseResult from './RecogniseResult';
+
+interface RecogniseGameProps {
+  onBack: () => void;
+}
+
+type GamePhase = 'intro' | 'play' | 'result';
+
+export default function RecogniseGame({ onBack }: RecogniseGameProps) {
+  const { state } = useApp();
+  const patientId = state.currentPatient?.id || 'default';
+
+  const [phase, setPhase] = useState<GamePhase>('intro');
+  const [difficulty, setDifficulty] = useState(1);
+  const [currentActivity, setCurrentActivity] = useState<RecogniseActivity | null>(null);
+  const [questionNumber, setQuestionNumber] = useState(1);
+  const [totalQuestions] = useState(5); // 5 questions per session
+  const [correctCount, setCorrectCount] = useState(0);
+  const [lastAnswer, setLastAnswer] = useState({ selected: '', correct: '', isCorrect: false });
+  const [totalTime, setTotalTime] = useState(0);
+  const [adjustmentMessage, setAdjustmentMessage] = useState('');
+
+  // Initialize game with adaptive difficulty
+  useEffect(() => {
+    if (phase === 'intro') {
+      // Get suggested difficulty from adaptive engine
+      const loadDifficulty = async () => {
+        const adjustment = await AdaptiveDifficultyService.calculateSuggestedDifficulty(
+          patientId,
+          'recognise',
+          difficulty
+        );
+        
+        setDifficulty(adjustment.suggestedDifficulty);
+        setAdjustmentMessage(AdaptiveDifficultyService.getAdjustmentMessage(adjustment));
+      };
+      
+      loadDifficulty();
+    }
+  }, [phase, patientId]);
+
+  // Start game
+  const startGame = () => {
+    const activity = RecogniseGameEngine.generateActivity(difficulty);
+    setCurrentActivity(activity);
+    setQuestionNumber(1);
+    setCorrectCount(0);
+    setTotalTime(0);
+    setPhase('play');
+  };
+
+  // Handle answer submission
+  const handleAnswerSubmit = async (selectedAnswer: string, timeSpent: number) => {
+    if (!currentActivity) return;
+
+    const isCorrect = selectedAnswer === currentActivity.correctAnswer;
+    
+    setLastAnswer({
+      selected: selectedAnswer,
+      correct: currentActivity.correctAnswer,
+      isCorrect,
+    });
+
+    if (isCorrect) {
+      setCorrectCount(prev => prev + 1);
+    }
+
+    setTotalTime(prev => prev + timeSpent);
+
+    // Check if this was the last question
+    if (questionNumber >= totalQuestions) {
+      // Save session
+      const accuracy = Math.round(((correctCount + (isCorrect ? 1 : 0)) / totalQuestions) * 100);
+      const session: GameSession = {
+        id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        patientId,
+        gameType: 'recognise',
+        difficulty,
+        score: correctCount + (isCorrect ? 1 : 0),
+        totalObjects: totalQuestions,
+        accuracy,
+        responseTime: totalTime + timeSpent,
+        timestamp: Date.now(),
+      };
+      
+      await GameStorage.saveSession(session);
+      setPhase('result');
+    } else {
+      // Next question
+      const nextActivity = RecogniseGameEngine.generateActivity(difficulty);
+      setCurrentActivity(nextActivity);
+      setQuestionNumber(prev => prev + 1);
+    }
+  };
+
+  // Play again
+  const handlePlayAgain = () => {
+    setPhase('intro');
+    setQuestionNumber(1);
+    setCorrectCount(0);
+    setTotalTime(0);
+  };
+
+  // Back to games
+  const handleBackToGames = () => {
+    onBack();
+  };
+
+  // Render current phase
+  switch (phase) {
+    case 'intro':
+      return (
+        <div>
+          {adjustmentMessage && (
+            <div className="bg-[#E3F2FD] border-b border-[#BBDEFB] px-5 py-3">
+              <p className="text-sm text-[#1565C0] text-center">
+                {adjustmentMessage}
+              </p>
+            </div>
+          )}
+          <RecogniseIntro onStart={startGame} onBack={onBack} />
+        </div>
+      );
+    
+    case 'play':
+      return currentActivity ? (
+        <div>
+          <div className="bg-white border-b border-[#E0D8CC] px-5 py-2">
+            <div className="max-w-lg mx-auto flex items-center justify-between">
+              <span className="text-sm text-[#7A7A7A]">
+                Question {questionNumber} of {totalQuestions}
+              </span>
+              <span className="text-sm font-medium text-[#E65100]">
+                Level {difficulty}
+              </span>
+            </div>
+          </div>
+          <RecognisePlay
+            activity={currentActivity}
+            onSubmit={handleAnswerSubmit}
+          />
+        </div>
+      ) : null;
+    
+    case 'result':
+      return (
+        <RecogniseResult
+          isCorrect={lastAnswer.isCorrect}
+          correctAnswer={lastAnswer.correct}
+          selectedAnswer={lastAnswer.selected}
+          responseTime={totalTime}
+          difficulty={difficulty}
+          totalQuestions={totalQuestions}
+          correctCount={correctCount}
+          onPlayAgain={handlePlayAgain}
+          onBackToGames={handleBackToGames}
+        />
+      );
+    
+    default:
+      return <RecogniseIntro onStart={startGame} onBack={onBack} />;
+  }
+}

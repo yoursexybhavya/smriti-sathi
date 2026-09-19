@@ -5,6 +5,7 @@ import { useVoice } from './useVoice';
 export interface UseReminderSchedulerOptions {
   intervalMs?: number;
   onTrigger?: (reminder: Reminder) => void;
+  playAudioOnTrigger?: boolean;
 }
 
 export interface UseReminderSchedulerReturn {
@@ -12,12 +13,13 @@ export interface UseReminderSchedulerReturn {
   dismissDueReminder: () => void;
   acknowledgeDueReminder: (reminder?: Reminder) => Promise<void>;
   checkDueReminders: () => Promise<void>;
+  playReminderAudioPrompt: (reminder: Reminder) => void;
 }
 
 export function useReminderScheduler(
   options: UseReminderSchedulerOptions = {}
 ): UseReminderSchedulerReturn {
-  const { intervalMs = 10000, onTrigger } = options;
+  const { intervalMs = 10000, onTrigger, playAudioOnTrigger = false } = options;
   const { speak, playReminderChime, playSuccessChime } = useVoice();
 
   const [activeDueReminder, setActiveDueReminder] = useState<Reminder | null>(null);
@@ -152,9 +154,11 @@ export function useReminderScheduler(
           }
         }
 
-        // Set active due reminder and play voice prompt
+        // Set active due reminder (MultimodalReminderModal handles synchronized audio & haptics)
         setActiveDueReminder(rem);
-        playReminderAudioPrompt(rem);
+        if (playAudioOnTrigger) {
+          playReminderAudioPrompt(rem);
+        }
 
         if (onTriggerRef.current) {
           onTriggerRef.current(rem);
@@ -228,5 +232,6 @@ export function useReminderScheduler(
     dismissDueReminder,
     acknowledgeDueReminder,
     checkDueReminders,
+    playReminderAudioPrompt,
   };
 }

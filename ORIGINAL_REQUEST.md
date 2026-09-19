@@ -627,3 +627,96 @@ Every text, shape, and image must be a native editable PowerPoint object. No ras
 - [ ] All 5 judging criteria addressed
 - [ ] Speaker notes on all slides
 - [ ] Core text unchanged
+
+## 2026-09-17T16:07:29Z
+
+# Teamwork Project Prompt — Draft
+
+> Status: Ready for launch — awaiting user approval
+> Goal: Craft prompt → get user approval → delegate to teamwork_preview
+> Requested team: [none — teamwork routes from the description]
+
+Implement three evidence-based dementia care features into the Smriti Sathi React/Capacitor application: errorless learning in cognitive games, multimodal cues for reminders, and familiar voice recordings for reminders.
+
+Working directory: ~/Documents/antigravity/peaceful-hertz/smriti-sathi
+Integrity mode: development
+
+## Requirements
+
+### R1. Familiar Voice Reminders (Caregiver Recordings)
+- In the Caregiver setup/settings, add a UI to record custom audio prompts using the browser `MediaRecorder` API.
+- Save these audio blobs locally into the existing Dexie IndexedDB database (attached to specific reminders).
+- Update the background/foreground reminder execution to play this custom audio instead of standard notification sounds.
+
+### R2. Multimodal Cues (Audio + Visual) for Reminders
+- Update the reminder pop-ups to be high-contrast, full-screen overlay modals (React Portals) that block out background UI distractions.
+- Ensure the modal synchronizes the visual display with the audio playback (the custom voice recording from R1) and triggers device haptic feedback (`navigator.vibrate`) when it mounts.
+- Use literal iconography/images and large sans-serif text (minimum 24px) for the reminder text.
+
+### R3. Errorless Learning in Cognitive Exercises
+- Modify the existing cognitive therapy games to prevent users from failing.
+- Disable or hide incorrect options rather than letting the user click them and receive an error message.
+- Add visual scaffolding (e.g., a pulsing CSS animation on the correct button after a few seconds of inactivity).
+- Completely remove any negative UI states (red 'X' marks, error sounds, failure dialogs).
+
+## Acceptance Criteria
+
+### Audio Recording & Storage (Programmatic & Visual)
+- [ ] Caregiver settings UI successfully accesses the microphone, records audio, and saves the blob to the Dexie database (verified via Dexie schema inspection/logging).
+- [ ] Playing the reminder successfully fetches the blob from Dexie and plays it back.
+
+### Multimodal Reminder Modals (Agent-as-Judge)
+- [ ] Reminder triggers a full-screen overlay that obscures the rest of the application.
+- [ ] Audio plays automatically and `navigator.vibrate` is called on mount.
+- [ ] Text is at least 24px and highly contrasted.
+
+### Errorless Learning UX (Agent-as-Judge)
+- [ ] In the cognitive games, clicking an incorrect answer does not show an error dialog, red X, or play a failure sound.
+- [ ] Incorrect options are either disabled visually or hidden, forcing the user toward the correct choice.
+- [ ] After 3 seconds of inactivity, the correct answer exhibits a visible pulsing animation.
+
+## 2026-09-18T01:02:52Z
+
+# Teamwork Project Prompt — Draft
+
+> Status: Ready for launch — awaiting user approval
+> Goal: Craft prompt → get user approval → delegate to teamwork_preview
+> Requested team: [none — teamwork routes from the description]
+
+Build an Android-first Flutter prototype for "SMRITI SATHI" (Smart India Hackathon 2026, Problem Statement: SIH26003, Team: CtrlAltElite). This is a hackathon prototype for an elderly-friendly cognitive engagement and memory assistance platform. 
+
+Working directory: ~/Documents/antigravity/peaceful-hertz/smriti-sathi-flutter
+Integrity mode: development
+
+## Requirements
+
+### R1. Clean Modular Flutter Architecture
+- Initialize a new Flutter project in the working directory (Flutter 3.x, Dart 3.x).
+- Establish the following directory structure in `lib/`:
+  - `core/` (theme, constants, utils)
+  - `models/`
+  - `database/repositories/`
+  - `features/` (home, games, reminders, progress, caregiver, settings)
+  - `services/` (adaptive_engine, voice, language, connectivity, sync)
+
+### R2. Basic Application Shell & Navigation
+- Create placeholder screens for: Home, Games, Reminders, Progress, Caregiver, Settings.
+- Implement the basic navigation between these placeholders. Do not implement advanced features yet.
+
+### R3. Professional Elderly-Friendly Design System
+- Implement a theme with large touch targets, readable typography, high contrast, simple navigation, and minimal cognitive load.
+- Avoid childish gaming aesthetics, excessive animations, excessive gradients, clutter, and tiny text.
+
+## Acceptance Criteria
+
+### [Architecture & Shell]
+- [ ] Directory structure perfectly matches the requirement (core, models, database, features, services).
+- [ ] Application shell runs and navigation between all 6 placeholder screens is functional.
+
+### [Design System]
+- [ ] Theme implements high-contrast colors and large text (minimum 24px for body/buttons).
+- [ ] Touch targets are at least 48x48 logical pixels.
+
+### [Build & Validation]
+- [ ] `flutter analyze` passes with 0 errors.
+- [ ] The Android build succeeds (`flutter build apk --debug`).
