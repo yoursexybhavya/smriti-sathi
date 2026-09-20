@@ -135,8 +135,11 @@ test('TIER 2 — Feature 2: Zero Lingering Muddy Colors Boundaries', async (t) =
 test('TIER 2 — Feature 3: Senior Touch Targets Boundaries', async (t) => {
   await t.test('3.1: Minimum height constraint boundary on mobile viewports (<360px)', () => {
     const buttonContent = fs.readFileSync(path.join(rootDir, 'src/components/LargeButton.tsx'), 'utf-8');
+    const minHeightMatch = buttonContent.match(/min-h-\[(\d+)px\]/);
     assert.ok(
-      buttonContent.includes('min-h-[56px]') || buttonContent.includes('py-4') || buttonContent.includes('h-14'),
+      (minHeightMatch !== null && Number(minHeightMatch[1]) >= 56) ||
+        buttonContent.includes('py-4') ||
+        buttonContent.includes('h-14'),
       'Button height must never collapse below 56px'
     );
   });

@@ -220,12 +220,10 @@ function AppContent() {
   // Show onboarding if not complete (patient only)
   if (!state.onboardingComplete && role === UserRole.PATIENT) {
     return (
-      <ScreenContainer>
-        <OnboardingFlow 
-          onComplete={() => handleNavigate('home')} 
-          onCancel={logout}
-        />
-      </ScreenContainer>
+      <OnboardingFlow 
+        onComplete={() => handleNavigate('home')} 
+        onCancel={logout}
+      />
     );
   }
 

@@ -80,17 +80,17 @@ export default function OnboardingWelcome({ onNext, onExploreDemo }: OnboardingW
       </div>
 
       {/* Action Buttons Footer */}
-      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row items-center gap-3.5">
-        <div className="w-full sm:w-2/3">
+      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center gap-3.5">
+        <div className="w-full sm:flex-1 sm:max-w-xl">
           <LargeButton onPress={onNext} size="lg" variant="primary">
             Begin Setup / আৰম্ভ কৰক
           </LargeButton>
         </div>
-        <div className="w-full sm:w-1/3">
+        <div className="w-full sm:w-auto">
           <button
             type="button"
             onClick={handleDemoClick}
-            className="w-full min-h-[58px] sm:min-h-[64px] px-5 py-3 rounded-2xl sm:rounded-3xl border-2 border-emerald-600/50 dark:border-emerald-400/50 bg-emerald-50/50 dark:bg-emerald-950/40 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
+            className="w-full sm:w-auto min-w-[220px] whitespace-nowrap min-h-[58px] sm:min-h-[64px] px-6 py-3 rounded-2xl sm:rounded-3xl border-2 border-emerald-600/50 dark:border-emerald-400/50 bg-emerald-50/50 dark:bg-emerald-950/40 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
           >
             <span>⚡ Demo Dashboard</span>
           </button>

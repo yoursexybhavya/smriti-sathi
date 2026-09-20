@@ -86,10 +86,10 @@ app.post('/api/sos', (req, res) => {
 // 5. In-App Auto-Update & Version Authority (Render Cloud Backend)
 app.get('/api/version', (req, res) => {
   res.json({
-    latestVersion: 'v2.5.3',
-    versionCode: 253,
-    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.3/SmritiSathi-v2.5.3.apk',
-    releaseNotes: 'Smriti Sathi v2.5.3: Complete UI/UX onboarding overhaul, centered high-contrast desktop frame, instant Demo Dashboard bypass, WCAG AAA daylight palette, and tactile elder profile presets.',
+    latestVersion: 'v2.6.1',
+    versionCode: 261,
+    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.6.1/SmritiSathi-v2.6.1.apk',
+    releaseNotes: 'Smriti Sathi v2.6.0: Premium Scandinavian v3 design system, bounded centered onboarding frame that fills the viewport on desktop and tablet, balanced footer actions, elder-scale 56px+ touch targets, and a static high-contrast cue under reduced motion.',
     publishedAt: new Date().toISOString(),
   });
 });

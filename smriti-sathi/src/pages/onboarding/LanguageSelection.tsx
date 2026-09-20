@@ -85,7 +85,7 @@ export default function LanguageSelection({
                 key={lang.code}
                 type="button"
                 onClick={() => onSelect(lang.code)}
-                className={`p-5 rounded-3xl border-2 text-left transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[140px] ${
+                className={`p-5 rounded-3xl border-2 text-left transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between min-h-[170px] ${
                   isSelected
                     ? 'bg-indigo-50/70 dark:bg-indigo-950/70 border-indigo-600 dark:border-indigo-400 shadow-md ring-2 ring-indigo-500/20'
                     : 'bg-[var(--color-card)] border-[var(--color-border)] hover:border-indigo-400/80 shadow-xs'
@@ -121,9 +121,9 @@ export default function LanguageSelection({
                   </p>
                 </div>
 
-                <div className="mt-3 pt-2 border-t border-[var(--color-border)] flex items-center justify-between text-[11px] text-[var(--color-text-muted)] font-semibold">
-                  <span>{lang.region}</span>
-                  <span className="text-emerald-700 dark:text-emerald-400">Audio Ready ✓</span>
+                <div className="mt-3 pt-2 border-t border-[var(--color-border)] flex items-center justify-between gap-2 text-xs text-[var(--color-text-muted)] font-semibold">
+                  <span className="min-w-0">{lang.region}</span>
+                  <span className="text-emerald-700 dark:text-emerald-400 whitespace-nowrap flex-shrink-0">Audio Ready ✓</span>
                 </div>
               </button>
             );
@@ -140,17 +140,17 @@ export default function LanguageSelection({
       </div>
 
       {/* Navigation Buttons Footer */}
-      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row items-center gap-3.5">
-        <div className="w-full sm:w-2/3">
+      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center gap-3.5">
+        <div className="w-full sm:flex-1 sm:max-w-xl">
           <LargeButton onPress={onNext} size="lg" variant="primary">
             <span>Continue to Accessibility / পৰৱৰ্তী: সুবিধা</span>
           </LargeButton>
         </div>
-        <div className="w-full sm:w-1/3">
+        <div className="w-full sm:w-auto">
           <button
             type="button"
             onClick={onBack}
-            className="w-full min-h-[58px] sm:min-h-[64px] px-5 py-3 rounded-2xl sm:rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
+            className="w-full sm:w-auto min-w-[220px] whitespace-nowrap min-h-[58px] sm:min-h-[64px] px-6 py-3 rounded-2xl sm:rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
           >
             <ChevronLeft size={18} />
             <span>Back to Profile</span>

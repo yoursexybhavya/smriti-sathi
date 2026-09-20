@@ -13,7 +13,7 @@ interface NativeAppUpdatePlugin {
 
 const NativeAppUpdate = registerPlugin<NativeAppUpdatePlugin>('AppUpdate');
 
-export const CURRENT_APP_VERSION = 'v2.5.3';
+export const CURRENT_APP_VERSION = 'v2.6.1';
 const GITHUB_REPO = 'yoursexybhavya/smriti-sathi';
 const RENDER_VERSION_URL = 'https://smriti-sathi.onrender.com/api/version';
 

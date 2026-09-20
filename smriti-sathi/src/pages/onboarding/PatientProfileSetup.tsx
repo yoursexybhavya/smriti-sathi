@@ -98,7 +98,7 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
                 key={opt.label}
                 type="button"
                 onClick={() => selectPreset(opt)}
-                className={`p-2.5 rounded-xl border-2 text-left flex items-center gap-2 text-xs font-bold transition-all cursor-pointer ${
+                className={`p-3 min-h-[56px] rounded-xl border-2 text-left flex items-center gap-2 text-sm font-bold transition-all cursor-pointer ${
                   name === opt.label.split(' (')[0]
                     ? 'bg-indigo-50 dark:bg-indigo-950/80 border-indigo-600 dark:border-indigo-400 text-indigo-950 dark:text-indigo-100 shadow-xs'
                     : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text)] hover:border-indigo-400'
@@ -216,17 +216,17 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
       </div>
 
       {/* Navigation Buttons Footer */}
-      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row items-center gap-3.5">
-        <div className="w-full sm:w-2/3">
+      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center gap-3.5">
+        <div className="w-full sm:flex-1 sm:max-w-xl">
           <LargeButton onPress={handleNext} disabled={!canProceed} size="lg" variant="primary">
             <span>Continue to Language / পৰৱৰ্তী: ভাষা</span>
           </LargeButton>
         </div>
-        <div className="w-full sm:w-1/3">
+        <div className="w-full sm:w-auto">
           <button
             type="button"
             onClick={onBack}
-            className="w-full min-h-[58px] sm:min-h-[64px] px-5 py-3 rounded-2xl sm:rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
+            className="w-full sm:w-auto min-w-[220px] whitespace-nowrap min-h-[58px] sm:min-h-[64px] px-6 py-3 rounded-2xl sm:rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
           >
             <ChevronLeft size={18} />
             <span>Back to Welcome</span>
@@ -254,7 +254,7 @@ function ReminderRow({
     <button
       type="button"
       onClick={onToggle}
-      className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-[var(--color-card)] transition-colors cursor-pointer text-left"
+      className="w-full min-h-[56px] flex items-center justify-between p-3 rounded-xl hover:bg-[var(--color-card)] transition-colors cursor-pointer text-left"
     >
       <div className="pr-3 flex-1 min-w-0">
         <div className="flex items-baseline gap-1.5 flex-wrap">

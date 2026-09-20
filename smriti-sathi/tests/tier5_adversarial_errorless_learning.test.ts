@@ -118,7 +118,7 @@ test('TIER 5 — Suite 1: Static Code Audit - Zero Negative Feedback across Cogn
     assert.ok(keyframeMatch, '@keyframes scaffoldPulse must be defined in globals.css');
 
     const keyframeCSS = keyframeMatch[0];
-    assert.ok(keyframeCSS.includes('rgba(16, 185, 129'), 'scaffoldPulse must use emerald rgba(16, 185, 129)');
+    assert.ok(/rgba\(\s*16,\s*185,\s*129/.test(keyframeCSS), 'scaffoldPulse must use emerald rgba(16, 185, 129)');
     assert.ok(!keyframeCSS.includes('red'), 'scaffoldPulse must never use red');
     assert.ok(!keyframeCSS.includes('#EF4444'), 'scaffoldPulse must never use #EF4444');
     assert.ok(!keyframeCSS.includes('#7F1D1D'), 'scaffoldPulse must never use #7F1D1D');
@@ -652,10 +652,13 @@ test('TIER 5 — Suite 6: Scandinavian Token Integrity & Redesigned UI Adversari
     }
   });
 
-  await t.test('6.4: globals.css Scandinavian canvas tokens (#F8FAFC, #0B0F17) are strictly defined', () => {
+  await t.test('6.4: globals.css Scandinavian canvas tokens (#F8FAFC, dark midnight) are strictly defined', () => {
     const globals = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
     assert.ok(globals.includes('#F8FAFC'), 'globals.css must define light canvas #F8FAFC');
-    assert.ok(globals.includes('#0B0F17'), 'globals.css must define dark canvas #0B0F17');
+    assert.ok(
+      globals.includes('#080C14') || globals.includes('#0B0F17'),
+      'globals.css must define a deep midnight dark canvas (#080C14 / #0B0F17)'
+    );
   });
 
   await t.test('6.5: Viewport meta tag in index.html prevents user scale breaking senior layout', () => {

@@ -82,18 +82,18 @@ export default function OnboardingComplete({ patientName, onFinish, onBack }: On
       </div>
 
       {/* Navigation Buttons Footer */}
-      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row items-center gap-3.5">
-        <div className="w-full sm:w-2/3">
+      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row sm:items-center gap-3.5">
+        <div className="w-full sm:flex-1 sm:max-w-xl">
           <LargeButton onPress={onFinish} size="lg" variant="primary">
             <span>Enter Smriti Sathi / স্মৃতি সাথী আৰম্ভ কৰক</span>
           </LargeButton>
         </div>
         {onBack && (
-          <div className="w-full sm:w-1/3">
+          <div className="w-full sm:w-auto">
             <button
               type="button"
               onClick={onBack}
-              className="w-full min-h-[58px] sm:min-h-[64px] px-5 py-3 rounded-2xl sm:rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
+              className="w-full sm:w-auto min-w-[220px] whitespace-nowrap min-h-[58px] sm:min-h-[64px] px-6 py-3 rounded-2xl sm:rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
             >
               <ChevronLeft size={18} />
               <span>Review Settings</span>

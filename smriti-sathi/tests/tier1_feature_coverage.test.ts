@@ -41,8 +41,8 @@ test('TIER 1 — Feature 1: Scandinavian Design Tokens & Canvas', async (t) => {
     );
   });
 
-  await t.test('1.2: Dark canvas color token (#0A1420 / #0B0F17) is defined in globals.css', () => {
-    const hasDarkCanvas = globalsCss.includes('#0A1420') || globalsCss.includes('#0B0F17');
+  await t.test('1.2: Dark canvas color token (#080C14 / #0A1420 / #0B0F17) is defined in globals.css', () => {
+    const hasDarkCanvas = globalsCss.includes('#080C14') || globalsCss.includes('#0A1420') || globalsCss.includes('#0B0F17');
     assert.ok(hasDarkCanvas, 'Dark theme canvas must define deep midnight navy / slate canvas');
   });
 
@@ -108,9 +108,9 @@ test('TIER 1 — Feature 2: Zero Lingering Muddy Colors in Core Redesigned UI', 
 test('TIER 1 — Feature 3: Tactile 56-64px Senior Touch Targets', async (t) => {
   await t.test('3.1: LargeButton component satisfies minimum 56px senior touch target', () => {
     const content = fs.readFileSync(path.join(rootDir, 'src/components/LargeButton.tsx'), 'utf-8');
+    const minHeightMatch = content.match(/min-h-\[(\d+)px\]/);
     const has56px =
-      content.includes('min-h-[56px]') ||
-      content.includes('min-h-[64px]') ||
+      (minHeightMatch !== null && Number(minHeightMatch[1]) >= 56) ||
       content.includes('py-4') ||
       content.includes('h-14') ||
       content.includes('h-16');

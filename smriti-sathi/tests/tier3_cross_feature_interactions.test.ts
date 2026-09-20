@@ -314,7 +314,10 @@ test('TIER 3 — Cross-Feature Interaction 15: Scandinavian Colors Active across
 
   // Verify pure light and dark tokens
   assert.ok(globals.includes('#F8FAFC'), 'Light canvas is clean #F8FAFC');
-  assert.ok(globals.includes('#0A1420') || globals.includes('#0B0F17'), 'Dark canvas is deep midnight/slate');
+  assert.ok(
+    globals.includes('#080C14') || globals.includes('#0A1420') || globals.includes('#0B0F17'),
+    'Dark canvas is deep midnight/slate'
+  );
   assert.ok(!globals.includes('#F5F0E8'), 'Zero muddy #F5F0E8 in tokens');
   assert.ok(!globals.includes('#FDF8F0'), 'Zero warm muddy #FDF8F0 in tokens');
 });

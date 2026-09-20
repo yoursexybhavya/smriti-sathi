@@ -47,13 +47,13 @@ jobs:
 
       - name: Prepare Release Asset
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk SmritiSathi-v2.5.3.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk SmritiSathi-v2.6.1.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smriti-sathi-latest-apk
-          path: SmritiSathi-v2.5.3.apk
+          path: SmritiSathi-v2.6.1.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -61,20 +61,19 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v2.5.3
-          name: "Smriti Sathi v2.5.3 Release"
+          tag_name: v2.6.1
+          name: "Smriti Sathi v2.6.1 Release"
           body: |
-            ## Smriti Sathi — v2.5.3 Android Release
+            ## Smriti Sathi — v2.6.1 Android Release
             
-            - **Download Link**: [SmritiSathi-v2.5.3.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.3/SmritiSathi-v2.5.3.apk)
+            - **Download Link**: [SmritiSathi-v2.6.1.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.6.1/SmritiSathi-v2.6.1.apk)
             - **Changelog**:
-              - Complete UI/UX onboarding overhaul across all 5 steps (Welcome, Profile, Language, Display, Ready)
-              - Elimination of empty black void on desktop browsers with responsive centered container
-              - Instant "⚡ Demo Dashboard" one-click evaluation bypass
-              - WCAG AAA contrast ratio daylight palette (#F8FAFC, #FFFFFF cards, #0F172A ink)
-              - 4 Elder Profile presets (Kamala Baa, Deka Koka, Aai, Bapu) for instant setup
-              - Spoken audio test preview on Accessibility setup
-          files: SmritiSathi-v2.5.3.apk
+              - Bounded, centered onboarding frame: no more cramped edge-to-edge content or dead void on desktop and tablet
+              - Balanced footer actions with capped CTA width instead of full-width bars
+              - Language cards resized so regional labels are never clipped
+              - Elder-scale touch targets (56px+) on preset profiles and care reminder rows
+              - Static high-contrast emerald cue when reduced motion disables the scaffold pulse
+          files: SmritiSathi-v2.6.1.apk
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

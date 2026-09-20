@@ -153,9 +153,9 @@ const htmlContent = `<!DOCTYPE html>
     let amberColors = getColors(document.getElementById('test-amber'));
     let emeraldColors = getColors(document.getElementById('test-emerald'));
 
-    assert('2.1: Root .dark: #root background changes to dark canvas #0B0F17 (rgb(11, 15, 23))', 
-      rootColors.backgroundColor === 'rgb(11, 15, 23)', 
-      { actual: rootColors.backgroundColor, expected: 'rgb(11, 15, 23)' }
+    assert('2.1: Root .dark: #root background changes to dark canvas #080C14 / #0B0F17', 
+      ['rgb(8, 12, 20)', 'rgb(11, 15, 23)'].includes(rootColors.backgroundColor), 
+      { actual: rootColors.backgroundColor, expected: 'rgb(8, 12, 20) | rgb(11, 15, 23)' }
     );
     assert('2.2: Root .dark: #root has NO gradient bleed', 
       rootColors.backgroundImage === 'none', 
@@ -190,9 +190,9 @@ const htmlContent = `<!DOCTYPE html>
     amberColors = getColors(document.getElementById('test-amber'));
     emeraldColors = getColors(document.getElementById('test-emerald'));
 
-    assert('3.1: Root .theme-dark: #root background changes to dark canvas #0B0F17', 
-      rootColors.backgroundColor === 'rgb(11, 15, 23)', 
-      { actual: rootColors.backgroundColor, expected: 'rgb(11, 15, 23)' }
+    assert('3.1: Root .theme-dark: #root background changes to dark canvas #080C14 / #0B0F17', 
+      ['rgb(8, 12, 20)', 'rgb(11, 15, 23)'].includes(rootColors.backgroundColor), 
+      { actual: rootColors.backgroundColor, expected: 'rgb(8, 12, 20) | rgb(11, 15, 23)' }
     );
     assert('3.2: Root .theme-dark: #root has NO gradient bleed', 
       rootColors.backgroundImage === 'none', 
@@ -210,8 +210,8 @@ const htmlContent = `<!DOCTYPE html>
       isWhite(cardColors.color), 
       { actual: cardColors.color }
     );
-    assert('3.6: Root .theme-dark: CSS variable --color-bg is #0B0F17', 
-      getVar('--color-bg').toUpperCase() === '#0B0F17', 
+    assert('3.6: Root .theme-dark: CSS variable --color-bg is midnight (#080C14 / #0B0F17)', 
+      ['#080C14', '#0B0F17'].includes(getVar('--color-bg').toUpperCase()), 
       { actual: getVar('--color-bg') }
     );
     assert('3.7: Root .theme-dark: functional dark:text-amber-400 triggers', 
@@ -258,9 +258,9 @@ const htmlContent = `<!DOCTYPE html>
     rootColors = getColors(document.getElementById('root'));
     cardColors = getColors(document.getElementById('test-card'));
 
-    assert('6.1: Dual html.theme-dark + body.theme-dark: #root is #0B0F17', 
-      rootColors.backgroundColor === 'rgb(11, 15, 23)', 
-      { actual: rootColors.backgroundColor, expected: 'rgb(11, 15, 23)' }
+    assert('6.1: Dual html.theme-dark + body.theme-dark: #root is midnight canvas', 
+      ['rgb(8, 12, 20)', 'rgb(11, 15, 23)'].includes(rootColors.backgroundColor), 
+      { actual: rootColors.backgroundColor, expected: 'rgb(8, 12, 20) | rgb(11, 15, 23)' }
     );
     assert('6.2: Dual html.theme-dark + body.theme-dark: #root has NO gradient bleed', 
       rootColors.backgroundImage === 'none', 
