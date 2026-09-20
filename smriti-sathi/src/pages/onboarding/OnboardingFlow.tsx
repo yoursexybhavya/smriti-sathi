@@ -6,6 +6,7 @@ import LanguageSelection from './LanguageSelection';
 import AccessibilitySetup from './AccessibilitySetup';
 import OnboardingComplete from './OnboardingComplete';
 import { PatientProfile, AccessibilitySettings, useApp } from '../../context/AppContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -14,6 +15,7 @@ interface OnboardingFlowProps {
 
 export default function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowProps) {
   const { state, completeOnboarding, toggleTheme, skipToElderDemo } = useApp();
+  const { setLanguage: setGlobalLanguage } = useLanguage();
   const [step, setStep] = useState(0);
   const [patient, setPatient] = useState<PatientProfile | null>(null);
   const [language, setLanguage] = useState('as');
@@ -28,6 +30,11 @@ export default function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowP
   const handlePatientNext = (newPatient: PatientProfile) => {
     setPatient(newPatient);
     setStep(2);
+  };
+
+  const handleLanguageSelect = (lang: string) => {
+    setLanguage(lang);
+    setGlobalLanguage(lang as any);
   };
 
   const handleLanguageNext = () => {
@@ -82,7 +89,7 @@ export default function OnboardingFlow({ onComplete, onCancel }: OnboardingFlowP
         return (
           <LanguageSelection
             selectedLanguage={language}
-            onSelect={setLanguage}
+            onSelect={handleLanguageSelect}
             onNext={handleLanguageNext}
             onBack={goBack}
           />

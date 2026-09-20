@@ -206,11 +206,13 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
               <label className="block text-sm font-bold text-[var(--color-text)] text-center">
                 Select Starting Tier
               </label>
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 {[
                   { level: 1, label: 'Gentle', sub: '3 Steps' },
                   { level: 2, label: 'Standard', sub: '4 Steps' },
                   { level: 3, label: 'Active', sub: '5 Steps' },
+                  { level: 4, label: 'Master', sub: '6 Steps' },
+                  { level: 5, label: 'Champion', sub: 'All 6' },
                 ].map(tier => (
                   <button
                     key={tier.level}

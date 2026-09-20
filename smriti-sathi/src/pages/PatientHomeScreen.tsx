@@ -24,7 +24,9 @@ import {
   ChevronRight,
   ShieldCheck,
   User,
-  Users
+  Users,
+  Globe,
+  Radio
 } from 'lucide-react';
 import ProgressCard from '../components/ProgressCard';
 import SectionHeader from '../components/SectionHeader';
@@ -32,6 +34,8 @@ import StatusIndicator from '../components/StatusIndicator';
 import LargeButton from '../components/LargeButton';
 import RoleAndProfileModal from '../components/RoleAndProfileModal';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useVoice } from '../hooks/useVoice';
 import { reminderService } from '../services/ReminderService';
 import { notificationService } from '../services/NotificationService';
 import { gameSessionRepository } from '../database';
@@ -45,6 +49,8 @@ interface PatientHomeScreenProps {
 
 export default function PatientHomeScreen({ onNavigate, isOnline = true }: PatientHomeScreenProps) {
   const { state, toggleTheme } = useApp();
+  const { language, t } = useLanguage();
+  const { speak, isSpeaking } = useVoice();
   const patient = state.currentPatient;
   const isDark = state.accessibility?.theme === 'dark';
   const userId = patient?.id ? parseInt(patient.id, 10) : undefined;
@@ -71,10 +77,11 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
     }
     return false;
   });
-  const [modalInitialTab, setModalInitialTab] = useState<'role' | 'profile'>(() => {
+  const [modalInitialTab, setModalInitialTab] = useState<'role' | 'profile' | 'language' | 'sync'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('modal') === 'role') return 'role';
+      const m = params.get('modal');
+      if (m === 'role' || m === 'language' || m === 'sync') return m;
     }
     return 'profile';
   });
@@ -194,21 +201,20 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
     }
   };
 
-  // Speak comfort message aloud
-  const speakComfort = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const message = "Take your time. There is no rush. Every moment you spend here strengthens your mind, keeps your memories bright, and brings peace to your day.";
-      const utterance = new SpeechSynthesisUtterance(message);
-      utterance.rate = 0.85;
-      setIsSpeakingComfort(true);
-      utterance.onend = () => setIsSpeakingComfort(false);
-      utterance.onerror = () => setIsSpeakingComfort(false);
-      window.speechSynthesis.speak(utterance);
+  // Speak comfort message aloud in selected language
+  const speakComfort = async () => {
+    setIsSpeakingComfort(true);
+    try {
+      const message = t.comfortQuote || "Take your time. There is no rush. Every moment you spend here strengthens your mind, keeps your memories bright, and brings peace to your day.";
+      await speak(message, language);
+    } catch (err) {
+      console.error('Error speaking comfort message:', err);
+    } finally {
+      setIsSpeakingComfort(false);
     }
   };
 
-  const greeting = getGreeting();
+  const greeting = getGreeting(language);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200">
@@ -265,8 +271,39 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
             </div>
           </div>
 
-          {/* Right: Actions (Role Switcher, Theme Toggle & Prominent 52px Settings Button) */}
+          {/* Right: Actions (Language Switcher, Mesh Sync, Role Switcher, Theme Toggle & Prominent 52px Settings Button) */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Language Switcher Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                setModalInitialTab('language');
+                setShowRoleProfileModal(true);
+              }}
+              className="h-12 min-h-[40px] sm:min-h-[48px] px-2.5 sm:px-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 border-2 border-indigo-300 dark:border-indigo-800 hover:border-indigo-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
+              aria-label="Select Language"
+              title="Change Language & Voice"
+            >
+              <Globe size={16} className="text-indigo-600 dark:text-indigo-400" />
+              <span className="uppercase">{language}</span>
+              <span className="text-[10px] opacity-70">▾</span>
+            </button>
+
+            {/* Offline Mesh Sync Demo Trigger */}
+            <button
+              type="button"
+              onClick={() => {
+                setModalInitialTab('sync');
+                setShowRoleProfileModal(true);
+              }}
+              className="h-12 min-h-[40px] sm:min-h-[48px] px-2.5 sm:px-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-200 border-2 border-blue-300 dark:border-blue-800 hover:border-blue-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
+              aria-label="Offline Mesh Sync"
+              title="North East Offline Data Sync Architecture"
+            >
+              <Radio size={16} className="text-blue-600 dark:text-blue-400" />
+              <span className="hidden md:inline">Sync</span>
+            </button>
+
             {/* Quick Role Switcher Button */}
             <button
               type="button"
@@ -328,13 +365,13 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 <div className="space-y-2 flex-1">
                   <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
                     <Sparkles size={14} className="text-indigo-600 dark:text-indigo-400" />
-                    <span>Today's Daily Focus</span>
+                    <span>{t.dailyFocus || "Today's Daily Focus"}</span>
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-text)] tracking-tight pt-0.5">
                     Remember Game
                   </h2>
                   <p className="text-base sm:text-lg text-[var(--color-text-secondary)] leading-relaxed">
-                    View familiar everyday objects, then recall them peacefully. Strengthens visual memory with zero pressure.
+                    {t.dailyFocusDesc || "View familiar everyday objects, then recall them peacefully. Strengthens visual memory with zero pressure."}
                   </p>
                 </div>
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center justify-center flex-shrink-0">
@@ -347,7 +384,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 icon={<Play size={22} fill="currentColor" />}
                 size="lg"
               >
-                Start Daily Exercise
+                {t.startDailyExercise || "Start Daily Exercise"}
               </LargeButton>
             </div>
 
@@ -355,7 +392,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <SectionHeader
-                  title="Cognitive Exercises"
+                  title={t.todaysExercises || "Cognitive Exercises"}
                   icon={<Brain size={24} className="text-indigo-600 dark:text-indigo-400" />}
                 />
                 <span className="text-xs font-bold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-3 py-1 rounded-full border border-[var(--color-border)]">
@@ -376,7 +413,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                       <Eye size={28} />
                     </div>
                     <span className="text-xs font-extrabold px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800">
-                      Level {gameProgress.remember.level}
+                      {t.level || 'Level'} {gameProgress.remember.level}
                     </span>
                   </div>
                   <div>
@@ -412,7 +449,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                       <Brain size={28} />
                     </div>
                     <span className="text-xs font-extrabold px-2.5 py-1 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200/80 dark:border-cyan-800">
-                      Level {gameProgress.recognise.level}
+                      {t.level || 'Level'} {gameProgress.recognise.level}
                     </span>
                   </div>
                   <div>
@@ -448,7 +485,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                       <Grid3X3 size={28} />
                     </div>
                     <span className="text-xs font-extrabold px-2.5 py-1 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800">
-                      Level {gameProgress.memoryMatch.level}
+                      {t.level || 'Level'} {gameProgress.memoryMatch.level}
                     </span>
                   </div>
                   <div>
@@ -484,7 +521,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                       <Sun size={28} />
                     </div>
                     <span className="text-xs font-extrabold px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
-                      Level {gameProgress.dailyRoutine.level}
+                      {t.level || 'Level'} {gameProgress.dailyRoutine.level}
                     </span>
                   </div>
                   <div>
@@ -518,12 +555,11 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 </div>
                 <div>
                   <span className="text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-wider">
-                    {/* Featured Family Sanctuary */}
-                    Cherished Family Stories
+                    {t.cherishedStories || "Cherished Family Stories"}
                   </span>
                   <h3 className="text-lg sm:text-xl font-bold text-[var(--color-text)]">Personal Memory Book</h3>
                   <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">
-                    Explore family photos, familiar village places, and voice notes
+                    {t.familyMemoryBookDesc || "Explore family photos, familiar village places, and voice notes"}
                   </p>
                 </div>
               </div>
@@ -534,7 +570,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   className="min-h-[56px] px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-extrabold text-sm shadow-[0_4px_12px_rgba(225,29,72,0.3)] border-2 border-rose-400/60 transition-all active:translate-y-1 flex items-center justify-center gap-2 cursor-pointer"
                   aria-label="Play Family Memory Quiz"
                 >
-                  <span>🎮 Family Quiz</span>
+                  <span>🎮 {t.familyQuizBtn || "Family Quiz"}</span>
                 </button>
                 <button
                   type="button"
@@ -542,7 +578,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   className="min-h-[56px] px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-sm shadow-[0_4px_12px_rgba(79,70,229,0.3)] border-2 border-indigo-400/60 transition-all active:translate-y-1 flex items-center justify-center gap-2 cursor-pointer"
                   aria-label="Open Personal Memory Book"
                 >
-                  <span>View Photos</span>
+                  <span>{t.viewPhotosBtn || "View Photos"}</span>
                 </button>
               </div>
             </div>
@@ -552,7 +588,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
                   <Heart size={20} fill="currentColor" />
-                  <span>Daily Comfort & Reassurance</span>
+                  <span>{t.comfortTitle || "Daily Comfort & Reassurance"}</span>
                 </div>
                 <button
                   type="button"
@@ -564,11 +600,11 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   }`}
                 >
                   <Volume2 size={16} />
-                  <span>{isSpeakingComfort ? 'Speaking...' : 'Listen Aloud'}</span>
+                  <span>{isSpeakingComfort ? 'Speaking...' : (t.listenAloud || 'Listen Aloud')}</span>
                 </button>
               </div>
               <p className="text-sm sm:text-base text-[var(--color-text-secondary)] leading-relaxed italic">
-                "Take your time. There is no rush. Every moment you spend here strengthens your mind, keeps your memories bright, and brings peace to your day."
+                "{t.comfortQuote || "Take your time. There is no rush. Every moment you spend here strengthens your mind, keeps your memories bright, and brings peace to your day."}"
               </p>
             </div>
           </div>
@@ -606,7 +642,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
             {/* Today's Real Care Schedule */}
             <div className="space-y-3.5">
               <SectionHeader
-                title="Today's Care Schedule"
+                title={t.careScheduleTitle || "Today's Care Schedule"}
                 icon={<Calendar size={22} className="text-amber-600 dark:text-amber-400" />}
                 action={{
                   label: 'Manage',
@@ -689,7 +725,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 ) : (
                   <div className="p-6 sm:p-7 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] text-center space-y-4 shadow-xs">
                     <p className="text-sm font-medium text-[var(--color-text-secondary)]">
-                      No care reminders scheduled for today. Your routine is peaceful.
+                      {t.noRemindersScheduled || "No care reminders scheduled for today. Your routine is peaceful."}
                     </p>
                     <button
                       type="button"
@@ -697,7 +733,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                       className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-2 border-emerald-500/30 text-sm font-bold hover:bg-emerald-500/25 transition-all cursor-pointer min-h-[48px]"
                     >
                       <Plus size={16} />
-                      <span>Add Care Reminder</span>
+                      <span>{t.addReminderBtn || "Add Care Reminder"}</span>
                     </button>
                   </div>
                 )}
@@ -707,7 +743,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
             {/* Real Engagement & Progress Stats (Zero Dummy Data) */}
             <div className="space-y-3.5">
               <SectionHeader
-                title="Your Progress Today"
+                title={t.progressSummaryTitle || "Your Progress Today"}
                 icon={<TrendingUp size={22} className="text-indigo-600 dark:text-indigo-400" />}
                 action={{
                   label: 'View Details',
@@ -718,7 +754,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 <div onClick={() => onNavigate('progress')} className="cursor-pointer active:scale-95 transition-transform">
                   <ProgressCard
                     icon={<Brain size={22} />}
-                    label="Activities"
+                    label={t.activitiesCompletedLabel || "Activities"}
                     value={activitiesTodayCount}
                     subtitle="Completed"
                     color="#10B981"
@@ -727,7 +763,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 <div onClick={() => onNavigate('progress')} className="cursor-pointer active:scale-95 transition-transform">
                   <ProgressCard
                     icon={<Sparkles size={22} />}
-                    label="Streak"
+                    label={t.currentStreakLabel || "Streak"}
                     value={currentStreak > 0 ? `${currentStreak} ${currentStreak === 1 ? 'Day' : 'Days'}` : '0 Days'}
                     subtitle="Daily Habit"
                     color="#F59E0B"
@@ -736,7 +772,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 <div onClick={() => onNavigate('progress')} className="cursor-pointer active:scale-95 transition-transform">
                   <ProgressCard
                     icon={<Eye size={22} />}
-                    label="Accuracy"
+                    label={t.accuracyLabel || "Accuracy"}
                     value={accuracy}
                     subtitle="Recall Score"
                     color="#6366F1"
@@ -773,7 +809,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   className="w-full min-h-[50px] py-3 px-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-200 dark:border-indigo-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xs"
                 >
                   <User size={16} />
-                  <span>Edit Name & Age</span>
+                  <span>{t.editNameAgeBtn || "Edit Name & Age"}</span>
                 </button>
 
                 <button
@@ -785,7 +821,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   className="w-full min-h-[50px] py-3 px-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xs"
                 >
                   <Users size={16} />
-                  <span>Switch Role (Son, Doctor)</span>
+                  <span>{t.switchRoleBtn || "Switch Role (Son, Doctor)"}</span>
                 </button>
               </div>
             </div>
@@ -799,7 +835,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] truncate">
-                      Preferences & Display
+                      {t.preferencesCardTitle || "Preferences & Display"}
                     </h3>
                     <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] truncate">
                       Text size, high contrast, languages & updates
@@ -881,8 +917,23 @@ function calculateStreak(timestamps: number[]): number {
   return streak;
 }
 
-function getGreeting(): string {
+function getGreeting(lang?: string): string {
   const hour = new Date().getHours();
+  if (lang === 'as') {
+    if (hour < 12) return 'সুপ্ৰভাত';
+    if (hour < 17) return 'শুভ অপৰাহ্ন';
+    return 'শুভ সন্ধিয়া';
+  }
+  if (lang === 'brx') {
+    if (hour < 12) return 'फुंनि मोजां';
+    if (hour < 17) return 'सानजौफुनि मोजां';
+    return 'बेलासि मोजां';
+  }
+  if (lang === 'mni') {
+    if (hour < 12) return 'অয়ুক্কি য়াইফপা';
+    if (hour < 17) return 'নুংথিলকি য়াইফপা';
+    return 'নুমিদাংকি য়াইফপা';
+  }
   if (hour < 12) return 'Good Morning';
   if (hour < 17) return 'Good Afternoon';
   return 'Good Evening';

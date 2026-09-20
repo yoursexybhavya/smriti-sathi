@@ -4,6 +4,7 @@ import LargeButton from '../../components/LargeButton';
 import { RecogniseActivity } from '../../models/RecogniseGame';
 import { useVoice } from '../../hooks/useVoice';
 import { REMEMBER_OBJECTS, RememberObject } from '../../models/GameSession';
+import ObjectCardVisual from '../../components/ObjectCardVisual';
 
 interface RecognisePlayProps {
   activity: RecogniseActivity;
@@ -122,14 +123,13 @@ export default function RecognisePlay({
                   >
                     {/* Object Image */}
                     <div className="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center overflow-hidden mb-2 bg-[var(--color-bg-subtle)] rounded-2xl p-2 border border-[var(--color-border)]/50">
-                      <img
-                        src={obj.imageUrl}
-                        alt={obj.name}
-                        className="w-full h-full object-contain drop-shadow-sm rounded-xl"
-                        loading="eager"
-                        onError={(e) => {
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
+                      <ObjectCardVisual
+                        imageUrl={obj.imageUrl}
+                        name={obj.name}
+                        emoji={obj.emoji}
+                        className="w-full h-full"
+                        imgClassName="w-full h-full object-contain drop-shadow-sm rounded-xl"
+                        onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                       />
                     </div>
 
@@ -176,7 +176,7 @@ export default function RecognisePlay({
                 {[...activity.objects, ...activity.objects].map((obj, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--color-bg-subtle)] rounded-2xl border-2 border-[var(--color-border)] flex flex-col items-center justify-center p-2 shadow-xs">
-                      <img src={obj.imageUrl} alt={obj.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+                      <ObjectCardVisual imageUrl={obj.imageUrl} name={obj.name} emoji={obj.emoji} className="w-10 h-10 sm:w-12 sm:h-12" />
                       <span className="text-[10px] sm:text-xs font-semibold text-[var(--color-text-secondary)] mt-0.5 truncate">{obj.name}</span>
                     </div>
                     {i < activity.objects.length * 2 - 1 && (
@@ -194,7 +194,12 @@ export default function RecognisePlay({
                 }`}>
                   {selectedOption ? (
                     <>
-                      <img src={selectedOption} alt="Selected" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+                      <ObjectCardVisual
+                        imageUrl={selectedOption}
+                        name={getObjectDetails(selectedOption)?.name}
+                        emoji={getObjectDetails(selectedOption)?.emoji}
+                        className="w-10 h-10 sm:w-12 sm:h-12"
+                      />
                       <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate">
                         {getObjectDetails(selectedOption)?.name || 'Choice'}
                       </span>
@@ -227,7 +232,7 @@ export default function RecognisePlay({
                       }`}
                     >
                       <div className="w-14 h-14 flex items-center justify-center overflow-hidden mb-1 bg-[var(--color-bg-subtle)] rounded-xl p-1.5 border border-[var(--color-border)]/50">
-                        <img src={option} alt={details?.name || 'Option'} className="w-full h-full object-contain" />
+                        <ObjectCardVisual imageUrl={option} name={details?.name} emoji={details?.emoji} className="w-full h-full" />
                       </div>
                       <span className="text-xs sm:text-sm font-bold text-[var(--color-text)] truncate">
                         {details?.name || `Option ${i + 1}`}
@@ -276,7 +281,12 @@ export default function RecognisePlay({
                         }`}>
                           {selectedOption ? (
                             <>
-                              <img src={selectedOption} alt="Selected" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+                              <ObjectCardVisual
+                                imageUrl={selectedOption}
+                                name={getObjectDetails(selectedOption)?.name}
+                                emoji={getObjectDetails(selectedOption)?.emoji}
+                                className="w-10 h-10 sm:w-12 sm:h-12"
+                              />
                               <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate">
                                 {getObjectDetails(selectedOption)?.name || 'Choice'}
                               </span>
@@ -287,7 +297,7 @@ export default function RecognisePlay({
                         </div>
                       ) : (
                         <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--color-bg-subtle)] rounded-2xl border-2 border-[var(--color-border)] flex flex-col items-center justify-center p-2 shadow-xs">
-                          <img src={obj.imageUrl} alt={obj.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
+                          <ObjectCardVisual imageUrl={obj.imageUrl} name={obj.name} emoji={obj.emoji} className="w-10 h-10 sm:w-12 sm:h-12" />
                           <span className="text-[10px] sm:text-xs font-semibold text-[var(--color-text-secondary)] mt-0.5 truncate">{obj.name}</span>
                         </div>
                       )}
@@ -321,7 +331,7 @@ export default function RecognisePlay({
                       }`}
                     >
                       <div className="w-14 h-14 flex items-center justify-center overflow-hidden mb-1 bg-[var(--color-bg-subtle)] rounded-xl p-1.5 border border-[var(--color-border)]/50">
-                        <img src={option} alt={details?.name || 'Option'} className="w-full h-full object-contain" />
+                        <ObjectCardVisual imageUrl={option} name={details?.name} emoji={details?.emoji} className="w-full h-full" />
                       </div>
                       <span className="text-xs sm:text-sm font-bold text-[var(--color-text)] truncate">
                         {details?.name || `Option ${i + 1}`}

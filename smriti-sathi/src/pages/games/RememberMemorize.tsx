@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Eye } from 'lucide-react';
 import { RememberObject } from '../../models/GameSession';
+import ObjectCardVisual from '../../components/ObjectCardVisual';
 
 interface RememberMemorizeProps {
   objects: RememberObject[];
@@ -82,7 +83,7 @@ function ObjectCard({ object }: { object: RememberObject }) {
   return (
     <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-4 sm:p-6 flex flex-col items-center justify-center aspect-square shadow-sm transition-all">
       <div className="mb-2.5 flex justify-center w-20 h-20 sm:w-28 sm:h-28 items-center bg-[var(--color-bg-subtle)] rounded-2xl p-2 border border-[var(--color-border)]/50">
-        <img src={object.imageUrl} alt={object.name} className="w-full h-full object-contain" />
+        <ObjectCardVisual imageUrl={object.imageUrl} name={object.name} emoji={object.emoji} className="w-full h-full" />
       </div>
       <p className="text-base sm:text-lg font-bold text-[var(--color-text)] text-center truncate">
         {object.name}

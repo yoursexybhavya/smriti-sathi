@@ -62,27 +62,29 @@ export default function RecogniseIntro({ onStart, onBack }: RecogniseIntroProps)
           </div>
         </div>
 
-        {/* Example with Real Photographic Objects */}
+        {/* Example with Guaranteed Offline Visual Objects */}
         <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-5 shadow-xs">
-          <p className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-3 text-center">Example Sequence:</p>
+          <p className="text-sm font-bold text-[var(--color-text)] uppercase tracking-wider mb-3 text-center">
+            Example Sequence:
+          </p>
           <div className="flex items-center justify-center gap-2 md:gap-3 flex-wrap">
-            <div className="w-14 h-14 md:w-16 md:h-16 bg-[var(--color-bg-subtle)] rounded-2xl border border-[var(--color-border)] p-1.5 flex flex-col items-center justify-center shadow-xs">
-              <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6fac6?auto=format&fit=crop&w=400&q=80" alt="Apple" className="w-8 h-8 object-contain" />
-              <span className="text-[10px] font-bold text-[var(--color-text-secondary)]">Apple</span>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--color-bg-subtle)] rounded-2xl border-2 border-indigo-200 dark:border-indigo-800/60 p-2 flex flex-col items-center justify-center shadow-xs">
+              <span className="text-2xl sm:text-3xl">🍎</span>
+              <span className="text-[11px] font-extrabold text-[var(--color-text)] mt-0.5">Apple</span>
             </div>
             <span className="text-base font-bold text-[var(--color-text-muted)]">→</span>
-            <div className="w-14 h-14 md:w-16 md:h-16 bg-[var(--color-bg-subtle)] rounded-2xl border border-[var(--color-border)] p-1.5 flex flex-col items-center justify-center shadow-xs">
-              <img src="https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=400&q=80" alt="Mango" className="w-8 h-8 object-contain" />
-              <span className="text-[10px] font-bold text-[var(--color-text-secondary)]">Mango</span>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--color-bg-subtle)] rounded-2xl border-2 border-amber-200 dark:border-amber-800/60 p-2 flex flex-col items-center justify-center shadow-xs">
+              <span className="text-2xl sm:text-3xl">🥭</span>
+              <span className="text-[11px] font-extrabold text-[var(--color-text)] mt-0.5">Mango</span>
             </div>
             <span className="text-base font-bold text-[var(--color-text-muted)]">→</span>
-            <div className="w-14 h-14 md:w-16 md:h-16 bg-[var(--color-bg-subtle)] rounded-2xl border border-[var(--color-border)] p-1.5 flex flex-col items-center justify-center shadow-xs">
-              <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6fac6?auto=format&fit=crop&w=400&q=80" alt="Apple" className="w-8 h-8 object-contain" />
-              <span className="text-[10px] font-bold text-[var(--color-text-secondary)]">Apple</span>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[var(--color-bg-subtle)] rounded-2xl border-2 border-indigo-200 dark:border-indigo-800/60 p-2 flex flex-col items-center justify-center shadow-xs">
+              <span className="text-2xl sm:text-3xl">🍎</span>
+              <span className="text-[11px] font-extrabold text-[var(--color-text)] mt-0.5">Apple</span>
             </div>
             <span className="text-base font-bold text-[var(--color-text-muted)]">→</span>
-            <div className="w-14 h-14 md:w-16 md:h-16 bg-[#E65100]/15 rounded-2xl border-2 border-dashed border-[#E65100] flex items-center justify-center shadow-xs">
-              <span className="text-xl font-extrabold text-[#E65100]">?</span>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-amber-100/60 dark:bg-amber-950/50 rounded-2xl border-2 border-dashed border-amber-500 flex flex-col items-center justify-center shadow-xs">
+              <span className="text-2xl font-black text-amber-600 dark:text-amber-400">?</span>
             </div>
           </div>
           <p className="text-center text-sm font-medium text-[var(--color-text-secondary)] mt-3">

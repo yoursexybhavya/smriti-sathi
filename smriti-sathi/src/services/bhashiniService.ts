@@ -8,6 +8,7 @@ export const BHASHINI_CONFIG = {
   UDYAT_API_KEY: '18d72059e6-821b-4f4d-9498-76232c6c2e24',
   INFERENCE_KEY: '287McPfaybEXK-HLX6gEiji4fG-NK0tShAh1E7wh56DmrvqPgjIfiZVAMy9qgaXZ',
   PIPELINE_URL: 'https://dhruva-api.bhashini.gov.in/services/inference/pipeline',
+  IS_PENDING_APPROVAL: true, // Official production API key pending government approval
 };
 
 const ttsAudioCache = new Map<string, string>();
@@ -16,6 +17,10 @@ export async function synthesizeBhashiniTTS(
   text: string,
   sourceLanguage: 'as' | 'brx' | 'mni' | 'en'
 ): Promise<string | null> {
+  // If government API approval is pending, immediately yield to zero-latency local speech engine
+  if (BHASHINI_CONFIG.IS_PENDING_APPROVAL) {
+    return null;
+  }
   const cacheKey = `${sourceLanguage}:${text.trim()}`;
   if (ttsAudioCache.has(cacheKey)) {
     return ttsAudioCache.get(cacheKey)!;

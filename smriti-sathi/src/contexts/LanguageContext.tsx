@@ -32,6 +32,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         setLanguageState(setting.value as Language);
         try {
           localStorage.setItem(STORAGE_KEY, setting.value);
+          localStorage.setItem('smriti_sathi_language', setting.value);
         } catch {
           // ignore
         }
@@ -39,12 +40,23 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }).catch((err) => {
       console.warn('Could not load language from DB:', err);
     });
+
+    const handleCustomChange = (e: Event) => {
+      const customEvent = e as CustomEvent<Language>;
+      if (customEvent.detail && customEvent.detail in translations) {
+        setLanguageState(customEvent.detail);
+      }
+    };
+    window.addEventListener('smriti_language_changed', handleCustomChange);
+    return () => window.removeEventListener('smriti_language_changed', handleCustomChange);
   }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     try {
       localStorage.setItem(STORAGE_KEY, lang);
+      localStorage.setItem('smriti_sathi_language', lang);
+      window.dispatchEvent(new CustomEvent('smriti_language_changed', { detail: lang }));
     } catch {
       // ignore
     }

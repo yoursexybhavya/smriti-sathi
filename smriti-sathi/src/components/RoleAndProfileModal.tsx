@@ -14,17 +14,24 @@ import {
   Pill,
   Droplets,
   Activity,
-  Calendar
+  Calendar,
+  Volume2,
+  Globe,
+  Radio
 } from 'lucide-react';
 import { useApp, PatientProfile } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useVoice } from '../hooks/useVoice';
+import type { Language } from '../i18n/translations';
+import OfflineSyncDemo from './OfflineSyncDemo';
 import { UserRole } from '../models/Role';
 import { DEFAULT_USERS } from '../services/auth/AuthService';
 
 interface RoleAndProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialTab?: 'role' | 'profile';
+  initialTab?: 'role' | 'profile' | 'language' | 'sync';
   onNavigate?: (screen: string) => void;
 }
 
@@ -34,9 +41,12 @@ export default function RoleAndProfileModal({
   initialTab = 'profile',
   onNavigate,
 }: RoleAndProfileModalProps) {
-  const { state, updatePatient, resetOnboarding } = useApp();
+  const { state, updatePatient, resetOnboarding, updateLanguage } = useApp();
   const { session, switchRole, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState<'role' | 'profile'>(initialTab);
+  const { language, setLanguage, t } = useLanguage();
+  const { speak, isSpeaking } = useVoice();
+  const [activeTab, setActiveTab] = useState<'role' | 'profile' | 'language' | 'sync'>(initialTab);
+  const [testingLang, setTestingLang] = useState<string | null>(null);
 
   // Profile form state
   const [name, setName] = useState('');
@@ -75,6 +85,48 @@ export default function RoleAndProfileModal({
     { emoji: '👴', label: 'Deka Koka', assamese: 'ডেকা ককা', defaultAge: '76' },
     { emoji: '🌸', label: 'Aai', assamese: 'আই', defaultAge: '68' },
     { emoji: '🌿', label: 'Bapu', assamese: 'বাপু', defaultAge: '70' },
+  ];
+
+  const LANGUAGES: Array<{
+    code: Language;
+    name: string;
+    nativeName: string;
+    flagEmoji: string;
+    region: string;
+    greetingVoiceSample: string;
+  }> = [
+    {
+      code: 'en',
+      name: 'English',
+      nativeName: 'English (Indian)',
+      flagEmoji: '🇮🇳',
+      region: 'Standard Clear Audio',
+      greetingVoiceSample: 'Hello! I am Smriti Sathi, your caring memory companion.'
+    },
+    {
+      code: 'as',
+      name: 'Assamese',
+      nativeName: 'অসমীয়া',
+      flagEmoji: '🌸',
+      region: 'Assam & Brahmaputra Valley',
+      greetingVoiceSample: 'নমস্কাৰ! মই স্মৃতি সাথী, আপোনাৰ মৰমৰ স্মৃতি সংগী।'
+    },
+    {
+      code: 'brx',
+      name: 'Bodo',
+      nativeName: 'बर’ / Bodo',
+      flagEmoji: '🌿',
+      region: 'Bodoland Territorial Region',
+      greetingVoiceSample: 'खुलुमबाय! आं स्मृती साथी, नोंथांनि गोसोखां साथी।'
+    },
+    {
+      code: 'mni',
+      name: 'Manipuri',
+      nativeName: 'মৈতৈলোন্ / Meetei',
+      flagEmoji: '🌺',
+      region: 'Manipur & Imphal Valley',
+      greetingVoiceSample: 'খুরুমজরি! ঐনা স্মৃতি সাথী, অদোমগী নুংশিবা ৱাখলগী মরুপ।'
+    }
   ];
 
   const allAvatarEmojis = ['👵', '👴', '🌸', '🌿', '🌺', '🌻', '🧓', '🕊️', '☀️', '🪴'];
@@ -168,38 +220,62 @@ export default function RoleAndProfileModal({
         aria-labelledby="role-profile-title"
       >
         {/* Header with Navigation Tabs */}
-        <div className="p-4 sm:p-5 border-b-2 border-[var(--color-border)] bg-[var(--color-bg-subtle)] flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="p-3.5 sm:p-4 border-b-2 border-[var(--color-border)] bg-[var(--color-bg-subtle)] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none min-w-0">
             <button
               type="button"
               onClick={() => setActiveTab('profile')}
-              className={`px-4 py-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer min-h-[44px] ${
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap min-h-[42px] ${
                 activeTab === 'profile'
                   ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
                   : 'bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-400'
               }`}
             >
-              <User size={16} />
-              <span>👤 Name & Age</span>
+              <User size={15} />
+              <span>👤 Profile</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('language')}
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap min-h-[42px] ${
+                activeTab === 'language'
+                  ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
+                  : 'bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-400'
+              }`}
+            >
+              <Globe size={15} />
+              <span>🌐 Language</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('role')}
-              className={`px-4 py-2.5 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer min-h-[44px] ${
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap min-h-[42px] ${
                 activeTab === 'role'
                   ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
                   : 'bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-400'
               }`}
             >
-              <Users size={16} />
-              <span>👥 Who is Using? (Role)</span>
+              <Users size={15} />
+              <span>👥 Role</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('sync')}
+              className={`px-3 py-2 sm:px-3.5 sm:py-2 rounded-2xl font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap min-h-[42px] ${
+                activeTab === 'sync'
+                  ? 'bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-500/20'
+                  : 'bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-400'
+              }`}
+            >
+              <Radio size={15} />
+              <span>📡 Mesh Sync</span>
             </button>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text)] bg-[var(--color-card)] border border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-90 cursor-pointer shadow-xs"
+            className="w-10 h-10 rounded-2xl flex items-center justify-center text-[var(--color-text-secondary)] hover:text-[var(--color-text)] bg-[var(--color-card)] border border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-90 cursor-pointer shadow-xs flex-shrink-0"
             aria-label="Close"
           >
             <X size={20} />
@@ -360,7 +436,118 @@ export default function RoleAndProfileModal({
           )}
 
           {/* ============================================================== */}
-          {/* TAB 2: WHO IS USING? (ROLE PERSONA SELECTION) */}
+          {/* TAB 2: MULTILINGUAL SYSTEM & AUDIO VOICE SELECTOR */}
+          {/* ============================================================== */}
+          {activeTab === 'language' && (
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                    Multilingual Audio Engine / ভাষা ব্যৱস্থা
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[var(--color-text)] tracking-tight mt-1">
+                  Choose Language & Test Voice
+                </h2>
+                <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">
+                  Selecting a language immediately updates all UI labels and sets the audio synthesizer so that all speak buttons speak in your chosen tongue.
+                </p>
+              </div>
+
+              {/* Grid of 4 supported languages */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {LANGUAGES.map((langItem) => {
+                  const isSelected = language === langItem.code;
+                  const isTesting = testingLang === langItem.code;
+                  return (
+                    <div
+                      key={langItem.code}
+                      className={`p-4 rounded-2xl border-2 transition-all flex flex-col justify-between gap-3 ${
+                        isSelected
+                          ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/30 ring-2 ring-indigo-500/20 shadow-sm'
+                          : 'border-[var(--color-border)] bg-[var(--color-card)] hover:border-indigo-400'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl sm:text-3xl p-2 rounded-xl bg-[var(--color-bg-subtle)] border border-[var(--color-border)]">
+                            {langItem.flagEmoji}
+                          </span>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-base sm:text-lg font-extrabold text-[var(--color-text)]">
+                                {langItem.name}
+                              </h3>
+                              {isSelected && (
+                                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-indigo-600 text-white">
+                                  Active
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                              {langItem.nativeName}
+                            </p>
+                            <p className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
+                              {langItem.region}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-[var(--color-border)] flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await setLanguage(langItem.code);
+                            await updateLanguage(langItem.code);
+                          }}
+                          className={`px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] flex-1 cursor-pointer ${
+                            isSelected
+                              ? 'bg-indigo-600 text-white shadow-xs'
+                              : 'bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-400'
+                          }`}
+                        >
+                          {isSelected ? '✓ Selected' : 'Select Language'}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            setTestingLang(langItem.code);
+                            await speak(langItem.greetingVoiceSample, langItem.code);
+                            setTestingLang(null);
+                          }}
+                          className={`px-3 py-2 rounded-xl text-xs font-bold transition-all min-h-[40px] flex items-center justify-center gap-1.5 cursor-pointer border ${
+                            isTesting
+                              ? 'bg-amber-500 text-white border-amber-600 animate-pulse'
+                              : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+                          }`}
+                          title={`Listen to sample audio in ${langItem.name}`}
+                        >
+                          <Volume2 size={15} />
+                          <span>{isTesting ? 'Speaking...' : 'Test Voice'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Status note */}
+              <div className="p-4 rounded-2xl bg-[var(--color-bg-subtle)] border-2 border-[var(--color-border)] text-xs text-[var(--color-text-secondary)] space-y-1.5 leading-relaxed">
+                <p className="font-bold text-[var(--color-text)] flex items-center gap-2">
+                  <Check size={16} className="text-emerald-500" />
+                  <span>Dual Audio Architecture (Online Bhashini AI + Offline Web Speech):</span>
+                </p>
+                <p>
+                  When connected, neural voices from India's Bhashini AI are utilized. When in remote offline areas (hills, flood zones), local synthesized speech runs 100% offline with zero network latency.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================== */}
+          {/* TAB 3: WHO IS USING? (ROLE PERSONA SELECTION) */}
           {/* ============================================================== */}
           {activeTab === 'role' && (
             <div className="space-y-5">
@@ -573,6 +760,15 @@ export default function RoleAndProfileModal({
                   <span>Log Out to Start Screen (Select Role on App Entry)</span>
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* ============================================================== */}
+          {/* TAB 4: OFFLINE MESH SYNC ARCHITECTURE & DEMO */}
+          {/* ============================================================== */}
+          {activeTab === 'sync' && (
+            <div className="space-y-4">
+              <OfflineSyncDemo />
             </div>
           )}
         </div>

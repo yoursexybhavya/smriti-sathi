@@ -3,6 +3,9 @@ import { Brain, ArrowLeft, Sparkles, Info, Eye, Sun, Play, Trophy, Flame, Target
 import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
 import { useApp } from '../context/AppContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useVoice } from '../hooks/useVoice';
+import type { Language } from '../i18n/translations';
 import { GameStorage } from '../services/storage/GameStorage';
 import RecogniseGame from './games/RecogniseGame';
 import RememberGame from './games/RememberGame';
@@ -11,6 +14,13 @@ import DailyRoutineGame from './games/DailyRoutineGame';
 import FamilyMemoryGame from '../games/family/FamilyMemoryGame';
 import { Heart } from 'lucide-react';
 
+const GAME_BANNER_PROMPTS: Record<Language, string> = {
+  en: 'Gentle cognitive exercises designed for elder engagement. Difficulty adapts automatically to your comfort.',
+  as: 'বয়োজ্যেষ্ঠসকলৰ বাবে প্ৰস্তুত কৰা স্মৃতি আৰু মনোযোগৰ শান্ত খেল। আপোনাৰ সুবিধা অনুযায়ী স্তৰ নিজে সলনি হয়।',
+  brx: 'गोसोखौ मोजां लाखिनो बानायनाय सुलुम गेलेनाय। नोंथांनि गोसोबायदि बेयो सोलायगोन।',
+  mni: 'ৱাখলবু মপুং ফাহন্নবা অমসুং শক্তি হাপ্পদা মতেং পাংবা শান্নবশিং। অদোমগী খুদোংচাবগী মতুং ইন্না মহাকপু শেমগৎকনি।'
+};
+
 interface GamesScreenProps {
   onNavigate: (screen: string) => void;
   isOnline?: boolean;
@@ -18,6 +28,8 @@ interface GamesScreenProps {
 
 export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }: GamesScreenProps) {
   const { state } = useApp();
+  const { language } = useLanguage();
+  const { speak } = useVoice();
   const patientId = state.currentPatient?.id || 'default';
   const [activeGame, setActiveGame] = useState<string | null>(null);
   const [stats, setStats] = useState({ totalGames: 0, currentStreak: 0, averageAccuracy: 0 });
@@ -62,15 +74,9 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
           </p>
           <button
             type="button"
-            onClick={() => {
-              if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance('These games are designed for cognitive engagement and enjoyment. Choose any game below to keep your mind active.');
-                u.rate = 0.85;
-                window.speechSynthesis.speak(u);
-              }
-            }}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-sky-200 text-sky-700 text-xs font-extrabold shadow-sm hover:bg-sky-50 active:scale-95 transition-all"
+            onClick={() => speak(GAME_BANNER_PROMPTS[language] || GAME_BANNER_PROMPTS.en, language)}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-sky-200 text-sky-700 text-xs font-extrabold shadow-sm hover:bg-sky-50 active:scale-95 transition-all cursor-pointer"
+            title="Listen to game guide in selected language"
           >
             🔊 Listen
           </button>

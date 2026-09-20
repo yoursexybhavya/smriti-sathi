@@ -168,10 +168,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
         voiceGuidance: accessibility.voiceGuidance,
       });
 
+      // Update storage and dispatch event
+      try {
+        localStorage.setItem('smriti_language', language);
+        localStorage.setItem('smriti_sathi_language', language);
+        window.dispatchEvent(new CustomEvent('smriti_language_changed', { detail: language }));
+      } catch {}
+
       // Update state
       setState({
         onboardingComplete: true,
-        currentPatient: { ...patient, id: userId.toString() },
+        currentPatient: { ...patient, id: userId.toString(), preferredLanguage: language },
         interfaceLanguage: language,
         accessibility,
         isLoading: false,
@@ -240,7 +247,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
           preferredLanguage: language,
         });
       }
-      setState(prev => ({ ...prev, interfaceLanguage: language }));
+      try {
+        localStorage.setItem('smriti_language', language);
+        localStorage.setItem('smriti_sathi_language', language);
+        window.dispatchEvent(new CustomEvent('smriti_language_changed', { detail: language }));
+      } catch {}
+      setState(prev => ({
+        ...prev,
+        interfaceLanguage: language,
+        currentPatient: prev.currentPatient ? { ...prev.currentPatient, preferredLanguage: language } : null,
+      }));
     } catch (error) {
       console.error('Failed to update language:', error);
     }

@@ -6,6 +6,7 @@ import { GameStorage } from '../../services/storage/GameStorage';
 import AppHeader from '../../components/AppHeader';
 import LargeButton from '../../components/LargeButton';
 import ProgressCard from '../../components/ProgressCard';
+import ObjectCardVisual from '../../components/ObjectCardVisual';
 import { ArrowLeft, Clock, Target, TrendingUp, CheckCircle, Sparkles, HelpCircle } from 'lucide-react';
 
 interface MemoryMatchGameProps {
@@ -180,11 +181,13 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
               <label className="block text-sm font-bold text-[var(--color-text)] mb-2 text-center">
                 Select Difficulty Tier
               </label>
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 {[
                   { level: 1, label: 'Gentle', sub: '2 Pairs' },
                   { level: 2, label: 'Standard', sub: '3 Pairs' },
                   { level: 3, label: 'Active', sub: '4 Pairs' },
+                  { level: 4, label: 'Master', sub: '6 Pairs' },
+                  { level: 5, label: 'Champion', sub: '8 Pairs' },
                 ].map(tier => (
                   <button
                     key={tier.level}
@@ -260,7 +263,7 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
               >
                 {(card.isFlipped || card.isMatched) ? (
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-2.5 animate-in fade-in zoom-in duration-200">
-                    <img src={card.object.imageUrl} alt={card.object.name} className="w-14 h-14 sm:w-20 sm:h-20 object-contain drop-shadow-sm" />
+                    <ObjectCardVisual imageUrl={card.object.imageUrl} name={card.object.name} emoji={card.object.emoji} className="w-14 h-14 sm:w-20 sm:h-20" />
                     <span className="text-xs sm:text-sm font-bold text-[var(--color-text)] mt-1 truncate w-full text-center">
                       {card.object.name}
                     </span>

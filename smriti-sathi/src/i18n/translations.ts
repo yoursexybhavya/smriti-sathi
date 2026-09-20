@@ -231,6 +231,34 @@ export interface Translations {
   pairedSuccess: string;
   shareWhatsappReport: string;
   cloudSyncNow: string;
+
+  // Patient Home Screen & Elder Experience
+  comfortTitle: string;
+  comfortQuote: string;
+  comfortSubtitle: string;
+  listenAloud: string;
+  dailyFocus: string;
+  dailyFocusDesc: string;
+  startDailyExercise: string;
+  cherishedStories: string;
+  familyMemoryBookDesc: string;
+  familyQuizBtn: string;
+  viewPhotosBtn: string;
+  careScheduleTitle: string;
+  testBuzzerBtn: string;
+  noRemindersScheduled: string;
+  addReminderBtn: string;
+  progressSummaryTitle: string;
+  activitiesCompletedLabel: string;
+  accuracyLabel: string;
+  currentStreakLabel: string;
+  preferencesCardTitle: string;
+  editNameAgeBtn: string;
+  switchRoleBtn: string;
+  chooseLanguage: string;
+  selectLanguage: string;
+  offlineMeshSync: string;
+  offlineMeshSyncDesc: string;
 }
 
 const en: Translations = {
@@ -445,6 +473,34 @@ const en: Translations = {
   pairedSuccess: 'Family Account Linked Successfully',
   shareWhatsappReport: 'Share Daily Report via WhatsApp',
   cloudSyncNow: 'Sync Data to Cloud',
+
+  // Patient Home Screen & Elder Experience
+  comfortTitle: 'Daily Comfort & Reassurance',
+  comfortQuote: 'Take your time. There is no rush. Every moment you spend here strengthens your mind, keeps your memories bright, and brings peace to your day.',
+  comfortSubtitle: 'A gentle reassurance for your day',
+  listenAloud: 'Listen Aloud',
+  dailyFocus: "Today's Daily Focus",
+  dailyFocusDesc: 'Memory, recognition & gentle engagement',
+  startDailyExercise: 'Start Daily Exercise',
+  cherishedStories: 'Cherished Family Stories / Personal Memory Book',
+  familyMemoryBookDesc: 'Photos and cherished moments of your children, grandchildren, and home.',
+  familyQuizBtn: '🎮 Family Quiz',
+  viewPhotosBtn: 'View Photos',
+  careScheduleTitle: "Today's Care Schedule",
+  testBuzzerBtn: 'Care Alarm & Buzzer',
+  noRemindersScheduled: 'No care reminders scheduled for today.',
+  addReminderBtn: '+ Add Care Reminder',
+  progressSummaryTitle: 'Your Progress Today',
+  activitiesCompletedLabel: 'Activities',
+  accuracyLabel: 'Accuracy',
+  currentStreakLabel: 'Streak',
+  preferencesCardTitle: 'Elder Name, Age & Role Management',
+  editNameAgeBtn: '✏️ Edit Name & Age',
+  switchRoleBtn: '👥 Switch Role (Son, Doctor)',
+  chooseLanguage: 'Choose Language',
+  selectLanguage: 'Select Language',
+  offlineMeshSync: 'Offline Mesh Sync',
+  offlineMeshSyncDesc: 'Sync via Bluetooth & Hotspot without internet',
 };
 
 const as: Translations = {
@@ -659,6 +715,34 @@ const as: Translations = {
   pairedSuccess: 'পৰিয়াল একাউন্ট সফলতাৰে সংযোগ কৰা হ’ল',
   shareWhatsappReport: 'হোৱাটছএপত দৈনিক স্বাস্থ্য ৰিপৰ্ট পঠিয়াওক',
   cloudSyncNow: 'ক্লাউডলৈ তথ্য সংমিশ্ৰণ কৰক',
+
+  // Patient Home Screen & Elder Experience
+  comfortTitle: 'দৈনন্দিন আশ্বাস আৰু শান্তি',
+  comfortQuote: 'লাহে লাহে কৰক, কোনো খৰখেদা নাই। ইয়াত কটোৱা প্ৰতিটো মুহূৰ্তই আপোনাৰ মনটোক সতেজ কৰি ৰাখে আৰু স্মৃতি উজ্জ্বল কৰে।',
+  comfortSubtitle: 'আজিৰ দিনটোৰ বাবে এটি শান্তিদায়ক বাৰ্তা',
+  listenAloud: 'কথা শুনি শুনক',
+  dailyFocus: 'আজিৰ মূল মনোযোগ',
+  dailyFocusDesc: 'স্মৃতি, চিনাক্তকৰণ আৰু শান্তিদায়ক অনুশীলন',
+  startDailyExercise: 'দৈনন্দিন অনুশীলন আৰম্ভ কৰক',
+  cherishedStories: 'পৰিয়ালৰ মৰমৰ স্মৃতি / ব্যক্তিগত স্মৃতি পুথি',
+  familyMemoryBookDesc: 'আপোনাৰ সন্তান, নাতি-নাতিনী আৰু ঘৰৰ মৰমৰ আলোকচিত্ৰসমূহ।',
+  familyQuizBtn: '🎮 পৰিয়ালৰ কুইজ',
+  viewPhotosBtn: 'ফটো চাওক',
+  careScheduleTitle: 'আজিৰ যত্ন আৰু সময়সূচী',
+  testBuzzerBtn: 'যত্ন সতৰ্কবাৰ্তা আৰু ঘন্টা',
+  noRemindersScheduled: 'আজিৰ বাবে কোনো সতৰ্কবাৰ্তা নাই।',
+  addReminderBtn: '+ সতৰ্কবাৰ্তা যোগ কৰক',
+  progressSummaryTitle: 'আজিৰ আপোনাৰ অগ্ৰগতি',
+  activitiesCompletedLabel: 'অনুশীলনসমূহ',
+  accuracyLabel: 'সঠিকতা',
+  currentStreakLabel: 'ধাৰাবাহিকতা',
+  preferencesCardTitle: 'নাম, বয়স আৰু ভূমিকা পৰিচালনা',
+  editNameAgeBtn: '✏️ নাম আৰু বয়স সলনি কৰক',
+  switchRoleBtn: '👥 ভূমিকা সলনি কৰক (ল\'ৰা, চিকিৎসক)',
+  chooseLanguage: 'ভাষা বাছনি কৰক',
+  selectLanguage: 'ভাষা নিৰ্বাচন',
+  offlineMeshSync: 'অফলাইন ব্লুটুথ সংযোগ',
+  offlineMeshSyncDesc: 'ইন্টাৰনেট অবিহনে ব্লুটুথ আৰু হটস্পটৰে তথ্য সংযোগ',
 };
 
 // Bodo translations (Devanagari script)
@@ -874,6 +958,34 @@ const brx: Translations = {
   pairedSuccess: 'नोगोर एकान्ट मोजाङै लोगो जाबाय',
   shareWhatsappReport: 'व्हाट्सएपआव साननि रिपर्ट हर',
   cloudSyncNow: 'क्लाउड सिंक खालाम',
+
+  // Patient Home Screen & Elder Experience
+  comfortTitle: 'सानफ्रोमबोनि गोजोन आरो थुलुंगा',
+  comfortQuote: 'लसायै खालाम, जेबो गोख्रोंथि गैया। बेयाव होनाय समा नोंथांनि गोसोखौ गोजोन आरो गोख्रों खालामो।',
+  comfortSubtitle: 'दिनैनि साननि थाखाय गोजोन खौरां',
+  listenAloud: 'खोनासं',
+  dailyFocus: 'दिनैनि गाहाय नोजोर',
+  dailyFocusDesc: 'गोसोखांथि, सिनायथि आरो रेबगोन हाबाफारि',
+  startDailyExercise: 'दिनैनि हाबाफारि जागाय',
+  cherishedStories: 'नखरनि मोजां गोसोखांथि / नखरनि बिजाब',
+  familyMemoryBookDesc: 'नोंथांनि फिसाफोर, उन्दै फिसाफोर आरो न\'नि गाहाय सावगारिफोर।',
+  familyQuizBtn: '🎮 नखरनि कुइज',
+  viewPhotosBtn: 'सावगारि नाय',
+  careScheduleTitle: 'दिनैनि गोसोखांथि फारिलाइ',
+  testBuzzerBtn: 'घन्टी आनजाद',
+  noRemindersScheduled: 'दिनैनि थाखाय जेबो फारिलाइ गैया।',
+  addReminderBtn: '+ फारिलाइ दा',
+  progressSummaryTitle: 'दिनैनि जौगानाय',
+  activitiesCompletedLabel: 'हाबाफारि',
+  accuracyLabel: 'गेबेंथि',
+  currentStreakLabel: 'थाखाय',
+  preferencesCardTitle: 'मुं, बैसो आरो बिबान सामलायनाय',
+  editNameAgeBtn: '✏️ मुं आरो बैसो सोलाय',
+  switchRoleBtn: '👥 बिबान सोलाय (फिसा, डाक्टर)',
+  chooseLanguage: "राव सायख'",
+  selectLanguage: 'राव सायखनाय',
+  offlineMeshSync: 'अफलाइन ब्लुटुथ सिंक',
+  offlineMeshSyncDesc: 'इन्तारनेत गैयाब्ला ब्लुतुथजों सिंक खालाम',
 };
 
 // Manipuri translations (Bengali script)
@@ -1089,6 +1201,34 @@ const mni: Translations = {
   pairedSuccess: 'ইমুংগী একাউন্ট ময়েক শেংনা শম্নরে',
   shareWhatsappReport: 'হোৱাতসএপতা নুমিৎ খুদিংগী রিপোর্ত থাবা',
   cloudSyncNow: 'ক্লাউদতা দেতা সিঙ্ক তৌবা',
+
+  // Patient Home Screen & Elder Experience
+  comfortTitle: 'নোংমগী নিংশিংবা অমসুং নুংঙাইবা',
+  comfortQuote: 'তপ্না তৌবিয়ু, করিগুম্বা খোঙজেল থুবা নত্তে। মফমসিদা লৈরিবা মতম অসিনা নহাক্কী ৱাখলবু কনখৎহল্লি।',
+  comfortSubtitle: 'ঙসিগীদমক শান্তিগী পাউজেল',
+  listenAloud: 'ৱাখল তাইনবা তারি',
+  dailyFocus: 'ঙসিগী মরুওইবা থৌরম',
+  dailyFocusDesc: 'নিংশিংবা, খঙদোকপা অমসুং ৱাখলবু শান্তি ওইহনবা',
+  startDailyExercise: 'ঙসিগী থৌরম হৌবিয়ু',
+  cherishedStories: 'ইমুং-মনুংগী নিংশিং খোঙচৎ / মেমোরি বুক',
+  familyMemoryBookDesc: 'ইচা-ইশু অমসুং য়ুমগী নুংশিবা ফটোশিং।',
+  familyQuizBtn: '🎮 ইমুংগী কুইজ',
+  viewPhotosBtn: 'ফটো য়েংবিয়ু',
+  careScheduleTitle: 'ঙসিগী নিংশিং নুমিৎ কাপ্পা',
+  testBuzzerBtn: 'বেল তেস্ত তৌবা',
+  noRemindersScheduled: 'ঙসিগীদমক নিংশিংবা অমত্তা লৈতে।',
+  addReminderBtn: '+ নিংশিংবা হাপচিনবা',
+  progressSummaryTitle: 'ঙসিগী নহাক্কী খুমাং চাউশিনবা',
+  activitiesCompletedLabel: 'থৌরমশিং',
+  accuracyLabel: 'চুম্বা',
+  currentStreakLabel: 'লেপ্তনা',
+  preferencesCardTitle: 'মিং, চহি অমসুং থৌদাং শেমজিনবা',
+  editNameAgeBtn: '✏️ মিং অমসুং চহি শেমদোকপা',
+  switchRoleBtn: '👥 থৌদাং হোংদোকপা (মচা, দাক্তর)',
+  chooseLanguage: 'লোল খনবীয়ু',
+  selectLanguage: 'লোল খনবা',
+  offlineMeshSync: 'ওফলাইন ব্লুতুথ সিঙ্ক',
+  offlineMeshSyncDesc: 'ইন্তরনেত লৈতবা মতমদা ব্লুতুথনা সিঙ্ক তৌবা',
 };
 
 export const translations: Record<Language, Translations> = { en, as, brx, mni };

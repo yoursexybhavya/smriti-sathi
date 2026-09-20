@@ -44,15 +44,18 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      const tab = params.get('tab');
+      const tab = params.get('tab') || params.get('screen');
       if (tab) return tab;
     }
     return 'home';
   });
   const [navigationHistory, setNavigationHistory] = useState<string[]>(['home']);
   const [showSplash, setShowSplash] = useState(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem('smriti_splash_shown')) {
-      return false;
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('nosplash') === 'true' || sessionStorage.getItem('smriti_splash_shown')) {
+        return false;
+      }
     }
     return true;
   });

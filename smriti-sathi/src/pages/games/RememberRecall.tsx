@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Check } from 'lucide-react';
 import LargeButton from '../../components/LargeButton';
 import { RememberObject } from '../../models/GameSession';
+import ObjectCardVisual from '../../components/ObjectCardVisual';
 
 interface RememberRecallProps {
   recallSet: RememberObject[];
@@ -78,7 +79,7 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
                   aria-label={`${obj.name} ${isSelected ? 'selected' : 'not selected'}`}
                 >
                   <div className="mb-2 flex justify-center w-16 h-16 sm:w-20 sm:h-20 items-center bg-[var(--color-bg-subtle)] rounded-2xl p-1.5 border border-[var(--color-border)]/50">
-                    <img src={obj.imageUrl} alt={obj.name} className="w-full h-full object-contain" />
+                    <ObjectCardVisual imageUrl={obj.imageUrl} name={obj.name} emoji={obj.emoji} className="w-full h-full" />
                   </div>
                   <p className="text-sm sm:text-base font-bold text-[var(--color-text)] text-center truncate w-full px-1">
                     {obj.name}
