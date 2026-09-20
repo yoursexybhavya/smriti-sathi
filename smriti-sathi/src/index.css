@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap');
 @import "tailwindcss";
 @import "./styles/globals.css";
 
@@ -19,17 +20,15 @@
   --color-secondary-light: #60A5FA;
   --color-accent: #3B82F6;
   --color-surface: #FFFFFF;
-  --color-surface-warm: #F8FAFC;
+  --color-surface-warm: #FFFBF5;
   --color-surface-card: #FFFFFF;
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
+  --color-success: #059669;
+  --color-warning: #D97706;
+  --color-error: #DC2626;
   --color-offline: #64748B;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
-}
+* { -webkit-tap-highlight-color: transparent; }
 
 body {
   font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -37,35 +36,15 @@ body {
   color: var(--color-text, #0F172A);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Scrollbar styling for a clean look */
-::-webkit-scrollbar {
-  width: 4px;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }
+html { scroll-behavior: smooth; }
+*:focus-visible { outline: 3px solid #4F46E5; outline-offset: 2px; border-radius: 12px; }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 2px;
-}
-
-/* Ensure smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Focus styles for accessibility */
-*:focus-visible {
-  outline: 3px solid #4F46E5;
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
-/* Accessibility overrides */
 body.high-contrast {
   --color-primary: #000000;
   --color-text-primary: #000000;
@@ -75,11 +54,12 @@ body.high-contrast {
   color: #000000 !important;
   filter: contrast(1.2);
 }
+body.text-size-large { font-size: 110%; }
+body.text-size-extra-large { font-size: 125%; }
 
-body.text-size-large {
-  font-size: 110%;
-}
-
-body.text-size-extra-large {
-  font-size: 125%;
+/* Premium utilities */
+.glass-pill {
+  background: color-mix(in srgb, var(--color-card) 88%, transparent);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
 }
