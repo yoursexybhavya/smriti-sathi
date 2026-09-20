@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, Type, Eye, Volume2, Check, Sparkles } from 'lucide-react';
+import { Type, Eye, Volume2, Check, Sparkles, ChevronLeft } from 'lucide-react';
 import LargeButton from '../../components/LargeButton';
-import SectionHeader from '../../components/SectionHeader';
 import { AccessibilitySettings } from '../../context/AppContext';
 import { useVoice } from '../../hooks/useVoice';
 
@@ -34,7 +33,6 @@ export default function AccessibilitySetup({
     document.body.classList.add(`text-size-${settings.textSize}`);
 
     return () => {
-      // Ensure clean state if navigated away
       if (!settings.highContrast) {
         document.body.classList.remove('high-contrast');
       }
@@ -55,8 +53,8 @@ export default function AccessibilitySetup({
 
   const handleTestVoice = () => {
     setSpeaking(true);
-    speak('Welcome to Smriti Sathi. This is how voice guidance will speak to you.');
-    setTimeout(() => setSpeaking(false), 3000);
+    speak('নমস্কাৰ! স্মৃতি সাথীলৈ স্বাগতম। এইদৰে আপোনাক কথাৰে সহায় কৰা হ’ব।');
+    setTimeout(() => setSpeaking(false), 3200);
   };
 
   const handleNext = () => {
@@ -64,366 +62,302 @@ export default function AccessibilitySetup({
     onNext();
   };
 
-  // Font size scale definitions for the preview
-  const headingStyles = {
+  const headingTextClasses = {
     normal: 'text-xl font-bold',
     large: 'text-2xl font-bold',
     'extra-large': 'text-3xl font-extrabold',
   };
 
-  const bodyStyles = {
-    normal: 'text-base',
-    large: 'text-lg',
-    'extra-large': 'text-xl font-medium',
+  const bodyTextClasses = {
+    normal: 'text-sm sm:text-base',
+    large: 'text-base sm:text-lg',
+    'extra-large': 'text-lg sm:text-xl font-medium',
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${
-      settings.highContrast ? 'bg-black text-white' : 'bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100'
-    }`}>
-      {/* Top Header */}
-      <header className={`sticky top-0 z-40 border-b transition-colors ${
-        settings.highContrast ? 'bg-zinc-900 border-zinc-800' : 'bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-slate-200 dark:border-slate-700'
-      }`}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-4">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onBack}
-              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors cursor-pointer ${
-                settings.highContrast
-                  ? 'bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700'
-                  : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200'
-              }`}
-              aria-label="Go back"
-            >
-              <ChevronLeft size={22} />
-            </button>
-            <div>
-              <h1 className="text-xl font-bold">Accessibility & Display</h1>
-              <p className={`text-sm ${settings.highContrast ? 'text-yellow-400' : 'text-slate-500 dark:text-slate-400'}`}>
-                Step 3 of 4: Tailor to your comfort
-              </p>
+    <div className="p-6 sm:p-8 md:p-10 flex flex-col justify-between flex-1">
+      <div>
+        {/* Step Heading */}
+        <div className="mb-6 pb-4 border-b-2 border-[var(--color-border)] flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                Step 3 of 4
+              </span>
+              <span className="text-xs font-semibold text-[var(--color-text-muted)]">
+                Sight & Sound Accessibility
+              </span>
             </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-text)] tracking-tight mt-1">
+              Accessibility & Display / দৃষ্টি আৰু সুবিধা
+            </h2>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">
+              Customize large readable text, high-contrast visibility, and spoken audio.
+            </p>
           </div>
-          <span className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider ${
-            settings.highContrast 
-              ? 'bg-yellow-400 text-black' 
-              : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-          }`}>
-            {settings.highContrast ? 'High Contrast Mode' : 'Standard Scandinavian Theme'}
-          </span>
         </div>
-      </header>
 
-      {/* Main Responsive Container */}
-      <main className="max-w-6xl mx-auto px-5 py-6 pb-32">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Column: Accessibility Controls */}
-          <div className="md:col-span-7 space-y-6">
-            
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Text Size & Toggles */}
+          <div className="md:col-span-7 space-y-5">
             {/* 1. Text Size Selector */}
-            <div className="space-y-3">
-              <SectionHeader
-                title="1. Choose Text Size"
-                icon={<Type size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />}
-              />
-              <div className={`rounded-2xl border p-4 space-y-3 ${
-                settings.highContrast ? 'bg-zinc-900 border-zinc-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm'
-              }`}>
+            <div>
+              <label className="text-sm sm:text-base font-bold text-[var(--color-text)] flex items-center gap-2 mb-2">
+                <Type size={18} className="text-indigo-600 dark:text-indigo-400" />
+                <span>Text Size / আখৰৰ আকাৰ</span>
+              </label>
+
+              <div className="space-y-2">
                 {/* Normal */}
                 <button
                   type="button"
                   onClick={() => updateTextSize('normal')}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition-all min-h-[64px] flex items-center justify-between cursor-pointer ${
+                  className={`w-full p-3.5 rounded-2xl border-2 text-left transition-all flex items-center justify-between cursor-pointer ${
                     settings.textSize === 'normal'
-                      ? settings.highContrast
-                        ? 'bg-zinc-800 border-yellow-400 text-white'
-                        : 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-600 dark:border-indigo-500 text-slate-900 dark:text-slate-100 ring-2 ring-indigo-500/20'
-                      : settings.highContrast
-                        ? 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'
-                        : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
+                      ? 'bg-indigo-50 dark:bg-indigo-950/70 border-indigo-600 dark:border-indigo-400 text-[var(--color-text)] ring-2 ring-indigo-500/20 shadow-xs'
+                      : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text)] hover:border-indigo-400'
                   }`}
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-base font-bold">Normal Size (18px)</span>
-                      {settings.textSize === 'normal' && (
-                        <span className={`text-xs px-2 py-0.5 rounded font-bold ${
-                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-indigo-600 text-white'
-                        }`}>Selected</span>
-                      )}
+                      <span className="text-base font-bold">Standard Size (18px)</span>
+                      <span className="text-xs text-[var(--color-text-muted)] font-serif">সাধাৰণ আকাৰ</span>
                     </div>
-                    <p className="text-base mt-1 text-slate-500 dark:text-slate-400">
-                      Standard text size for easy everyday reading.
-                    </p>
+                    <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">For easy everyday reading</p>
                   </div>
-                  {settings.textSize === 'normal' && (
-                    <Check size={24} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />
-                  )}
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 ${
+                    settings.textSize === 'normal' ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-[var(--color-border)]'
+                  }`}>
+                    {settings.textSize === 'normal' && <Check size={14} className="stroke-[3]" />}
+                  </div>
                 </button>
 
                 {/* Large */}
                 <button
                   type="button"
                   onClick={() => updateTextSize('large')}
-                  className={`w-full p-4 rounded-xl border-2 text-left transition-all min-h-[72px] flex items-center justify-between cursor-pointer ${
+                  className={`w-full p-3.5 rounded-2xl border-2 text-left transition-all flex items-center justify-between cursor-pointer ${
                     settings.textSize === 'large'
-                      ? settings.highContrast
-                        ? 'bg-zinc-800 border-yellow-400 text-white'
-                        : 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-600 dark:border-indigo-500 text-slate-900 dark:text-slate-100 ring-2 ring-indigo-500/20'
-                      : settings.highContrast
-                        ? 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'
-                        : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
+                      ? 'bg-indigo-50 dark:bg-indigo-950/70 border-indigo-600 dark:border-indigo-400 text-[var(--color-text)] ring-2 ring-indigo-500/20 shadow-xs'
+                      : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text)] hover:border-indigo-400'
                   }`}
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xl font-bold">Large Size (24px)</span>
-                      <span className="text-xs bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-200 px-2 py-0.5 rounded font-semibold">Recommended</span>
-                      {settings.textSize === 'large' && (
-                        <span className={`text-xs px-2 py-0.5 rounded font-bold ${
-                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-indigo-600 text-white'
-                        }`}>Selected</span>
-                      )}
+                      <span className="text-lg font-extrabold">Large Size (24px)</span>
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300">
+                        Recommended
+                      </span>
                     </div>
-                    <p className="text-lg mt-1 font-medium text-slate-600 dark:text-slate-300">
-                      Bigger words for comfortable, strain-free reading.
-                    </p>
+                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">Comfortable strain-free reading for seniors</p>
                   </div>
-                  {settings.textSize === 'large' && (
-                    <Check size={26} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />
-                  )}
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 ${
+                    settings.textSize === 'large' ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-[var(--color-border)]'
+                  }`}>
+                    {settings.textSize === 'large' && <Check size={14} className="stroke-[3]" />}
+                  </div>
                 </button>
 
                 {/* Extra Large */}
                 <button
                   type="button"
                   onClick={() => updateTextSize('extra-large')}
-                  className={`w-full p-5 rounded-xl border-2 text-left transition-all min-h-[84px] flex items-center justify-between cursor-pointer ${
+                  className={`w-full p-3.5 rounded-2xl border-2 text-left transition-all flex items-center justify-between cursor-pointer ${
                     settings.textSize === 'extra-large'
-                      ? settings.highContrast
-                        ? 'bg-zinc-800 border-yellow-400 text-white'
-                        : 'bg-indigo-50 dark:bg-indigo-950/50 border-indigo-600 dark:border-indigo-500 text-slate-900 dark:text-slate-100 ring-2 ring-indigo-500/20'
-                      : settings.highContrast
-                        ? 'bg-zinc-950 border-zinc-800 text-zinc-300 hover:border-zinc-700'
-                        : 'bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-600'
+                      ? 'bg-indigo-50 dark:bg-indigo-950/70 border-indigo-600 dark:border-indigo-400 text-[var(--color-text)] ring-2 ring-indigo-500/20 shadow-xs'
+                      : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text)] hover:border-indigo-400'
                   }`}
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-extrabold">Extra Large (30px)</span>
-                      {settings.textSize === 'extra-large' && (
-                        <span className={`text-xs px-2 py-0.5 rounded font-bold ${
-                          settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-indigo-600 text-white'
-                        }`}>Selected</span>
-                      )}
+                      <span className="text-xl font-extrabold">Extra Large (30px)</span>
+                      <span className="text-xs text-[var(--color-text-muted)] font-serif">অতি ডাঙৰ</span>
                     </div>
-                    <p className="text-xl mt-1 font-bold text-slate-700 dark:text-slate-200">
-                      Maximum size for elders with visual difficulties.
-                    </p>
+                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">Maximum readability for visual difficulty</p>
                   </div>
-                  {settings.textSize === 'extra-large' && (
-                    <Check size={30} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />
-                  )}
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 ${
+                    settings.textSize === 'extra-large' ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-[var(--color-border)]'
+                  }`}>
+                    {settings.textSize === 'extra-large' && <Check size={14} className="stroke-[3]" />}
+                  </div>
                 </button>
               </div>
             </div>
 
             {/* 2. High Contrast Mode Toggle */}
-            <div className="space-y-3">
-              <SectionHeader
-                title="2. High Contrast Mode"
-                icon={<Eye size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />}
-              />
-              <div className={`rounded-2xl border p-5 ${
-                settings.highContrast ? 'bg-zinc-900 border-yellow-400' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm'
-              }`}>
-                <button
-                  type="button"
-                  onClick={toggleHighContrast}
-                  className="w-full flex items-center justify-between min-h-[60px] text-left cursor-pointer"
-                >
-                  <div className="pr-4">
-                    <span className="text-lg font-bold flex items-center gap-2">
-                      Enable High Contrast
-                      {settings.highContrast && (
-                        <span className="text-xs bg-yellow-400 text-black px-2 py-0.5 rounded font-extrabold">
-                          ACTIVE
-                        </span>
-                      )}
-                    </span>
-                    <p className={`text-base mt-1 ${settings.highContrast ? 'text-zinc-300' : 'text-slate-500 dark:text-slate-400'}`}>
-                      Deep black background, stark borders, and bold yellow accents designed for maximum visibility.
-                    </p>
-                  </div>
-
-                  <div className={`w-16 h-9 rounded-full relative transition-colors flex-shrink-0 ${
-                    settings.highContrast ? 'bg-yellow-400' : 'bg-slate-300 dark:bg-slate-600'
-                  }`}>
-                    <div className={`absolute top-1.5 w-6 h-6 rounded-full transition-transform ${
-                      settings.highContrast
-                        ? 'translate-x-8 bg-black'
-                        : 'translate-x-1.5 bg-white shadow-md'
-                    }`} />
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* 3. Voice Guidance Toggle */}
-            <div className="space-y-3">
-              <SectionHeader
-                title="3. Spoken Voice Guidance"
-                icon={<Volume2 size={22} className={settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'} />}
-              />
-              <div className={`rounded-2xl border p-5 space-y-3 ${
-                settings.highContrast ? 'bg-zinc-900 border-zinc-800' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-sm'
-              }`}>
-                <button
-                  type="button"
-                  onClick={toggleVoiceGuidance}
-                  className="w-full flex items-center justify-between min-h-[56px] text-left cursor-pointer"
-                >
-                  <div className="pr-4">
-                    <span className="text-lg font-bold">Enable Voice Instructions</span>
-                    <p className={`text-base mt-1 ${settings.highContrast ? 'text-zinc-300' : 'text-slate-500 dark:text-slate-400'}`}>
-                      Reads questions, medicine reminders, and instructions aloud.
-                    </p>
-                  </div>
-                  <div className={`w-16 h-9 rounded-full relative transition-colors flex-shrink-0 ${
-                    settings.voiceGuidance
-                      ? (settings.highContrast ? 'bg-yellow-400' : 'bg-indigo-600')
-                      : 'bg-slate-300 dark:bg-slate-600'
-                  }`}>
-                    <div className={`absolute top-1.5 w-6 h-6 rounded-full transition-transform ${
-                      settings.voiceGuidance
-                        ? (settings.highContrast ? 'translate-x-8 bg-black' : 'translate-x-8 bg-white shadow-md')
-                        : 'translate-x-1.5 bg-white shadow-md'
-                    }`} />
-                  </div>
-                </button>
-
-                {settings.voiceGuidance && (
-                  <button
-                    type="button"
-                    onClick={handleTestVoice}
-                    disabled={speaking}
-                    className={`mt-2 w-full min-h-[52px] py-3 px-4 rounded-xl flex items-center justify-center gap-2 font-bold text-base transition-colors cursor-pointer ${
-                      settings.highContrast
-                        ? 'bg-zinc-800 text-yellow-400 border border-yellow-400 hover:bg-zinc-700'
-                        : 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800/60'
-                    }`}
-                  >
-                    <Volume2 size={20} className={speaking ? 'animate-pulse' : ''} />
-                    <span>{speaking ? 'Speaking now...' : '🔊 Test Voice Audio / মাত পৰীক্ষা কৰক'}</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right Column: Dynamic Interactive Live Preview Box */}
-          <div className="md:col-span-5 sticky top-24 space-y-5">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className={`text-sm font-bold uppercase tracking-wider flex items-center gap-1.5 ${
-                  settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'
-                }`}>
-                  <Sparkles size={16} />
-                  Live Preview / লাইভ পূৰ্বদৰ্শন
-                </span>
-                <span className="text-xs px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium">
-                  {settings.textSize.toUpperCase()} • {settings.highContrast ? 'HIGH CONTRAST' : 'STANDARD'}
-                </span>
-              </div>
-
-              {/* Dynamic Mockup Screen Box */}
-              <div className={`rounded-3xl p-6 transition-all duration-300 shadow-xl ${
-                settings.highContrast
-                  ? 'bg-zinc-950 border-4 border-yellow-400 text-white'
-                  : 'bg-white dark:bg-slate-800 border-2 border-indigo-500/30 text-slate-900 dark:text-slate-100'
-              }`}>
-                {/* Mock Card Header */}
-                <div className="flex items-center justify-between border-b pb-4 mb-4 border-current opacity-70">
-                  <span className="text-xs font-bold uppercase tracking-widest">
-                    Smriti Sathi Preview
-                  </span>
-                  <span className={`text-xs px-2 py-0.5 rounded font-bold ${
-                    settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
-                  }`}>
-                    {settings.highContrast ? 'WCAG AAA (14:1)' : 'WCAG AA'}
-                  </span>
-                </div>
-
-                {/* Mock Title */}
-                <h3 className={`${headingStyles[settings.textSize]} mb-2 leading-tight ${
-                  settings.highContrast ? 'text-yellow-400' : 'text-indigo-600 dark:text-indigo-400'
-                }`}>
-                  Good Morning, Kamala Baa!
-                </h3>
-
-                {/* Mock Body */}
-                <p className={`${bodyStyles[settings.textSize]} mb-5 leading-relaxed opacity-90`}>
-                  This is how your text, reminders, and memory activities will appear on your tablet screen.
-                </p>
-
-                {/* Mock Action Card */}
-                <div className={`p-4 rounded-2xl mb-5 transition-colors ${
-                  settings.highContrast
-                    ? 'bg-zinc-900 border-2 border-yellow-400/80'
-                    : 'bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700'
-                }`}>
-                  <p className="text-xs font-bold opacity-75 uppercase tracking-wider mb-1">
-                    Morning Reminder:
-                  </p>
-                  <p className={`${bodyStyles[settings.textSize]} font-semibold`}>
-                    💧 Drink a warm glass of water & take morning tablet
-                  </p>
-                </div>
-
-                {/* Mock Interactive Button */}
-                <button
-                  type="button"
-                  className={`w-full min-h-[56px] py-4 px-6 rounded-2xl font-bold flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-md cursor-pointer ${
-                    settings.highContrast
-                      ? 'bg-yellow-400 text-black text-xl hover:bg-yellow-300 border-2 border-white'
-                      : 'bg-indigo-600 text-white text-lg hover:bg-indigo-700'
-                  }`}
-                >
-                  <Check size={22} />
-                  <span>I Took My Medicine</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Continue & Back Buttons */}
-            <div className="pt-2 space-y-3">
-              <LargeButton
-                onPress={handleNext}
-                size="lg"
-                className={settings.highContrast ? 'bg-yellow-400 text-black hover:bg-yellow-300' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}
-              >
-                Continue to Next Step
-              </LargeButton>
+            <div className="p-4 rounded-2xl bg-[var(--color-bg-subtle)] border-2 border-[var(--color-border)]">
               <button
                 type="button"
-                onClick={onBack}
-                className={`w-full min-h-[52px] py-3.5 px-4 rounded-2xl border-2 text-base font-bold transition-all cursor-pointer active:scale-95 ${
+                onClick={toggleHighContrast}
+                className="w-full flex items-center justify-between text-left cursor-pointer"
+              >
+                <div className="pr-3 flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Eye size={18} className="text-amber-500 flex-shrink-0" />
+                    <span className="text-base font-bold text-[var(--color-text)]">
+                      High Contrast Mode / উচ্চ বিপৰীত ৰূপ
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+                    Stark black background, bold yellow accents & maximum WCAG AAA legibility.
+                  </p>
+                </div>
+                <div
+                  className={`w-14 h-8 rounded-full p-1 transition-colors flex-shrink-0 flex items-center ${
+                    settings.highContrast
+                      ? 'bg-amber-500 justify-end'
+                      : 'bg-slate-300 dark:bg-slate-700 justify-start'
+                  }`}
+                >
+                  <div className="w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center">
+                    {settings.highContrast ? <Check size={13} className="text-amber-600 stroke-[3]" /> : null}
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            {/* 3. Spoken Voice Audio Guidance */}
+            <div className="p-4 rounded-2xl bg-[var(--color-bg-subtle)] border-2 border-[var(--color-border)] space-y-3">
+              <button
+                type="button"
+                onClick={toggleVoiceGuidance}
+                className="w-full flex items-center justify-between text-left cursor-pointer"
+              >
+                <div className="pr-3 flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Volume2 size={18} className="text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
+                    <span className="text-base font-bold text-[var(--color-text)]">
+                      Spoken Voice Prompts / কথাৰে সহায়
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+                    Reads aloud daily reminders, instructions, and memory game cues.
+                  </p>
+                </div>
+                <div
+                  className={`w-14 h-8 rounded-full p-1 transition-colors flex-shrink-0 flex items-center ${
+                    settings.voiceGuidance
+                      ? 'bg-indigo-600 justify-end'
+                      : 'bg-slate-300 dark:bg-slate-700 justify-start'
+                  }`}
+                >
+                  <div className="w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center">
+                    {settings.voiceGuidance ? <Check size={13} className="text-indigo-600 stroke-[3]" /> : null}
+                  </div>
+                </div>
+              </button>
+
+              {settings.voiceGuidance && (
+                <button
+                  type="button"
+                  onClick={handleTestVoice}
+                  disabled={speaking}
+                  className="w-full py-2.5 px-4 rounded-xl border-2 border-indigo-300 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer"
+                >
+                  <Volume2 size={16} className={speaking ? 'animate-pulse text-rose-500' : ''} />
+                  <span>{speaking ? 'Speaking Audio Sample...' : '🔊 Listen to Audio Sample / মাত শুনা'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column: Live High-Contrast Screen Preview */}
+          <div className="md:col-span-5 space-y-3">
+            <div className="flex items-center justify-between text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">
+              <span className="flex items-center gap-1.5">
+                <Sparkles size={14} className="text-amber-500" />
+                <span>Live Tablet Preview / পূৰ্বদৰ্শন</span>
+              </span>
+              <span className="px-2 py-0.5 rounded bg-[var(--color-bg-subtle)] border border-[var(--color-border)]">
+                {settings.textSize.toUpperCase()}
+              </span>
+            </div>
+
+            {/* Simulated Tablet Screen Preview Card */}
+            <div
+              className={`p-5 rounded-3xl border-2 transition-all shadow-md ${
+                settings.highContrast
+                  ? 'bg-black border-4 border-yellow-400 text-white'
+                  : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text)]'
+              }`}
+            >
+              <div className="flex items-center justify-between border-b pb-3 mb-3 border-[var(--color-border)] opacity-75">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider">
+                  Smriti Sathi Tablet
+                </span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold ${
+                  settings.highContrast ? 'bg-yellow-400 text-black' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300'
+                }`}>
+                  {settings.highContrast ? 'WCAG AAA' : 'High Clarity'}
+                </span>
+              </div>
+
+              {/* Sample Headline - GUARANTEED HIGH CONTRAST */}
+              <h3 className={`${headingTextClasses[settings.textSize]} leading-tight font-extrabold ${
+                settings.highContrast ? 'text-yellow-400' : 'text-[var(--color-text)]'
+              }`}>
+                Good Morning, Kamala Baa!
+              </h3>
+              <p className="text-xs font-serif text-emerald-600 dark:text-emerald-400 font-semibold mb-3">
+                নমস্কাৰ, কমলা বা!
+              </p>
+
+              <p className={`${bodyTextClasses[settings.textSize]} text-[var(--color-text-secondary)] mb-4 leading-relaxed`}>
+                This is how your medicine reminders and memory activities will look on your screen.
+              </p>
+
+              {/* Sample Reminder Widget */}
+              <div className={`p-3.5 rounded-2xl mb-4 border-2 ${
+                settings.highContrast
+                  ? 'bg-zinc-900 border-yellow-400 text-white'
+                  : 'bg-[var(--color-bg-subtle)] border-[var(--color-border)] text-[var(--color-text)]'
+              }`}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-base">💧</span>
+                  <span className="text-xs font-bold uppercase tracking-wider opacity-80">
+                    Morning Reminder (৮:০০ বজাত)
+                  </span>
+                </div>
+                <p className={`${bodyTextClasses[settings.textSize]} font-bold`}>
+                  Drink water & take blood pressure tablet
+                </p>
+              </div>
+
+              {/* Sample Button */}
+              <button
+                type="button"
+                className={`w-full py-3.5 px-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xs transition-transform active:scale-95 ${
                   settings.highContrast
-                    ? 'border-zinc-700 text-zinc-300 hover:bg-zinc-800'
-                    : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ? 'bg-yellow-400 text-black border-2 border-white'
+                    : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                 }`}
               >
-                Back to Language
+                <Check size={18} className="stroke-[3]" />
+                <span className="text-sm sm:text-base">I Took My Medicine / ঔষধ খালু</span>
               </button>
             </div>
           </div>
-
         </div>
-      </main>
+      </div>
+
+      {/* Navigation Buttons Footer */}
+      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row items-center gap-3.5">
+        <div className="w-full sm:w-2/3">
+          <LargeButton onPress={handleNext} size="lg" variant="primary">
+            <span>Continue to Review / পৰৱৰ্তী: সম্পূৰ্ণ</span>
+          </LargeButton>
+        </div>
+        <div className="w-full sm:w-1/3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="w-full min-h-[58px] sm:min-h-[64px] px-5 py-3 rounded-2xl sm:rounded-3xl border-2 border-[var(--color-border)] bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
+          >
+            <ChevronLeft size={18} />
+            <span>Back to Language</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
-

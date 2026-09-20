@@ -145,18 +145,18 @@ html.dark,
 html.theme-dark,
 body.dark,
 body.theme-dark {
-  --color-bg: #0B0F17;             /* Ultra-deep modern slate canvas */
+  --color-bg: #0B0F17;             /* Deep Himalayan midnight slate canvas */
   --color-background: #0B0F17;
-  --color-bg-subtle: #111827;      /* Subtle dark elevation */
+  --color-bg-subtle: #1E293B;      /* Slate-800 elevation */
   --color-surface: #1E293B;        /* Slate-800 card */
   --color-surface-warm: #1E293B;
   --color-surface-card: #1E293B;
   --color-card: #1E293B;           /* Primary card background */
   --color-card-hover: #334155;     /* Card hover / active */
-  --color-card-subtle: #141E30;    /* Secondary container */
-  --color-border: #334155;         /* Crisp card border (slate-800 / slate-700) */
+  --color-card-subtle: #243247;    /* Secondary container */
+  --color-border: #334155;         /* Crisp card border (slate-700) */
   --color-border-subtle: #1E293B;
-  --color-border-focus: #6366F1;
+  --color-border-focus: #818CF8;
 
   --color-text: #F8FAFC;           /* High contrast slate-50 */
   --color-text-primary: #F8FAFC;
@@ -164,30 +164,76 @@ body.theme-dark {
   --color-text-muted: #94A3B8;     /* Slate-400 */
   --color-text-inverse: #0B0F17;
 
-  --color-primary: #6366F1;        /* Luminous indigo */
-  --color-primary-hover: #4F46E5;
-  --color-primary-glow: rgba(99, 102, 241, 0.25);
-  --color-accent: #3B82F6;         /* Cobalt blue */
+  --color-primary: #818CF8;        /* Luminous high-contrast indigo */
+  --color-primary-hover: #6366F1;
+  --color-primary-glow: rgba(129, 140, 248, 0.25);
+  --color-accent: #60A5FA;         /* Sky blue */
 
-  --color-accent-teal: #10B981;
+  --color-accent-teal: #34D399;
   --color-accent-blue: #38BDF8;
-  --color-accent-purple: #A855F7;
-  --color-accent-amber: #F59E0B;
+  --color-accent-purple: #C084FC;
+  --color-accent-amber: #FBBF24;
   --color-accent-rose: #FB7185;
 
-  --color-success: #10B981;
-  --color-success-bg: rgba(16, 185, 129, 0.2);
-  --color-warning: #F59E0B;
-  --color-warning-bg: rgba(245, 158, 11, 0.2);
+  --color-success: #34D399;
+  --color-success-bg: rgba(52, 211, 153, 0.18);
+  --color-warning: #FBBF24;
+  --color-warning-bg: rgba(251, 191, 36, 0.18);
   --color-error: #F87171;
-  --color-error-bg: rgba(239, 68, 68, 0.2);
+  --color-error-bg: rgba(248, 113, 113, 0.18);
 
   --shadow-card: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 0 24px rgba(99, 102, 241, 0.25);
+  --shadow-glow: 0 0 24px rgba(129, 140, 248, 0.25);
   --shadow-nav: 0 -4px 20px rgba(0, 0, 0, 0.6);
 
   background-color: var(--color-bg) !important;
   color: var(--color-text) !important;
+}
+
+/* ==========================================================================
+   Centered Desktop & Tablet Presentation Canvas
+   ========================================================================== */
+.onboarding-screen-frame {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-bg);
+  padding: 24px 16px;
+  transition: background-color var(--transition-normal);
+}
+
+@media (min-width: 768px) {
+  .onboarding-screen-frame {
+    padding: 40px 24px;
+  }
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 860px;
+  background: var(--color-card);
+  border: 2px solid var(--color-border);
+  border-radius: 28px;
+  box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.12), 0 0 0 1px var(--color-border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+@media (max-width: 640px) {
+  .onboarding-screen-frame {
+    padding: 0;
+    justify-content: flex-start;
+  }
+  .onboarding-card {
+    border-radius: 0;
+    border: none;
+    min-height: 100dvh;
+    box-shadow: none;
+  }
 }
 
 @media (min-width: 768px) {

@@ -1,4 +1,4 @@
-import { Brain, Heart, Shield, Sun, Moon, ArrowLeft } from 'lucide-react';
+import { Brain, Heart, Shield, Sparkles } from 'lucide-react';
 import LargeButton from '../../components/LargeButton';
 import { APP } from '../../core/constants/app';
 import { useApp } from '../../context/AppContext';
@@ -6,100 +6,124 @@ import { useApp } from '../../context/AppContext';
 interface OnboardingWelcomeProps {
   onNext: () => void;
   onBack?: () => void;
+  onExploreDemo?: () => void;
 }
 
-export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeProps) {
-  const { state, toggleTheme } = useApp();
-  const isDark = state.accessibility?.theme === 'dark';
+export default function OnboardingWelcome({ onNext, onExploreDemo }: OnboardingWelcomeProps) {
+  const { skipToElderDemo } = useApp();
+
+  const handleDemoClick = () => {
+    if (onExploreDemo) {
+      onExploreDemo();
+    } else {
+      skipToElderDemo();
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-center px-4 py-8 transition-colors duration-200">
-      {/* Top Bar with Theme Toggle */}
-      <div className="max-w-5xl mx-auto w-full flex items-center justify-between pb-6">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-200/60 dark:border-indigo-800/60">
-            Northeast Elder Care Companion
-          </span>
-        </div>
-
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="w-12 h-12 flex items-center justify-center rounded-2xl bg-[var(--color-card)] text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-90 shadow-sm cursor-pointer"
-          aria-label="Toggle Theme"
-          title={isDark ? 'Light Theme' : 'Dark Theme'}
-        >
-          {isDark ? <Sun size={22} className="text-[#F59E0B]" /> : <Moon size={22} className="text-[#64748B]" />}
-        </button>
-      </div>
-
-      {/* Hero & Features Container */}
-      <div className="max-w-5xl mx-auto w-full px-2 md:px-6 py-6 md:py-12 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-        {/* Left: Branding & Tagline */}
+    <div className="p-6 sm:p-8 md:p-10 flex flex-col justify-between flex-1">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 items-center">
+        {/* Left Column: Reassuring Brand Identity */}
         <div className="md:col-span-6 flex flex-col items-center md:items-start text-center md:text-left">
-          {/* Logo */}
-          <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-slate-900 border border-slate-700/80 flex items-center justify-center mb-6 shadow-xl ring-4 ring-indigo-500/20">
-            <Brain size={54} className="text-indigo-400" />
+          {/* Luminous Logo Badge */}
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-indigo-50 dark:bg-indigo-950/80 border-2 border-indigo-200 dark:border-indigo-700/80 flex items-center justify-center mb-5 shadow-md shadow-indigo-500/10">
+            <Brain size={48} className="text-indigo-600 dark:text-indigo-400 stroke-[2.2]" />
           </div>
 
-          {/* App Name */}
-          <h1 className="text-3xl md:text-5xl font-extrabold text-[var(--color-text)] tracking-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[var(--color-text)] tracking-tight">
             {APP.name}
           </h1>
-          <p className="text-xl md:text-2xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">
-            স্মৃতি সাথী
+
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className="text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400 font-serif">
+              স্মৃতি সাথী
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+              Elder Companion
+            </span>
+          </div>
+
+          <p className="text-base sm:text-lg text-[var(--color-text-secondary)] mt-3 leading-relaxed max-w-md">
+            A serene, dignified cognitive care companion designed for elders in Northeast India. Strengthening memories, daily habits, and peace of mind.
           </p>
 
-          {/* Tagline */}
-          <p className="text-base md:text-xl text-[var(--color-text-secondary)] mt-3 max-w-md leading-relaxed">
-            {APP.tagline}
-          </p>
-          <div className="mt-4 inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800/60 px-3.5 py-1.5 rounded-full text-xs font-bold text-indigo-700 dark:text-indigo-300">
-            <span>🌿 Cognitive Care & Memory Companion</span>
+          <div className="mt-4 p-3 rounded-2xl bg-[var(--color-bg-subtle)] border border-[var(--color-border)] text-xs sm:text-sm text-[var(--color-text-muted)] flex items-center gap-2.5">
+            <Sparkles size={18} className="text-amber-500 flex-shrink-0" />
+            <span>Culturally adapted for Assamese, Bodo, Manipuri & English speakers.</span>
           </div>
         </div>
 
-        {/* Right: Feature Highlights & CTA */}
-        <div className="md:col-span-6 space-y-4">
-          <FeatureRow
-            icon={<Heart size={24} className="text-rose-500" />}
-            title="Memory Activities & Games"
-            description="Gentle, culturally attuned cognitive exercises with errorless learning"
+        {/* Right Column: Three Core Care Pillars */}
+        <div className="md:col-span-6 space-y-3.5">
+          <FeatureCard
+            icon={<Heart size={24} className="text-rose-600 dark:text-rose-400" />}
+            iconBg="bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-900"
+            title="Cognitive Games & Memory"
+            subtitle="মনোযোগ আৰু স্মৃতি খেল"
+            description="Gentle cognitive exercises designed with errorless learning to encourage and uplift."
           />
-          <FeatureRow
+          <FeatureCard
             icon={<Shield size={24} className="text-indigo-600 dark:text-indigo-400" />}
-            title="Multimodal Reminders"
-            description="Audio, picture, and family voice prompts for medicine and hydration"
+            iconBg="bg-indigo-50 dark:bg-indigo-950/60 border-indigo-200 dark:border-indigo-900"
+            title="Daily Care & Medicine Routine"
+            subtitle="দৈনিক ঔষধ আৰু পানীৰ সোঁৱৰণী"
+            description="Audible voice prompts and clear picture reminders for medicine, hydration, and visits."
           />
-          <FeatureRow
-            icon={<Brain size={24} className="text-blue-500" />}
-            title="100% Offline-First Architecture"
-            description="Runs completely locally in remote Northeast hill areas without internet"
+          <FeatureCard
+            icon={<Brain size={24} className="text-emerald-600 dark:text-emerald-400" />}
+            iconBg="bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-900"
+            title="100% Offline & Private"
+            subtitle="ইন্টাৰনেট অবিহনে সম্পূৰ্ণ সুৰক্ষিত"
+            description="All personal memory books and records stay safely on this tablet without needing internet."
           />
+        </div>
+      </div>
 
-          <div className="pt-4 space-y-3">
-            <LargeButton onPress={onNext} size="lg">
-              Begin Setup / আৰম্ভ কৰক
-            </LargeButton>
-            <p className="text-center text-xs md:text-sm text-[var(--color-text-muted)]">
-              Designed for elderly users and caregivers with high-contrast accessibility.
-            </p>
-          </div>
+      {/* Action Buttons Footer */}
+      <div className="mt-8 pt-6 border-t-2 border-[var(--color-border)] flex flex-col sm:flex-row items-center gap-3.5">
+        <div className="w-full sm:w-2/3">
+          <LargeButton onPress={onNext} size="lg" variant="primary">
+            Begin Setup / আৰম্ভ কৰক
+          </LargeButton>
+        </div>
+        <div className="w-full sm:w-1/3">
+          <button
+            type="button"
+            onClick={handleDemoClick}
+            className="w-full min-h-[58px] sm:min-h-[64px] px-5 py-3 rounded-2xl sm:rounded-3xl border-2 border-emerald-600/50 dark:border-emerald-400/50 bg-emerald-50/50 dark:bg-emerald-950/40 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 text-base font-bold transition-all active:scale-[0.98] shadow-xs cursor-pointer flex items-center justify-center gap-2"
+          >
+            <span>⚡ Demo Dashboard</span>
+          </button>
         </div>
       </div>
     </div>
   );
 }
 
-function FeatureRow({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
+function FeatureCard({
+  icon,
+  iconBg,
+  title,
+  subtitle,
+  description,
+}: {
+  icon: React.ReactNode;
+  iconBg: string;
+  title: string;
+  subtitle: string;
+  description: string;
+}) {
   return (
-    <div className="flex items-center gap-4 p-4 bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)]">
-      <div className="w-12 h-12 rounded-xl bg-[var(--color-bg-subtle)] flex items-center justify-center flex-shrink-0">
+    <div className="p-4 rounded-2xl bg-[var(--color-card)] border-2 border-[var(--color-border)] shadow-xs flex items-start gap-4 transition-all hover:border-[var(--color-primary)]">
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border ${iconBg}`}>
         {icon}
       </div>
-      <div>
-        <h3 className="text-base font-semibold text-[var(--color-text)]">{title}</h3>
-        <p className="text-sm text-[var(--color-text-secondary)]">{description}</p>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline gap-2 flex-wrap">
+          <h3 className="text-base font-bold text-[var(--color-text)] leading-snug">{title}</h3>
+          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-serif">{subtitle}</span>
+        </div>
+        <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5 leading-relaxed">{description}</p>
       </div>
     </div>
   );

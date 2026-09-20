@@ -42,13 +42,23 @@ function AppContent() {
   const { isAuthenticated, role, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
   const [navigationHistory, setNavigationHistory] = useState<string[]>(['home']);
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('smriti_splash_shown')) {
+      return false;
+    }
+    return true;
+  });
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (showSplash) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+        try { sessionStorage.setItem('smriti_splash_shown', 'true'); } catch {}
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [showSplash]);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

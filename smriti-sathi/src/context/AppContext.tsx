@@ -40,6 +40,7 @@ interface AppContextType {
   updateAccessibility: (settings: AccessibilitySettings) => Promise<void>;
   updateLanguage: (language: string) => Promise<void>;
   toggleTheme: () => void;
+  skipToElderDemo: () => Promise<void>;
 }
 
 const defaultState: AppState = {
@@ -239,6 +240,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const skipToElderDemo = async () => {
+    const demoPatient: PatientProfile = {
+      id: Date.now().toString(),
+      name: 'Kamala Baa (কমলা বা)',
+      age: 72,
+      preferredLanguage: 'as',
+      profileImage: undefined,
+      dailyRoutine: ['morning', 'afternoon'],
+      reminderPreferences: {
+        medicine: true,
+        hydration: true,
+        activity: true,
+        appointment: true,
+      },
+    };
+    await completeOnboarding(demoPatient, 'as', {
+      textSize: 'large',
+      highContrast: false,
+      voiceGuidance: true,
+      theme: 'light',
+    });
+  };
+
   return (
     <AppContext.Provider value={{
       state,
@@ -248,6 +272,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       updateAccessibility,
       updateLanguage,
       toggleTheme,
+      skipToElderDemo,
     }}>
       {children}
     </AppContext.Provider>

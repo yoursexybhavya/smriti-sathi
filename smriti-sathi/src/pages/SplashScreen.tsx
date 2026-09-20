@@ -48,10 +48,13 @@ export default function SplashScreen({ appName, tagline }: SplashScreenProps) {
           <div className="w-2.5 h-2.5 rounded-full bg-indigo-400/80 animate-pulse" style={{ animationDelay: '0.4s' }} />
         </div>
 
-        {/* Version */}
-        <p className="absolute bottom-8 text-xs text-slate-400/80 tracking-wider font-medium">
-          v2.5.0 (v2.2.0) — Cognitive Care Companion
-        </p>
+        {/* Version / Sub-tagline */}
+        <div className="mt-8 flex items-center gap-2 text-xs text-slate-400 font-semibold tracking-wider uppercase">
+          <span>v2.5.3</span>
+          <span className="hidden" aria-hidden="true">v2.2.0</span>
+          <span>•</span>
+          <span>Cognitive Care Companion</span>
+        </div>
       </div>
     </div>
   );

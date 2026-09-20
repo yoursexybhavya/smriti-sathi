@@ -47,13 +47,13 @@ jobs:
 
       - name: Prepare Release Asset
         run: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk SmritiSathi-v2.5.2.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk SmritiSathi-v2.5.3.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smriti-sathi-latest-apk
-          path: SmritiSathi-v2.5.2.apk
+          path: SmritiSathi-v2.5.3.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -61,19 +61,20 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v2.5.2
-          name: "Smriti Sathi v2.5.2 Release"
+          tag_name: v2.5.3
+          name: "Smriti Sathi v2.5.3 Release"
           body: |
-            ## Smriti Sathi — v2.5.2 Android Release
+            ## Smriti Sathi — v2.5.3 Android Release
             
-            - **Download Link**: [SmritiSathi-v2.5.2.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.2/SmritiSathi-v2.5.2.apk)
+            - **Download Link**: [SmritiSathi-v2.5.3.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.3/SmritiSathi-v2.5.3.apk)
             - **Changelog**:
-              - Complete UI/UX overhaul using modern Scandinavian design system
-              - Physical tactile 2px hardware button definitions and multi-line wrapping
-              - Friction-free dementia patient flow (zero profile-selection prompt on boot)
-              - Unblocked header and prominent 52px Settings launcher
-              - Memory Book overhaul with speech narration controls
-          files: SmritiSathi-v2.5.2.apk
+              - Complete UI/UX onboarding overhaul across all 5 steps (Welcome, Profile, Language, Display, Ready)
+              - Elimination of empty black void on desktop browsers with responsive centered container
+              - Instant "⚡ Demo Dashboard" one-click evaluation bypass
+              - WCAG AAA contrast ratio daylight palette (#F8FAFC, #FFFFFF cards, #0F172A ink)
+              - 4 Elder Profile presets (Kamala Baa, Deka Koka, Aai, Bapu) for instant setup
+              - Spoken audio test preview on Accessibility setup
+          files: SmritiSathi-v2.5.3.apk
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
