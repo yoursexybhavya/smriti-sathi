@@ -14,7 +14,7 @@ export interface User {
 export interface GameSession {
   id?: number;
   userId: number;
-  gameType: 'remember' | 'recognise' | 'test' | 'memory_match';
+  gameType: 'remember' | 'recognise' | 'test' | 'memory_match' | 'family_quiz';
   difficulty: number;
   score: number;
   totalObjects: number;
@@ -87,6 +87,10 @@ export interface MemoryItem {
   imageData?: string; // base64 encoded image
   date?: string; // optional date
   voiceNote?: string; // optional voice note placeholder
+  relation?: string; // e.g. "Grandson", "Daughter", "Son", "Spouse"
+  hobbies?: string[]; // e.g. ["Football", "Drawing"]
+  characteristics?: string[]; // e.g. ["Calls every afternoon", "Loves morning tea"]
+  phoneNumber?: string; // e.g. "+91 98765 43210"
   createdAt: number;
   updatedAt: number;
 }

@@ -24,6 +24,7 @@ import SyncTestScreen from './pages/settings/SyncTestScreen';
 import SecurityTestScreen from './pages/settings/SecurityTestScreen';
 import MemoryBookScreen from './screens/MemoryBookScreen';
 import MemoryBookViewerScreen from './screens/MemoryBookViewerScreen';
+import FamilyMemoryGame from './games/family/FamilyMemoryGame';
 import LoginScreen from './pages/auth/LoginScreen';
 import CaregiverHome from './pages/caregiver/CaregiverHome';
 import SafetyDashboard from './pages/caregiver/SafetyDashboard';
@@ -254,6 +255,8 @@ function AppContent() {
           return <MemoryBookScreen onBack={handleGoBack} onNavigate={handleNavigate} />;
         case 'memory-book-viewer':
           return <MemoryBookViewerScreen onBack={handleGoBack} onNavigate={handleNavigate} />;
+        case 'family-memory-game':
+          return <FamilyMemoryGame onBack={handleGoBack} />;
         default:
           return <PatientHomeScreen onNavigate={handleNavigate} isOnline={isOnline} />;
       }

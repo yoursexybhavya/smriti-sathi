@@ -106,8 +106,17 @@ export default function MemoryBookViewerScreen({ onBack, onNavigate }: Props) {
           </div>
 
           <div className="flex items-center gap-3">
+            {onNavigate && (
+              <button
+                type="button"
+                onClick={() => onNavigate('family-memory-game')}
+                className="flex items-center gap-2 px-4 py-2.5 min-h-[52px] bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-sm rounded-xl border-2 border-rose-700 shadow-md active:translate-y-0.5 transition-all"
+              >
+                <span>🎮 Play Family Quiz</span>
+              </button>
+            )}
             {memoryItems.length > 0 && (
-              <span className="text-sm md:text-base font-bold text-[var(--color-success)] bg-[var(--color-success-bg)] px-4 py-2 rounded-full border-2 border-[var(--color-success)]/30 shadow-sm">
+              <span className="text-sm md:text-base font-bold text-[var(--color-success)] bg-[var(--color-success-bg)] px-4 py-2 rounded-full border-2 border-[var(--color-success)]/30 shadow-sm hidden md:inline-flex">
                 {currentIndex + 1} of {memoryItems.length}
               </span>
             )}

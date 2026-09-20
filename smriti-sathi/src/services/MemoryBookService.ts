@@ -13,6 +13,31 @@ export interface MemoryItemInput {
   imageData?: string;
   date?: string;
   voiceNote?: string;
+  relation?: string;
+  hobbies?: string[];
+  characteristics?: string[];
+  phoneNumber?: string;
+}
+
+export interface FamilyQuizOption {
+  id: string;
+  label: string;
+  sublabel?: string;
+  icon?: string;
+  isCorrect: boolean;
+  audioText: string;
+}
+
+export interface FamilyQuizQuestion {
+  id: string;
+  type: 'who_is_this' | 'hobby' | 'characteristic';
+  relative: MemoryItem;
+  promptText: string;
+  promptTextRegional: string;
+  audioPrompt: string;
+  targetAnswer: string;
+  options: FamilyQuizOption[];
+  explanationText: string;
 }
 
 export class MemoryBookService {
@@ -174,17 +199,37 @@ export class MemoryBookService {
       {
         userId,
         category: 'family',
+        title: 'Aarav',
+        subject: 'Grandson / নাতি',
+        relation: 'Grandson (নাতি)',
+        hobbies: ['Playing football', 'Drawing pictures'],
+        characteristics: ['Loves grandma ladoos', 'Calls every afternoon at 4 PM'],
+        phoneNumber: '+91 98765 43210',
+        description: 'My sweet grandson Aarav. He is 8 years old. He loves playing football and brings his drawings to show me.',
+        date: '2024-01-10',
+      },
+      {
+        userId,
+        category: 'family',
         title: 'Anita',
-        subject: 'Daughter',
-        description: 'My daughter Anita. She lives in Guwahati with her family. She visits every Sunday.',
+        subject: 'Daughter / জীয়াৰী',
+        relation: 'Daughter (জীয়াৰী)',
+        hobbies: ['Gardening', 'Cooking Bihu sweets'],
+        characteristics: ['Lives in Guwahati', 'Visits every Sunday morning with fresh sweets'],
+        phoneNumber: '+91 98123 45678',
+        description: 'My daughter Anita. She lives in Guwahati with her family. She visits every Sunday and makes sweet pitha.',
         date: '2024-01-15',
       },
       {
         userId,
         category: 'family',
         title: 'Rajesh',
-        subject: 'Son',
-        description: 'My son Rajesh. He works in Delhi. He calls every evening.',
+        subject: 'Son / পুত্ৰ',
+        relation: 'Son (পুত্ৰ)',
+        hobbies: ['Morning walk', 'Reading Assamese books'],
+        characteristics: ['Doctor in Assam Medical College', 'Calls every evening at 8 PM'],
+        phoneNumber: '+91 98234 56789',
+        description: 'My son Rajesh. He works as a doctor in Assam Medical College. He calls every evening to check on my health.',
         date: '2024-02-10',
       },
       {
@@ -238,6 +283,114 @@ export class MemoryBookService {
     for (const item of sampleItems) {
       await this.createMemoryItem(item);
     }
+  }
+
+  /**
+   * Generate questions for the Family Memory Book Game
+   */
+  async getFamilyQuizQuestions(userId: number): Promise<FamilyQuizQuestion[]> {
+    let familyItems = await this.getMemoryItemsByCategory(userId, 'family');
+    
+    // Auto-seed if empty so the elder never faces a blank game
+    if (familyItems.length === 0) {
+      await this.createSampleMemories(userId);
+      familyItems = await this.getMemoryItemsByCategory(userId, 'family');
+    }
+
+    const questions: FamilyQuizQuestion[] = [];
+
+    for (const relative of familyItems) {
+      const relName = relative.title;
+      const relation = relative.relation || relative.subject || 'Family Member';
+      const hobbies = relative.hobbies && relative.hobbies.length > 0 ? relative.hobbies : ['Drinking afternoon tea'];
+
+      // 1. Who is this relative?
+      const otherRelatives = familyItems.filter(f => f.id !== relative.id);
+      const distractor1 = otherRelatives[0]?.title ? `${otherRelatives[0].title} (${otherRelatives[0].relation || otherRelatives[0].subject})` : 'Ramesh (Neighbor)';
+      const distractor2 = otherRelatives[1]?.title ? `${otherRelatives[1].title} (${otherRelatives[1].relation || otherRelatives[1].subject})` : 'Dr. Baruah (Doctor)';
+
+      const whoOptions: FamilyQuizOption[] = [
+        {
+          id: `${relative.id}-who-correct`,
+          label: relName,
+          sublabel: relation,
+          icon: '❤️',
+          isCorrect: true,
+          audioText: `${relName}, your ${relation}`,
+        },
+        {
+          id: `${relative.id}-who-w1`,
+          label: distractor1.split(' (')[0],
+          sublabel: distractor1.includes('(') ? distractor1.split('(')[1].replace(')', '') : undefined,
+          icon: '👤',
+          isCorrect: false,
+          audioText: distractor1,
+        },
+        {
+          id: `${relative.id}-who-w2`,
+          label: distractor2.split(' (')[0],
+          sublabel: distractor2.includes('(') ? distractor2.split('(')[1].replace(')', '') : undefined,
+          icon: '👤',
+          isCorrect: false,
+          audioText: distractor2,
+        },
+      ].sort(() => Math.random() - 0.5);
+
+      questions.push({
+        id: `who-${relative.id}`,
+        type: 'who_is_this',
+        relative,
+        promptText: `Who is this person in your family?`,
+        promptTextRegional: `আপোনাৰ পৰিয়ালৰ এই মৰমৰ মানুহজন কোন?`,
+        audioPrompt: `Look at this photo. Who is this person in your family?`,
+        targetAnswer: `${relName} (${relation})`,
+        options: whoOptions,
+        explanationText: `Yes, wonderful! This is ${relName}, your loving ${relation}.`,
+      });
+
+      // 2. What does this relative love doing?
+      const primaryHobby = hobbies[0];
+      const hobbyDistractor1 = primaryHobby.toLowerCase().includes('football') ? 'Singing Bihu folk songs' : 'Playing football in the field';
+      const hobbyDistractor2 = primaryHobby.toLowerCase().includes('tea') ? 'Riding a bicycle' : 'Drinking warm afternoon tea';
+
+      const hobbyOptions: FamilyQuizOption[] = [
+        {
+          id: `${relative.id}-hobby-correct`,
+          label: primaryHobby,
+          icon: primaryHobby.toLowerCase().includes('football') ? '⚽' : primaryHobby.toLowerCase().includes('tea') ? '🍵' : primaryHobby.toLowerCase().includes('gardening') ? '🌸' : '🌟',
+          isCorrect: true,
+          audioText: primaryHobby,
+        },
+        {
+          id: `${relative.id}-hobby-w1`,
+          label: hobbyDistractor1,
+          icon: hobbyDistractor1.includes('football') ? '⚽' : '🎶',
+          isCorrect: false,
+          audioText: hobbyDistractor1,
+        },
+        {
+          id: `${relative.id}-hobby-w2`,
+          label: hobbyDistractor2,
+          icon: hobbyDistractor2.includes('bicycle') ? '🚲' : '🍵',
+          isCorrect: false,
+          audioText: hobbyDistractor2,
+        },
+      ].sort(() => Math.random() - 0.5);
+
+      questions.push({
+        id: `hobby-${relative.id}`,
+        type: 'hobby',
+        relative,
+        promptText: `What does ${relName} (${relation}) love doing?`,
+        promptTextRegional: `${relName} (${relation}) এ কি কাম কৰি ভাল পায়?`,
+        audioPrompt: `What is ${relName}'s favorite hobby or activity?`,
+        targetAnswer: primaryHobby,
+        options: hobbyOptions,
+        explanationText: `Exactly! ${relName} loves ${primaryHobby}!`,
+      });
+    }
+
+    return questions;
   }
 }
 

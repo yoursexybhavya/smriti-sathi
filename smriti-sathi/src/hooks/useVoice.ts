@@ -6,7 +6,7 @@
  * while also providing an integration hook for Government of India's Bhashini API.
  */
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import type { Language } from '../i18n/translations';
 import { synthesizeBhashiniTTS } from '../services/bhashiniService';
@@ -21,6 +21,7 @@ const SPEECH_LANG_MAP: Record<Language, string[]> = {
 
 export function useVoice() {
   const { language } = useLanguage();
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -45,11 +46,16 @@ export function useVoice() {
   const speak = useCallback(async (text: string, overrideLang?: Language) => {
     const targetLang = overrideLang || language;
 
-    // Cancel previous audio if playing
+    // Stop previous audio
     if (activeAudioRef.current) {
       activeAudioRef.current.pause();
       activeAudioRef.current = null;
     }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    setIsSpeaking(true);
 
     // Try online Bhashini TTS first if navigator is online
     if (navigator.onLine && targetLang !== 'en') {
@@ -58,6 +64,8 @@ export function useVoice() {
         if (audioUri) {
           const audio = new Audio(audioUri);
           activeAudioRef.current = audio;
+          audio.onended = () => setIsSpeaking(false);
+          audio.onerror = () => setIsSpeaking(false);
           await audio.play();
           return;
         }
@@ -68,6 +76,7 @@ export function useVoice() {
 
     if (!('speechSynthesis' in window)) {
       console.warn('Speech synthesis not supported on this device');
+      setIsSpeaking(false);
       return;
     }
 
@@ -107,11 +116,29 @@ export function useVoice() {
       utterance.pitch = 1.05;
       utterance.volume = 1.0;
 
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
       window.speechSynthesis.speak(utterance);
     } catch (err) {
       console.error('Error speaking text:', err);
+      setIsSpeaking(false);
     }
   }, [language]);
+
+  /**
+   * Stop any active speech or audio synthesis
+   */
+  const stopSpeaking = useCallback(() => {
+    if (activeAudioRef.current) {
+      activeAudioRef.current.pause();
+      activeAudioRef.current = null;
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
+  }, []);
 
   /**
    * Harmonious success chime (C5 - E5 - G5 ascending arpeggio)
@@ -198,6 +225,8 @@ export function useVoice() {
 
   return {
     speak,
+    stopSpeaking,
+    isSpeaking,
     playSuccessChime,
     playCardFlip,
     playReminderChime,

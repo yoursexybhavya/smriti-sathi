@@ -463,14 +463,24 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => onNavigate('memory-book-viewer')}
-                className="w-full sm:w-auto min-h-[54px] px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-base shadow-[0_4px_12px_rgba(79,70,229,0.3)] border-2 border-indigo-400/60 transition-all active:translate-y-1 active:scale-[0.99] flex items-center justify-center gap-2 flex-shrink-0 cursor-pointer"
-                aria-label="Open Personal Memory Book"
-              >
-                <span>Open Memory Book</span>
-              </button>
+              <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => onNavigate('family-memory-game')}
+                  className="min-h-[52px] px-5 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-extrabold text-sm shadow-[0_4px_12px_rgba(225,29,72,0.3)] border-2 border-rose-400/60 transition-all active:translate-y-1 flex items-center justify-center gap-2 cursor-pointer"
+                  aria-label="Play Family Memory Quiz"
+                >
+                  <span>🎮 Family Quiz</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onNavigate('memory-book-viewer')}
+                  className="min-h-[52px] px-5 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-sm shadow-[0_4px_12px_rgba(79,70,229,0.3)] border-2 border-indigo-400/60 transition-all active:translate-y-1 flex items-center justify-center gap-2 cursor-pointer"
+                  aria-label="Open Personal Memory Book"
+                >
+                  <span>View Photos</span>
+                </button>
+              </div>
             </div>
 
             {/* Daily Comfort & Audio Anchor Card */}

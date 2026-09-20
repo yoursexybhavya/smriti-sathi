@@ -8,6 +8,8 @@ import RecogniseGame from './games/RecogniseGame';
 import RememberGame from './games/RememberGame';
 import MemoryMatchGame from './games/MemoryMatchGame';
 import DailyRoutineGame from './games/DailyRoutineGame';
+import FamilyMemoryGame from '../games/family/FamilyMemoryGame';
+import { Heart } from 'lucide-react';
 
 interface GamesScreenProps {
   onNavigate: (screen: string) => void;
@@ -32,6 +34,7 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
     loadData();
   }, [patientId]);
 
+  if (activeGame === 'family-memory-game') return <FamilyMemoryGame onBack={() => setActiveGame(null)} />;
   if (activeGame === 'recognise-game') return <RecogniseGame onBack={() => setActiveGame(null)} />;
   if (activeGame === 'remember-game') return <RememberGame onBack={() => setActiveGame(null)} />;
   if (activeGame === 'memory-match') return <MemoryMatchGame onBack={() => setActiveGame(null)} />;
@@ -105,6 +108,16 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
 
         <div className="grid gap-4 md:grid-cols-2">
           <GameCard
+            title="Family Memory Quiz"
+            desc="Recognize grandchildren, sons, daughters, and their hobbies with speech and photos."
+            icon={<Heart size={28} className="text-white fill-current" />}
+            accent="rose"
+            badge="Recommended"
+            meta={['Family Faces', 'Voice Guided']}
+            cta="Play Family Quiz"
+            onPress={() => setActiveGame('family-memory-game')}
+          />
+          <GameCard
             title="Remember"
             desc="Look at familiar objects, then recall which ones you saw."
             icon={<Eye size={28} />}
@@ -170,13 +183,19 @@ function GameCard({
   title: string;
   desc: string;
   icon: React.ReactNode;
-  accent: 'emerald' | 'sky' | 'amber';
+  accent: 'emerald' | 'sky' | 'amber' | 'rose';
   badge: string;
   meta: string[];
   cta: string;
   onPress: () => void;
 }) {
   const styles: Record<string, { wrap: string; icon: string; badge: string; cta: string }> = {
+    rose: {
+      wrap: 'bg-[linear-gradient(135deg,#FFF1F2_0%,#FFE4E6_55%,#FFFFFF_100%)] border-rose-200 hover:border-rose-300 hover:shadow-[0_16px_32px_rgba(244,63,94,0.16)]',
+      icon: 'bg-[linear-gradient(135deg,#E11D48,#F43F5E)] text-white shadow-[0_10px_20px_rgba(244,63,94,0.28)] border-white/20',
+      badge: 'bg-rose-500 text-white border-rose-600',
+      cta: 'bg-rose-600 text-white shadow-[0_8px_16px_rgba(244,63,94,0.22)]',
+    },
     emerald: {
       wrap: 'bg-[linear-gradient(135deg,#ECFDF5_0%,#F0FDF4_60%,#FFFFFF_100%)] border-emerald-200 hover:border-emerald-300 hover:shadow-[0_16px_32px_rgba(16,185,129,0.16)]',
       icon: 'bg-[linear-gradient(135deg,#059669,#10B981)] text-white shadow-[0_10px_20px_rgba(16,185,129,0.28)] border-white/20',
