@@ -26,6 +26,11 @@
    - Palette: Deep Slate (`#0F172A` / `#1E293B`), Modern Indigo (`#4F46E5`), Soft Neutral Light Canvas (`#F8FAFC`), Deep Dark Canvas (`#0B0F17`), hairline borders (`#E2E8F0` / `#334155`).
    - Tactile senior-friendly touch targets: minimum 56px–64px height.
    - No repetitive clunky SaaS card kits (monotonous thick rounded boxes with middle dots).
+4. **Instant Browser Testing & Versioned GitHub Releases on Every Change**:
+   - The user must never be forced to reinstall the APK on their tablet just to inspect changes.
+   - Always keep local development server running (`http://localhost:5173/`) and provide direct clickable links.
+   - Maintain cloud web app deployment link (`https://smriti-sathi.onrender.com`) for testing on tablet/phone browsers without installation.
+   - On completing changes, always push strict new semver tags and releases to GitHub.
 
 ---
 
