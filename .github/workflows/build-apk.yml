@@ -50,15 +50,23 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
 
+      - name: Extract App Version
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./smriti-sathi/package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
       - name: Prepare Release Asset
         run: |
-          cp smriti-sathi/android/app/build/outputs/apk/debug/app-debug.apk smriti-sathi/SmritiSathi-v2.5.2.apk
+          VERSION="${{ steps.get_version.outputs.version }}"
+          cp smriti-sathi/android/app/build/outputs/apk/debug/app-debug.apk "smriti-sathi/SmritiSathi-v${VERSION}.apk"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: smriti-sathi-debug-apk
-          path: smriti-sathi/SmritiSathi-v2.5.2.apk
+          path: "smriti-sathi/SmritiSathi-v${{ steps.get_version.outputs.version }}.apk"
           if-no-files-found: error
           retention-days: 14
 
@@ -66,13 +74,14 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v2.5.2
-          name: "Smriti Sathi v2.5.2 Release"
+          tag_name: ${{ steps.get_version.outputs.tag }}
+          name: "Smriti Sathi v${{ steps.get_version.outputs.version }} Release"
           body: |
-            ## Smriti Sathi — v2.5.2 Android Release
+            ## Smriti Sathi — v${{ steps.get_version.outputs.version }} Android Release
             
-            - **Download Link**: [SmritiSathi-v2.5.2.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.2/SmritiSathi-v2.5.2.apk)
-          files: smriti-sathi/SmritiSathi-v2.5.2.apk
+            - **Download Link**: [SmritiSathi-v${{ steps.get_version.outputs.version }}.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v${{ steps.get_version.outputs.version }}/SmritiSathi-v${{ steps.get_version.outputs.version }}.apk)
+            - **Web Browser (No Install)**: https://smriti-sathi.onrender.com
+          files: "smriti-sathi/SmritiSathi-v${{ steps.get_version.outputs.version }}.apk"
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
