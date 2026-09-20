@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pill, Calendar, Clock, Bell, Check, Edit2, Trash2, Volume2 } from 'lucide-react';
+import { Plus, Pill, Calendar, Clock, Bell, Check, Edit2, Trash2, Volume2, ArrowLeft } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
+import LargeButton from '../components/LargeButton';
 import { useApp } from '../context/AppContext';
 import { reminderService } from '../services/ReminderService';
 import { notificationService } from '../services/NotificationService';
@@ -204,27 +205,26 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
       />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         {/* Action Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="w-full flex items-center justify-center gap-2.5 bg-[#10B981] hover:bg-[#059669] text-white font-bold text-base py-3.5 px-5 rounded-2xl shadow-md active:scale-[0.98] transition-all min-h-[52px]"
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <LargeButton
+            variant="primary"
+            onPress={() => setShowCreateForm(true)}
+            icon={<Plus size={22} />}
           >
-            <Plus size={20} />
-            <span>Add New Reminder</span>
-          </button>
-          <button
-            type="button"
-            onClick={async () => {
+            Add New Reminder
+          </LargeButton>
+          <LargeButton
+            variant="secondary"
+            onPress={async () => {
               await notificationService.triggerBuzzer(
-                '🔔 Care Schedule Test Alarm',
+                'Care Schedule Test Alarm',
                 'Testing the audible chime and vibration for scheduled care routines.'
               );
             }}
-            className="w-full flex items-center justify-center gap-2.5 bg-[var(--color-bg-subtle)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-[#F59E0B] font-semibold text-base py-3.5 px-5 rounded-2xl shadow-sm active:scale-[0.98] transition-all min-h-[52px]"
+            icon={<Volume2 size={22} className="text-amber-500" />}
           >
-            <Volume2 size={20} className="text-[#F59E0B]" />
-            <span>Test Care Alarm & Buzzer</span>
-          </button>
+            Test Care Alarm
+          </LargeButton>
         </div>
 
         {/* Create/Edit Form */}
@@ -456,6 +456,17 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
           <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
             Reminders work offline. They'll sync when you're back online.
           </p>
+        </div>
+
+        {/* Back Button */}
+        <div className="pt-2">
+          <LargeButton
+            onPress={() => onNavigate('home')}
+            variant="outline"
+            icon={<ArrowLeft size={22} />}
+          >
+            Back to Home
+          </LargeButton>
         </div>
       </div>
     </>

@@ -38,7 +38,7 @@ export default function RememberResult({
             <h2 className="text-xl font-bold text-[var(--color-text)]">Activity Complete</h2>
             <p className="text-sm text-[var(--color-text-secondary)]">Memory Recall Results & Progression</p>
           </div>
-          <span className="text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
+          <span className="text-sm font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-3.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-800">
             Level {difficulty} of 5
           </span>
         </div>
@@ -47,8 +47,8 @@ export default function RememberResult({
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6 pb-12">
         {/* Success Icon */}
         <div className="flex justify-center py-2">
-          <div className="w-24 h-24 rounded-full bg-[#10B981]/15 flex items-center justify-center shadow-lg border-4 border-[#10B981]/30 animate-in zoom-in-75 duration-200">
-            <CheckCircle size={52} className="text-[#10B981]" />
+          <div className="w-24 h-24 rounded-full bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shadow-lg border-4 border-emerald-200 dark:border-emerald-800 animate-in zoom-in-75 duration-200">
+            <CheckCircle size={52} className="text-emerald-600 dark:text-emerald-400" />
           </div>
         </div>
 
@@ -65,13 +65,13 @@ export default function RememberResult({
             icon={<Target size={22} />}
             label="Score"
             value={`${score}/${targetObjects.length}`}
-            color="#10B981"
+            color="#4F46E5"
           />
           <ProgressCard
             icon={<TrendingUp size={22} />}
             label="Accuracy"
             value={`${accuracy}%`}
-            color="#E65100"
+            color="#10B981"
           />
           <ProgressCard
             icon={<Clock size={22} />}
@@ -82,10 +82,10 @@ export default function RememberResult({
         </div>
 
         {/* Level Progression Selector */}
-        <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-5 shadow-sm space-y-3">
+        <div className="bg-[var(--color-card)] rounded-3xl border border-[var(--color-border)] p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-base font-bold text-[var(--color-text)]">Select Memory Level:</span>
-            <span className="text-sm font-semibold text-[var(--color-text-secondary)]">1 (2 Objects) → 5 (6 Objects)</span>
+            <span className="text-sm font-semibold text-[var(--color-text-secondary)]">1 (2 Objects) to 5 (6 Objects)</span>
           </div>
           <div className="grid grid-cols-5 gap-2">
             {[1, 2, 3, 4, 5].map((lvl) => {
@@ -95,10 +95,10 @@ export default function RememberResult({
                   key={lvl}
                   type="button"
                   onClick={() => onSelectLevel ? onSelectLevel(lvl) : onPlayAgain()}
-                  className={`py-3 rounded-2xl font-bold text-center border-2 transition-all ${
+                  className={`py-3 rounded-2xl font-bold text-center border transition-all cursor-pointer ${
                     isCurrent
-                      ? 'bg-[#10B981] text-white border-[#059669] shadow-md scale-105'
-                      : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[#10B981]'
+                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-md scale-105 ring-2 ring-indigo-500/25'
+                      : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-indigo-300 dark:hover:border-indigo-700'
                   }`}
                 >
                   <span className="block text-lg">L{lvl}</span>
@@ -114,33 +114,30 @@ export default function RememberResult({
         {/* Actions */}
         <div className="space-y-3 pt-2">
           {canAdvance ? (
-            <button
-              type="button"
-              onClick={onNextLevel || onPlayAgain}
-              className="w-full py-4 px-6 bg-[#10B981] hover:bg-[#059669] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
+            <LargeButton
+              variant="primary"
+              onPress={onNextLevel || onPlayAgain}
+              icon={<ArrowRight size={22} />}
             >
-              <span>Advance to Level {difficulty + 1}</span>
-              <ArrowRight size={24} />
-            </button>
+              Advance to Level {difficulty + 1}
+            </LargeButton>
           ) : (
-            <button
-              type="button"
-              onClick={onPlayAgain}
-              className="w-full py-4 px-6 bg-[#10B981] hover:bg-[#059669] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
+            <LargeButton
+              variant="primary"
+              onPress={onPlayAgain}
+              icon={<RotateCcw size={22} />}
             >
-              <RotateCcw size={22} />
-              <span>Practice Level {difficulty} Again</span>
-            </button>
+              Practice Level {difficulty} Again
+            </LargeButton>
           )}
 
           {canAdvance && (
-            <button
-              type="button"
-              onClick={onPlayAgain}
-              className="w-full py-3 px-6 bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] text-base font-semibold rounded-xl border border-[var(--color-border)] transition-colors"
+            <LargeButton
+              variant="secondary"
+              onPress={onPlayAgain}
             >
               Replay Level {difficulty}
-            </button>
+            </LargeButton>
           )}
 
           <LargeButton onPress={onBackToGames} variant="outline">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Brain, Grid3X3, ArrowLeft, Sparkles, Info, Eye, Sun } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
+import LargeButton from '../components/LargeButton';
 import { useApp } from '../context/AppContext';
 import { GameStorage } from '../services/storage/GameStorage';
 import RecogniseGame from './games/RecogniseGame';
@@ -149,7 +150,7 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
                   <Sparkles size={14} className="text-[var(--color-accent-amber)]" />
                   <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-bold text-[var(--color-success)]">Start Activity →</span>
+                <span className="text-sm font-bold text-[var(--color-success)]">Start Activity</span>
               </div>
             </div>
           </Card>
@@ -186,7 +187,7 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
                   <Sparkles size={14} className="text-[var(--color-accent-amber)]" />
                   <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-bold text-[var(--color-accent-blue)]">Start Activity →</span>
+                <span className="text-sm font-bold text-[var(--color-accent-blue)]">Start Activity</span>
               </div>
             </div>
           </Card>
@@ -223,23 +224,23 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
                   <Sparkles size={14} className="text-[var(--color-accent-amber)]" />
                   <span className="text-xs text-[var(--color-text-secondary)]">Adaptive difficulty</span>
                 </div>
-                <span className="text-sm font-bold text-[var(--color-warning)]">Start Activity →</span>
+                <span className="text-sm font-bold text-[var(--color-warning)]">Start Activity</span>
               </div>
             </div>
           </Card>
 
           {/* DAILY ROUTINE Sequencing Game */}
-          <Card onPress={() => setActiveGame('daily-routine')} className="overflow-hidden cursor-pointer hover:border-[var(--color-success)] transition-all active:scale-98">
+          <Card onPress={() => setActiveGame('daily-routine')} className="overflow-hidden cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition-all active:scale-98">
             <div className="p-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-[var(--color-success)]/15 text-[var(--color-success)] border border-[var(--color-success)]/30 flex items-center justify-center flex-shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center justify-center flex-shrink-0">
                   <Sun size={32} />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="text-lg font-bold text-[var(--color-text)]">Daily Routine</h4>
-                    <span className="text-xs font-bold text-[var(--color-success)] bg-[var(--color-success)]/15 px-2 py-0.5 rounded-full border border-[var(--color-success)]/30">
-                      New
+                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                      Active
                     </span>
                   </div>
                   <p className="text-sm text-[var(--color-text-secondary)] mt-1 leading-relaxed">
@@ -260,7 +261,7 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
                   <Sparkles size={14} className="text-[var(--color-accent-amber)]" />
                   <span className="text-xs text-[var(--color-text-secondary)]">Errorless learning</span>
                 </div>
-                <span className="text-sm font-bold text-[var(--color-success)]">Start Activity →</span>
+                <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">Start Activity</span>
               </div>
             </div>
           </Card>
@@ -272,15 +273,15 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
           <Card className="p-4">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-2xl font-bold text-[var(--color-success)]">{stats.totalGames}</p>
+                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.totalGames}</p>
                 <p className="text-xs text-[var(--color-text-muted)] mt-1">Games Played</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-accent-amber)]">{stats.currentStreak}</p>
+                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.currentStreak}</p>
                 <p className="text-xs text-[var(--color-text-muted)] mt-1">Day Streak</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-[var(--color-accent-blue)]">{stats.averageAccuracy}%</p>
+                <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{stats.averageAccuracy}%</p>
                 <p className="text-xs text-[var(--color-text-muted)] mt-1">Avg. Accuracy</p>
               </div>
             </div>
@@ -288,13 +289,15 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
         </div>
 
         {/* Back Button */}
-        <button
-          onClick={() => onNavigate('home')}
-          className="flex items-center gap-2 text-[var(--color-text-secondary)] text-base font-medium px-4 py-3 rounded-xl hover:bg-[var(--color-card-hover)] transition-colors"
-        >
-          <ArrowLeft size={18} />
-          Back to Home
-        </button>
+        <div className="pt-2">
+          <LargeButton
+            onPress={() => onNavigate('home')}
+            variant="outline"
+            icon={<ArrowLeft size={22} />}
+          >
+            Back to Home
+          </LargeButton>
+        </div>
       </div>
     </>
   );

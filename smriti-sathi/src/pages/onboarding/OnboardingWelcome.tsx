@@ -14,28 +14,22 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
 
   return (
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-center px-4 py-8 transition-colors duration-200">
-      {/* Top Bar with Back & Theme Toggle */}
+      {/* Top Bar with Theme Toggle */}
       <div className="max-w-5xl mx-auto w-full flex items-center justify-between pb-6">
-        {onBack ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-95 shadow-sm text-sm font-semibold cursor-pointer"
-            aria-label="Back to Account Login"
-          >
-            <ArrowLeft size={18} />
-            <span>Switch Profile / Login</span>
-          </button>
-        ) : <div />}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-200/60 dark:border-indigo-800/60">
+            Northeast Elder Care Companion
+          </span>
+        </div>
 
         <button
           type="button"
           onClick={toggleTheme}
-          className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-90 shadow-sm cursor-pointer"
+          className="w-12 h-12 flex items-center justify-center rounded-2xl bg-[var(--color-card)] text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-90 shadow-sm cursor-pointer"
           aria-label="Toggle Theme"
           title={isDark ? 'Light Theme' : 'Dark Theme'}
         >
-          {isDark ? <Sun size={19} className="text-[#F59E0B]" /> : <Moon size={19} className="text-[#64748B]" />}
+          {isDark ? <Sun size={22} className="text-[#F59E0B]" /> : <Moon size={22} className="text-[#64748B]" />}
         </button>
       </div>
 
@@ -84,18 +78,9 @@ export default function OnboardingWelcome({ onNext, onBack }: OnboardingWelcomeP
           />
 
           <div className="pt-4 space-y-3">
-            <LargeButton onPress={onNext}>
-              Begin Setup / আৰম্ভ কৰক →
+            <LargeButton onPress={onNext} size="lg">
+              Begin Setup / আৰম্ভ কৰক
             </LargeButton>
-            {onBack && (
-              <button
-                type="button"
-                onClick={onBack}
-                className="w-full min-h-[48px] py-3 px-4 rounded-xl border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[var(--color-bg-subtle)] text-sm font-semibold transition-colors cursor-pointer"
-              >
-                ← Return to Profile Selection
-              </button>
-            )}
             <p className="text-center text-xs md:text-sm text-[var(--color-text-muted)]">
               Designed for elderly users and caregivers with high-contrast accessibility.
             </p>

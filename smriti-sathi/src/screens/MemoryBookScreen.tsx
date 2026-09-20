@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-
-import { ArrowLeft, Plus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Plus, Edit2, Trash2, Image as ImageIcon, BookOpen, Sparkles } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { memoryBookService, MemoryCategory, MemoryItemInput } from '../services/MemoryBookService';
 import { MemoryItem } from '../database/db';
-import { formatDate } from '../utils/dateUtils';
 
 interface Props { onBack?: () => void; onNavigate?: (s: string) => void; }
 export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
@@ -144,12 +142,13 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
 
   if (!userId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">No patient selected</p>
+      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center p-6">
+        <div className="text-center bg-[var(--color-card)] p-8 rounded-3xl border-2 border-[var(--color-border)] shadow-md max-w-sm w-full">
+          <p className="text-[var(--color-text-secondary)] font-medium text-lg">No patient selected</p>
           <button
+            type="button"
             onClick={() => onNavigate?.('home')}
-            className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            className="mt-6 w-full min-h-[52px] px-6 py-3 bg-gradient-to-b from-emerald-600 to-emerald-700 text-white rounded-2xl font-bold border-2 border-emerald-500/80 shadow-md active:translate-y-0.5"
           >
             Go to Home
           </button>
@@ -161,48 +160,68 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
   const categories = memoryBookService.getAllCategories();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--color-bg)] pb-12">
       {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+      <header className="bg-[var(--color-card)] border-b-2 border-[var(--color-border)] shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
               <button
-                onClick={() => onNavigate?.('home')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                type="button"
+                onClick={() => (onNavigate ? onNavigate('home') : onBack?.())}
+                className="min-h-[52px] min-w-[52px] flex items-center justify-center p-3 bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] rounded-2xl transition-all border-2 border-[var(--color-border)] shadow-sm active:translate-y-0.5 active:scale-95"
+                aria-label="Back"
               >
-                <ArrowLeft className="w-6 h-6 text-gray-600" />
+                <ArrowLeft className="w-6 h-6 text-[var(--color-text)]" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Memory Book</h1>
-                <p className="text-gray-600 mt-1">Manage memory anchors</p>
+                <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--color-text)] tracking-tight">Memory Book Manager</h1>
+                <p className="text-sm md:text-base text-[var(--color-text-secondary)] font-medium">Add and organize personal memory anchors</p>
               </div>
             </div>
-            <div className="flex gap-2">
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              {onNavigate && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate('memory-book-viewer')}
+                  className="min-h-[50px] px-4 py-2.5 bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-[var(--color-text)] font-bold rounded-2xl border-2 border-[var(--color-border)] transition-all active:translate-y-0.5 shadow-sm text-sm flex items-center gap-2"
+                >
+                  <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <span>Open Viewer</span>
+                </button>
+              )}
+
               <button
+                type="button"
                 onClick={handleCreateSampleMemories}
-                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium"
+                className="min-h-[50px] px-4 py-2.5 bg-[var(--color-card)] hover:bg-[var(--color-bg-subtle)] text-indigo-600 dark:text-indigo-400 font-bold rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 transition-all active:translate-y-0.5 shadow-sm text-sm flex items-center gap-2"
               >
-                Add Sample Memories
+                <Sparkles className="w-4 h-4" />
+                <span>Sample Anchors</span>
               </button>
+
               <button
+                type="button"
                 onClick={() => setShowForm(true)}
-                className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="min-h-[50px] flex items-center gap-2 px-5 py-2.5 bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold rounded-2xl shadow-md border-2 border-emerald-500/80 transition-all active:translate-y-0.5 active:scale-[0.99] text-sm"
+                style={{ boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3)' }}
               >
                 <Plus className="w-5 h-5" />
-                <span className="font-semibold">Add Memory</span>
+                <span>Add Memory</span>
               </button>
             </div>
           </div>
 
           {/* Category Filter */}
-          <div className="flex gap-2 mt-6 overflow-x-auto pb-2">
+          <div className="flex gap-2.5 mt-5 overflow-x-auto pb-1 scrollbar-none">
             <button
+              type="button"
               onClick={() => setSelectedCategory('all')}
-              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+              className={`min-h-[44px] px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all border-2 active:translate-y-0.5 ${
                 selectedCategory === 'all'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-[var(--color-success)] border-emerald-600 text-white shadow-md'
+                  : 'bg-[var(--color-card)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-success)]'
               }`}
             >
               All ({memoryItems.length})
@@ -210,11 +229,12 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
             {categories.map((category) => (
               <button
                 key={category}
+                type="button"
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors flex items-center gap-2 ${
+                className={`min-h-[44px] px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all flex items-center gap-2 border-2 active:translate-y-0.5 ${
                   selectedCategory === category
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-[var(--color-success)] border-emerald-600 text-white shadow-md'
+                    : 'bg-[var(--color-card)] text-[var(--color-text)] border-[var(--color-border)] hover:border-[var(--color-success)]'
                 }`}
               >
                 <span>{memoryBookService.getCategoryIcon(category)}</span>
@@ -223,26 +243,26 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
             ))}
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-4 py-6">
         {/* Form */}
         {showForm && (
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="bg-[var(--color-card)] rounded-3xl shadow-md border-2 border-[var(--color-border)] p-6 md:p-8 mb-8">
+            <h2 className="text-xl md:text-2xl font-extrabold text-[var(--color-text)] mb-6">
               {editingItem ? 'Edit Memory Item' : 'Add New Memory Item'}
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-[var(--color-text)] mb-2">
                   Category
                 </label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value as MemoryCategory })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[var(--color-card)] text-[var(--color-text)] border-2 border-[var(--color-border)] rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors font-medium text-base"
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -254,7 +274,7 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-[var(--color-text)] mb-2">
                   Title *
                 </label>
                 <input
@@ -262,63 +282,63 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g., Anita, Our Home, Wedding Day"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[var(--color-card)] text-[var(--color-text)] border-2 border-[var(--color-border)] rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors font-medium text-base"
                   required
                 />
               </div>
 
               {/* Subject */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Person/Place/Object *
+                <label className="block text-sm font-bold text-[var(--color-text)] mb-2">
+                  Person / Place / Object *
                 </label>
                 <input
                   type="text"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  placeholder="e.g., Daughter, Family House, Wedding Ring"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="e.g., Eldest Daughter, Family House in Guwahati, Wedding Ring"
+                  className="w-full px-4 py-3 bg-[var(--color-card)] text-[var(--color-text)] border-2 border-[var(--color-border)] rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors font-medium text-base"
                   required
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-[var(--color-text)] mb-2">
                   Description *
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Write a short description..."
+                  placeholder="Write a clear, loving memory description that the app can speak aloud..."
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[var(--color-card)] text-[var(--color-text)] border-2 border-[var(--color-border)] rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors font-medium text-base leading-relaxed"
                   required
                 />
               </div>
 
               {/* Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date (optional)
+                <label className="block text-sm font-bold text-[var(--color-text)] mb-2">
+                  Date or Year (optional)
                 </label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 bg-[var(--color-card)] text-[var(--color-text)] border-2 border-[var(--color-border)] rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors font-medium text-base"
                 />
               </div>
 
               {/* Image */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-bold text-[var(--color-text)] mb-2">
                   Photo (optional)
                 </label>
                 <div className="flex items-center gap-4">
-                  <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors">
-                    <ImageIcon className="w-5 h-5" />
-                    <span>Choose Image</span>
+                  <label className="min-h-[48px] flex items-center gap-2 px-5 py-2.5 bg-[var(--color-bg-subtle)] text-[var(--color-text)] border-2 border-[var(--color-border)] rounded-xl hover:border-emerald-500 cursor-pointer transition-colors font-bold text-sm shadow-sm active:translate-y-0.5">
+                    <ImageIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <span>Choose Photo</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -327,29 +347,32 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
                     />
                   </label>
                   {formData.imageData && (
-                    <img
-                      src={formData.imageData}
-                      alt="Preview"
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
+                    <div className="relative">
+                      <img
+                        src={formData.imageData}
+                        alt="Preview"
+                        className="w-20 h-20 object-cover rounded-xl border-2 border-[var(--color-border)]"
+                      />
+                    </div>
                   )}
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-4 pt-4">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+                  className="flex-1 min-h-[52px] px-6 py-3 border-2 border-[var(--color-border)] text-[var(--color-text)] bg-[var(--color-card)] rounded-2xl hover:bg-[var(--color-bg-subtle)] transition-all font-bold text-base active:translate-y-0.5 shadow-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                  className="flex-1 min-h-[52px] px-6 py-3 bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-2xl transition-all font-bold text-base active:translate-y-0.5 shadow-md border-2 border-emerald-500/80"
+                  style={{ boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3)' }}
                 >
-                  {editingItem ? 'Update' : 'Save'}
+                  {editingItem ? 'Update Memory' : 'Save Memory'}
                 </button>
               </div>
             </form>
@@ -358,61 +381,70 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
 
         {/* Memory Items List */}
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-            <p className="text-gray-600 mt-4">Loading memory items...</p>
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mx-auto"></div>
+            <p className="text-[var(--color-text-secondary)] mt-4 font-medium">Loading memory anchors...</p>
           </div>
         ) : memoryItems.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-16 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-8">
             <div className="text-6xl mb-4">📸</div>
-            <p className="text-gray-600 text-lg">No memory items yet</p>
-            <p className="text-gray-500 mt-2">Add memories to create a personal memory book</p>
+            <p className="text-xl font-bold text-[var(--color-text)]">No memory items yet</p>
+            <p className="text-[var(--color-text-secondary)] mt-2 font-medium max-w-md mx-auto">
+              Add family photos and familiar faces to create a personal memory book for cognitive grounding.
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {memoryItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                {item.imageData && (
+              <div key={item.id} className="bg-[var(--color-card)] rounded-2xl shadow-sm border-2 border-[var(--color-border)] overflow-hidden flex flex-col justify-between hover:border-emerald-500/50 transition-colors">
+                {item.imageData ? (
                   <img
                     src={item.imageData}
                     alt={item.title}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-52 object-cover border-b-2 border-[var(--color-border)]"
                   />
+                ) : (
+                  <div className="h-44 bg-[var(--color-bg-subtle)] flex items-center justify-center text-5xl border-b-2 border-[var(--color-border)]">
+                    {memoryBookService.getCategoryIcon(item.category)}
+                  </div>
                 )}
-                <div className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-2xl">{memoryBookService.getCategoryIcon(item.category)}</span>
-                        <h3 className="text-lg font-semibold text-gray-900">{item.title}</h3>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium">{item.subject}</p>
-                      <p className="text-sm text-gray-700 mt-2">{item.description}</p>
-                      {item.date && (
-                        <p className="text-xs text-gray-500 mt-2">{item.date}</p>
-                      )}
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">{memoryBookService.getCategoryIcon(item.category)}</span>
+                      <h3 className="text-lg md:text-xl font-extrabold text-[var(--color-text)]">{item.title}</h3>
                     </div>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.id!)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                    <p className="text-sm font-bold text-amber-600 dark:text-amber-400">{item.subject}</p>
+                    <p className="text-sm text-[var(--color-text-secondary)] mt-2 leading-relaxed line-clamp-3">{item.description}</p>
+                    {item.date && (
+                      <p className="text-xs text-[var(--color-text-muted)] font-medium mt-2">{item.date}</p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-4 mt-3 border-t border-[var(--color-border)]">
+                    <button
+                      type="button"
+                      onClick={() => handleEdit(item)}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2.5 text-indigo-600 dark:text-indigo-400 bg-[var(--color-card)] hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl border-2 border-[var(--color-border)] hover:border-indigo-400 transition-colors active:scale-95 shadow-sm"
+                      aria-label="Edit memory"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(item.id!)}
+                      className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2.5 text-red-600 dark:text-red-400 bg-[var(--color-card)] hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl border-2 border-[var(--color-border)] hover:border-red-400 transition-colors active:scale-95 shadow-sm"
+                      aria-label="Delete memory"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

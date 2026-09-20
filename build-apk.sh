@@ -2,7 +2,7 @@
 set -e
 
 echo "=========================================================="
-echo " Smriti Sathi — Native Android APK Builder v2.5.0"
+echo " Smriti Sathi — Native Android APK Builder v2.5.2"
 echo "=========================================================="
 
 export JAVA_HOME="/Users/krishnajangid/Library/Java/JavaVirtualMachines/jbr-21.0.11/Contents/Home"
@@ -23,13 +23,13 @@ echo "🚀 [3/3] Compiling Native Android APK..."
 cd "$APP_DIR/android"
 ./gradlew assembleDebug
 
-cp app/build/outputs/apk/debug/app-debug.apk "$ROOT_DIR/SmritiSathi-v2.5.0.apk"
-cp app/build/outputs/apk/debug/app-debug.apk "$APP_DIR/SmritiSathi-v2.5.0.apk"
-cp app/build/outputs/apk/debug/app-debug.apk "/Users/krishnajangid/Desktop/SmritiSathi-v2.5.0.apk"
+cp app/build/outputs/apk/debug/app-debug.apk "$ROOT_DIR/SmritiSathi-v2.5.2.apk"
+cp app/build/outputs/apk/debug/app-debug.apk "$APP_DIR/SmritiSathi-v2.5.2.apk"
+cp app/build/outputs/apk/debug/app-debug.apk "/Users/krishnajangid/Desktop/SmritiSathi-v2.5.2.apk"
 echo ""
 echo "=========================================================="
 echo " ✅ Build Complete!"
 echo " 📱 Native APK saved to:"
-echo "    $ROOT_DIR/SmritiSathi-v2.5.0.apk"
-echo "    /Users/krishnajangid/Desktop/SmritiSathi-v2.5.0.apk"
+echo "    $ROOT_DIR/SmritiSathi-v2.5.2.apk"
+echo "    /Users/krishnajangid/Desktop/SmritiSathi-v2.5.2.apk"
 echo "=========================================================="

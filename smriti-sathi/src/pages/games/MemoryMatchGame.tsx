@@ -29,6 +29,7 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
 
   const [phase, setPhase] = useState<Phase>('intro');
   const [difficulty, setDifficulty] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState(1);
   const [cards, setCards] = useState<CardItem[]>([]);
   const [flippedIds, setFlippedIds] = useState<string[]>([]);
   const [startTime, setStartTime] = useState(0);
@@ -173,16 +174,42 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
             </ul>
           </div>
           
-          <div className="space-y-3">
-            <LargeButton onPress={() => startGame(1)} className="bg-[#10B981] hover:bg-[#059669] text-white">
-              Start Level 1 (2 Pairs • Gentle)
+          {/* Clean Tier Selector */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold text-[var(--color-text)] mb-2 text-center">
+                Select Difficulty Tier
+              </label>
+              <div className="grid grid-cols-3 gap-2.5">
+                {[
+                  { level: 1, label: 'Gentle', sub: '2 Pairs' },
+                  { level: 2, label: 'Standard', sub: '3 Pairs' },
+                  { level: 3, label: 'Active', sub: '4 Pairs' },
+                ].map(tier => (
+                  <button
+                    key={tier.level}
+                    type="button"
+                    onClick={() => setSelectedLevel(tier.level)}
+                    className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer select-none active:scale-95 ${
+                      selectedLevel === tier.level
+                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-600 dark:border-indigo-400 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs ring-2 ring-indigo-500/20'
+                        : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-slate-300 dark:hover:border-slate-700 font-medium'
+                    }`}
+                  >
+                    <span className="block text-sm font-bold">Level {tier.level}</span>
+                    <span className="block text-xs text-[var(--color-text-muted)] mt-0.5">{tier.sub}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <LargeButton
+              variant="primary"
+              onPress={() => startGame(selectedLevel)}
+            >
+              Start Level {selectedLevel}
             </LargeButton>
-            <LargeButton onPress={() => startGame(2)} className="bg-[#E65100] hover:bg-[#D84315] text-white">
-              Start Level 2 (3 Pairs)
-            </LargeButton>
-            <LargeButton onPress={() => startGame(3)} className="bg-[#0EA5E9] hover:bg-[#0284C7] text-white">
-              Start Level 3 (4 Pairs)
-            </LargeButton>
+
             <LargeButton onPress={onBack} variant="outline">
               Back to Games Hub
             </LargeButton>
@@ -200,13 +227,13 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setPhase('intro')} 
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] border border-[var(--color-border)] transition-colors"
+              className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] border border-[var(--color-border)] transition-colors cursor-pointer active:scale-95"
               aria-label="Back"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={22} />
             </button>
             <div>
-              <h2 className="text-base font-bold text-[var(--color-text)]">Memory Match</h2>
+              <h2 className="text-base sm:text-lg font-bold text-[var(--color-text)]">Memory Match</h2>
               <span className="text-xs text-[var(--color-text-secondary)]">Level {difficulty}</span>
             </div>
           </div>
@@ -312,11 +339,11 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
 
         <div className="space-y-3 pt-2">
           {accuracy >= 70 && difficulty < 5 ? (
-            <LargeButton onPress={() => startGame(difficulty + 1)} className="bg-[#10B981] hover:bg-[#059669] text-white">
-              Advance to Level {difficulty + 1} →
+            <LargeButton variant="primary" onPress={() => startGame(difficulty + 1)}>
+              Advance to Level {difficulty + 1}
             </LargeButton>
           ) : (
-            <LargeButton onPress={() => startGame(difficulty)} className="bg-[#10B981] hover:bg-[#059669] text-white">
+            <LargeButton variant="primary" onPress={() => startGame(difficulty)}>
               Play Level {difficulty} Again
             </LargeButton>
           )}

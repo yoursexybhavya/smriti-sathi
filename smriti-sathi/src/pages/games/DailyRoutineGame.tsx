@@ -36,6 +36,7 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
 
   const [phase, setPhase] = useState<'intro' | 'play' | 'result'>('intro');
   const [difficulty, setDifficulty] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState(1);
   const [activeItems, setActiveItems] = useState<RoutineItem[]>([]);
   const [shuffledDeck, setShuffledDeck] = useState<RoutineItem[]>([]);
   const [placedSlots, setPlacedSlots] = useState<(RoutineItem | null)[]>([]);
@@ -201,34 +202,42 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
             </div>
 
             {/* Level Picker */}
-            <div className="space-y-3 pt-2">
-              <span className="block text-sm font-bold text-[var(--color-text)] text-center">Select Starting Tier:</span>
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => startLevel(1)}
-                  className="py-3.5 px-4 bg-[#10B981] hover:bg-[#059669] text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 text-center"
-                >
-                  <span className="block text-lg">Level 1</span>
-                  <span className="text-xs opacity-90">3 Steps (Gentle)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => startLevel(2)}
-                  className="py-3.5 px-4 bg-[#E65100] hover:bg-[#D84315] text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 text-center"
-                >
-                  <span className="block text-lg">Level 2</span>
-                  <span className="text-xs opacity-90">4 Steps</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => startLevel(3)}
-                  className="py-3.5 px-4 bg-[#0EA5E9] hover:bg-[#0284C7] text-white font-bold rounded-2xl shadow-md transition-all active:scale-95 text-center"
-                >
-                  <span className="block text-lg">Level 3</span>
-                  <span className="text-xs opacity-90">5 Steps</span>
-                </button>
+            <div className="space-y-4 pt-2">
+              <label className="block text-sm font-bold text-[var(--color-text)] text-center">
+                Select Starting Tier
+              </label>
+              <div className="grid grid-cols-3 gap-2.5">
+                {[
+                  { level: 1, label: 'Gentle', sub: '3 Steps' },
+                  { level: 2, label: 'Standard', sub: '4 Steps' },
+                  { level: 3, label: 'Active', sub: '5 Steps' },
+                ].map(tier => (
+                  <button
+                    key={tier.level}
+                    type="button"
+                    onClick={() => setSelectedLevel(tier.level)}
+                    className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer select-none active:scale-95 ${
+                      selectedLevel === tier.level
+                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-600 dark:border-indigo-400 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs ring-2 ring-indigo-500/20'
+                        : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-slate-300 dark:hover:border-slate-700 font-medium'
+                    }`}
+                  >
+                    <span className="block text-sm font-bold">Level {tier.level}</span>
+                    <span className="block text-xs text-[var(--color-text-muted)] mt-0.5">{tier.sub}</span>
+                  </button>
+                ))}
               </div>
+
+              <LargeButton
+                variant="primary"
+                onPress={() => startLevel(selectedLevel)}
+              >
+                Start Daily Routine
+              </LargeButton>
+
+              <LargeButton onPress={onBack} variant="outline">
+                Back to Games Hub
+              </LargeButton>
             </div>
           </div>
         </main>
@@ -250,13 +259,13 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
               <button
                 type="button"
                 onClick={() => setPhase('intro')}
-                className="w-10 h-10 bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] rounded-xl flex items-center justify-center transition-colors border border-[var(--color-border)] text-[var(--color-text)]"
+                className="w-12 h-12 min-w-[48px] min-h-[48px] bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] rounded-2xl flex items-center justify-center transition-colors border border-[var(--color-border)] text-[var(--color-text)] cursor-pointer active:scale-95"
                 aria-label="Back"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={22} />
               </button>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-[var(--color-text)]">Arrange in Chronological Order</h2>
+                <h2 className="text-base sm:text-lg font-bold text-[var(--color-text)]">Arrange in Chronological Order</h2>
                 <p className="text-xs text-[var(--color-text-secondary)]">Tap an item from below, then tap its slot</p>
               </div>
             </div>
@@ -430,23 +439,21 @@ export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
         {/* Action Buttons */}
         <div className="space-y-3 pt-2">
           {canAdvance ? (
-            <button
-              type="button"
-              onClick={() => startLevel(difficulty + 1)}
-              className="w-full py-4 px-6 bg-[#10B981] hover:bg-[#059669] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
+            <LargeButton
+              variant="primary"
+              onPress={() => startLevel(difficulty + 1)}
+              icon={<ArrowRight size={22} />}
             >
-              <span>Advance to Level {difficulty + 1}</span>
-              <ArrowRight size={24} />
-            </button>
+              Advance to Level {difficulty + 1}
+            </LargeButton>
           ) : (
-            <button
-              type="button"
-              onClick={() => startLevel(difficulty)}
-              className="w-full py-4 px-6 bg-[#10B981] hover:bg-[#059669] text-white text-xl font-bold rounded-2xl flex items-center justify-center gap-3 shadow-lg transition-transform active:scale-95"
+            <LargeButton
+              variant="primary"
+              onPress={() => startLevel(difficulty)}
+              icon={<RotateCcw size={22} />}
             >
-              <RotateCcw size={22} />
-              <span>Practice Level {difficulty} Again</span>
-            </button>
+              Practice Level {difficulty} Again
+            </LargeButton>
           )}
 
           <LargeButton onPress={onBack} variant="outline">

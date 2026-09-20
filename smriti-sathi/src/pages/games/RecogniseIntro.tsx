@@ -15,7 +15,7 @@ export default function RecogniseIntro({ onStart, onBack }: RecogniseIntroProps)
         <div className="max-w-2xl mx-auto flex items-center gap-3 px-4 py-4">
           <button
             onClick={onBack}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] transition-colors"
+            className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] border border-[var(--color-border)] transition-colors cursor-pointer active:scale-95"
             aria-label="Go back"
           >
             <ArrowLeft size={22} />
@@ -30,8 +30,8 @@ export default function RecogniseIntro({ onStart, onBack }: RecogniseIntroProps)
       <div className="max-w-2xl mx-auto px-5 py-8 space-y-8">
         {/* Icon */}
         <div className="flex justify-center">
-          <div className="w-32 h-32 rounded-3xl bg-[#E65100]/15 border-2 border-[#E65100]/30 flex items-center justify-center shadow-md">
-            <Eye size={64} className="text-[#E65100]" />
+          <div className="w-32 h-32 rounded-3xl bg-indigo-50 dark:bg-indigo-950/60 border-2 border-indigo-200 dark:border-indigo-800 flex items-center justify-center shadow-md">
+            <Eye size={64} className="text-indigo-600 dark:text-indigo-400" />
           </div>
         </div>
 
@@ -109,7 +109,7 @@ export default function RecogniseIntro({ onStart, onBack }: RecogniseIntroProps)
 function InstructionStep({ number, text }: { number: number; text: string }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="w-8 h-8 rounded-full bg-[#E65100] text-white flex items-center justify-center flex-shrink-0 font-bold">
+      <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 font-bold">
         {number}
       </div>
       <p className="text-base text-[var(--color-text)] pt-1">{text}</p>

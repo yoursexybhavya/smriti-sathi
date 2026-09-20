@@ -402,20 +402,21 @@ export default function AccessibilitySetup({
             <div className="pt-2 space-y-3">
               <LargeButton
                 onPress={handleNext}
+                size="lg"
                 className={settings.highContrast ? 'bg-yellow-400 text-black hover:bg-yellow-300' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}
               >
-                Continue to Next Step →
+                Continue to Next Step
               </LargeButton>
               <button
                 type="button"
                 onClick={onBack}
-                className={`w-full min-h-[48px] py-3 px-4 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
+                className={`w-full min-h-[52px] py-3.5 px-4 rounded-2xl border-2 text-base font-bold transition-all cursor-pointer active:scale-95 ${
                   settings.highContrast
                     ? 'border-zinc-700 text-zinc-300 hover:bg-zinc-800'
-                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
+                    : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
-                ← Back to Language
+                Back to Language
               </button>
             </div>
           </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { TrendingUp, Brain, Grid3X3, Calendar, Award, ArrowLeft, Activity } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
+import LargeButton from '../components/LargeButton';
 import { useApp } from '../context/AppContext';
 import { progressAnalytics, ProgressMetrics } from '../services/ProgressAnalytics';
 
@@ -195,13 +196,15 @@ export default function ProgressScreen({ onNavigate, isOnline = true }: Progress
         </p>
 
         {/* Back Button */}
-        <button
-          onClick={() => onNavigate('home')}
-          className="flex items-center gap-2 text-[var(--color-text-secondary)] text-base font-medium px-4 py-3 rounded-xl hover:bg-[var(--color-card-hover)] transition-colors"
-        >
-          <ArrowLeft size={18} />
-          Back to Home
-        </button>
+        <div className="pt-2">
+          <LargeButton
+            onPress={() => onNavigate('home')}
+            variant="outline"
+            icon={<ArrowLeft size={22} />}
+          >
+            Back to Home
+          </LargeButton>
+        </div>
       </div>
     </>
   );

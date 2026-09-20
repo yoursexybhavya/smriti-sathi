@@ -86,11 +86,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
             },
           };
 
+          const savedTheme = (typeof window !== 'undefined' && localStorage.getItem('smriti_sathi_theme') === 'dark') ? 'dark' : 'light';
           const accessibility: AccessibilitySettings = settings ? {
             textSize: settings.textSize,
             highContrast: settings.highContrast,
             voiceGuidance: settings.voiceGuidance,
-          } : defaultState.accessibility;
+            theme: (settings as any).theme || savedTheme,
+          } : { ...defaultState.accessibility, theme: savedTheme };
 
           setState({
             onboardingComplete: true,
@@ -189,6 +191,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           voiceGuidance: settings.voiceGuidance,
         });
       }
+      if (settings.theme) {
+        localStorage.setItem('smriti_sathi_theme', settings.theme);
+      }
       setState(prev => ({ ...prev, accessibility: settings }));
     } catch (error) {
       console.error('Failed to update accessibility:', error);
@@ -211,8 +216,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => {
     setState(prev => {
       const nextTheme = prev.accessibility?.theme === 'dark' ? 'light' : 'dark';
+      const isDark = nextTheme === 'dark';
       try {
         localStorage.setItem('smriti_sathi_theme', nextTheme);
+        const rootEl = document.documentElement;
+        const bodyEl = document.body;
+        rootEl.classList.toggle('dark', isDark);
+        rootEl.classList.toggle('theme-dark', isDark);
+        rootEl.classList.toggle('theme-light', !isDark);
+        bodyEl.classList.toggle('dark', isDark);
+        bodyEl.classList.toggle('theme-dark', isDark);
+        bodyEl.classList.toggle('theme-light', !isDark);
+        rootEl.style.colorScheme = isDark ? 'dark' : 'light';
       } catch {}
       return {
         ...prev,

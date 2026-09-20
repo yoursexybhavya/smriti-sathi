@@ -17,8 +17,8 @@ chmod +x gradlew
 cd ..
 
 APK_SOURCE="android/app/build/outputs/apk/debug/app-debug.apk"
-APK_TARGET="SmritiSathi-v2.5.0.apk"
-DESKTOP_TARGET="/Users/krishnajangid/Desktop/SmritiSathi-v2.5.0.apk"
+APK_TARGET="SmritiSathi-v2.5.2.apk"
+DESKTOP_TARGET="/Users/krishnajangid/Desktop/SmritiSathi-v2.5.2.apk"
 
 if [ -f "$APK_SOURCE" ]; then
   cp "$APK_SOURCE" "$APK_TARGET"

@@ -47,9 +47,9 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
               Select the objects you remember seeing
             </p>
           </div>
-          <div className="flex items-center gap-2 bg-[var(--color-bg-subtle)] px-3 py-1.5 rounded-full border border-[var(--color-border)]">
+          <div className="flex items-center gap-2 bg-[var(--color-bg-subtle)] px-3.5 py-1.5 rounded-full border border-[var(--color-border)]">
             <span className="text-xs font-semibold text-[var(--color-text-secondary)]">Selected:</span>
-            <span className="text-base font-bold text-[#10B981]">
+            <span className="text-base font-bold text-indigo-600 dark:text-indigo-400">
               {selectedIds.size}
             </span>
           </div>
@@ -68,10 +68,10 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
                   onClick={() => toggleObject(obj)}
                   className={`
                     relative bg-[var(--color-card)] rounded-3xl border-2 p-4 flex flex-col items-center justify-center aspect-square
-                    transition-all active:scale-95 shadow-sm
+                    transition-all active:scale-95 shadow-sm cursor-pointer
                     ${isSelected 
-                      ? 'border-[#10B981] bg-[#10B981]/15 shadow-md ring-4 ring-[#10B981]/25 scale-102' 
-                      : 'border-[var(--color-border)] hover:border-[#10B981]'
+                      ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50/80 dark:bg-indigo-950/60 shadow-md ring-4 ring-indigo-500/20 scale-102' 
+                      : 'border-[var(--color-border)] hover:border-indigo-300 dark:hover:border-indigo-700'
                     }
                   `}
                   aria-pressed={isSelected}
@@ -84,7 +84,7 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
                     {obj.name}
                   </p>
                   {isSelected && (
-                    <div className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-[#10B981] flex items-center justify-center shadow-sm animate-in fade-in zoom-in duration-150">
+                    <div className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-sm animate-in fade-in zoom-in duration-150">
                       <Check size={16} className="text-white stroke-[3]" />
                     </div>
                   )}
@@ -101,9 +101,9 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
           <LargeButton 
             onPress={handleSubmit}
             disabled={selectedIds.size === 0}
-            className={selectedIds.size > 0 ? 'bg-[#10B981] text-white hover:bg-[#059669]' : ''}
+            variant={selectedIds.size > 0 ? 'primary' : 'secondary'}
           >
-            {selectedIds.size > 0 ? `Confirm Selection (${selectedIds.size}) ✓` : 'Tap objects to select'}
+            {selectedIds.size > 0 ? `Confirm Selection (${selectedIds.size})` : 'Tap objects to select'}
           </LargeButton>
           <p className="text-center text-xs text-[var(--color-text-muted)]">
             Tap an object to select or deselect it. Take all the time you need.

@@ -34,10 +34,10 @@ export default function RememberMemorize({ objects, memorizeTime, onComplete }: 
         <div className="max-w-xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Eye size={24} className="text-[#10B981]" />
+              <Eye size={24} className="text-indigo-600 dark:text-indigo-400" />
               <h2 className="text-xl font-bold text-[var(--color-text)]">Look Carefully</h2>
             </div>
-            <div className="text-2xl font-bold text-[#E65100] bg-[#E65100]/15 px-3 py-0.5 rounded-full border border-[#E65100]/30">
+            <div className="text-2xl font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-3.5 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
               {timeLeft}s
             </div>
           </div>
@@ -50,7 +50,7 @@ export default function RememberMemorize({ objects, memorizeTime, onComplete }: 
       {/* Progress Bar */}
       <div className="bg-[var(--color-border)] h-2">
         <div 
-          className="h-full bg-[#10B981] transition-all duration-1000 ease-linear"
+          className="h-full bg-indigo-600 transition-all duration-1000 ease-linear"
           style={{ width: `${(timeLeft / memorizeTime) * 100}%` }}
         />
       </div>

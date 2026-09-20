@@ -58,33 +58,33 @@ export default function RecognisePlay({
               <button
                 type="button"
                 onClick={onBack}
-                className="w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] border border-[var(--color-border)] transition-colors"
+                className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] border border-[var(--color-border)] transition-colors cursor-pointer active:scale-95"
                 aria-label="Back to Game Menu"
                 title="Back to Game Menu"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={22} />
               </button>
             )}
             {questionNumber && totalQuestions && (
-              <span className="text-xs sm:text-sm font-bold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-3 py-1 rounded-full border border-[var(--color-border)]">
+              <span className="text-xs sm:text-sm font-bold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-3.5 py-1.5 rounded-full border border-[var(--color-border)]">
                 Question {questionNumber} of {totalQuestions}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             {difficulty && (
-              <span className="text-xs sm:text-sm font-bold text-[#E65100] bg-[#E65100]/15 px-3 py-1 rounded-full border border-[#E65100]/30">
+              <span className="text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-3.5 py-1.5 rounded-full border border-indigo-200 dark:border-indigo-800">
                 Level {difficulty} of 5
               </span>
             )}
             <button
               type="button"
               onClick={() => speak(activity.question)}
-              className="w-10 h-10 rounded-xl bg-[#10B981]/15 hover:bg-[#10B981]/25 flex items-center justify-center text-[#10B981] border border-[#10B981]/30 flex-shrink-0 transition-colors"
+              className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex-shrink-0 transition-colors cursor-pointer active:scale-95"
               title="Read question aloud"
               aria-label="Read question aloud"
             >
-              <Volume2 size={20} />
+              <Volume2 size={22} />
             </button>
           </div>
         </div>
@@ -114,10 +114,10 @@ export default function RecognisePlay({
                     key={i}
                     type="button"
                     onClick={() => handleSelect(obj.imageUrl, obj.name)}
-                    className={`relative w-full rounded-3xl border-3 p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all active:scale-95 shadow-sm min-h-[160px] sm:min-h-[190px] ${
+                    className={`relative w-full rounded-3xl border-2 p-4 sm:p-6 flex flex-col items-center justify-center text-center transition-all active:scale-95 shadow-sm min-h-[160px] sm:min-h-[190px] cursor-pointer ${
                       isSelected
-                        ? 'border-[#E65100] bg-[#E65100]/15 shadow-lg scale-102 ring-4 ring-[#E65100]/25'
-                        : 'border-[var(--color-border)] bg-[var(--color-card)] hover:border-[#10B981]'
+                        ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50/80 dark:bg-indigo-950/60 shadow-lg scale-102 ring-4 ring-indigo-500/20'
+                        : 'border-[var(--color-border)] bg-[var(--color-card)] hover:border-indigo-300 dark:hover:border-indigo-700'
                     }`}
                   >
                     {/* Object Image */}
@@ -135,14 +135,14 @@ export default function RecognisePlay({
 
                     {/* Object Name Label */}
                     <span className={`text-base sm:text-lg font-bold ${
-                      isSelected ? 'text-[#E65100]' : 'text-[var(--color-text)]'
+                      isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-[var(--color-text)]'
                     }`}>
                       {obj.name}
                     </span>
 
                     {/* Selection Checkmark Badge */}
                     {isSelected && (
-                      <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#E65100] flex items-center justify-center shadow-md animate-in fade-in zoom-in duration-150">
+                      <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center shadow-md animate-in fade-in zoom-in duration-150">
                         <Check size={20} className="text-white stroke-[3]" />
                       </div>
                     )}
@@ -156,9 +156,9 @@ export default function RecognisePlay({
               <LargeButton
                 onPress={handleSubmit}
                 disabled={!selectedOption}
-                className={selectedOption ? 'bg-[#E65100] text-white hover:bg-[#D84315]' : ''}
+                variant={selectedOption ? 'primary' : 'secondary'}
               >
-                {selectedOption ? 'Confirm Answer ✓' : 'Tap an image to select'}
+                {selectedOption ? 'Confirm Answer' : 'Tap an image to select'}
               </LargeButton>
             </div>
           </div>
@@ -187,20 +187,20 @@ export default function RecognisePlay({
                 <span className="text-lg sm:text-xl font-bold text-[var(--color-text-muted)]">→</span>
 
                 {/* Target Gap Slot with Live Selection Preview */}
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-3 flex flex-col items-center justify-center p-2 shadow-sm transition-all ${
+                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 flex flex-col items-center justify-center p-2 shadow-sm transition-all ${
                   selectedOption
-                    ? 'border-[#10B981] bg-[#10B981]/15 border-dashed ring-2 ring-[#10B981]/30'
-                    : 'border-[#E65100] bg-[#E65100]/15 border-dashed'
+                    ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50/80 dark:bg-indigo-950/60 border-dashed ring-2 ring-indigo-500/20'
+                    : 'border-indigo-400 dark:border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/40 border-dashed'
                 }`}>
                   {selectedOption ? (
                     <>
                       <img src={selectedOption} alt="Selected" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
-                      <span className="text-[10px] sm:text-xs font-bold text-[#10B981] truncate">
+                      <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate">
                         {getObjectDetails(selectedOption)?.name || 'Choice'}
                       </span>
                     </>
                   ) : (
-                    <span className="text-2xl font-bold text-[#E65100]">?</span>
+                    <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">?</span>
                   )}
                 </div>
               </div>
@@ -269,20 +269,20 @@ export default function RecognisePlay({
                   return (
                     <div key={i} className="flex items-center gap-2">
                       {isGap ? (
-                        <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-3 flex flex-col items-center justify-center p-2 shadow-sm transition-all ${
+                        <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 flex flex-col items-center justify-center p-2 shadow-sm transition-all ${
                           selectedOption
-                            ? 'border-[#10B981] bg-[#10B981]/15 border-dashed ring-2 ring-[#10B981]/30'
-                            : 'border-[#E65100] bg-[#E65100]/15 border-dashed'
+                            ? 'border-indigo-600 dark:border-indigo-400 bg-indigo-50/80 dark:bg-indigo-950/60 border-dashed ring-2 ring-indigo-500/20'
+                            : 'border-indigo-400 dark:border-indigo-600 bg-indigo-50/40 dark:bg-indigo-950/40 border-dashed'
                         }`}>
                           {selectedOption ? (
                             <>
                               <img src={selectedOption} alt="Selected" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
-                              <span className="text-[10px] sm:text-xs font-bold text-[#10B981] truncate">
+                              <span className="text-[10px] sm:text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate">
                                 {getObjectDetails(selectedOption)?.name || 'Choice'}
                               </span>
                             </>
                           ) : (
-                            <span className="text-2xl font-bold text-[#E65100]">?</span>
+                            <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">?</span>
                           )}
                         </div>
                       ) : (
@@ -340,9 +340,9 @@ export default function RecognisePlay({
                 <LargeButton
                   onPress={handleSubmit}
                   disabled={!selectedOption}
-                  className={selectedOption ? 'bg-[#10B981] text-white hover:bg-[#059669]' : ''}
+                  variant={selectedOption ? 'success' : 'secondary'}
                 >
-                  {selectedOption ? 'Confirm Answer ✓' : 'Select missing item above'}
+                  {selectedOption ? 'Confirm Answer' : 'Select an item above'}
                 </LargeButton>
               </div>
             </div>

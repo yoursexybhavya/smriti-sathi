@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import BottomNav from './components/BottomNav';
 import ScreenContainer from './components/ScreenContainer';
 import SyncStatusIndicator from './components/SyncStatusIndicator';
@@ -68,15 +68,17 @@ function AppContent() {
     const bodyEl = document.body;
 
     if (isDark) {
-      rootEl.classList.add('theme-dark');
+      rootEl.classList.add('dark', 'theme-dark');
       rootEl.classList.remove('theme-light');
-      bodyEl.classList.add('theme-dark');
+      bodyEl.classList.add('dark', 'theme-dark');
       bodyEl.classList.remove('theme-light');
+      rootEl.style.colorScheme = 'dark';
     } else {
       rootEl.classList.add('theme-light');
-      rootEl.classList.remove('theme-dark');
+      rootEl.classList.remove('dark', 'theme-dark');
       bodyEl.classList.add('theme-light');
-      bodyEl.classList.remove('theme-dark');
+      bodyEl.classList.remove('dark', 'theme-dark');
+      rootEl.style.colorScheme = 'light';
     }
   }, [state.accessibility?.theme]);
 
@@ -95,7 +97,10 @@ function AppContent() {
 
   // Navigate forward and track history
   const handleNavigate = (screen: string) => {
-    setNavigationHistory(prev => [...prev, screen]);
+    setNavigationHistory(prev => {
+      if (prev[prev.length - 1] === screen) return prev;
+      return [...prev, screen];
+    });
     setActiveTab(screen);
   };
 
@@ -118,7 +123,12 @@ function AppContent() {
     return false;
   };
 
-  // Hardware and Gesture Back Button Listener (Capacitor Android)
+  const handleGoBackRef = useRef(handleGoBack);
+  useEffect(() => {
+    handleGoBackRef.current = handleGoBack;
+  });
+
+  // Hardware and Gesture Back Button Listener (Capacitor Android) - registered once on mount
   useEffect(() => {
     let backListener: any = null;
 
@@ -126,7 +136,7 @@ function AppContent() {
       try {
         const { App: CapApp } = await import('@capacitor/app');
         backListener = await CapApp.addListener('backButton', () => {
-          const handled = handleGoBack();
+          const handled = handleGoBackRef.current();
           if (!handled) {
             // On root screen: exit/minimize app cleanly, never dump the elder into login
             CapApp.exitApp();
@@ -144,7 +154,7 @@ function AppContent() {
         backListener.remove();
       }
     };
-  }, [navigationHistory, activeTab]);
+  }, []);
 
   // Initialize native care alarms and channels on mount
   useEffect(() => {
@@ -161,16 +171,23 @@ function AppContent() {
     }
   }, [state.currentPatient?.id, state.currentPatient?.name]);
 
-  // Set initial tab based on role after login
+  // Set initial tab based on role after login only if current tab is invalid for role
   useEffect(() => {
     if (isAuthenticated) {
-      const rootScreen = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
-      setNavigationHistory([rootScreen]);
-      setActiveTab(rootScreen);
+      const isCaregiver = role === UserRole.CAREGIVER;
+      const validPatientTabs = ['home', 'games', 'remember-game', 'recognise-game', 'memory-match', 'daily-routine', 'reminders', 'progress', 'settings', 'memory-book', 'memory-book-viewer'];
+      const validCaregiverTabs = ['caregiver-home', 'caregiver-reminders', 'caregiver-memory', 'caregiver-settings', 'safety-dashboard', 'sync-tests', 'security-tests', 'adaptive-tests', 'database-tests', 'reminder-tests', 'voice-language-tests'];
+
+      const currentValid = isCaregiver ? validCaregiverTabs.includes(activeTab) : validPatientTabs.includes(activeTab);
+      if (!currentValid) {
+        const rootScreen = isCaregiver ? 'caregiver-home' : 'home';
+        setNavigationHistory([rootScreen]);
+        setActiveTab(rootScreen);
+      }
     }
   }, [isAuthenticated, role]);
 
-  if (showSplash) {
+  if (showSplash || state.isLoading) {
     return <SplashScreen appName={APP.name} tagline={APP.tagline} />;
   }
 
@@ -228,7 +245,7 @@ function AppContent() {
         case 'memory-book':
           return <MemoryBookScreen onBack={handleGoBack} onNavigate={handleNavigate} />;
         case 'memory-book-viewer':
-          return <MemoryBookViewerScreen onBack={handleGoBack} />;
+          return <MemoryBookViewerScreen onBack={handleGoBack} onNavigate={handleNavigate} />;
         default:
           return <PatientHomeScreen onNavigate={handleNavigate} isOnline={isOnline} />;
       }
@@ -276,17 +293,13 @@ function AppContent() {
 
   return (
     <ScreenContainer>
-      <div className="relative">
+      <div className="relative min-h-screen">
         <UpdateNotifier />
-        {/* Sync Status Indicator - always visible, unobtrusive */}
-        <div className="fixed top-2 right-2 z-50">
-          <SyncStatusIndicator compact showDetails={false} />
-        </div>
         {renderScreen()}
         {showBottomNav && (
           <BottomNav 
             activeTab={activeTab} 
-            onTabChange={setActiveTab}
+            onTabChange={handleNavigate}
             role={role}
           />
         )}

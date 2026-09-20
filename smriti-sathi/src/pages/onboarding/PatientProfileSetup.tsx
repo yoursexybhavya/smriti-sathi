@@ -181,15 +181,15 @@ export default function PatientProfileSetup({ onNext, onBack }: PatientProfileSe
 
             {/* Continue Button */}
             <div className="pt-4 space-y-3">
-              <LargeButton onPress={handleNext} disabled={!canProceed}>
-                Continue to Language →
+              <LargeButton onPress={handleNext} disabled={!canProceed} size="lg">
+                Continue to Language
               </LargeButton>
               <button
                 type="button"
                 onClick={onBack}
-                className="w-full min-h-[48px] py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-sm font-semibold transition-colors cursor-pointer"
+                className="w-full min-h-[52px] py-3.5 px-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 text-base font-bold transition-all cursor-pointer active:scale-95"
               >
-                ← Back to Welcome
+                Back to Welcome
               </button>
             </div>
           </div>

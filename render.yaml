@@ -3,7 +3,7 @@ services:
     name: smriti-sathi
     runtime: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && npm run build
     startCommand: node smriti-sathi/server/index.js
     healthCheckPath: /health
     envVars:

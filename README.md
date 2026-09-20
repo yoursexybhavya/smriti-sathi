@@ -22,9 +22,10 @@
 
 There is **only one** official download link for the Smriti Sathi app. This link will always securely provide the latest compiled Android version directly to your device. 
 
-[![Download APK](https://img.shields.io/badge/Download%20APK-SmritiSathi--v2.5.0.apk-brightgreen?style=for-the-badge&logo=android)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.0/SmritiSathi-v2.5.0.apk)
+[![Download APK](https://img.shields.io/badge/Download%20APK-SmritiSathi--v2.5.2.apk-brightgreen?style=for-the-badge&logo=android)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.2/SmritiSathi-v2.5.2.apk)
 
-🔗 **[Direct Download: https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.0/SmritiSathi-v2.5.0.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.0/SmritiSathi-v2.5.0.apk)**
+🔗 **[Direct APK Download: SmritiSathi-v2.5.2.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.5.2/SmritiSathi-v2.5.2.apk)**  
+🌐 **[Try Directly in Browser (No Installation Required): https://smriti-sathi.onrender.com](https://smriti-sathi.onrender.com)**
 
 ### Quick Tablet Installation Steps:
 1. Open Chrome or any browser on your Android tablet/phone.

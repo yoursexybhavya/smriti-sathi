@@ -14,6 +14,23 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('smriti_sathi_theme');
+          var isDark = t === 'dark';
+          if (isDark) {
+            document.documentElement.classList.add('dark', 'theme-dark');
+            document.documentElement.classList.remove('theme-light');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.add('theme-light');
+            document.documentElement.classList.remove('dark', 'theme-dark');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch(e) {}
+      })();
+    </script>
     <style>
       html, body {
         margin: 0;
