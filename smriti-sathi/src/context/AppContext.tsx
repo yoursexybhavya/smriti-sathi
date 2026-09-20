@@ -103,6 +103,38 @@ export function AppProvider({ children }: { children: ReactNode }) {
             isLoading: false,
           });
         } else {
+          if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('demo') === 'true' || (params.get('role') === 'patient' && !params.has('step'))) {
+              const demoPatient: PatientProfile = {
+                id: '1',
+                name: 'Kamala Baa',
+                age: 72,
+                preferredLanguage: 'as',
+                profileImage: '👵',
+                dailyRoutine: ['morning', 'afternoon'],
+                reminderPreferences: {
+                  medicine: true,
+                  hydration: true,
+                  activity: true,
+                  appointment: true,
+                },
+              };
+              setState({
+                onboardingComplete: true,
+                currentPatient: demoPatient,
+                interfaceLanguage: 'as',
+                accessibility: {
+                  textSize: 'large',
+                  highContrast: false,
+                  voiceGuidance: true,
+                  theme: 'light',
+                },
+                isLoading: false,
+              });
+              return;
+            }
+          }
           setState(prev => ({ ...prev, isLoading: false }));
         }
       } catch (error) {

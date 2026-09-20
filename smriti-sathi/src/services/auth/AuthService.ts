@@ -40,24 +40,24 @@ export interface UserProfile {
   linkedPatientId?: string;
 }
 
-const DEFAULT_USERS: UserProfile[] = [
+export const DEFAULT_USERS: UserProfile[] = [
   {
     id: 'patient_primary',
     role: UserRole.PATIENT,
-    displayName: 'Elder (Self / Patient)',
+    displayName: 'Elderly Patient (Elder / Self)',
     pin: '', // No PIN for elderly patients
   },
   {
     id: 'caregiver_primary',
     role: UserRole.CAREGIVER,
-    displayName: 'Family Caregiver',
+    displayName: 'Son / Family Guardian',
     pin: '1234',
     linkedPatientId: 'patient_primary',
   },
   {
     id: 'asha_worker',
     role: UserRole.CAREGIVER,
-    displayName: 'Community Health Worker (ASHA)',
+    displayName: 'Doctor / ASHA Health Worker',
     pin: '0000',
     linkedPatientId: 'patient_primary',
   },
@@ -136,36 +136,38 @@ class AuthServiceClass {
     return { success: true, session };
   }
 
-  // Logout (resets safely to Elder patient companion session)
-  async logout(): Promise<void> {
-    const defaultElder = DEFAULT_USERS[0];
+  // Switch directly to a role persona (patient_primary, caregiver_primary, asha_worker)
+  async switchRoleDirect(userId: string): Promise<AuthSession | null> {
+    const user = DEFAULT_USERS.find(u => u.id === userId);
+    if (!user) return null;
+
     const session: AuthSession = {
-      userId: defaultElder.id,
-      role: defaultElder.role,
-      displayName: defaultElder.displayName,
-      patientId: defaultElder.linkedPatientId,
+      userId: user.id,
+      role: user.role,
+      displayName: user.displayName,
+      patientId: user.linkedPatientId,
       loginAt: Date.now(),
       expiresAt: Date.now() + SESSION_DURATION_MS,
     };
+
     this.currentSession = session;
     this.persistSession(session);
     this.notifyListeners(session);
+    return session;
+  }
+
+  // Logout (clears session so user returns cleanly to Role & Profile Selection screen)
+  async logout(): Promise<void> {
+    this.currentSession = null;
+    this.clearPersistedSession();
+    this.notifyListeners(null);
   }
 
   // Get current session
   getSession(): AuthSession | null {
-    if (!this.currentSession || this.currentSession.expiresAt < Date.now()) {
-      // Re-initialize default elder session
-      const defaultElder = DEFAULT_USERS[0];
-      this.currentSession = {
-        userId: defaultElder.id,
-        role: defaultElder.role,
-        displayName: defaultElder.displayName,
-        patientId: defaultElder.linkedPatientId,
-        loginAt: Date.now(),
-        expiresAt: Date.now() + SESSION_DURATION_MS,
-      };
-      this.persistSession(this.currentSession);
+    if (this.currentSession && this.currentSession.expiresAt < Date.now()) {
+      this.currentSession = null;
+      this.clearPersistedSession();
     }
     return this.currentSession;
   }
@@ -248,6 +250,45 @@ class AuthServiceClass {
 
   private restoreSession(): void {
     try {
+      if (typeof window !== 'undefined' && window.location.search) {
+        const params = new URLSearchParams(window.location.search);
+        const roleParam = params.get('role');
+        if (roleParam === 'patient') {
+          const user = DEFAULT_USERS[0];
+          this.currentSession = {
+            userId: user.id,
+            role: user.role,
+            displayName: user.displayName,
+            patientId: user.linkedPatientId,
+            loginAt: Date.now(),
+            expiresAt: Date.now() + SESSION_DURATION_MS,
+          };
+          return;
+        } else if (roleParam === 'caregiver') {
+          const user = DEFAULT_USERS[1];
+          this.currentSession = {
+            userId: user.id,
+            role: user.role,
+            displayName: user.displayName,
+            patientId: user.linkedPatientId,
+            loginAt: Date.now(),
+            expiresAt: Date.now() + SESSION_DURATION_MS,
+          };
+          return;
+        } else if (roleParam === 'doctor') {
+          const user = DEFAULT_USERS[2];
+          this.currentSession = {
+            userId: user.id,
+            role: user.role,
+            displayName: user.displayName,
+            patientId: user.linkedPatientId,
+            loginAt: Date.now(),
+            expiresAt: Date.now() + SESSION_DURATION_MS,
+          };
+          return;
+        }
+      }
+
       const stored = localStorage.getItem(SESSION_KEY);
       if (stored) {
         const session = JSON.parse(stored) as AuthSession;
@@ -262,19 +303,8 @@ class AuthServiceClass {
       this.clearPersistedSession();
     }
 
-    // Default to the Elder Patient profile automatically
-    // The device is dedicated to elder dementia care — zero login barriers
-    const defaultElder = DEFAULT_USERS[0];
-    const initialSession: AuthSession = {
-      userId: defaultElder.id,
-      role: defaultElder.role,
-      displayName: defaultElder.displayName,
-      patientId: defaultElder.linkedPatientId,
-      loginAt: Date.now(),
-      expiresAt: Date.now() + SESSION_DURATION_MS,
-    };
-    this.currentSession = initialSession;
-    this.persistSession(initialSession);
+    // If no active stored session, set currentSession to null to let user select role
+    this.currentSession = null;
   }
 }
 

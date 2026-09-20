@@ -17,6 +17,7 @@ interface AuthContextType {
   patientId: string | null;
   login: (userId: string, pin: string) => Promise<{ success: boolean; error?: string }>;
   quickLogin: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  switchRole: (userId: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   switchPatient: (patientId: string) => Promise<boolean>;
   hasPermission: (permission: keyof RolePermissions) => boolean;
@@ -48,6 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: result.success, error: result.error };
   }, []);
 
+  const switchRole = useCallback(async (userId: string) => {
+    const sess = await AuthService.switchRoleDirect(userId);
+    return { success: sess !== null };
+  }, []);
+
   const logout = useCallback(async () => {
     await AuthService.logout();
   }, []);
@@ -69,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     patientId: session?.patientId ?? null,
     login,
     quickLogin,
+    switchRole,
     logout,
     switchPatient,
     hasPermission: checkPermission,

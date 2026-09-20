@@ -15,11 +15,13 @@ import {
   LogOut, 
   Sun, 
   Moon, 
-  Check 
+  Check,
+  Users
 } from 'lucide-react';
 import AppHeader from '../components/AppHeader';
 import Card from '../components/Card';
 import LargeButton from '../components/LargeButton';
+import RoleAndProfileModal from '../components/RoleAndProfileModal';
 import { LANGUAGES, APP } from '../core/constants/app';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -41,6 +43,8 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
 
   // Modals state
   const [showPairingModal, setShowPairingModal] = useState(false);
+  const [showRoleProfileModal, setShowRoleProfileModal] = useState(false);
+  const [modalInitialTab, setModalInitialTab] = useState<'role' | 'profile'>('profile');
 
   // Update check states
   const [checkingUpdate, setCheckingUpdate] = useState(false);
@@ -105,21 +109,50 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
         {/* Patient Profile */}
         {patient && (
           <div className="space-y-3">
-            <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] px-1 flex items-center gap-2">
-              <User size={18} className="text-indigo-600 dark:text-indigo-400" />
-              Active Profile
-            </h3>
-            <Card className="p-4 sm:p-5">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] flex items-center gap-2">
+                <User size={18} className="text-indigo-600 dark:text-indigo-400" />
+                Active Profile & Role
+              </h3>
+              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                {role === UserRole.PATIENT ? 'Elder Patient View' : 'Caregiver View'}
+              </span>
+            </div>
+            <Card className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center flex-shrink-0 shadow-xs">
-                  <span className="text-2xl font-bold">
-                    {patient.name.charAt(0).toUpperCase()}
-                  </span>
+                <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-3xl flex-shrink-0 shadow-xs">
+                  <span>{patient.profileImage || '👵'}</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-lg font-bold text-[var(--color-text)] truncate">{patient.name}</h4>
                   <p className="text-xs sm:text-sm text-[var(--color-text-secondary)]">Age: {patient.age} • Care Recipient Profile</p>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 border-t border-[var(--color-border)]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalInitialTab('profile');
+                    setShowRoleProfileModal(true);
+                  }}
+                  className="w-full py-3 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors min-h-[44px] cursor-pointer"
+                >
+                  <User size={16} />
+                  <span>✏️ Edit Name & Age</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalInitialTab('role');
+                    setShowRoleProfileModal(true);
+                  }}
+                  className="w-full py-3 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors min-h-[44px] cursor-pointer"
+                >
+                  <Users size={16} />
+                  <span>👥 Switch Role (Elder, Son, Doctor)</span>
+                </button>
               </div>
             </Card>
           </div>
@@ -630,6 +663,13 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
           onClose={() => setShowPairingModal(false)}
         />
       )}
+
+      <RoleAndProfileModal
+        isOpen={showRoleProfileModal}
+        onClose={() => setShowRoleProfileModal(false)}
+        initialTab={modalInitialTab}
+        onNavigate={onNavigate}
+      />
     </>
   );
 }

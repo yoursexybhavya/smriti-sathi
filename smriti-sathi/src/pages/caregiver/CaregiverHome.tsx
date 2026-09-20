@@ -11,6 +11,7 @@ import { caregiverRepository, FollowUpSignal } from '../../database/repositories
 import { UserRole } from '../../models/Role';
 import {
   Users,
+  User,
   Bell,
   TrendingUp,
   AlertTriangle,
@@ -22,6 +23,7 @@ import {
   Shield,
   RefreshCw,
 } from 'lucide-react';
+import RoleAndProfileModal from '../../components/RoleAndProfileModal';
 
 interface CaregiverHomeProps {
   onNavigate: (screen: string) => void;
@@ -29,11 +31,15 @@ interface CaregiverHomeProps {
 }
 
 export default function CaregiverHome({ onNavigate, isOnline = true }: CaregiverHomeProps) {
-  const { session, logout, role } = useAuth();
+  const { session, logout, role, switchRole } = useAuth();
   const [patients, setPatients] = useState<Array<{ id: string; name: string; age: number }>>([]);
   const [signals, setSignals] = useState<FollowUpSignal[]>([]);
   const [summaries, setSummaries] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
+
+  // Role and profile modal state
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [modalInitialTab, setModalInitialTab] = useState<'role' | 'profile'>('role');
 
   useEffect(() => {
     loadData();
@@ -112,13 +118,38 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
               <p className="text-xs opacity-80">Caregiver Dashboard</p>
             </div>
           </div>
-          <button
-            onClick={handleLogout}
-            className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-            title="Logout"
-          >
-            <LogOut size={18} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={async () => {
+                await switchRole('patient_primary');
+                onNavigate('home');
+              }}
+              className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-xs"
+              title="Switch back to Elderly Patient Companion"
+            >
+              <span>👵 Elder View</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setModalInitialTab('role');
+                setShowRoleModal(true);
+              }}
+              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
+              title="Switch Role (Doctor, Guardian, Elder)"
+            >
+              <Users size={15} />
+              <span>Role ▾</span>
+            </button>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
+              title="Logout to Profile Selection"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
         </div>
         <div className="flex items-center gap-4 text-xs opacity-80">
           <span>{patients.length} patient{patients.length !== 1 ? 's' : ''}</span>
@@ -182,12 +213,26 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
                       <p className="text-xs text-[var(--color-text-muted)]">Age: {patient.age}</p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => onNavigate(`caregiver-patient-${patient.id}`)}
-                    className="p-2 rounded-lg bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] transition-colors"
-                  >
-                    <ChevronRight size={18} className="text-[var(--color-text-secondary)]" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setModalInitialTab('profile');
+                        setShowRoleModal(true);
+                      }}
+                      className="px-2.5 py-1.5 rounded-lg bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-xs font-bold text-[var(--color-text)] flex items-center gap-1 transition-colors cursor-pointer"
+                      title="Edit Patient Name & Age"
+                    >
+                      <User size={13} />
+                      <span>Edit Name/Age</span>
+                    </button>
+                    <button
+                      onClick={() => onNavigate(`caregiver-patient-${patient.id}`)}
+                      className="p-2 rounded-lg bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] transition-colors cursor-pointer"
+                    >
+                      <ChevronRight size={18} className="text-[var(--color-text-secondary)]" />
+                    </button>
+                  </div>
                 </div>
 
                 {summary && (
@@ -257,6 +302,13 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
           </div>
         </div>
       </div>
+
+      <RoleAndProfileModal
+        isOpen={showRoleModal}
+        onClose={() => setShowRoleModal(false)}
+        initialTab={modalInitialTab}
+        onNavigate={onNavigate}
+      />
     </div>
   );
 }

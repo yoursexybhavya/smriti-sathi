@@ -41,7 +41,14 @@ import { reminderService } from './services/ReminderService';
 function AppContent() {
   const { state } = useApp();
   const { isAuthenticated, role, logout } = useAuth();
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab) return tab;
+    }
+    return 'home';
+  });
   const [navigationHistory, setNavigationHistory] = useState<string[]>(['home']);
   const [showSplash, setShowSplash] = useState(() => {
     if (typeof window !== 'undefined' && sessionStorage.getItem('smriti_splash_shown')) {

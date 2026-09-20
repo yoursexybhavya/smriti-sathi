@@ -131,17 +131,23 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                       : 'border-[var(--color-border)] hover:border-[var(--color-border-focus)] bg-[var(--color-card)]'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${
-                    isPatientRole 
-                      ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800' 
-                      : 'bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 ${
+                    user.id === 'patient_primary'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                      : user.id === 'caregiver_primary'
+                      ? 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
+                      : 'bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
                   }`}>
-                    {isPatientRole ? <User size={24} /> : <Shield size={24} />}
+                    {user.id === 'patient_primary' ? '👵' : user.id === 'caregiver_primary' ? '👨‍👦' : '🩺'}
                   </div>
                   <div className="flex-1 min-w-0 text-left">
                     <div className="text-sm font-bold text-[var(--color-text)]">{user.displayName}</div>
                     <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">
-                      {isPatientRole ? 'Personalized cognitive exercises & routine' : 'Care circle monitoring & clinical logs'}
+                      {user.id === 'patient_primary'
+                        ? 'Simplified visual & voice interface, memory games & daily routines'
+                        : user.id === 'caregiver_primary'
+                        ? 'Family memory book, photo quizzes, care schedule & alerts (PIN: 1234)'
+                        : 'Clinical SPI stability index, cognitive decline logs & telemetry (PIN: 0000)'}
                     </div>
                   </div>
                   <div className="flex items-center">
@@ -175,7 +181,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             <div className="pt-3 border-t border-[var(--color-border)] space-y-3">
               <div>
                 <label className="text-xs font-semibold text-[var(--color-text-secondary)] block mb-1">
-                  Caregiver Security PIN (Default: 1234)
+                  Caregiver Security PIN (Default: {selectedUser === 'asha_worker' ? '0000' : '1234'})
                 </label>
                 <div className="relative">
                   <input

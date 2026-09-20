@@ -22,12 +22,15 @@ import {
   Play,
   Bell,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  User,
+  Users
 } from 'lucide-react';
 import ProgressCard from '../components/ProgressCard';
 import SectionHeader from '../components/SectionHeader';
 import StatusIndicator from '../components/StatusIndicator';
 import LargeButton from '../components/LargeButton';
+import RoleAndProfileModal from '../components/RoleAndProfileModal';
 import { useApp } from '../context/AppContext';
 import { reminderService } from '../services/ReminderService';
 import { notificationService } from '../services/NotificationService';
@@ -58,6 +61,22 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
     recognise: { doneToday: false, level: 1 },
     memoryMatch: { doneToday: false, level: 1 },
     dailyRoutine: { doneToday: false, level: 1 },
+  });
+
+  // Role and Profile modal state
+  const [showRoleProfileModal, setShowRoleProfileModal] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.has('modal');
+    }
+    return false;
+  });
+  const [modalInitialTab, setModalInitialTab] = useState<'role' | 'profile'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('modal') === 'role') return 'role';
+    }
+    return 'profile';
   });
 
   // Notification permission state
@@ -197,16 +216,44 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
       <header className="sticky top-0 z-40 bg-[var(--color-card)]/95 backdrop-blur-md border-b-2 border-[var(--color-border)] transition-colors duration-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-3.5 sm:px-6 py-3 gap-2 sm:gap-4">
           
-          {/* Left: Warm Greeting with Avatar */}
+          {/* Left: Warm Greeting with Avatar & Profile Editor Trigger */}
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-500/30 flex items-center justify-center text-2xl flex-shrink-0 shadow-xs">
-              🌸
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setModalInitialTab('profile');
+                setShowRoleProfileModal(true);
+              }}
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-500/30 flex items-center justify-center text-2xl flex-shrink-0 shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              title="Edit Elder Name, Age & Avatar"
+            >
+              {patient?.profileImage || '👵'}
+            </button>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-base sm:text-xl font-extrabold text-[var(--color-text)] truncate tracking-tight">
-                  {greeting}, {patient?.name || 'Friend'}
-                </h1>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalInitialTab('profile');
+                    setShowRoleProfileModal(true);
+                  }}
+                  className="text-left text-base sm:text-xl font-extrabold text-[var(--color-text)] truncate tracking-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                  title="Click to view/edit Name & Age"
+                >
+                  {greeting}, {patient?.name || 'Kamala Baa'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalInitialTab('profile');
+                    setShowRoleProfileModal(true);
+                  }}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-300/60 dark:border-indigo-800/60 hover:bg-indigo-100 transition-colors cursor-pointer"
+                  title="Age and Profile details"
+                >
+                  <span>Age {patient?.age || 72}</span>
+                  <span className="text-[10px] opacity-70">✏️</span>
+                </button>
                 <span className="hidden md:inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-300/60 dark:border-emerald-800/60">
                   <ShieldCheck size={13} />
                   <span>Calm Routine</span>
@@ -218,8 +265,24 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
             </div>
           </div>
 
-          {/* Right: Actions (Theme Toggle & Prominent 52px Settings Button) */}
+          {/* Right: Actions (Role Switcher, Theme Toggle & Prominent 52px Settings Button) */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Quick Role Switcher Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setModalInitialTab('role');
+                setShowRoleProfileModal(true);
+              }}
+              className="h-12 min-h-[40px] sm:min-h-[48px] px-3 sm:px-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
+              aria-label="Switch User Role"
+              title="Switch to Son / Guardian or Doctor"
+            >
+              <Users size={16} className="text-emerald-600 dark:text-emerald-400" />
+              <span className="hidden xs:inline">Role: Elder ▾</span>
+              <span className="xs:hidden">Role ▾</span>
+            </button>
+
             {/* Online/Offline status badge */}
             <div className="hidden sm:block">
               <StatusIndicator
@@ -300,7 +363,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {/* 1. Remember Game Card */}
                 <button
                   type="button"
@@ -682,6 +745,51 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
               </div>
             </div>
 
+            {/* Dedicated Elder Name, Age & Role Management Card */}
+            <div className="p-6 sm:p-7 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-xs space-y-4 transition-all">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className="w-13 h-13 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-2xl flex-shrink-0 shadow-xs">
+                    {patient?.profileImage || '👵'}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] truncate">
+                      {patient?.name || 'Kamala Baa'} (Age {patient?.age || 72})
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] truncate">
+                      Active Profile · Role: Elderly Patient (Self)
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalInitialTab('profile');
+                    setShowRoleProfileModal(true);
+                  }}
+                  className="w-full min-h-[50px] py-3 px-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-200 dark:border-indigo-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xs"
+                >
+                  <User size={16} />
+                  <span>Edit Name & Age</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalInitialTab('role');
+                    setShowRoleProfileModal(true);
+                  }}
+                  className="w-full min-h-[50px] py-3 px-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xs"
+                >
+                  <Users size={16} />
+                  <span>Switch Role (Son, Doctor)</span>
+                </button>
+              </div>
+            </div>
+
             {/* Prominent Settings & System Preferences Card (Guaranteed Discovery) */}
             <div className="p-6 sm:p-7 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-xs space-y-4.5 transition-all">
               <div className="flex items-center justify-between gap-3">
@@ -712,6 +820,13 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
           </div>
         </div>
       </main>
+
+      <RoleAndProfileModal
+        isOpen={showRoleProfileModal}
+        onClose={() => setShowRoleProfileModal(false)}
+        initialTab={modalInitialTab}
+        onNavigate={onNavigate}
+      />
     </div>
   );
 }
