@@ -86,10 +86,10 @@ app.post('/api/sos', (req, res) => {
 // 5. In-App Auto-Update & Version Authority (Render Cloud Backend)
 app.get('/api/version', (req, res) => {
   res.json({
-    latestVersion: 'v2.7.0',
-    versionCode: 270,
-    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.7.0/SmritiSathi-v2.7.0.apk',
-    releaseNotes: 'Smriti Sathi v2.7.0: Audio-first illiterate elder experience, personalized Family Memory Book quiz game with errorless learning and celebratory voice feedback, and 1-Year longitudinal clinical tracking dashboard for ASHA community health workers.',
+    latestVersion: 'v2.8.0',
+    versionCode: 280,
+    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.8.0/SmritiSathi-v2.8.0.apk',
+    releaseNotes: 'Smriti Sathi v2.8.0: Optimized tablet layout & responsive touch dimensions, 100% WCAG AAA dark and light theme contrast polish, eliminated screen voids with clinical neuroplasticity guide, and seamless multilingual voice prompts.',
     publishedAt: new Date().toISOString(),
   });
 });

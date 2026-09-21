@@ -16,9 +16,10 @@ chmod +x gradlew
 
 cd ..
 
+VERSION=$(node -p "require('./package.json').version")
 APK_SOURCE="android/app/build/outputs/apk/debug/app-debug.apk"
-APK_TARGET="SmritiSathi-v2.7.0.apk"
-DESKTOP_TARGET="/Users/krishnajangid/Desktop/SmritiSathi-v2.7.0.apk"
+APK_TARGET="SmritiSathi-v${VERSION}.apk"
+DESKTOP_TARGET="/Users/krishnajangid/Desktop/SmritiSathi-v${VERSION}.apk"
 
 if [ -f "$APK_SOURCE" ]; then
   cp "$APK_SOURCE" "$APK_TARGET"
