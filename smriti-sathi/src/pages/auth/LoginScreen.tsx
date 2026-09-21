@@ -58,12 +58,12 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const isElder = selectedUserData?.role === UserRole.PATIENT;
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-center px-4 py-8 transition-colors duration-200">
-      <div className="max-w-md mx-auto w-full space-y-5">
+    <div className="min-h-screen w-full bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 py-6 md:py-12 transition-colors duration-200">
+      <div className="w-full max-w-md md:max-w-xl lg:max-w-2xl mx-auto space-y-5 md:space-y-6">
         {/* Top bar with mode label, exit/reset, and theme toggle */}
         <div className="flex items-center justify-between px-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+            <span className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
               Smriti Sathi Health Platform
             </span>
           </div>
@@ -71,31 +71,31 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-90 shadow-sm cursor-pointer"
+              className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl bg-[var(--color-card)] text-[var(--color-text)] border border-[var(--color-border)] hover:border-indigo-500 transition-all active:scale-90 shadow-sm cursor-pointer"
               aria-label="Toggle Theme"
               title={isDark ? 'Light Theme' : 'Dark Theme'}
             >
-              {isDark ? <Sun size={19} className="text-[#F59E0B]" /> : <Moon size={19} className="text-[#64748B]" />}
+              {isDark ? <Sun size={20} className="text-[#F59E0B]" /> : <Moon size={20} className="text-[#64748B]" />}
             </button>
           </div>
         </div>
 
         {/* Header Hero - Scandinavian Deep Slate Canvas */}
-        <div className="bg-slate-900 text-white px-6 py-7 rounded-3xl text-center shadow-lg border border-slate-800 relative overflow-hidden">
+        <div className="bg-slate-900 text-white px-6 sm:px-8 py-7 sm:py-8 rounded-3xl text-center shadow-lg border border-slate-800 relative overflow-hidden">
           <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-indigo-500/15 blur-2xl pointer-events-none" />
-          <div className="relative w-14 h-14 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 mx-auto flex items-center justify-center mb-3 shadow-inner">
+          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 mx-auto flex items-center justify-center mb-3 shadow-inner">
             <HeartHandshake size={32} className="text-indigo-300" />
           </div>
-          <h1 className="text-2xl font-bold mb-1 tracking-tight text-white">Smriti Sathi</h1>
-          <p className="text-sm text-slate-300 font-medium">Cognitive Care & Memory Companion</p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight text-white">Smriti Sathi</h1>
+          <p className="text-sm sm:text-base text-slate-300 font-medium">Cognitive Care & Memory Companion</p>
         </div>
 
         {/* Profile Selection */}
-        <div className="bg-[var(--color-card)] rounded-3xl border border-[var(--color-border)] p-5 sm:p-6 shadow-sm space-y-4">
+        <div className="bg-[var(--color-card)] rounded-3xl border border-[var(--color-border)] p-5 sm:p-7 md:p-8 shadow-sm space-y-4 md:space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-[var(--color-text)]">Select Profile to Begin</h2>
-              <p className="text-xs text-[var(--color-text-muted)] mt-0.5">Select your role to explore the companion</p>
+              <h2 className="text-base sm:text-lg md:text-xl font-bold text-[var(--color-text)]">Select Profile to Begin</h2>
+              <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-0.5">Select your role to explore the companion</p>
             </div>
             {selectedUser !== 'patient_primary' && (
               <button
@@ -105,7 +105,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                   setPin('');
                   setError('');
                 }}
-                className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline px-2 py-1"
+                className="text-xs sm:text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline px-2 py-1"
                 aria-label="Back to Elder Profile"
               >
                 ← Back to Elder
@@ -113,7 +113,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             )}
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 sm:space-y-3.5">
             {demoUsers.map(user => {
               const isSelected = selectedUser === user.id;
               const isPatientRole = user.role === UserRole.PATIENT;
@@ -125,13 +125,13 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                     setSelectedUser(user.id);
                     setError('');
                   }}
-                  className={`flex items-center gap-3.5 p-4 rounded-2xl border-2 transition-all cursor-pointer ${
+                  className={`flex items-center gap-3.5 sm:gap-4 p-4 sm:p-5 rounded-2xl border-2 transition-all cursor-pointer min-h-[68px] sm:min-h-[76px] ${
                     isSelected
                       ? 'border-indigo-600 dark:border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30 shadow-sm ring-2 ring-indigo-500/20'
                       : 'border-[var(--color-border)] hover:border-[var(--color-border-focus)] bg-[var(--color-card)]'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 ${
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 ${
                     user.id === 'patient_primary'
                       ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
                       : user.id === 'caregiver_primary'
@@ -141,8 +141,8 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                     {user.id === 'patient_primary' ? '👵' : user.id === 'caregiver_primary' ? '👨‍👦' : '🩺'}
                   </div>
                   <div className="flex-1 min-w-0 text-left">
-                    <div className="text-sm font-bold text-[var(--color-text)]">{user.displayName}</div>
-                    <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">
+                    <div className="text-sm sm:text-base md:text-lg font-bold text-[var(--color-text)]">{user.displayName}</div>
+                    <div className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">
                       {user.id === 'patient_primary'
                         ? 'Simplified visual & voice interface, memory games & daily routines'
                         : user.id === 'caregiver_primary'
@@ -151,7 +151,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                    <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 flex items-center justify-center ${
                       isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-[var(--color-border)]'
                     }`}>
                       {isSelected && <div className="w-2 h-2 rounded-full bg-white" />}
@@ -169,7 +169,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 type="button"
                 onClick={handleDirectElderLogin}
                 disabled={isLoading}
-                className="w-full min-h-[56px] py-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-2xl font-bold text-base sm:text-lg shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/40 cursor-pointer disabled:opacity-50"
+                className="w-full min-h-[56px] sm:min-h-[64px] py-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-2xl font-bold text-base sm:text-lg md:text-xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/40 cursor-pointer disabled:opacity-50"
               >
                 <span>{isLoading ? 'Opening...' : 'Enter as Elder Patient →'}</span>
               </button>

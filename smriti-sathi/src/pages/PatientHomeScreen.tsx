@@ -214,6 +214,15 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
     }
   };
 
+  const speakGreeting = async () => {
+    try {
+      const text = `${greeting}, ${patient?.name || 'Kamala Baa'}`;
+      await speak(text, language);
+    } catch (err) {
+      console.warn('Error speaking greeting:', err);
+    }
+  };
+
   const greeting = getGreeting(language);
 
   return (
@@ -222,48 +231,53 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
       <header className="sticky top-0 z-40 bg-[var(--color-card)]/95 backdrop-blur-md border-b-2 border-[var(--color-border)] transition-colors duration-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between px-3.5 sm:px-6 py-3 gap-2 sm:gap-4">
           
-          {/* Left: Warm Greeting with Avatar & Profile Editor Trigger */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+          {/* Left: Warm Greeting with Avatar, Voice Reader & Profile Editor Trigger */}
+          <div className="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
             <button
               type="button"
               onClick={() => {
                 setModalInitialTab('profile');
                 setShowRoleProfileModal(true);
               }}
-              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-500/30 flex items-center justify-center text-2xl flex-shrink-0 shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-500/30 flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer"
               title="Edit Elder Name, Age & Avatar"
             >
               {patient?.profileImage || '👵'}
             </button>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                 <button
                   type="button"
                   onClick={() => {
                     setModalInitialTab('profile');
                     setShowRoleProfileModal(true);
                   }}
-                  className="text-left text-base sm:text-xl font-extrabold text-[var(--color-text)] truncate tracking-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                  className="text-left text-base sm:text-xl md:text-2xl font-extrabold text-[var(--color-text)] truncate tracking-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
                   title="Click to view/edit Name & Age"
                 >
                   {greeting}, {patient?.name || 'Kamala Baa'}
                 </button>
                 <button
                   type="button"
+                  onClick={speakGreeting}
+                  className="w-9 h-9 sm:w-10 sm:h-10 min-h-[40px] min-w-[40px] rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center hover:bg-indigo-100 transition-all active:scale-90 cursor-pointer flex-shrink-0 shadow-xs"
+                  aria-label="Listen to greeting aloud"
+                  title="Listen to Greeting"
+                >
+                  <Volume2 size={18} />
+                </button>
+                <button
+                  type="button"
                   onClick={() => {
                     setModalInitialTab('profile');
                     setShowRoleProfileModal(true);
                   }}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-300/60 dark:border-indigo-800/60 hover:bg-indigo-100 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-300/60 dark:border-indigo-800/60 hover:bg-indigo-100 transition-colors cursor-pointer"
                   title="Age and Profile details"
                 >
                   <span>Age {patient?.age || 72}</span>
                   <span className="text-[10px] opacity-70">✏️</span>
                 </button>
-                <span className="hidden md:inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-300/60 dark:border-emerald-800/60">
-                  <ShieldCheck size={13} />
-                  <span>Calm Routine</span>
-                </span>
               </div>
               <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] font-medium truncate">
                 স্মৃতি সাথী · Memory Companion
@@ -271,8 +285,8 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
             </div>
           </div>
 
-          {/* Right: Actions (Language Switcher, Mesh Sync, Role Switcher, Theme Toggle & Prominent 52px Settings Button) */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Right utility toolbar: Language, Role, Theme, Settings */}
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
             {/* Language Switcher Trigger */}
             <button
               type="button"
@@ -280,28 +294,13 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 setModalInitialTab('language');
                 setShowRoleProfileModal(true);
               }}
-              className="h-12 min-h-[40px] sm:min-h-[48px] px-2.5 sm:px-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 border-2 border-indigo-300 dark:border-indigo-800 hover:border-indigo-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
+              className="h-11 sm:h-12 min-h-[40px] px-3 sm:px-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 border-2 border-indigo-300 dark:border-indigo-800 hover:border-indigo-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
               aria-label="Select Language"
               title="Change Language & Voice"
             >
-              <Globe size={16} className="text-indigo-600 dark:text-indigo-400" />
-              <span className="uppercase">{language}</span>
+              <Globe size={18} className="text-indigo-600 dark:text-indigo-400" />
+              <span className="uppercase font-extrabold">{language}</span>
               <span className="text-[10px] opacity-70">▾</span>
-            </button>
-
-            {/* Offline Mesh Sync Demo Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                setModalInitialTab('sync');
-                setShowRoleProfileModal(true);
-              }}
-              className="h-12 min-h-[40px] sm:min-h-[48px] px-2.5 sm:px-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-200 border-2 border-blue-300 dark:border-blue-800 hover:border-blue-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
-              aria-label="Offline Mesh Sync"
-              title="North East Offline Data Sync Architecture"
-            >
-              <Radio size={16} className="text-blue-600 dark:text-blue-400" />
-              <span className="hidden md:inline">Sync</span>
             </button>
 
             {/* Quick Role Switcher Button */}
@@ -311,42 +310,34 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 setModalInitialTab('role');
                 setShowRoleProfileModal(true);
               }}
-              className="h-12 min-h-[40px] sm:min-h-[48px] px-3 sm:px-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
+              className="h-11 sm:h-12 min-h-[40px] px-3 sm:px-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
               aria-label="Switch User Role"
               title="Switch to Son / Guardian or Doctor"
             >
-              <Users size={16} className="text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden xs:inline">Role: Elder ▾</span>
-              <span className="xs:hidden">Role ▾</span>
+              <Users size={18} className="text-emerald-600 dark:text-emerald-400" />
+              <span className="hidden sm:inline">Role: Elder ▾</span>
+              <span className="sm:hidden">Role ▾</span>
             </button>
 
-            {/* Online/Offline status badge */}
-            <div className="hidden sm:block">
-              <StatusIndicator
-                type={isOnline ? 'online' : 'offline'}
-                compact
-              />
-            </div>
-
-            {/* Theme Toggle (Tactile 52px target) */}
+            {/* Theme Toggle (Tactile target) */}
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-12 h-12 min-w-[48px] min-h-[40px] sm:min-h-[48px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-indigo-500 dark:hover:border-indigo-400 transition-all active:scale-95 cursor-pointer shadow-xs"
+              className="w-11 h-11 sm:w-12 sm:h-12 min-w-[40px] min-h-[40px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-indigo-500 dark:hover:border-indigo-400 transition-all active:scale-95 cursor-pointer shadow-xs"
               aria-label={isDark ? 'Switch to Daylight Light Theme' : 'Switch to Midnight Dark Theme'}
               title={isDark ? 'Light Theme' : 'Dark Theme'}
             >
-              {isDark ? <Sun size={22} className="text-amber-500" /> : <Moon size={22} className="text-slate-600" />}
+              {isDark ? <Sun size={20} className="text-amber-500" /> : <Moon size={20} className="text-slate-600" />}
             </button>
 
             {/* Prominent High-Visibility Settings Button */}
             <button
               onClick={() => onNavigate('settings')}
-              className="h-12 min-h-[40px] sm:min-h-[48px] px-3 sm:px-4 rounded-2xl bg-indigo-50 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-200 dark:border-slate-700 hover:border-indigo-600 dark:hover:border-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="h-11 sm:h-12 min-h-[40px] px-3 sm:px-4 rounded-2xl bg-indigo-50 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-200 dark:border-slate-700 hover:border-indigo-600 dark:hover:border-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-2 cursor-pointer"
               aria-label="Settings and Preferences"
             >
               <Settings size={20} className="text-indigo-600 dark:text-indigo-400" />
-              <span className="text-sm font-bold">Settings</span>
+              <span className="hidden sm:inline text-sm font-bold">Settings</span>
             </button>
           </div>
         </div>
@@ -611,34 +602,6 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
 
           {/* Right Column (5 cols in Landscape, Full Width in Portrait) */}
           <div className="lg:col-span-5 space-y-7 sm:space-y-8">
-            
-            {/* Notification Permission Banner (If notifications are not granted yet) */}
-            {notificationPermission !== 'granted' && (
-              <div className="p-5 bg-amber-50 dark:bg-amber-950/40 rounded-3xl border-2 border-amber-300 dark:border-amber-700 shadow-sm space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center flex-shrink-0">
-                    <Bell size={22} />
-                  </div>
-                  <div>
-                    <h4 className="text-base font-bold text-amber-950 dark:text-amber-100">
-                      Enable Care Reminders
-                    </h4>
-                    <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-200 mt-0.5 leading-snug">
-                      Allow alerts so Smriti Sathi can chime for morning medicine and water routines.
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={requestNotificationPermission}
-                  className="w-full min-h-[50px] py-3 px-4 rounded-2xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold text-sm shadow-sm transition-all active:translate-y-0.5 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <Bell size={18} />
-                  <span>Turn On Daily Care Alarms</span>
-                </button>
-              </div>
-            )}
-
             {/* Today's Real Care Schedule */}
             <div className="space-y-3.5">
               <SectionHeader
