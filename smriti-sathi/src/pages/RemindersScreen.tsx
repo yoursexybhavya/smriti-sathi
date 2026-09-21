@@ -203,7 +203,7 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
         showSettings
         onSettingsPress={() => onNavigate('settings')}
       />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-44 sm:pb-52 space-y-6">
         {/* Action Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <LargeButton

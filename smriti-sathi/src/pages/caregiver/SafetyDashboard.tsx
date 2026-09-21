@@ -101,7 +101,7 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
   const unacknowledgedAlerts = alerts.filter(a => !a.acknowledged);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-8">
+    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-44 sm:pb-52">
       {/* Header */}
       <div className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">

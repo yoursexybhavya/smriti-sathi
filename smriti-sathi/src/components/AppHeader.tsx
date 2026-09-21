@@ -34,30 +34,30 @@ export default function AppHeader({
           {(showBack || onBack) && (
             <button
               onClick={onBack}
-              className="inline-flex items-center justify-center gap-2 min-h-[52px] min-w-[52px] px-4 rounded-full bg-[var(--color-card)] border border-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.06)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)] hover:border-[var(--color-border-strong)] hover:-translate-y-[1px] hover:shadow-[0_8px_16px_rgba(15,23,42,0.08)] active:translate-y-0 active:scale-[0.97] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 flex-shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 h-10 sm:h-12 px-3 sm:px-4 rounded-full bg-[var(--color-card)] border border-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.06)] text-[var(--color-text)] hover:bg-[var(--color-card-hover)] hover:border-[var(--color-border-strong)] hover:-translate-y-[1px] active:scale-[0.97] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 flex-shrink-0"
               aria-label="Go back"
             >
-              <ArrowLeft size={19} strokeWidth={2.6} />
+              <ArrowLeft size={18} strokeWidth={2.6} />
               <span className="hidden sm:inline text-[14px] font-bold tracking-tight">Back</span>
             </button>
           )}
 
           <div className="min-w-0 flex-1">
-            <h1 className="font-[700] tracking-[-0.02em] leading-none text-[18px] sm:text-[20px] text-[var(--color-text)] flex items-center gap-2">
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4F46E5,#7C3AED)] text-white text-[12px] font-black shadow-[0_6px_16px_rgba(79,70,229,0.28)]">
+            <h1 className="font-[700] tracking-[-0.02em] leading-none text-[17px] sm:text-[20px] text-[var(--color-text)] flex items-center gap-2">
+              <span className="inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[linear-gradient(135deg,#4F46E5,#7C3AED)] text-white text-[11px] sm:text-[12px] font-black shadow-[0_6px_16px_rgba(79,70,229,0.28)] flex-shrink-0">
                 স্মৃ
               </span>
               <span className="truncate" style={{ fontFamily: 'var(--font-display)' }}>{title}</span>
             </h1>
             {subtitle && (
-              <p className="text-[12px] sm:text-[13px] font-semibold tracking-wide text-[var(--color-text-muted)] mt-1 truncate">
+              <p className="text-[11px] sm:text-[13px] font-semibold tracking-wide text-[var(--color-text-muted)] mt-0.5 sm:mt-1 truncate">
                 {subtitle}
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
           {/* Online pill - desktop */}
           <div
             className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-extrabold tracking-wide border shadow-sm ${
@@ -78,21 +78,21 @@ export default function AppHeader({
             <button
               type="button"
               onClick={toggleTheme}
-              className="h-[52px] w-[52px] inline-flex items-center justify-center rounded-full bg-[var(--color-card)] border border-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.06)] text-[var(--color-text-secondary)] hover:bg-[var(--color-card-hover)] hover:-translate-y-[1px] active:scale-[0.96] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20"
+              className="h-10 w-10 sm:h-12 sm:w-12 min-h-[40px] min-w-[40px] inline-flex items-center justify-center rounded-full bg-[var(--color-card)] border border-[var(--color-border)] shadow-[0_2px_10px_rgba(15,23,42,0.06)] text-[var(--color-text-secondary)] hover:bg-[var(--color-card-hover)] hover:-translate-y-[1px] active:scale-[0.96] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20"
               aria-label={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
               title={isDark ? 'Light Theme' : 'Dark Theme'}
             >
-              {isDark ? <Sun size={20} className="text-amber-500" /> : <Moon size={20} />}
+              {isDark ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} />}
             </button>
           )}
 
           {showSettings && (
             <button
               onClick={onSettingsPress}
-              className="h-[52px] w-[52px] inline-flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white border border-slate-700/60 shadow-[0_4px_14px_rgba(15,23,42,0.18)] hover:bg-slate-800 dark:hover:bg-slate-700 hover:-translate-y-[1px] active:scale-[0.96] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 cursor-pointer"
+              className="h-10 w-10 sm:h-12 sm:w-12 min-h-[40px] min-w-[40px] inline-flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white border border-slate-700/60 shadow-[0_4px_14px_rgba(15,23,42,0.18)] hover:bg-slate-800 dark:hover:bg-slate-700 hover:-translate-y-[1px] active:scale-[0.96] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 cursor-pointer"
               aria-label="Settings"
             >
-              <Settings size={20} />
+              <Settings size={18} />
             </button>
           )}
         </div>

@@ -105,7 +105,7 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
         showBack 
         onBack={() => onNavigate(caregiverUnlocked ? 'caregiver-home' : 'home')} 
       />
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-32 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-44 sm:pb-52 space-y-6">
         {/* Patient Profile */}
         {patient && (
           <div className="space-y-3">

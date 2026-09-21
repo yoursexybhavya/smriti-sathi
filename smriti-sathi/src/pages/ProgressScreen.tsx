@@ -90,7 +90,7 @@ export default function ProgressScreen({ onNavigate, isOnline = true }: Progress
         onSettingsPress={() => onNavigate('settings')}
       />
 
-      <main className="max-w-4xl mx-auto w-full px-4 sm:px-6 py-6 pb-28 space-y-6">
+      <main className="max-w-4xl mx-auto w-full px-4 sm:px-6 py-6 pb-44 sm:pb-52 space-y-6">
         {/* Time Window Selector Pills */}
         <div className="flex items-center justify-between bg-[var(--color-card)] p-2 rounded-2xl border-2 border-[var(--color-border)] shadow-sm">
           <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-muted)] pl-2 hidden sm:inline">

@@ -105,7 +105,7 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-8">
+    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-44 sm:pb-52">
       {/* Header */}
       <div className="bg-[var(--color-success)] text-white px-5 py-5">
         <div className="max-w-5xl mx-auto">

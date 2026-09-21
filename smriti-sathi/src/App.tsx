@@ -314,7 +314,7 @@ function AppContent() {
 
   return (
     <ScreenContainer>
-      <div className="relative min-h-screen w-full flex-1 flex flex-col">
+      <div className={`relative min-h-screen w-full flex-1 flex flex-col ${showBottomNav ? 'pb-24 sm:pb-28' : ''}`}>
         <UpdateNotifier />
         {renderScreen()}
         {showBottomNav && (

@@ -160,7 +160,7 @@ export default function MemoryBookScreen({ onBack, onNavigate }: Props) {
   const categories = memoryBookService.getAllCategories();
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] pb-12">
+    <div className="min-h-screen bg-[var(--color-bg)] pb-44 sm:pb-52">
       {/* Header */}
       <header className="bg-[var(--color-card)] border-b-2 border-[var(--color-border)] shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-5">

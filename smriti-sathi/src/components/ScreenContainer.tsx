@@ -8,7 +8,7 @@ interface ScreenContainerProps {
 export default function ScreenContainer({ children, className = '' }: ScreenContainerProps) {
   return (
     <div
-      className={`relative w-full max-w-7xl mx-auto min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200 overflow-clip flex flex-col ${className}`}
+      className={`relative w-full max-w-7xl mx-auto min-h-full bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200 flex flex-col ${className}`}
     >
       {/* soft ambient blobs */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">

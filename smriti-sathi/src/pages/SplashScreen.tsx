@@ -50,8 +50,8 @@ export default function SplashScreen({ appName, tagline }: SplashScreenProps) {
 
         {/* Version / Sub-tagline */}
         <div className="mt-8 flex items-center gap-2 text-xs text-slate-400 font-semibold tracking-wider uppercase">
-          <span>v2.8.0</span>
-          <span className="hidden" aria-hidden="true">v2.2.0</span>
+          <span>v2.9.0</span>
+          <span className="hidden" aria-hidden="true">v2.5.0 (v2.2.0)</span>
           <span>•</span>
           <span>Cognitive Care Companion</span>
         </div>

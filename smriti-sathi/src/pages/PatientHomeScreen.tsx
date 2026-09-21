@@ -231,7 +231,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
       <header className="sticky top-0 z-40 w-full bg-[var(--color-card)]/95 backdrop-blur-md border-b-2 border-[var(--color-border)] transition-colors duration-200">
         <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-3.5 sm:px-6 py-3 gap-2 sm:gap-4">
           
-          {/* Left: Warm Greeting with Avatar, Voice Reader & Profile Editor Trigger */}
+          {/* Left: Warm Greeting with Avatar, Full Elder Name & Voice Reader */}
           <div className="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
             <button
               type="button"
@@ -245,14 +245,15 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
               {patient?.profileImage || '👵'}
             </button>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              {/* Elder Greeting with Voice Speaker */}
+              <div className="flex items-center gap-1.5 min-w-0">
                 <button
                   type="button"
                   onClick={() => {
                     setModalInitialTab('profile');
                     setShowRoleProfileModal(true);
                   }}
-                  className="text-left text-base sm:text-xl md:text-2xl font-extrabold text-[var(--color-text)] truncate max-w-[200px] sm:max-w-none tracking-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                  className="text-left text-base sm:text-xl font-extrabold text-[var(--color-text)] tracking-tight leading-snug hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer truncate"
                   title="Click to view/edit Name & Age"
                 >
                   {greeting}, {patient?.name || 'Kamala Baa'}
@@ -260,33 +261,38 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 <button
                   type="button"
                   onClick={speakGreeting}
-                  className="w-9 h-9 sm:w-10 sm:h-10 min-h-[40px] min-w-[40px] rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center hover:bg-indigo-100 transition-all active:scale-90 cursor-pointer flex-shrink-0 shadow-xs"
+                  className="w-9 h-9 min-h-[40px] min-w-[40px] rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center hover:bg-indigo-100 transition-all active:scale-90 cursor-pointer flex-shrink-0 shadow-xs"
                   aria-label="Listen to greeting aloud"
                   title="Listen to Greeting"
                 >
-                  <Volume2 size={18} />
+                  <Volume2 size={16} />
                 </button>
+              </div>
+
+              {/* Sub-bar: Age & App Subtitle */}
+              <div className="flex items-center gap-2 mt-0.5 min-w-0">
                 <button
                   type="button"
                   onClick={() => {
                     setModalInitialTab('profile');
                     setShowRoleProfileModal(true);
                   }}
-                  className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2.5 py-0.5 rounded-full border border-indigo-300/60 dark:border-indigo-800/60 hover:bg-indigo-100 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-300/60 dark:border-indigo-800/60 hover:bg-indigo-100 transition-colors cursor-pointer flex-shrink-0"
                   title="Age and Profile details"
                 >
                   <span>Age {patient?.age || 72}</span>
-                  <span className="text-[10px] opacity-70">✏️</span>
+                  <span className="text-[9px] opacity-70">✏️</span>
                 </button>
+                <span className="text-[11px] text-[var(--color-text-secondary)] font-medium truncate">
+                  <span className="sm:hidden">স্মৃতি সাথী</span>
+                  <span className="hidden sm:inline">স্মৃতি সাথী · Memory Companion</span>
+                </span>
               </div>
-              <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] font-medium truncate">
-                স্মৃতি সাথী · Memory Companion
-              </p>
             </div>
           </div>
 
-          {/* Right utility toolbar: Language, Role, Theme, Settings */}
-          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-end">
+          {/* Right utility toolbar: Language, Theme, Role, Settings */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {/* Language Switcher Trigger */}
             <button
               type="button"
@@ -294,50 +300,49 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                 setModalInitialTab('language');
                 setShowRoleProfileModal(true);
               }}
-              className="h-11 sm:h-12 min-h-[40px] px-3 sm:px-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 border-2 border-indigo-300 dark:border-indigo-800 hover:border-indigo-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
+              className="h-10 sm:h-11 min-h-[40px] px-2.5 sm:px-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 border-2 border-indigo-300 dark:border-indigo-800 hover:border-indigo-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1 cursor-pointer text-xs font-bold"
               aria-label="Select Language"
               title="Change Language & Voice"
             >
-              <Globe size={18} className="text-indigo-600 dark:text-indigo-400" />
-              <span className="uppercase font-extrabold">{language}</span>
-              <span className="text-[10px] opacity-70">▾</span>
+              <Globe size={16} className="text-indigo-600 dark:text-indigo-400" />
+              <span className="uppercase font-extrabold text-[11px] sm:text-xs">{language}</span>
+              <span className="text-[9px] opacity-70">▾</span>
             </button>
 
-            {/* Quick Role Switcher Button */}
+            {/* Quick Role Switcher Button - responsive visibility */}
             <button
               type="button"
               onClick={() => {
                 setModalInitialTab('role');
                 setShowRoleProfileModal(true);
               }}
-              className="h-11 sm:h-12 min-h-[40px] px-3 sm:px-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer text-xs sm:text-sm font-bold"
+              className="hidden sm:inline-flex h-10 sm:h-11 min-h-[40px] px-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-500 transition-all active:scale-95 shadow-xs items-center justify-center gap-1.5 cursor-pointer text-xs font-bold"
               aria-label="Switch User Role"
               title="Switch to Son / Guardian or Doctor"
             >
-              <Users size={18} className="text-emerald-600 dark:text-emerald-400" />
-              <span className="hidden sm:inline">Role: Elder ▾</span>
-              <span className="sm:hidden">Role ▾</span>
+              <Users size={16} className="text-emerald-600 dark:text-emerald-400" />
+              <span>Role: Elder ▾</span>
             </button>
 
             {/* Theme Toggle (Tactile target) */}
             <button
               type="button"
               onClick={toggleTheme}
-              className="w-11 h-11 sm:w-12 sm:h-12 min-w-[40px] min-h-[40px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-indigo-500 dark:hover:border-indigo-400 transition-all active:scale-95 cursor-pointer shadow-xs"
+              className="w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-indigo-500 dark:hover:border-indigo-400 transition-all active:scale-95 cursor-pointer shadow-xs"
               aria-label={isDark ? 'Switch to Daylight Light Theme' : 'Switch to Midnight Dark Theme'}
               title={isDark ? 'Light Theme' : 'Dark Theme'}
             >
-              {isDark ? <Sun size={20} className="text-amber-500" /> : <Moon size={20} className="text-slate-600" />}
+              {isDark ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} />}
             </button>
 
-            {/* Prominent High-Visibility Settings Button */}
+            {/* Settings Button (visible on tablet/desktop, mobile uses bottom bar) */}
             <button
               onClick={() => onNavigate('settings')}
-              className="h-11 sm:h-12 min-h-[40px] px-3 sm:px-4 rounded-2xl bg-indigo-50 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-200 dark:border-slate-700 hover:border-indigo-600 dark:hover:border-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="hidden sm:flex w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] rounded-2xl bg-indigo-50 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-200 dark:border-slate-700 hover:border-indigo-600 dark:hover:border-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 transition-all active:scale-95 shadow-xs items-center justify-center cursor-pointer"
               aria-label="Settings and Preferences"
+              title="Settings"
             >
-              <Settings size={20} className="text-indigo-600 dark:text-indigo-400" />
-              <span className="hidden sm:inline text-sm font-bold">Settings</span>
+              <Settings size={18} className="text-indigo-600 dark:text-indigo-400" />
             </button>
           </div>
         </div>

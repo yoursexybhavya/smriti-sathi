@@ -63,7 +63,7 @@ export default function GamesScreen({ onNavigate, isOnline = navigator.onLine }:
         showSettings
         onSettingsPress={() => onNavigate('settings')}
       />
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 pb-36 space-y-6 sm:space-y-8">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 pb-44 sm:pb-52 space-y-6 sm:space-y-8">
         {/* Info banner */}
         <div className="relative overflow-hidden rounded-3xl border border-sky-200 dark:border-sky-900/70 bg-gradient-to-br from-sky-50/80 via-white to-indigo-50/40 dark:from-slate-900 dark:via-sky-950/30 dark:to-slate-900 p-4 sm:p-5 flex items-start gap-3.5 shadow-sm">
           <span className="h-10 w-10 rounded-2xl bg-sky-100 dark:bg-sky-950/80 border border-sky-200 dark:border-sky-800 shadow-xs inline-flex items-center justify-center flex-shrink-0">
