@@ -43,15 +43,26 @@ interface AppContextType {
   skipToElderDemo: () => Promise<void>;
 }
 
+const getInitialTheme = (): 'light' | 'dark' => {
+  if (typeof window === 'undefined') return 'light';
+  try {
+    const urlTheme = new URLSearchParams(window.location.search).get('theme');
+    if (urlTheme === 'dark' || urlTheme === 'light') return urlTheme;
+    return localStorage.getItem('smriti_sathi_theme') === 'dark' ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
+};
+
 const defaultState: AppState = {
   onboardingComplete: false,
   currentPatient: null,
-  interfaceLanguage: 'en',
+  interfaceLanguage: 'as',
   accessibility: {
     textSize: 'large',
     highContrast: false,
     voiceGuidance: true,
-    theme: (typeof window !== 'undefined' && localStorage.getItem('smriti_sathi_theme') === 'dark') ? 'dark' : 'light',
+    theme: getInitialTheme(),
   },
   isLoading: true,
 };
@@ -87,12 +98,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
             },
           };
 
-          const savedTheme = (typeof window !== 'undefined' && localStorage.getItem('smriti_sathi_theme') === 'dark') ? 'dark' : 'light';
+          const savedTheme = getInitialTheme();
           const accessibility: AccessibilitySettings = settings ? {
             textSize: settings.textSize,
             highContrast: settings.highContrast,
             voiceGuidance: settings.voiceGuidance,
-            theme: (settings as any).theme || savedTheme,
+            theme: (typeof window !== 'undefined' && (new URLSearchParams(window.location.search).get('theme') as any)) || (settings as any).theme || savedTheme,
           } : { ...defaultState.accessibility, theme: savedTheme };
 
           setState({
@@ -128,7 +139,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
                   textSize: 'large',
                   highContrast: false,
                   voiceGuidance: true,
-                  theme: 'light',
+                  theme: getInitialTheme(),
                 },
                 isLoading: false,
               });

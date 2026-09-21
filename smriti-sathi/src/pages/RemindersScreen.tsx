@@ -242,7 +242,7 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g., Morning Medicine"
-                className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
+                className="w-full px-4 py-3 bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
               />
             </div>
 
@@ -273,10 +273,10 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                 <select
                   value={hour}
                   onChange={(e) => setHour(parseInt(e.target.value))}
-                  className="flex-1 px-4 py-3 border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
+                  className="flex-1 px-4 py-3 bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
                 >
                   {Array.from({ length: 24 }, (_, i) => (
-                    <option key={i} value={i}>
+                    <option key={i} value={i} className="bg-[var(--color-card)] text-[var(--color-text)]">
                       {i.toString().padStart(2, '0')}
                     </option>
                   ))}
@@ -284,10 +284,10 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                 <select
                   value={minute}
                   onChange={(e) => setMinute(parseInt(e.target.value))}
-                  className="flex-1 px-4 py-3 border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
+                  className="flex-1 px-4 py-3 bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
                 >
                   {Array.from({ length: 60 }, (_, i) => (
-                    <option key={i} value={i}>
+                    <option key={i} value={i} className="bg-[var(--color-card)] text-[var(--color-text)]">
                       {i.toString().padStart(2, '0')}
                     </option>
                   ))}
@@ -325,7 +325,7 @@ export default function RemindersScreen({ onNavigate, isOnline = true }: Reminde
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Add notes..."
                 rows={2}
-                className="w-full px-4 py-3 border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
+                className="w-full px-4 py-3 bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
               />
             </div>
 

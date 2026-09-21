@@ -39,7 +39,7 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
     <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col transition-colors duration-200">
       {/* Header */}
       <div className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4">
-        <div className="max-w-xl mx-auto flex items-center justify-between">
+        <div className="max-w-2xl md:max-w-3xl mx-auto flex items-center justify-between">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-[var(--color-text)]">
               Which objects did you see?
@@ -59,7 +59,7 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
 
       {/* Recall Grid */}
       <div className="flex-1 px-4 sm:px-6 py-6 overflow-y-auto">
-        <div className="max-w-xl mx-auto">
+        <div className="max-w-2xl md:max-w-3xl mx-auto">
           <div className={`grid ${getGridCols()} gap-3 sm:gap-4`}>
             {recallSet.map((obj) => {
               const isSelected = selectedIds.has(obj.id);
@@ -98,7 +98,7 @@ export default function RememberRecall({ recallSet, targetObjects, onSubmit }: R
 
       {/* Submit Button */}
       <div className="bg-[var(--color-card)] border-t border-[var(--color-border)] px-4 sm:px-6 py-4">
-        <div className="max-w-xl mx-auto space-y-2">
+        <div className="max-w-2xl md:max-w-3xl mx-auto space-y-2">
           <LargeButton 
             onPress={handleSubmit}
             disabled={selectedIds.size === 0}

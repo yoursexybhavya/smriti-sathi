@@ -101,7 +101,7 @@ export default function HomeScreen({ onNavigate, isOnline = true }: HomeScreenPr
                   <div className="h-full w-[68%] rounded-full bg-[linear-gradient(90deg,#0EA5E9,#38BDF8)]" />
                 </div>
               </div>
-              <span className="h-10 w-10 rounded-full bg-[var(--color-text)] text-white inline-flex items-center justify-center shadow-[0_8px_16px_rgba(15,23,42,0.14)] group-hover:translate-x-0.5 transition-transform flex-shrink-0">
+              <span className="h-10 w-10 rounded-full bg-slate-900 dark:bg-slate-700 text-white inline-flex items-center justify-center shadow-[0_8px_16px_rgba(15,23,42,0.14)] group-hover:translate-x-0.5 transition-transform flex-shrink-0">
                 <ChevronRight size={18} />
               </span>
             </div>
@@ -189,7 +189,7 @@ function ScheduleItem({ time, label, done = false, tone = 'slate', action }: { t
       {done ? (
         <span className="ml-auto inline-flex items-center px-2 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-extrabold">Done</span>
       ) : action ? (
-        <span className="ml-auto inline-flex items-center px-3 py-1 rounded-full bg-[var(--color-text)] text-white text-[11px] font-extrabold shadow-sm">{action}</span>
+        <span className="ml-auto inline-flex items-center px-3 py-1 rounded-full bg-slate-900 dark:bg-indigo-600 text-white text-[11px] font-extrabold shadow-sm">{action}</span>
       ) : null}
     </div>
   );

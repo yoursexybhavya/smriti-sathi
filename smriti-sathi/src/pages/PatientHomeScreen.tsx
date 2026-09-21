@@ -226,10 +226,10 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
   const greeting = getGreeting(language);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200">
+    <div className="min-h-screen w-full flex-1 flex flex-col bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200">
       {/* Elder-friendly Scandinavian App Header */}
-      <header className="sticky top-0 z-40 bg-[var(--color-card)]/95 backdrop-blur-md border-b-2 border-[var(--color-border)] transition-colors duration-200">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-3.5 sm:px-6 py-3 gap-2 sm:gap-4">
+      <header className="sticky top-0 z-40 w-full bg-[var(--color-card)]/95 backdrop-blur-md border-b-2 border-[var(--color-border)] transition-colors duration-200">
+        <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-3.5 sm:px-6 py-3 gap-2 sm:gap-4">
           
           {/* Left: Warm Greeting with Avatar, Voice Reader & Profile Editor Trigger */}
           <div className="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
@@ -252,7 +252,7 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                     setModalInitialTab('profile');
                     setShowRoleProfileModal(true);
                   }}
-                  className="text-left text-base sm:text-xl md:text-2xl font-extrabold text-[var(--color-text)] truncate tracking-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
+                  className="text-left text-base sm:text-xl md:text-2xl font-extrabold text-[var(--color-text)] truncate max-w-[200px] sm:max-w-none tracking-tight hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer"
                   title="Click to view/edit Name & Age"
                 >
                   {greeting}, {patient?.name || 'Kamala Baa'}

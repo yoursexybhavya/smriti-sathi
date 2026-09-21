@@ -107,7 +107,7 @@ export default function RecognisePlay({
         {/* CASE 1: ODD-ONE-OUT (Direct 2x2 Interactive Grid) */}
         {activity.type === 'odd-one-out' && (
           <div className="w-full space-y-6">
-            <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-xl mx-auto">
+            <div className="grid grid-cols-2 gap-4 md:gap-6 max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto">
               {activity.objects.map((obj, i) => {
                 const isSelected = selectedOption === obj.imageUrl;
                 return (
@@ -212,7 +212,7 @@ export default function RecognisePlay({
             </div>
 
             {/* Choices Grid */}
-            <div className="max-w-xl mx-auto space-y-4">
+            <div className="max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto space-y-4">
               <p className="text-base font-bold text-[var(--color-text)] text-center">
                 What comes next? Select your answer:
               </p>
@@ -311,7 +311,7 @@ export default function RecognisePlay({
             </div>
 
             {/* Sequence Choices */}
-            <div className="max-w-xl mx-auto space-y-4">
+            <div className="max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto space-y-4">
               <p className="text-base font-bold text-[var(--color-text)] text-center">
                 Select the missing item:
               </p>

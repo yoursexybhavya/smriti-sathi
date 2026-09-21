@@ -108,59 +108,61 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
     <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-8">
       {/* Header */}
       <div className="bg-[var(--color-success)] text-white px-5 py-5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <Shield size={20} />
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                <Shield size={20} />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold">{session?.displayName}</h1>
+                <p className="text-xs opacity-80">Caregiver Dashboard</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-lg font-bold">{session?.displayName}</h1>
-              <p className="text-xs opacity-80">Caregiver Dashboard</p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  await switchRole('patient_primary');
+                  onNavigate('home');
+                }}
+                className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-xs"
+                title="Switch back to Elderly Patient Companion"
+              >
+                <span>👵 Elder View</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setModalInitialTab('role');
+                  setShowRoleModal(true);
+                }}
+                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
+                title="Switch Role (Doctor, Guardian, Elder)"
+              >
+                <Users size={15} />
+                <span>Role ▾</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
+                title="Logout to Profile Selection"
+              >
+                <LogOut size={18} />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={async () => {
-                await switchRole('patient_primary');
-                onNavigate('home');
-              }}
-              className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-xs"
-              title="Switch back to Elderly Patient Companion"
-            >
-              <span>👵 Elder View</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setModalInitialTab('role');
-                setShowRoleModal(true);
-              }}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
-              title="Switch Role (Doctor, Guardian, Elder)"
-            >
-              <Users size={15} />
-              <span>Role ▾</span>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-              title="Logout to Profile Selection"
-            >
-              <LogOut size={18} />
-            </button>
+          <div className="flex items-center gap-4 text-xs opacity-80">
+            <span>{patients.length} patient{patients.length !== 1 ? 's' : ''}</span>
+            <span>•</span>
+            <span>{signals.length} alert{signals.length !== 1 ? 's' : ''}</span>
+            <span>•</span>
+            <span>{isOnline ? '🟢 Online' : '🔴 Offline'}</span>
           </div>
-        </div>
-        <div className="flex items-center gap-4 text-xs opacity-80">
-          <span>{patients.length} patient{patients.length !== 1 ? 's' : ''}</span>
-          <span>•</span>
-          <span>{signals.length} alert{signals.length !== 1 ? 's' : ''}</span>
-          <span>•</span>
-          <span>{isOnline ? '🟢 Online' : '🔴 Offline'}</span>
         </div>
       </div>
 
-      <div className="px-5 py-4 space-y-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         {/* Follow-up Signals */}
         {signals.length > 0 && (
           <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">

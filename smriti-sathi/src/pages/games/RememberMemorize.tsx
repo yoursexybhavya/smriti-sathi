@@ -58,7 +58,7 @@ export default function RememberMemorize({ objects, memorizeTime, onComplete }: 
 
       {/* Objects Grid */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-6 sm:py-8">
-        <div className="max-w-xl mx-auto w-full">
+        <div className="max-w-2xl md:max-w-3xl mx-auto w-full">
           <div className={`grid ${getGridCols()} gap-4 sm:gap-6`}>
             {objects.map((obj) => (
               <ObjectCard key={obj.id} object={obj} />
@@ -69,7 +69,7 @@ export default function RememberMemorize({ objects, memorizeTime, onComplete }: 
 
       {/* Instruction */}
       <div className="bg-[var(--color-card)] border-t border-[var(--color-border)] px-4 sm:px-6 py-4">
-        <div className="max-w-xl mx-auto text-center">
+        <div className="max-w-2xl md:max-w-3xl mx-auto text-center">
           <p className="text-sm sm:text-base text-[var(--color-text-secondary)]">
             Look at each object and notice its colors and shapes
           </p>

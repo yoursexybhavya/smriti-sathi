@@ -26,10 +26,10 @@ export default function AppHeader({
   const isDark = state.accessibility?.theme === 'dark';
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-card)_86%,transparent)] backdrop-blur-[16px] supports-[backdrop-filter]:bg-[color-mix(in_srgb,var(--color-card)_78%,transparent)]">
+    <header className="sticky top-0 z-40 w-full border-b border-[var(--color-border)] bg-[color-mix(in_srgb,var(--color-card)_86%,transparent)] backdrop-blur-[16px] supports-[backdrop-filter]:bg-[color-mix(in_srgb,var(--color-card)_78%,transparent)]">
       {/* subtle top accent line */}
       <div className="h-[2px] w-full bg-[linear-gradient(90deg,#4F46E5_0%,#7C3AED_35%,#06B6D4_70%,#10B981_100%)] opacity-90" />
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3.5 gap-3">
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3.5 gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {(showBack || onBack) && (
             <button
@@ -89,7 +89,7 @@ export default function AppHeader({
           {showSettings && (
             <button
               onClick={onSettingsPress}
-              className="h-[52px] w-[52px] inline-flex items-center justify-center rounded-full bg-[var(--color-text)] text-white shadow-[0_8px_20px_rgba(15,23,42,0.18)] hover:brightness-[1.05] hover:-translate-y-[1px] active:scale-[0.96] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20"
+              className="h-[52px] w-[52px] inline-flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white border border-slate-700/60 shadow-[0_4px_14px_rgba(15,23,42,0.18)] hover:bg-slate-800 dark:hover:bg-slate-700 hover:-translate-y-[1px] active:scale-[0.96] transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 cursor-pointer"
               aria-label="Settings"
             >
               <Settings size={20} />

@@ -247,7 +247,7 @@ export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
           </div>
         </header>
 
-        <main className="flex-1 flex flex-col justify-center max-w-xl mx-auto w-full p-4 sm:p-6">
+        <main className="flex-1 flex flex-col justify-center max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto w-full p-4 sm:p-6 md:p-8">
           <div className={`grid ${gridCols} gap-3 sm:gap-4`}>
             {cards.map(card => (
               <button 
