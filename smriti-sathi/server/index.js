@@ -86,10 +86,10 @@ app.post('/api/sos', (req, res) => {
 // 5. In-App Auto-Update & Version Authority (Render Cloud Backend)
 app.get('/api/version', (req, res) => {
   res.json({
-    latestVersion: 'v2.9.0',
-    versionCode: 290,
-    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.0/SmritiSathi-v2.9.0.apk',
-    releaseNotes: 'Smriti Sathi v2.9.0: Fluid touch scrolling with native momentum, full bottom navigation bar clearance (pb-44/pb-52) across all screens preventing UI overlap, untruncated mobile headers, and seamless multilingual voice prompts.',
+    latestVersion: 'v2.9.1',
+    versionCode: 291,
+    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.1/SmritiSathi-v2.9.1.apk',
+    releaseNotes: 'Smriti Sathi v2.9.1: Persistent Caregiver Connection & Family Pairing fix, fluid touch scrolling with full BottomNav clearance, and visual architecture documentation.',
     publishedAt: new Date().toISOString(),
   });
 });

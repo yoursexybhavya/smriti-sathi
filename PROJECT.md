@@ -1,91 +1,121 @@
-# Project: SMRITI SATHI Cognitive Care Platform v2.2.0
+# Project: Herodotus PWA Build (Phase 1 MVP)
 
 ## Architecture
-- **Framework**: Flutter 3.47.4 / Dart 3.13.3 (Android-first).
-- **Target App ID / Org**: `com.ctrlaltelite.smriti_sathi_flutter`
-- **Pattern**: Clean Feature-First Modular Architecture with offline-first repositories and native `IndexedStack` shell navigation.
-- **Directory Structure**:
-  - `lib/core/`: Application constants (`AppColors`, `AppDimensions`, `AppTypography`, `AppRoutes`), accessibility utilities, and Material 3 `AppTheme`.
-  - `lib/models/`: Pure Dart domain entities (`Patient`, `CognitiveDomain`, `GameSession`, `Reminder`, `ReminderLog`, `AppSettings`).
-  - `lib/database/repositories/`: Abstract repository interfaces and in-memory pre-seeded providers (`PatientRepository`, `ReminderRepository`, `GameSessionRepository`, `SettingsRepository`).
-  - `lib/features/`: Feature modules (`home`, `games`, `reminders`, `progress`, `caregiver`, `settings`, `shell`).
-  - `lib/services/`: Core platform services (`AdaptiveEngineService`, `VoiceService`, `LanguageService`, `ConnectivityService`, `SyncService`).
+- **Framework & Build**: React 19 + Vite 6 + TypeScript 5.9 + Tailwind CSS v4 + Lucide React.
+- **Visual Design Identity**: Cinematic Dark-Editorial (`#0D0B09` / `#12100E`), antique gold accents (`#C69214`, `#D4A856`), weathered stone dark cards (`#1A1714`, `#2E2A25`), editorial serif headlines (`Playfair Display` / `Cinzel` / `Cambria`), legible sans body (`Inter` / `Plus Jakarta Sans` / `Calibri`).
+- **Cartography Engine**: Leaflet.js with CartoDB Dark Matter tiles (`dark_all`), custom DOM glowing gold pin markers (`#C69214`) with category-specific SVG glyphs, dynamic clustering, floating preview card, slide-up bottom sheet drawer.
+- **Audio Engine**: Zero-server browser-native Web Speech API (`window.speechSynthesis`) supporting 5 languages (`en-IN`, `hi-IN`, `ta-IN`, `te-IN`, `bn-IN`), playback controls (Play/Pause/Resume/Stop), speed selector (0.75x–1.5x), animated SVG/CSS waveform visualizer.
+- **Spatial Catalog**: Curated dataset of 50 Indian heritage monuments across Delhi, Agra, Jaipur, and Marquee National Sites with 18 schema fields, verified Wikimedia 960px standard thumbnail images, and full 5-language scripts.
+- **Discovery Engine**: Debounced fuzzy search across names/cities/dynasties, horizontal category filter chips, Haversine formula "Near Me" proximity calculator, and 4 curated heritage circuits.
+- **Enterprise Analytics**: Dedicated `bigquery/` module containing production-grade SQL definitions for partitioned/clustered DDL (`01`), BigQuery ML vector embedding semantic search (`02`), ARIMA_PLUS visitor forecasting (`03`), and Vertex AI Gemini Pro narrative enrichment (`04`).
 
 ## Feature Inventory
+Every feature from the Survey phase appears here with its assigned milestone.
 | # | Feature | Description | Milestone | Source |
 |---|---------|-------------|-----------|--------|
-| 1 | Flutter Project Initialization | Initialize Flutter 3.x project in `smriti-sathi-flutter` with `com.ctrlaltelite` | M1 | ORIGINAL_REQUEST R1 |
-| 2 | Modular Directory Hierarchy | Establish `core/`, `models/`, `database/repositories/`, `features/`, `services/` | M1 | ORIGINAL_REQUEST R1 |
-| 3 | Core Domain Models | Patient, GameSession, Reminder, ReminderLog, CognitiveDomain, AppSettings | M1 | ORIGINAL_REQUEST R1 & database.ts |
-| 4 | Database Repositories | Abstract contracts + in-memory providers pre-seeded with realistic elderly data | M1 | ORIGINAL_REQUEST R1 |
-| 5 | Modular Core Services | Adaptive engine, voice, language, connectivity, sync service definitions | M1 | ORIGINAL_REQUEST R1 |
-| 6 | WCAG AAA Color System | High-contrast dark (`#0A1420`) and light (`#F8FAFC`) palettes with >= 7:1 contrast | M2 | ORIGINAL_REQUEST R3 & Survey |
-| 7 | Large Typography Engine | Strict >= 24px floor for body styles and button labels with anti-crowding line-height | M2 | ORIGINAL_REQUEST R3 & Survey |
-| 8 | Motor Ergonomic Dimensions | >= 48x48px touch targets, 64-88px button heights, 16-24px tremor safety gaps | M2 | ORIGINAL_REQUEST R3 & Survey |
-| 9 | Material 3 ThemeData | Complete `ThemeData` (ColorScheme, TextTheme, ElevatedButton, Card, NavigationBar) | M2 | ORIGINAL_REQUEST R3 & Survey |
-| 10 | Accessible UI Components | Reusable `ElderlyCard`, `ElderlyButton`, and `ElderlyHeader` components | M2 | ORIGINAL_REQUEST R3 & Survey |
-| 11 | Main Navigation Shell | Native `IndexedStack` preserving state across 6 destinations with zero latency | M3 | ORIGINAL_REQUEST R2 & Survey |
-| 12 | Home Placeholder Screen | Greeting, next reminder, single primary CTA, and 1-tap navigation shortcuts | M3 | ORIGINAL_REQUEST R2 |
-| 13 | Games Placeholder Screen | Cognitive game cards with errorless learning visual scaffolding (3s hint) | M3 | ORIGINAL_REQUEST R2 |
-| 14 | Reminders Placeholder Screen| Daily reminder schedule with large voice playback button and acknowledgment CTA | M3 | ORIGINAL_REQUEST R2 |
-| 15 | Progress Placeholder Screen | Daily adherence metrics, cognitive streak, and simplified progress indicators | M3 | ORIGINAL_REQUEST R2 |
-| 16 | Caregiver Placeholder Screen| Familiar voice recording interface and patient management controls | M3 | ORIGINAL_REQUEST R2 |
-| 17 | Settings Placeholder Screen | High-contrast toggle, font scale selector, and Indian language preferences | M3 | ORIGINAL_REQUEST R2 |
-| 18 | Static Analysis Verification| `flutter analyze` passes with 0 errors and 0 warnings across all files | M4 | ORIGINAL_REQUEST Acceptance |
-| 19 | Android Debug Build | `flutter build apk --debug` completes successfully producing `app-debug.apk` | M4 | ORIGINAL_REQUEST Acceptance |
-| 20 | E2E Automated Verification | Opaque-box automated test suite validating typography, touch targets, and navigation | M4 | Dual Track Acceptance |
+| 1 | Cinematic Dark-Editorial Styling | Dark luxury aesthetic (`#0D0B09`), heritage gold accents (`#C69214`), stone cards (`#1A1714`) | M1 | Survey Spec Miner |
+| 2 | High-Editorial Typography | Serif display headlines + clean sans body with dramatic hierarchy | M1 | Survey Spec Miner |
+| 3 | Responsive Map-First Layout | Fullscreen map with collapsible top bar, floating preview, bottom sheet | M1 | Survey Spec Miner |
+| 4 | PWA Manifest & App Shell | Installable web app manifest with standalone display, dark theme, icons | M1 | Survey Spec Miner |
+| 5 | Service Worker Offline Caching | Service worker caching shell, scripts, CSS, and `monuments.json` | M1 | Survey Spec Miner |
+| 6 | 50-Monument Spatial Catalog | Curated GeoJSON/JSON dataset of 50 monuments across Golden Triangle & India | M2 | Survey Spec Miner |
+| 7 | Dual-Script Names & Aliases | Multi-script identification (English name, Hindi Devanagari, aliases) | M2 | Survey Spec Miner |
+| 8 | Historical Narrative & Milestones | 2-sentence hook, 300-500 word narrative, highlights, timeline milestones | M2 | Survey Spec Miner |
+| 9 | Official Visitor Logistics & Tariffs | Official timings, closed days, domestic/SAARC/foreign tariffs, ASI e-ticket link | M2 | Survey Spec Miner |
+| 10 | 5-Language Audio Narrations | Pre-written localized scripts in English, Hindi, Tamil, Telugu, and Bengali | M2 | Survey Spec Miner |
+| 11 | Interactive Leaflet Map Canvas | Dark-matter tiled map centered on India (lat: 22.97, lng: 78.65, zoom: 5) | M3 | Survey Spec Miner |
+| 12 | Glowing Gold Pin Markers | Custom DOM markers with `#C69214` gold glow, pulsating aura, category glyphs | M3 | Survey Spec Miner |
+| 13 | Dynamic Marker Clustering | Marker grouping using cluster badges with monument count | M3 | Survey Spec Miner |
+| 14 | Floating Preview Card | On-map card with thumbnail, name, timings, category badge, and CTA | M3 | Survey Spec Miner |
+| 15 | Smooth Fly-to Animation | Camera transitions smoothly to selected monument coordinates (`flyTo`) | M3 | Survey Spec Miner |
+| 16 | Browser Web Speech Synthesis | Zero-server audio narration using `window.speechSynthesis` | M4 | Survey Spec Miner |
+| 17 | 5-Language Voice Selection | Dynamic voice matcher for `en-IN`, `hi-IN`, `ta-IN`, `te-IN`, `bn-IN` with fallbacks | M4 | Survey Spec Miner |
+| 18 | Audio Controls & Speed Modulation | Play, Pause, Resume, Stop controls and speed selectors (0.75x, 1.0x, 1.25x, 1.5x) | M4 | Survey Spec Miner |
+| 19 | Animated Audio Waveform | Oscillating visualizer synchronized with active speech playback state | M4 | Survey Spec Miner |
+| 20 | Unified Fuzzy Search Bar | Instant autocomplete multi-field search across names, cities, dynasties | M5 | Survey Spec Miner |
+| 21 | Category Filter Chips | Chips: "All", "Forts & Palaces", "Temples", "UNESCO Sites", "Tombs & Mosques", "Stepwells" | M5 | Survey Spec Miner |
+| 22 | Haversine "Near Me" Geolocation | Calculates Great-Circle distance using Haversine formula and sorts ascending | M5 | Survey Spec Miner |
+| 23 | Curated Heritage Circuits | 4 thematic routes (Golden Triangle, UNESCO Trail, Sacred Temples, Desert Forts) | M5 | Survey Spec Miner |
+| 24 | Partitioned DDL Schema (`01`) | DDL creating partitioned/clustered tables for monuments, telemetry, bookmarks | M6 | Survey Spec Miner |
+| 25 | Vector Embedding & Search (`02`) | Vector search using `ML.GENERATE_EMBEDDING` and `VECTOR_SEARCH` (Cosine) | M6 | Survey Spec Miner |
+| 26 | Time-Series Forecasting (`03`) | Footfall prediction using `ARIMA_PLUS` / `AI.FORECAST` with holiday calendar | M6 | Survey Spec Miner |
+| 27 | GenAI Narrative Enrichment (`04`) | Narrative enhancement & Hindi translation using Gemini Pro via `AI.GENERATE` | M6 | Survey Spec Miner |
+| 28 | Ultra-Lean Bundle Budget | Production bundle size under 500 KB gzipped initial JS/CSS payload | M7 | Survey Spec Miner |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Project Setup & Architecture Setup | Initialize Flutter project, create modular directories (`core`, `models`, `database/repositories`, `features`, `services`), define models, repository contracts, and service stubs. | none | PLANNED |
-| M2 | Design System & Theme Engine | Implement WCAG AAA palettes, >=24px typography, >=48x48 touch targets, Material 3 `ThemeData`, and accessible UI components. | M1 | PLANNED |
-| M3 | Application Shell & 6 Feature Screens | Implement `MainNavigationShell` (`IndexedStack`), 6 placeholder screens (Home, Games, Reminders, Progress, Caregiver, Settings), and interactive bindings to repositories/services. | M2 | PLANNED |
-| M4 | E2E Verification & Android Build | Automated widget tests (touch targets >=48px, typography >=24px, navigation), `flutter analyze` (0 errors), and `flutter build apk --debug`. | M3 | PLANNED |
+| E2E | E2E Testing Suite Track | Comprehensive opaque-box test runner & Tiers 1-4 test suite, publish TEST_READY.md | none | DONE |
+| M1 | PWA Shell & Theme | Dependencies fix (@vitejs/plugin-react), Tailwind v4 setup, dark theme tokens, PWA manifest & sw.js | none | DONE |
+| M2 | 50-Monument Spatial Catalog | `src/data/monuments.json`, 50 complete monuments, 5-language scripts, verified images | none | DONE |
+| M3-M5 | Interactive Cartography, Audio & Discovery UI | Leaflet map, glowing pins, drawer, Web Speech audio player, waveform, search & filter | M1, M2 | IN_PROGRESS |
+| M6 | BigQuery Analytics Suite | 4 SQL files in `herodotus/bigquery/` (`01_schema`, `02_semantic`, `03_forecast`, `04_genai`) | none | DONE |
+| M7 | Final Milestone: 100% E2E Pass & Hardening | Pass 100% of E2E tests, < 500 KB gzipped bundle verification, adversarial hardening | M1-M6, E2E | PLANNED |
 
 ## Interface Contracts
+### Monument Catalog (`src/types/monument.ts` ↔ Components)
+- `Monument`: Contains `id`, `name`, `hindiName`, `alternateNames`, `category`, `coordinates: { lat, lng }`, `state`, `city`, `district`, `asiCircle`, `unesco`, `dynasty`, `era`, `foundedYear`, `shortDescription`, `fullNarrative`, `architecturalHighlights`, `timeline`, `timings`, `tariffs`, `eTicketUrl`, `heroImage`, `galleryImages`, `audioNarrations: Record<'en'|'hi'|'ta'|'te'|'bn', MonumentAudio>`.
+- `Circuit`: Contains `id`, `name`, `subtitle`, `monumentIds`, `description`, `approxDays`.
 
-### Shell ↔ Features
-- Navigation state: `currentIndex` (0: Home, 1: Games, 2: Reminders, 3: Progress, 4: Caregiver, 5: Settings).
-- Shell provides top app bar with context-sensitive back buttons for sub-flows (Caregiver/Settings) and title display.
-- Shell provides `onNavigate(int index)` callback accessible to in-screen shortcut buttons on Home.
+### Audio Engine Contract (`src/lib/speech.ts` ↔ `AudioPlayer.tsx`)
+- `playNarration(text: string, lang: 'en'|'hi'|'ta'|'te'|'bn', rate: number, callbacks: { onStart, onEnd, onError, onPause, onResume })`: Controls `window.speechSynthesis`.
+- `stopNarration()`: Cancels active utterance cleanly.
+- `getAvailableVoice(lang: string)`: Returns best-matching system voice with regional fallbacks.
 
-### Features ↔ Repositories
-- `PatientRepository.getCurrentPatient()` -> `Future<Patient>`
-- `ReminderRepository.getActiveReminders()` -> `Future<List<Reminder>>`
-- `ReminderRepository.acknowledgeReminder(String id)` -> `Future<void>`
-- `GameSessionRepository.getRecentSessions()` -> `Future<List<GameSession>>`
-- `SettingsRepository.getSettings()` -> `Future<AppSettings>`
-
-### Features ↔ Services
-- `VoiceService.playAudioCue(String audioPath)` -> `Future<void>`
-- `AdaptiveEngineService.triggerScaffoldingHint()` -> `void`
-- `LanguageService.getCurrentLanguage()` -> `String`
-- `ConnectivityService.isOnline` -> `bool`
+### Distance / Geolocation Contract (`src/lib/haversine.ts`)
+- `calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number`: Great-circle Haversine formula.
+- `formatDistance(km: number): string`: Returns formatted string (`"X.X km away"` or `"XXX m away"`).
 
 ## Code Layout
-- `smriti-sathi-flutter/`
-  - `pubspec.yaml`
-  - `analysis_options.yaml`
-  - `lib/`
-    - `main.dart`
-    - `core/`
-      - `constants/` (`app_colors.dart`, `app_dimensions.dart`, `app_typography.dart`, `app_routes.dart`)
-      - `theme/` (`app_theme.dart`)
-      - `utils/` (`accessibility_utils.dart`, `date_formatter.dart`)
-      - `widgets/` (`elderly_button.dart`, `elderly_card.dart`, `elderly_header.dart`)
-    - `models/` (`patient.dart`, `cognitive_domain.dart`, `game_session.dart`, `reminder.dart`, `reminder_log.dart`, `app_settings.dart`)
-    - `database/repositories/` (`patient_repository.dart`, `reminder_repository.dart`, `game_session_repository.dart`, `settings_repository.dart`)
-    - `features/`
-      - `shell/` (`main_navigation_shell.dart`)
-      - `home/` (`home_screen.dart`)
-      - `games/` (`games_hub_screen.dart`)
-      - `reminders/` (`reminders_screen.dart`)
-      - `progress/` (`progress_screen.dart`)
-      - `caregiver/` (`caregiver_screen.dart`)
-      - `settings/` (`settings_screen.dart`)
-    - `services/` (`adaptive_engine_service.dart`, `voice_service.dart`, `language_service.dart`, `connectivity_service.dart`, `sync_service.dart`)
-  - `test/`
-    - `widget_test.dart`
-    - `accessibility_test.dart`
-    - `navigation_test.dart`
+```
+herodotus/
+├── index.html
+├── vite.config.ts
+├── tsconfig.json
+├── package.json
+├── public/
+│   ├── manifest.json
+│   ├── sw.js
+│   ├── vite.svg
+│   ├── data/
+│   │   └── monuments.json
+│   └── images/
+├── src/
+│   ├── main.tsx
+│   ├── App.tsx
+│   ├── index.css
+│   ├── types/
+│   │   └── monument.ts
+│   ├── data/
+│   │   ├── monuments.json
+│   │   ├── circuits.json
+│   │   └── circuits.ts
+│   ├── lib/
+│   │   ├── speech.ts
+│   │   ├── haversine.ts
+│   │   └── search.ts
+│   └── components/
+│       ├── Header/
+│       │   └── Header.tsx
+│       ├── Map/
+│       │   └── MapView.tsx
+│       ├── PreviewCard/
+│       │   └── PreviewCard.tsx
+│       ├── Drawer/
+│       │   └── StoryDrawer.tsx
+│       ├── AudioPlayer/
+│       │   ├── AudioPlayer.tsx
+│       │   └── WaveformVisualizer.tsx
+│       └── Discovery/
+│           ├── SearchBar.tsx
+│           ├── CategoryChips.tsx
+│           └── CircuitSelector.tsx
+├── bigquery/
+│   ├── 01_schema_monuments.sql
+│   ├── 02_semantic_search.sql
+│   ├── 03_visitor_forecasting.sql
+│   ├── 04_multilingual_narrative_gen.sql
+│   └── README.md
+└── scripts/
+    └── verify_herodotus.js
+```

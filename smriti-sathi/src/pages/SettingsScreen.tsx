@@ -375,22 +375,37 @@ export default function SettingsScreen({ onNavigate, isOnline = true }: Settings
         {/* Family Pairing */}
         {!isCaregiver && (
           <div className="space-y-3">
-            <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] px-1 flex items-center gap-2">
-              <Smartphone size={18} className="text-indigo-600 dark:text-indigo-400" />
-              Caregiver Connection
-            </h3>
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] flex items-center gap-2">
+                <Smartphone size={18} className="text-indigo-600 dark:text-indigo-400" />
+                Caregiver Connection
+              </h3>
+              {typeof window !== 'undefined' && localStorage.getItem('smriti_linked_caregiver_phone') && (
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  ✓ Companion Linked
+                </span>
+              )}
+            </div>
             <Card className="p-4 sm:p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-base font-bold text-[var(--color-text)]">Link with Caregiver</p>
-                  <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">Sync reminders and activity updates securely</p>
+                  <p className="text-base font-bold text-[var(--color-text)]">
+                    {typeof window !== 'undefined' && localStorage.getItem('smriti_linked_caregiver_name')
+                      ? `Linked: ${localStorage.getItem('smriti_linked_caregiver_name')}`
+                      : 'Link with Caregiver'}
+                  </p>
+                  <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">
+                    {typeof window !== 'undefined' && localStorage.getItem('smriti_linked_caregiver_phone')
+                      ? `${localStorage.getItem('smriti_linked_caregiver_phone')} • Sync & WhatsApp reports ready`
+                      : 'Sync reminders and activity updates securely'}
+                  </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowPairingModal(true)}
                   className="px-4 py-2.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl font-bold border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors text-sm min-h-[44px] cursor-pointer"
                 >
-                  Pair Device
+                  {typeof window !== 'undefined' && localStorage.getItem('smriti_linked_caregiver_phone') ? 'Manage Link' : 'Pair Device'}
                 </button>
               </div>
             </Card>

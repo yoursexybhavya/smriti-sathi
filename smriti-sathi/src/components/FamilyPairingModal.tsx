@@ -22,14 +22,27 @@ export function FamilyPairingModal({ isOpen, onClose }: FamilyPairingModalProps)
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Load existing caregiver link & stable sync code from settings
+  // Load existing caregiver link & stable sync code from localStorage + settings fallback
   useEffect(() => {
     const loadPairingInfo = async () => {
       try {
-        const nameSetting = await db.settings.get('linked_caregiver_name');
-        const phoneSetting = await db.settings.get('linked_caregiver_phone');
-        const codeSetting = await db.settings.get('elder_sync_code');
-        const syncTimeSetting = await db.settings.get('last_cloud_synced_at');
+        const storedName = localStorage.getItem('smriti_linked_caregiver_name');
+        const storedPhone = localStorage.getItem('smriti_linked_caregiver_phone');
+        const storedCode = localStorage.getItem('smriti_elder_sync_code');
+        const storedSyncTime = localStorage.getItem('smriti_last_cloud_synced_at');
+
+        const nameSetting = storedName
+          ? { value: storedName }
+          : await db.settings.get('linked_caregiver_name').catch(() => undefined);
+        const phoneSetting = storedPhone
+          ? { value: storedPhone }
+          : await db.settings.get('linked_caregiver_phone').catch(() => undefined);
+        const codeSetting = storedCode
+          ? { value: storedCode }
+          : await db.settings.get('elder_sync_code').catch(() => undefined);
+        const syncTimeSetting = storedSyncTime
+          ? { value: storedSyncTime }
+          : await db.settings.get('last_cloud_synced_at').catch(() => undefined);
 
         if (nameSetting?.value && phoneSetting?.value) {
           setCaregiverName(nameSetting.value);
@@ -39,11 +52,13 @@ export function FamilyPairingModal({ isOpen, onClose }: FamilyPairingModalProps)
 
         if (codeSetting?.value) {
           setSyncCode(codeSetting.value);
+          localStorage.setItem('smriti_elder_sync_code', codeSetting.value);
         } else {
           // Generate a stable 4-digit code based on patient id or random seed
           const randomNum = 1000 + Math.floor(Math.random() * 9000);
           const generatedCode = `SATHI-${randomNum}`;
-          await db.settings.put({ key: 'elder_sync_code', value: generatedCode });
+          localStorage.setItem('smriti_elder_sync_code', generatedCode);
+          await db.settings.put({ key: 'elder_sync_code', value: generatedCode }).catch(() => {});
           setSyncCode(generatedCode);
         }
 
@@ -66,8 +81,14 @@ export function FamilyPairingModal({ isOpen, onClose }: FamilyPairingModalProps)
     e.preventDefault();
     if (!caregiverPhone.trim()) return;
 
-    await db.settings.put({ key: 'linked_caregiver_name', value: caregiverName.trim() || 'Family Caregiver' });
-    await db.settings.put({ key: 'linked_caregiver_phone', value: caregiverPhone.trim() });
+    const finalName = caregiverName.trim() || 'Family Caregiver';
+    const finalPhone = caregiverPhone.trim();
+    localStorage.setItem('smriti_linked_caregiver_name', finalName);
+    localStorage.setItem('smriti_linked_caregiver_phone', finalPhone);
+    await db.settings.put({ key: 'linked_caregiver_name', value: finalName }).catch(() => {});
+    await db.settings.put({ key: 'linked_caregiver_phone', value: finalPhone }).catch(() => {});
+    setCaregiverName(finalName);
+    setCaregiverPhone(finalPhone);
     setIsPaired(true);
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -75,8 +96,10 @@ export function FamilyPairingModal({ isOpen, onClose }: FamilyPairingModalProps)
 
   const handleUnlink = async () => {
     if (window.confirm('Unlink this child companion phone?')) {
-      await db.settings.delete('linked_caregiver_name');
-      await db.settings.delete('linked_caregiver_phone');
+      localStorage.removeItem('smriti_linked_caregiver_name');
+      localStorage.removeItem('smriti_linked_caregiver_phone');
+      await db.settings.delete('linked_caregiver_name').catch(() => {});
+      await db.settings.delete('linked_caregiver_phone').catch(() => {});
       setCaregiverName('');
       setCaregiverPhone('');
       setIsPaired(false);
@@ -109,15 +132,18 @@ export function FamilyPairingModal({ isOpen, onClose }: FamilyPairingModalProps)
     setCloudSyncing(true);
     setCloudStatus('Connecting to Smriti Sathi Cloud REST API...');
     try {
-      const allSessions = await db.gameSessions.toArray();
-      const allLogs = await db.reminderLogs.toArray();
+      const allSessions = await db.gameSessions.toArray().catch(() => []);
+      const allLogs = await db.reminderLogs.toArray().catch(() => []);
 
       const payload = {
         syncCode,
+        deviceId: syncCode,
         elderName: patient?.name || 'Elder',
         elderAge: patient?.age || 70,
         caregiverName,
         caregiverPhone,
+        sessions: allSessions,
+        reminderLogs: allLogs,
         sessionsCount: allSessions.length,
         adherenceCount: allLogs.length,
         streak: stats.streak,
@@ -133,17 +159,21 @@ export function FamilyPairingModal({ isOpen, onClose }: FamilyPairingModalProps)
 
       const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       if (res.ok) {
+        const syncedLabel = `Today at ${nowTime}`;
         setCloudStatus(`✓ Successfully synced with Family Cloud server at ${nowTime}!`);
-        await db.settings.put({ key: 'last_cloud_synced_at', value: `Today at ${nowTime}` });
-        setLastSynced(`Today at ${nowTime}`);
+        localStorage.setItem('smriti_last_cloud_synced_at', syncedLabel);
+        await db.settings.put({ key: 'last_cloud_synced_at', value: syncedLabel }).catch(() => {});
+        setLastSynced(syncedLabel);
       } else {
         setCloudStatus(`✓ Telemetry packaged locally. Server response: ${res.status}. Stored in offline cache.`);
       }
     } catch {
       const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const syncedLabel = `Today at ${nowTime} (Local)`;
       setCloudStatus(`✓ Synced to local cache at ${nowTime}. Cloud transmission will retry automatically when online.`);
-      await db.settings.put({ key: 'last_cloud_synced_at', value: `Today at ${nowTime} (Local)` });
-      setLastSynced(`Today at ${nowTime} (Local)`);
+      localStorage.setItem('smriti_last_cloud_synced_at', syncedLabel);
+      await db.settings.put({ key: 'last_cloud_synced_at', value: syncedLabel }).catch(() => {});
+      setLastSynced(syncedLabel);
     } finally {
       setCloudSyncing(false);
     }

@@ -627,3 +627,84 @@ Every text, shape, and image must be a native editable PowerPoint object. No ras
 - [ ] All 5 judging criteria addressed
 - [ ] Speaker notes on all slides
 - [ ] Core text unchanged
+
+
+## 2026-09-25T02:44:23Z
+
+# Teamwork Project Prompt — Herodotus PWA Build (Phase 1 MVP)
+
+Herodotus is a map-first Progressive Web App (PWA) that allows travelers to discover, explore, and listen to the living history of India's ancient monuments. It couples an interactive spatial cartography canvas with zero-server-cost browser-native speech narration in multiple Indian languages, verified ASI logistics, and a BigQuery AI/ML analytics architecture.
+
+Working directory: `/Users/krishnajangid/Documents/antigravity/peaceful-hertz/herodotus`
+Integrity mode: development
+
+## Requirements
+
+### R1. Cinematic Heritage Frontend Design & Core PWA Shell
+- Build a responsive web application (React + Vite + Tailwind CSS + Lucide icons) rooted in the distinctive cinematic dark-editorial visual identity established in the pitch presentation:
+  - Deep near-black background (`#0D0B09` / `#12100E`)
+  - Antique heritage gold accents (`#C69214`, `#D4A856`)
+  - Weathered stone dark cards (`#1A1714`) with subtle borders (`#2E2A25`)
+  - High editorial typography: Serif display headings (Playfair Display / Cinzel / Cambria) with clean, legible sans-serif body (Inter / Calibri)
+  - Subtle gold dashed lines, GPS coordinate readouts, and architectural textures
+- Implement a fluid mobile-first layout: full-screen spatial map, collapsible search & filter bar, floating monument preview card, and a bottom sheet / drawer for full monument details.
+- PWA manifest (`manifest.json`) and service worker (`sw.js`) enabling installability and offline caching of the core application shell and monument database.
+
+### R2. Verified 50-Monument Spatial Catalog (Golden Triangle + Heritage Icons)
+- Create a comprehensive, production-ready GeoJSON and JSON dataset (`src/data/monuments.json`) containing at least 50 prominent Indian heritage monuments across Delhi, Agra, Jaipur (the Golden Triangle), plus marquee national monuments (Hampi, Konark, Khajuraho, Ajanta, Ellora, Thanjavur, Fatehpur Sikri).
+- Each monument record must adhere strictly to the schema:
+  - Unique ID, primary name, Hindi name, alternate names
+  - Exact GPS coordinates (`lat`, `lng`)
+  - State, city, district, ASI circle, UNESCO status
+  - Historical classification: Dynasty, era, founding year, architectural category (Fort, Palace, Temple, Stepwell, Tomb, Mosque)
+  - Practical visitor logistics: Official visiting hours, open/closed days, domestic vs. international tariffs, direct ASI e-ticket booking link
+  - Curated storytelling: 2-sentence hook description, full 300-500 word historical narrative, architectural highlights list, and timeline milestones
+  - Verified thumbnail and gallery image URLs (using existing high-res project assets and reliable Wikimedia Commons links)
+  - Multi-lingual audio scripts in 5 languages: English, Hindi, Tamil, Telugu, and Bengali
+
+### R3. Interactive Spatial Cartography Engine
+- Implement an interactive map component (Leaflet.js with custom dark-matter/carto tiles or Mapbox GL):
+  - 60 FPS smooth panning and zooming from National View (India-wide) to State, City, and Monument level
+  - Custom glowing gold monument pin markers (`#C69214`) with category-specific glyphs
+  - Dynamic clustering using Leaflet markercluster or Supercluster for fluid performance
+  - Tap/click pin interaction that reveals an on-map preview card and seamlessly expands to the detailed story drawer
+  - "Fly to monument" camera animation upon search or list selection
+
+### R4. Browser-Native Multilingual Audio Narration Engine
+- Implement an audio player component powered by the browser-native Web Speech API (`window.speechSynthesis`):
+  - Zero server streaming bandwidth or cloud API latency
+  - Language selection toggle supporting English (`en-IN`), Hindi (`hi-IN`), Tamil (`ta-IN`), Telugu (`te-IN`), and Bengali (`bn-IN`)
+  - Playback controls: Play, Pause, Resume, Stop, and Playback Rate speed selector (0.75x, 1.0x, 1.25x, 1.5x)
+  - Visual audio waveform visualizer component reflecting active speech state
+  - Fallback voice selection for cross-browser reliability (Chrome, Safari, Firefox, Edge, Android Chrome)
+
+### R5. Search, Filter, and Discovery Experience
+- Unified search bar with real-time fuzzy autocomplete searching by monument name, city, state, or dynasty.
+- Category filter chips: "All", "Forts & Palaces", "Temples", "UNESCO Sites", "Tombs & Mosques", "Stepwells".
+- "Near Me" geolocation button utilizing the browser Geolocation API (`navigator.geolocation`) to calculate distance using the Haversine formula and sort monuments by proximity.
+- Curated heritage circuits quick-filter (e.g. "Golden Triangle Circuit", "UNESCO World Heritage Trail").
+
+### R6. BigQuery AI/ML Analytics & Semantic Intelligence Pipeline
+- Provide a dedicated `bigquery/` module containing production-grade SQL definitions and documentation demonstrating Herodotus's enterprise and government scalability:
+  1. `01_schema_monuments.sql`: DDL for partitioned and clustered BigQuery tables storing 3,693 ASI monuments, daily visitor telemetry, and user bookmarks.
+  2. `02_semantic_search.sql`: BigQuery ML vector embedding pipeline using `ML.GENERATE_EMBEDDING` and vector search for natural language historical queries (e.g. "Find Mughal stepwells with Persian water engineering").
+  3. `03_visitor_forecasting.sql`: BigQuery ML time-series forecasting model using `AI.FORECAST` / `ARIMA_PLUS` predicting daily tourist footfall to optimize queue wait times and ASI ticketing operations.
+  4. `04_multilingual_narrative_gen.sql`: GenAI pipeline using `AI.GENERATE` with Gemini Pro in BigQuery to dynamically enrich monument summaries and translate regional folklore into English and Hindi.
+
+## Acceptance Criteria
+
+### Build & Code Quality
+- [ ] `npm run build` in `herodotus/` succeeds with exit code 0 and no TypeScript/linter errors.
+- [ ] Production build output bundles to `< 500 KB` gzipped initial JS/CSS payload.
+- [ ] `npm run test` or automated verification script passes all unit and integration assertions.
+
+### Functional Verification
+- [ ] App launches locally and renders the interactive map with at least 50 geocoded monuments.
+- [ ] Clicking a pin centers the map and displays the monument preview card with photo, name, and timings.
+- [ ] Clicking "Listen / Read Story" opens the full detail drawer showing the complete narrative and architecture.
+- [ ] Web Speech audio player plays narration when Play is tapped, updates state to Playing, and stops cleanly.
+- [ ] Switching language updates the displayed audio narrative script.
+- [ ] Search input filters pins in real time with instant feedback.
+- [ ] Filter chips filter visible monuments by category accurately.
+- [ ] PWA manifest is valid and service worker registers successfully.
+- [ ] BigQuery SQL scripts are syntactically valid and follow BigQuery AI/ML standards.

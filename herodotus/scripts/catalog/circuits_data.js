@@ -1,0 +1,87 @@
+// scripts/catalog/circuits_data.js
+// 4 Curated Heritage Circuits conforming strictly to Circuit interface
+
+export const circuitsData = [
+  {
+    "id": "golden-triangle",
+    "name": "The Imperial Golden Triangle",
+    "subtitle": "Delhi · Agra · Jaipur",
+    "monumentIds": [
+      "IN-DL-001",
+      "IN-DL-002",
+      "IN-DL-003",
+      "IN-DL-004",
+      "IN-UP-001",
+      "IN-UP-002",
+      "IN-UP-003",
+      "IN-UP-004",
+      "IN-UP-005",
+      "IN-RJ-001",
+      "IN-RJ-002",
+      "IN-RJ-003",
+      "IN-RJ-004",
+      "IN-RJ-005",
+      "IN-RJ-006"
+    ],
+    "description": "India's legendary cultural circuit connecting the political capital of Delhi, the Mughal splendor of Agra, and the royal pink sandstone ramparts of Jaipur.",
+    "approxDays": 5
+  },
+  {
+    "id": "unesco-world-heritage",
+    "name": "UNESCO Living Heritage Trail",
+    "subtitle": "Pan-India Masterpieces of Outstanding Universal Value",
+    "monumentIds": [
+      "IN-UP-001",
+      "IN-UP-002",
+      "IN-UP-003",
+      "IN-RJ-001",
+      "IN-RJ-002",
+      "IN-RJ-003",
+      "IN-DL-001",
+      "IN-DL-002",
+      "IN-DL-003",
+      "IN-KA-001",
+      "IN-KA-002",
+      "IN-OR-001",
+      "IN-TN-001",
+      "IN-TN-002",
+      "IN-MP-001",
+      "IN-MP-002",
+      "IN-MH-001",
+      "IN-MH-002",
+      "IN-GJ-001",
+      "IN-BR-001"
+    ],
+    "description": "A grand expedition connecting 20 of India's premier UNESCO World Heritage monuments across 10 states, from rock-cut sanctuaries to soaring Dravidian vimanas.",
+    "approxDays": 14
+  },
+  {
+    "id": "royal-rajput-forts",
+    "name": "Hill Forts & Desert Bastions",
+    "subtitle": "Chivalry, Siege Warfare & Rajput Grandeur",
+    "monumentIds": [
+      "IN-RJ-001",
+      "IN-RJ-002",
+      "IN-RJ-003",
+      "IN-RJ-004",
+      "IN-RJ-005",
+      "IN-RJ-006"
+    ],
+    "description": "The formidable stone bastions and mountain ramparts of Rajasthan that witnessed chivalry, siege warfare, and centuries of legendary Rajput history.",
+    "approxDays": 7
+  },
+  {
+    "id": "southern-dynasties",
+    "name": "Sacred Stone & Spire Circuit",
+    "subtitle": "Southern Dynasties Sacred Architecture Trail",
+    "monumentIds": [
+      "IN-KA-001",
+      "IN-KA-002",
+      "IN-KA-003",
+      "IN-TN-001",
+      "IN-TN-002"
+    ],
+    "description": "An architectural pilgrimage tracing sacred geometry, celestial solar alignments, and stone-carving mastery across southern India's most celebrated historic temples.",
+    "approxDays": 8
+  }
+];
