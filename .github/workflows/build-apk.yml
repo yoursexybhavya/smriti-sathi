@@ -26,11 +26,13 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'smriti-sathi/package-lock.json'
 
-      - name: Set up JDK 17
+      # @capacitor/android 8 compiles with Java 21 source/target — on JDK 17 the
+      # Gradle step dies with "error: invalid source release: 21".
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '21'
 
       - name: Install Dependencies
         working-directory: smriti-sathi
@@ -81,6 +83,15 @@ jobs:
             
             - **Download Link**: [SmritiSathi-v${{ steps.get_version.outputs.version }}.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v${{ steps.get_version.outputs.version }}/SmritiSathi-v${{ steps.get_version.outputs.version }}.apk)
             - **Web Browser (No Install)**: https://smriti-sathi.onrender.com
+            - **What's new in 3.0.0** — "Warm Heritage Care":
+              - Complete UI/UX redesign across the web app and this APK: warm ivory canvas, deep teal ink, saffron and terracotta accents from the logo
+              - Fixed the root cause of the broken layout — the unlayered global reset that silently zeroed every spacing utility
+              - Phone dock (4 tabs + persistent SOS), tablet rail and a 1240px desktop sidebar from one navigation definition
+              - All four cognitive games rebuilt on a shared immersive frame: bigger art, honest timers, gentle errorless-learning cues
+              - Emergency tools rebuilt: Safe Return QR + WhatsApp beacon, 112 and Elderline 14567 speed-dial, CR80 wearable badge, 4-7-8 sundowning care with optional chime, ASHA triage
+              - Self-hosted Fraunces, Plus Jakarta Sans and Noto Devanagari/Bengali so every script renders offline
+              - Five locales complete key-for-key (en, hi, as, brx, mni), English default
+              - Light and dark themes, 52/60/72px touch targets, reduced-motion and high-contrast support
           files: "smriti-sathi/SmritiSathi-v${{ steps.get_version.outputs.version }}.apk"
           make_latest: true
         env:
