@@ -57,7 +57,7 @@ export default function SplashScreen() {
       </div>
 
       <div className="absolute bottom-7 left-0 right-0 text-center text-[0.7rem] font-semibold tracking-wide text-[#7FA79E]">
-        v3.0.0
+        v3.1.0
       </div>
     </div>
   );

@@ -19,7 +19,6 @@ import { db } from '../../database';
 import { userRepository } from '../../database/repositories/UserRepository';
 import { reminderRepository } from '../../database/repositories/ReminderRepository';
 import { AdaptiveEngineTests } from '../../services/adaptive_engine/AdaptiveEngineTests';
-import { ttsService } from '../../services/voice/TextToSpeechService';
 import { ConnectivityService } from '../../services/sync/ConnectivityService';
 import { SECURITY_STATUS } from '../../services/auth/SecurityConfig';
 
@@ -103,12 +102,17 @@ export default function DiagnosticsScreen({ onBack, onNavigate }: Props) {
         blurb: 'Confirms the browser speech engine and the language pack list.',
         icon: Volume2,
         run: async () => {
-          const available = ttsService.isAvailable();
-          const langs = ttsService.getAvailableLanguages();
+          const available = typeof window !== 'undefined' && 'speechSynthesis' in window;
+          const voices = available ? window.speechSynthesis.getVoices() : [];
+          const langs = Array.from(new Set(voices.map((v) => v.lang))).slice(0, 8);
           return [
-            { name: 'Speech synthesis', passed: available, detail: available ? 'Engine present in this browser' : 'Not available — voice playback falls back silently' },
-            pass('Languages offered', langs.join(', ')),
-            pass('Hindi pack', ttsService.isLanguageAvailable('hi' as never) ? 'Installed' : 'Falls back to device default'),
+            {
+              name: 'Speech synthesis',
+              passed: available,
+              detail: available ? 'Engine present in this browser' : 'Not available — voice playback falls back silently',
+            },
+            pass('Voices installed', String(voices.length)),
+            pass('Language packs', langs.length ? langs.join(', ') : 'Device default only'),
           ];
         },
       },

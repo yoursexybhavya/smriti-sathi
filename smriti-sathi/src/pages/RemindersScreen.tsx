@@ -218,7 +218,13 @@ export default function RemindersScreen({ onNavigate, persona = 'elder' }: Props
             </Button>
           </div>
         )}
-        {kind === 'future' && <Tag tone="teal">Tomorrow</Tag>}
+        {kind === 'future' && (
+          <Tag tone="teal">
+            {new Date(r.scheduledTime).toDateString() === new Date(Date.now() + 86400000).toDateString()
+              ? t('c.tomorrow')
+              : new Date(r.scheduledTime).toLocaleDateString(meta.htmlLang, { weekday: 'short' })}
+          </Tag>
+        )}
         {kind === 'done' && <Tag tone="success" icon={<Check className="h-3 w-3" />}>{t('c.done')}</Tag>}
         {kind === 'missed' && <Tag tone="danger">{t('rem.missed')}</Tag>}
         {isCaregiver && (

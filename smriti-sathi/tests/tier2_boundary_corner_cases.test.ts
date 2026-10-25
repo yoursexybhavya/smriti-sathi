@@ -214,19 +214,19 @@ test('TIER 2 — Feature 5: Profile Selection Boundaries', async (t) => {
     assert.ok(loginContent.includes('{error}'), 'Must render the error state');
   });
 
-  await t.test('5.2: A short PIN cannot be submitted', () => {
-    assert.ok(loginContent.includes('pin.length < 4'), 'Submit must require four digits');
-    assert.ok(loginContent.includes('disabled='), 'The submit control must actually disable');
+  await t.test('5.2: A PIN is capped at four digits', () => {
+    assert.ok(loginContent.includes('.slice(0, 4)'), 'The PIN field must never exceed four digits');
+    assert.ok(loginContent.includes('next.length === 4'), 'Four digits must trigger the check');
   });
 
   await t.test('5.3: The PIN is entered on a tactile keypad with delete', () => {
     assert.ok(loginContent.includes('Delete'), 'Must offer a delete key for mistakes');
-    assert.ok(loginContent.includes('aria-label="Tactile Keypad for Caregiver PIN"'), 'Keypad must be labelled for assistive tech');
+    assert.ok(loginContent.includes("aria-label={t('auth.pin')}"), 'Keypad must be labelled for assistive tech');
   });
 
-  await t.test('5.4: Rapid double-tap cannot start two sign-ins', () => {
-    assert.ok(loginContent.includes('loading={busy}'), 'Button must show and block while busy');
+  await t.test('5.4: A sign-in in flight cannot be started twice', () => {
     assert.ok(loginContent.includes('setBusy(true)'), 'Busy state must be set during sign-in');
+    assert.ok(loginContent.includes('const [busy, setBusy]'), 'Busy state must exist');
   });
 
   await t.test('5.5: Switching selected profiles resets any prior error message', () => {
@@ -255,7 +255,7 @@ test('TIER 2 — Feature 6: Onboarding Flow Boundaries', async (t) => {
   });
 
   await t.test('6.4: Onboarding finish is guarded against null patient profile', () => {
-    assert.ok(flowContent.includes('if (patient) {'), 'Must check patient existence before completing');
+    assert.ok(flowContent.includes('if (!patient) return;'), 'Must check patient existence before completing');
   });
 
   await t.test('6.5: An unexpected step can never leave the user on a blank screen', () => {

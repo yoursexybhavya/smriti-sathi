@@ -69,25 +69,37 @@ export function BrandLockup({
   tagline,
   name,
   className,
+  onDark,
 }: {
   size?: number;
   showTagline?: boolean;
   tagline?: string;
   name?: string;
   className?: string;
+  /** Set on the teal brand panel, where ink colours would disappear. */
+  onDark?: boolean;
 }) {
   return (
     <div className={`flex items-center gap-2.5 ${className ?? ''}`}>
       <BrandMark size={size} />
       <div className="min-w-0">
         <div
-          className="t-h3 leading-tight tracking-tight text-ink"
-          style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+          className="t-h3 leading-tight tracking-tight"
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontWeight: 600,
+            color: onDark ? '#FBF6EE' : 'var(--ink)',
+          }}
         >
           {name ?? 'Smriti Sathi'}
         </div>
         {showTagline && tagline && (
-          <div className="t-xs leading-tight text-ink-3">{tagline}</div>
+          <div
+            className="t-xs leading-tight"
+            style={{ color: onDark ? 'rgba(251,246,238,0.72)' : 'var(--ink-3)' }}
+          >
+            {tagline}
+          </div>
         )}
       </div>
     </div>

@@ -25,6 +25,7 @@ export const SECURITY_STATUS = {
     dataMinimization: 'Only necessary data stored locally',
     uniqueIds: 'UUID-based user/patient identification',
     sessionManagement: 'Local session with expiration',
+    pinHashing: 'Salted SHA-256 via WebCrypto, with an iterated fallback on http origins',
     noHardcodedSecrets: 'No API keys or secrets in code',
   },
 
@@ -33,8 +34,8 @@ export const SECURITY_STATUS = {
     serverSideAuth: 'No server-side authentication',
     encryptionAtRest: 'Local storage not encrypted',
     encryptionInTransit: 'No HTTPS (no backend yet)',
-    passwordHashing: 'Demo PINs stored in plaintext',
-    rateLimiting: 'No brute-force protection',
+    passwordHashing: 'PIN digests are salted and hashed, but a 4-digit PIN has a tiny keyspace',
+    rateLimiting: 'No brute-force protection on the local PIN pad',
     auditLogging: 'No security event logging',
     sessionTokens: 'No secure session tokens',
     csrfProtection: 'No CSRF tokens',
@@ -99,7 +100,7 @@ export const DATA_CLASSIFICATION = {
     description: 'Highly sensitive data',
     examples: ['Authentication credentials', 'API keys'],
     encryptionRequired: true,
-    currentStatus: 'NOT STORED (demo only)',
+    currentStatus: 'Stored only as a salted digest on this device',
   },
 } as const;
 

@@ -2,17 +2,19 @@ import { useState } from 'react';
 import {
   Type as ALargeSmall,
   ArrowRight,
-  BookOpen,
   Contrast,
   Database,
   Eye,
-  FlaskConical,
   Globe,
+  HeartHandshake,
   Info,
+  LifeBuoy,
   LogOut,
+  Pill,
   Moon,
-  RefreshCw,
+  ShieldCheck,
   Sun,
+  Trash2,
   UserRound,
   Volume2,
 } from 'lucide-react';
@@ -22,6 +24,7 @@ import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { useI18n } from '../i18n';
 import { UserRole } from '../models/Role';
+import { medicalCardService, type MedicalCard } from '../services/care/MedicalCardService';
 
 interface Props {
   onNavigate: (screen: string) => void;
@@ -30,16 +33,22 @@ interface Props {
 }
 
 export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props) {
-  const { state, updateAccessibility, updatePatient, toggleTheme } = useApp();
-  const { role, logout, switchRole } = useAuth();
+  const { state, updateAccessibility, updatePatient, updateEmergencyContact, toggleTheme, eraseEverything } = useApp();
+  const { role, logout } = useAuth();
   const { t, lang, setLanguage, languages } = useI18n();
 
   const isCaregiver = role === UserRole.CAREGIVER;
   const [showLang, setShowLang] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [showDemo, setShowDemo] = useState(false);
-  const [demoPin, setDemoPin] = useState('');
-  const [demoError, setDemoError] = useState('');
+  const [showCare, setShowCare] = useState(false);
+  const [showErase, setShowErase] = useState(false);
+  const [eraseConfirm, setEraseConfirm] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [contactName, setContactName] = useState(state.emergencyContact?.name ?? '');
+  const [contactPhone, setContactPhone] = useState(state.emergencyContact?.phone ?? '');
+  const [contactError, setContactError] = useState('');
+  const [showMed, setShowMed] = useState(false);
+  const [med, setMed] = useState<MedicalCard>(() => medicalCardService.get());
   const [name, setName] = useState(state.currentPatient?.name ?? '');
   const [age, setAge] = useState(String(state.currentPatient?.age ?? 72));
   const [nameError, setNameError] = useState('');
@@ -75,15 +84,35 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
     setShowProfile(false);
   };
 
-  const unlockDemo = () => {
-    if (demoPin === '1234' || demoPin === '0000') {
-      setShowDemo(false);
-      setDemoPin('');
-      setDemoError('');
-      onNavigate('demo');
-    } else {
-      setDemoError(t('auth.pinWrong'));
+  const saveContact = async () => {
+    const phone = contactPhone.replace(/[^0-9+]/g, '');
+    if (!contactName.trim() && !phone) {
+      await updateEmergencyContact(null);
+      setShowCare(false);
+      return;
     }
+    if (contactName.trim().length < 2 || phone.replace(/\D/g, '').length < 8) {
+      setContactError(t('set.contactError'));
+      return;
+    }
+    setContactError('');
+    await updateEmergencyContact({ name: contactName.trim(), phone });
+    setShowCare(false);
+  };
+
+  const saveMedical = () => {
+    medicalCardService.save(med);
+    setShowMed(false);
+  };
+
+  const doErase = async () => {
+    if (eraseConfirm.trim().toUpperCase() !== 'ERASE') {
+      return;
+    }
+    setBusy(true);
+    await eraseEverything();
+    setBusy(false);
+    window.location.href = window.location.pathname;
   };
 
   return (
@@ -227,17 +256,13 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
               </button>
             )}
 
-            <button
-              type="button"
-              onClick={() => switchRole(role === UserRole.CAREGIVER ? 'patient_primary' : 'caregiver_primary')}
-              className="row row--tap"
-            >
+            <button type="button" onClick={logout} className="row row--tap">
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--brand-saffron-soft)] text-[var(--brand-saffron-ink)]">
-                <RefreshCw className="h-5 w-5" />
+                <HeartHandshake className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[0.95rem] font-bold text-ink">{t('set.switchProfile')}</span>
-                <span className="t-xs block">{role === UserRole.CAREGIVER ? t('cg.elderView') : t('auth.guardian')}</span>
+                <span className="t-xs block">{t('set.switchProfileBody')}</span>
               </span>
               <ArrowRight className="h-4 w-4 shrink-0 text-ink-4" />
             </button>
@@ -258,14 +283,58 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
               <Tag tone="success">v3</Tag>
             </button>
 
+            <button
+              type="button"
+              onClick={() => {
+                setContactName(state.emergencyContact?.name ?? '');
+                setContactPhone(state.emergencyContact?.phone ?? '');
+                setContactError('');
+                setShowCare(true);
+              }}
+              className="row row--tap"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--danger-soft)] text-[var(--danger-strong)]">
+                <LifeBuoy className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[0.95rem] font-bold text-ink">{t('set.careCircle')}</span>
+                <span className="t-xs block">
+                  {state.emergencyContact
+                    ? `${state.emergencyContact.name} · ${state.emergencyContact.phone}`
+                    : t('set.careCircleEmpty')}
+                </span>
+              </span>
+              <ArrowRight className="h-4 w-4 shrink-0 text-ink-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setMed(medicalCardService.get());
+                setShowMed(true);
+              }}
+              className="row row--tap"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--info-soft)] text-[var(--info)]">
+                <Pill className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[0.95rem] font-bold text-ink">{t('set.medicalCard')}</span>
+                <span className="t-xs block">
+                  {medicalCardService.isEmpty(med) ? t('set.medicalCardEmpty') : t('set.medicalCardBody')}
+                </span>
+              </span>
+              <ArrowRight className="h-4 w-4 shrink-0 text-ink-4" />
+            </button>
+
             {isCaregiver && (
-              <button type="button" onClick={() => setShowDemo(true)} className="row row--tap">
+              <button type="button" onClick={() => onNavigate('diagnostics')} className="row row--tap">
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--surface-sunken)] text-ink-3">
-                  <FlaskConical className="h-5 w-5" />
+                  <ShieldCheck className="h-5 w-5" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[0.95rem] font-bold text-ink">{t('demo.title')}</span>
-                  <span className="t-xs block">{t('demo.note')}</span>
+                  <span className="block text-[0.95rem] font-bold text-ink">{t('set.systemCheck')}</span>
+                  <span className="t-xs block">{t('set.systemCheckBody')}</span>
                 </span>
                 <ArrowRight className="h-4 w-4 shrink-0 text-ink-4" />
               </button>
@@ -279,7 +348,7 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
                 <div className="text-[0.95rem] font-bold text-ink">{t('set.about')}</div>
                 <div className="t-xs">{t('set.aboutBody')}</div>
               </div>
-              <Tag>{t('set.version')} 3.0.0</Tag>
+              <Tag>{t('set.version')} 3.1.0</Tag>
             </div>
           </Card>
 
@@ -292,6 +361,19 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
             icon={<LogOut className="h-[18px] w-[18px]" />}
           >
             {t('set.signOut')}
+          </Button>
+          <Button
+            variant="ghost"
+            block
+            size="lg"
+            className="mt-2"
+            onClick={() => {
+              setEraseConfirm('');
+              setShowErase(true);
+            }}
+            icon={<Trash2 className="h-[18px] w-[18px]" />}
+          >
+            {t('set.erase')}
           </Button>
           <p className="t-xs mt-2 text-center">{t('saf.disclaimer')}</p>
         </Section>
@@ -342,7 +424,7 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
             label={t('ob.ageLabel')}
             htmlFor="p-age"
             error={ageError}
-            hint={!ageError ? 'Valid elder care range: 40–120 years' : undefined}
+            hint={!ageError ? t('ob.ageRange') : undefined}
           >
             <Input
               id="p-age"
@@ -360,35 +442,132 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
         </div>
       </Sheet>
 
-      {/* Demo gate */}
+      {/* Care circle — the number printed on the Safe Return card */}
       <Sheet
-        open={showDemo}
-        onClose={() => setShowDemo(false)}
-        title={t('demo.pinTitle')}
+        open={showCare}
+        onClose={() => setShowCare(false)}
+        title={t('set.careCircle')}
         footer={
-          <Button block size="lg" onClick={unlockDemo} disabled={demoPin.length < 4} icon={<BookOpen className="h-[18px] w-[18px]" />}>
-            {t('auth.enter')}
+          <Button block size="lg" onClick={saveContact} icon={<ShieldCheck className="h-[18px] w-[18px]" />}>
+            {t('c.save')}
           </Button>
         }
       >
-        <p className="t-body">{t('demo.pinBody')}</p>
-        <Field className="mt-4" label={t('auth.pin')} htmlFor="demo-pin" error={demoError}>
+        <p className="t-body">{t('set.careCircleBody')}</p>
+        <div className="mt-4 flex flex-col gap-3">
+          <Field label={t('ob.contactName')} htmlFor="care-name" error={contactError ? contactError : undefined}>
+            <Input
+              id="care-name"
+              value={contactName}
+              onChange={(e) => {
+                setContactName(e.target.value);
+                if (contactError) setContactError('');
+              }}
+              placeholder={t('ob.contactNamePlaceholder')}
+            />
+          </Field>
+          <Field label={t('ob.contactPhone')} htmlFor="care-phone" hint={t('ob.contactHint')}>
+            <Input
+              id="care-phone"
+              type="tel"
+              inputMode="tel"
+              value={contactPhone}
+              onChange={(e) => {
+                setContactPhone(e.target.value);
+                if (contactError) setContactError('');
+              }}
+              placeholder="+91 98765 43210"
+            />
+          </Field>
+        </div>
+        <p className="t-xs mt-3">{t('ob.contactStays')}</p>
+      </Sheet>
+
+      {/* Medical card — printed on the Safe Return screen for a stranger */}
+      <Sheet
+        open={showMed}
+        onClose={() => setShowMed(false)}
+        title={t('set.medicalCard')}
+        footer={
+          <Button block size="lg" onClick={saveMedical} icon={<ShieldCheck className="h-[18px] w-[18px]" />}>
+            {t('c.save')}
+          </Button>
+        }
+      >
+        <p className="t-body">{t('set.medicalCardBody')}</p>
+        <div className="mt-4 flex flex-col gap-3">
+          <Field label={t('saf.bloodGroup')} htmlFor="med-blood">
+            <Input
+              id="med-blood"
+              value={med.bloodGroup}
+              onChange={(e) => setMed((m) => ({ ...m, bloodGroup: e.target.value.toUpperCase().slice(0, 4) }))}
+              placeholder="O+"
+            />
+          </Field>
+          <Field label={t('saf.conditions')} htmlFor="med-conditions" hint={t('set.medicalCardHint')}>
+            <Input
+              id="med-conditions"
+              value={med.conditions.join(', ')}
+              onChange={(e) =>
+                setMed((m) => ({ ...m, conditions: e.target.value.split(',').map((v) => v.trimStart()) }))
+              }
+              placeholder={t('set.medicalCardConditionsPlaceholder')}
+            />
+          </Field>
+          <Field label={t('saf.medicines')} htmlFor="med-medicines" hint={t('set.medicalCardHint')}>
+            <Input
+              id="med-medicines"
+              value={med.medicines.join(', ')}
+              onChange={(e) =>
+                setMed((m) => ({ ...m, medicines: e.target.value.split(',').map((v) => v.trimStart()) }))
+              }
+              placeholder={t('set.medicalCardMedicinesPlaceholder')}
+            />
+          </Field>
+          <Field label={t('saf.allergies')} htmlFor="med-allergies" hint={t('set.medicalCardHint')}>
+            <Input
+              id="med-allergies"
+              value={med.allergies.join(', ')}
+              onChange={(e) =>
+                setMed((m) => ({ ...m, allergies: e.target.value.split(',').map((v) => v.trimStart()) }))
+              }
+              placeholder={t('set.medicalCardAllergiesPlaceholder')}
+            />
+          </Field>
+        </div>
+      </Sheet>
+
+      {/* Erase everything — the only way back to a blank install */}
+      <Sheet
+        open={showErase}
+        onClose={() => setShowErase(false)}
+        title={t('set.eraseTitle')}
+        footer={
+          <Button
+            block
+            size="lg"
+            variant="danger"
+            loading={busy}
+            disabled={eraseConfirm.trim().toUpperCase() !== 'ERASE'}
+            onClick={doErase}
+            icon={<Trash2 className="h-[18px] w-[18px]" />}
+          >
+            {t('set.eraseConfirm')}
+          </Button>
+        }
+      >
+        <Alert tone="danger" title={t('set.eraseTitle')}>
+          {t('set.eraseBody')}
+        </Alert>
+        <Field className="mt-4" label={t('set.eraseType')} htmlFor="erase-confirm">
           <Input
-            id="demo-pin"
-            type="password"
-            inputMode="numeric"
-            maxLength={4}
-            value={demoPin}
-            onChange={(e) => {
-              setDemoError('');
-              setDemoPin(e.target.value.replace(/\D/g, ''));
-            }}
-            data-autofocus
+            id="erase-confirm"
+            value={eraseConfirm}
+            onChange={(e) => setEraseConfirm(e.target.value)}
+            placeholder="ERASE"
+            autoComplete="off"
           />
         </Field>
-        <p className="t-xs mt-2">
-          {t('auth.demoPin')}: <span className="t-num font-bold">1234</span>
-        </p>
       </Sheet>
     </AppShell>
   );

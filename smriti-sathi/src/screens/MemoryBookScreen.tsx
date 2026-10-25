@@ -92,17 +92,6 @@ export default function MemoryBookScreen({ onNavigate, persona = 'elder' }: Prop
     }
   };
 
-  const addSamples = async () => {
-    if (!userId) return;
-    setBusy(true);
-    try {
-      await memoryBookService.createSampleMemories(userId);
-      await load(userId);
-    } finally {
-      setBusy(false);
-    }
-  };
-
   const remove = async () => {
     if (!toDelete?.id || !userId) return;
     await memoryBookService.deleteMemoryItem(toDelete.id);
@@ -143,11 +132,6 @@ export default function MemoryBookScreen({ onNavigate, persona = 'elder' }: Prop
         <Button variant="secondary" size="lg" onClick={() => onNavigate('memory-book-viewer')} icon={<BookHeart className="h-[18px] w-[18px]" />}>
           {t('mem.viewer')}
         </Button>
-        {items.length === 0 && (
-          <Button variant="ghost" size="lg" onClick={addSamples} loading={busy}>
-            {t('mem.samples')}
-          </Button>
-        )}
       </div>
 
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>

@@ -71,7 +71,7 @@ export default function AccessibilitySetup({
           {t('c.next')}
         </Button>
         <Button variant="ghost" size="lg" onClick={onBack}>
-          ← Back to Language
+          ← {t('c.back')}
         </Button>
       </div>
     </Card>

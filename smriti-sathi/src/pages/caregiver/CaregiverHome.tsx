@@ -171,8 +171,11 @@ export default function CaregiverHome({ onNavigate, isOnline = true, persona = '
                   {isOnline ? t('c.online') : t('c.offline')}
                 </Tag>
               </div>
-              <div className="t-sm mt-0.5 truncate">
-                {session?.displayName ?? t('auth.guardian')} · {lastActive ? t('cg.lastActive', { when: lastActive }) : t('cg.waiting')}
+              <div className="t-sm mt-0.5 flex flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-1.5">
+                <span className="truncate font-semibold text-ink-3">{session?.displayName ?? t('auth.guardian')}</span>
+                <span className="truncate">
+                  {lastActive ? t('cg.lastActive', { when: lastActive }) : t('cg.noActivityYet')}
+                </span>
               </div>
             </div>
           </div>
@@ -187,6 +190,10 @@ export default function CaregiverHome({ onNavigate, isOnline = true, persona = '
         {reminders.pending > 0 ? (
           <Alert tone="warning" icon={<Bell className="h-5 w-5" />} title={`${reminders.pending} ${t('rem.upcoming').toLowerCase()}`}>
             {t('cg.manageReminders')}
+          </Alert>
+        ) : sessions.week === 0 && reminders.total === 0 ? (
+          <Alert tone="info" icon={<Bell className="h-5 w-5" />} title={t('cg.nothingYet')}>
+            {t('cg.nothingYetBody')}
           </Alert>
         ) : (
           <Alert tone="success" icon={<CheckIcon />} title={t('cg.noAlerts')}>
@@ -215,43 +222,57 @@ export default function CaregiverHome({ onNavigate, isOnline = true, persona = '
               <TrendingUp className="h-3 w-3" /> {sessions.week}
             </Tag>
           </div>
-          <div className="mt-4 flex h-[120px] items-end gap-1.5" role="img" aria-label={t('cg.activity')}>
-            {days.map((d, i) => (
-              <div key={i} className="flex min-w-0 flex-1 flex-col items-center gap-1">
-                <div className="flex h-full w-full items-end">
-                  <div
-                    className="w-full rounded-t-[5px]"
-                    style={{
-                      height: `${Math.max(4, (d.count / maxCount) * 100)}%`,
-                      background:
-                        d.count === 0
-                          ? 'var(--surface-sunken)'
-                          : 'linear-gradient(180deg, var(--brand-teal-bright), var(--brand-teal))',
-                    }}
-                    title={`${d.label}: ${d.count}`}
-                  />
+          {sessions.count === 0 ? (
+            <div className="mt-4 flex h-[120px] flex-col items-center justify-center gap-2 rounded-[var(--r-sm)] bg-[var(--surface-sunken)] px-4 text-center">
+              <CalendarCheck className="h-5 w-5 text-ink-4" />
+              <p className="t-sm max-w-[22ch]">{t('cg.chartEmpty')}</p>
+            </div>
+          ) : (
+            <div className="mt-4 flex h-[120px] items-end gap-1.5" role="img" aria-label={t('cg.activity')}>
+              {days.map((d, i) => (
+                <div key={i} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+                  <div className="flex h-full w-full items-end">
+                    <div
+                      className="w-full rounded-t-[5px]"
+                      style={{
+                        height: `${Math.max(4, (d.count / maxCount) * 100)}%`,
+                        background:
+                          d.count === 0
+                            ? 'var(--surface-sunken)'
+                            : 'linear-gradient(180deg, var(--brand-teal-bright), var(--brand-teal))',
+                      }}
+                      title={`${d.label}: ${d.count}`}
+                    />
+                  </div>
+                  <span className="text-[0.6rem] font-bold uppercase text-ink-4">{d.label.slice(0, 1)}</span>
                 </div>
-                <span className="text-[0.6rem] font-bold uppercase text-ink-4">{d.label.slice(0, 1)}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Card>
 
         {/* ── Domains ─────────────────────────────────────────────────── */}
         <Card>
           <h2 className="t-h3">{t('cg.domains')}</h2>
-          <div className="mt-3 flex flex-col gap-3">
-            <ProgressBar label={t('prog.domainRecall')} value={sessions.accuracy} showValue />
-            <ProgressBar label={t('prog.domainRecognition')} value={Math.max(0, sessions.accuracy - 6)} showValue />
-            <ProgressBar label={t('prog.domainAttention')} value={Math.max(0, sessions.accuracy - 12)} showValue />
-            <ProgressBar label={t('prog.domainRoutine')} value={adherence} showValue tone="saffron" />
-          </div>
+          {sessions.count === 0 ? (
+            <div className="mt-3 flex h-[120px] flex-col items-center justify-center gap-2 rounded-[var(--r-sm)] bg-[var(--surface-sunken)] px-4 text-center">
+              <Target className="h-5 w-5 text-ink-4" />
+              <p className="t-sm max-w-[20ch]">{t('cg.domainsEmpty')}</p>
+            </div>
+          ) : (
+            <div className="mt-3 flex flex-col gap-3">
+              <ProgressBar label={t('prog.domainRecall')} value={sessions.accuracy} showValue />
+              <ProgressBar label={t('prog.domainRecognition')} value={Math.max(0, sessions.accuracy - 6)} showValue />
+              <ProgressBar label={t('prog.domainAttention')} value={Math.max(0, sessions.accuracy - 12)} showValue />
+              <ProgressBar label={t('prog.domainRoutine')} value={adherence} showValue tone="saffron" />
+            </div>
+          )}
         </Card>
       </div>
 
       {/* ── Quick actions ─────────────────────────────────────────────── */}
       <Section className="mt-6" title={t('cg.quickActions')}>
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map(({ key, icon: Icon, route, tone }) => (
             <button
               key={key}
@@ -262,7 +283,7 @@ export default function CaregiverHome({ onNavigate, isOnline = true, persona = '
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--r-sm)]" style={{ background: toneBg[tone], color: toneFg[tone] }}>
                 <Icon className="h-5 w-5" />
               </span>
-              <span className="min-w-0 flex-1 truncate text-[0.9rem] font-bold text-ink">{t(key)}</span>
+              <span className="min-w-0 flex-1 text-[0.9rem] font-bold leading-snug text-ink">{t(key)}</span>
               <ChevronRight className="h-4 w-4 shrink-0 text-ink-4" />
             </button>
           ))}

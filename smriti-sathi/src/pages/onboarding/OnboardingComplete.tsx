@@ -38,7 +38,7 @@ export default function OnboardingComplete({
         {t('ob.start')}
       </Button>
       <Button variant="ghost" onClick={onBack}>
-        ← Review Settings
+        ← {t('c.back')}
       </Button>
     </Card>
   );

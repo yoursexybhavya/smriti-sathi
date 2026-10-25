@@ -77,9 +77,11 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
     assert.ok(fs.existsSync(ashaPath), 'AshaTriageModal.tsx must exist');
     const content = fs.readFileSync(ashaPath, 'utf8');
     assert.ok(content.includes('14'), 'Must track the 14-session window');
-    assert.ok(content.includes('DOMAINS'), 'Must evaluate cognitive domains');
-    assert.ok(content.includes("prog.domainRecall"), 'Must evaluate memory recall');
-    assert.ok(content.includes("prog.domainRoutine"), 'Must evaluate daily-routine sequencing');
+    assert.ok(content.includes('DOMAIN_BY_GAME'), 'Must map games to cognitive domains');
+    assert.ok(content.includes('prog.domainRecall'), 'Must evaluate memory recall');
+    assert.ok(content.includes('prog.domainRoutine'), 'Must evaluate daily-routine sequencing');
+    assert.ok(content.includes('gameSessionRepository'), 'Domains must be computed from real sessions');
+    assert.ok(!content.includes('score: 88'), 'No hard-coded domain scores may ship');
     assert.ok(content.includes('wa.me'), 'Must support 1-click WhatsApp triage dispatch to PHC doctor');
     assert.ok(content.includes('window.print()'), 'Must support printable ASHA community health record');
   });

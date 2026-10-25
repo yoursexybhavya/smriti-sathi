@@ -60,7 +60,7 @@ export default function LanguageSelection({
           {t('c.next')}
         </Button>
         <Button variant="ghost" size="lg" onClick={onBack}>
-          ← Back to Profile Setup
+          ← {t('c.back')}
         </Button>
       </div>
     </Card>

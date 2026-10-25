@@ -83,6 +83,12 @@ jobs:
             
             - **Download Link**: [SmritiSathi-v${{ steps.get_version.outputs.version }}.apk](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v${{ steps.get_version.outputs.version }}/SmritiSathi-v${{ steps.get_version.outputs.version }}.apk)
             - **Web Browser (No Install)**: https://smriti-sathi.onrender.com
+            - **First run**: this build ships with *no demo data*. Open it once and you will create a real account — name, PIN, the person you care for, and an emergency contact — and every screen starts empty until the elder actually uses it. Between two judges, use **Settings → Erase all data** to get back to first run.
+            - **What's new in 3.1.0**:
+              - Demo data, sample profiles, seeded sessions and the demo hub are gone; replaced by a real create-account flow and honest empty states everywhere
+              - PINs are now salted and hashed instead of being compared against built-in demo accounts
+              - Safe Return card and ASHA triage now report the family's real contact and the elder's real sessions, including a "baseline calibrating" state before seven sessions
+              - **Settings → Erase all data** resets the device for a clean demonstration
             - **What's new in 3.0.0** — "Warm Heritage Care":
               - Complete UI/UX redesign across the web app and this APK: warm ivory canvas, deep teal ink, saffron and terracotta accents from the logo
               - Fixed the root cause of the broken layout — the unlayered global reset that silently zeroed every spacing utility

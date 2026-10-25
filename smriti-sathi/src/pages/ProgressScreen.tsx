@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Award, CalendarCheck, Flame, Sparkles, Target, TrendingUp } from 'lucide-react';
 import { AppShell } from '../shell/AppShell';
-import { Card, EmptyState, ProgressBar, Section, Stat, Tag } from '../ui';
+import { Button, Card, EmptyState, ProgressBar, Section, Stat, Tag } from '../ui';
 import { ACTIVITIES } from '../data/activities';
 import { useApp } from '../context/AppContext';
 import { useI18n } from '../i18n';
@@ -145,11 +145,22 @@ export default function ProgressScreen({ onNavigate }: Props) {
       subtitle={t('prog.subtitle')}
       identity={{ name: patient?.name ?? t('auth.elderName'), sub: t('prog.title') }}
     >
+      {totals.sessions === 0 && Object.keys(domain).length === 0 ? (
+        <Card className="rise-in">
+          <EmptyState
+            icon={<Sparkles />}
+            title={t('prog.firstTitle')}
+            body={t('prog.firstBody')}
+            action={<Button size="lg" onClick={() => onNavigate('games')}>{t('home.myActivities')}</Button>}
+          />
+        </Card>
+      ) : (
+      <>
       <div className="rise-in grid grid-cols-2 gap-2.5 lg:grid-cols-4">
         <Stat value={totals.streak} label={t('prog.streak')} icon={<Flame className="h-4 w-4" />} tone="saffron" />
         <Stat value={totals.sessions} label={t('prog.thisWeek')} icon={<Sparkles className="h-4 w-4" />} />
         <Stat value={totals.accuracy ? `${totals.accuracy}%` : '—'} label={t('prog.accuracy')} icon={<Target className="h-4 w-4" />} tone="teal" />
-        <Stat value={`${Object.values(domain).length}/4`} label={t('cg.domains')} icon={<Award className="h-4 w-4" />} />
+        <Stat value={`${Object.keys(domain).length}/4`} label={t('cg.domains')} icon={<Award className="h-4 w-4" />} />
       </div>
 
       {/* 14-day chart */}
@@ -232,6 +243,9 @@ export default function ProgressScreen({ onNavigate }: Props) {
           )}
         </Card>
       </div>
+
+      </>
+      )}
 
       <Card tone="sage" className="mt-4 flex items-center gap-3.5">
         <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--brand-teal)] text-white">

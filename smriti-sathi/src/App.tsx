@@ -22,7 +22,6 @@ import DailyRoutineGame from './pages/games/DailyRoutineGame';
 import FamilyMemoryGame from './games/family/FamilyMemoryGame';
 import CaregiverHome from './pages/caregiver/CaregiverHome';
 import SafetyDashboard from './pages/caregiver/SafetyDashboard';
-import DemoHubScreen from './pages/demo/DemoHubScreen';
 import DiagnosticsScreen from './pages/demo/DiagnosticsScreen';
 
 import { AppProvider, useApp } from './context/AppContext';
@@ -52,14 +51,7 @@ const CAREGIVER_SCREENS = [
   'memory-book-viewer',
   'caregiver-memory-viewer',
   'safety-dashboard',
-  'demo',
   'diagnostics',
-  'sync-tests',
-  'security-tests',
-  'adaptive-tests',
-  'database-tests',
-  'reminder-tests',
-  'voice-language-tests',
 ];
 
 function readInitialTab(): string {
@@ -70,7 +62,7 @@ function readInitialTab(): string {
 
 function AppContent() {
   const { state } = useApp();
-  const { isAuthenticated, role, logout, userId } = useAuth();
+  const { isAuthenticated, role, persona, logout } = useAuth();
 
   const [activeTab, setActiveTab] = useState<string>(readInitialTab);
   const [history, setHistory] = useState<string[]>([readInitialTab()]);
@@ -233,20 +225,33 @@ function AppContent() {
           const next = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
           setHistory([next]);
           setActiveTab(next);
+          window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
         }}
       />
     );
   }
 
-  if (!state.onboardingComplete && role === UserRole.PATIENT) {
-    return <OnboardingFlow onComplete={() => navigate('home')} onCancel={logout} />;
+  // Set-up runs for whoever signs in first: the elder answers for themselves,
+  // a family member answers for the person they care for.
+  if (!state.onboardingComplete) {
+    return (
+      <OnboardingFlow
+        onComplete={() => {
+          const next = role === UserRole.CAREGIVER ? 'caregiver-home' : 'home';
+          setHistory([next]);
+          setActiveTab(next);
+          window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+        }}
+        onCancel={logout}
+      />
+    );
   }
 
-  const persona = role === UserRole.CAREGIVER ? (userId === 'asha_worker' ? 'clinician' : 'caregiver') : 'elder';
+  const activePersona = persona ?? 'elder';
   const showDock =
     role === UserRole.CAREGIVER ? caregiverNavTabs.includes(activeTab) : patientNavTabs.includes(activeTab);
 
-  const shared = { onNavigate: navigate, onBack: goBack, isOnline, persona: persona as 'elder' | 'caregiver' | 'clinician', showDock };
+  const shared = { onNavigate: navigate, onBack: goBack, isOnline, persona: activePersona as 'elder' | 'caregiver' | 'clinician', showDock };
 
   /* ── routes ─────────────────────────────────────────────────────────── */
   const renderScreen = () => {
@@ -305,15 +310,7 @@ function AppContent() {
         return <SettingsScreen {...shared} />;
       case 'safety-dashboard':
         return <SafetyDashboard {...shared} />;
-      case 'demo':
-        return <DemoHubScreen {...shared} />;
       case 'diagnostics':
-      case 'sync-tests':
-      case 'security-tests':
-      case 'adaptive-tests':
-      case 'database-tests':
-      case 'reminder-tests':
-      case 'voice-language-tests':
         return <DiagnosticsScreen onBack={goBack} onNavigate={navigate} />;
       default:
         return <CaregiverHome {...shared} />;
@@ -328,9 +325,6 @@ function AppContent() {
       <SundowningCareModal isOpen={modal === 'sundowning'} onClose={() => setModal(null)} />
       <AshaTriageModal isOpen={modal === 'asha'} onClose={() => setModal(null)} />
       <WearableBadgeGeneratorModal isOpen={modal === 'badge'} onClose={() => setModal(null)} />
-
-      {/* Public SOS entry — visible to anyone, including on the login screen */}
-      {showDock && role === UserRole.PATIENT && null}
     </>
   );
 }

@@ -179,19 +179,22 @@ test('TIER 1 — Feature 4: Splash Screen Tranquil Animation & Theme Awareness',
 test('TIER 1 — Feature 5: Friction-Free Profile Selection & Back Navigation', async (t) => {
   const content = fs.readFileSync(path.join(rootDir, 'src/pages/auth/LoginScreen.tsx'), 'utf-8');
 
-  await t.test('5.1: Elder login uses quickLogin bypassing PIN requirements', () => {
-    assert.ok(content.includes('quickLogin'), 'LoginScreen must provide quickLogin for elders');
-    assert.ok(content.includes('handleDirectElderLogin'), 'Must have handleDirectElderLogin handler');
+  await t.test('5.1: A profile without a PIN opens in a single tap', () => {
+    assert.ok(content.includes('p.hasPin'), 'The picker must know which profiles are PIN-protected');
+    assert.ok(content.includes('if (!hasPin)'), 'An unprotected profile must skip the keypad entirely');
+    assert.ok(content.includes('void signIn(id)'), 'One tap must sign the person straight in');
   });
 
-  await t.test('5.2: Caregiver login enforces security PIN verification', () => {
-    assert.ok(content.includes('login(selectedUser, pin)'), 'Caregiver login must check PIN');
-    assert.ok(content.includes("t('auth.pin')"), 'Must show the caregiver PIN label');
-    assert.ok(content.includes('pin.length < 4'), 'Must refuse to submit a short PIN');
+  await t.test('5.2: A profile with a PIN cannot be opened without it', () => {
+    assert.ok(content.includes('login(accountId, withPin ??'), 'Sign-in must pass the PIN to the account store');
+    assert.ok(content.includes("result.error === 'pin'"), 'A wrong PIN must be reported, not ignored');
+    assert.ok(content.includes("t('auth.pin')"), 'Must show the PIN label');
   });
 
-  await t.test('5.3: Profile selection initializes to patient_primary by default', () => {
-    assert.ok(content.includes("useState<string>('patient_primary')"), 'Default profile must be patient_primary');
+  await t.test('5.3: First run has no default persona and asks to create an account', () => {
+    assert.ok(content.includes('profiles.length === 0'), 'A blank install must be detected');
+    assert.ok(content.includes("t('auth.firstRunTitle')"), 'It must offer set-up instead of a fake profile');
+    assert.ok(!content.includes('patient_primary'), 'No hard-coded persona may ship');
   });
 
   await t.test('5.4: Theme toggle button is present on login screen', () => {

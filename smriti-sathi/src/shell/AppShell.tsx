@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { ChevronLeft, LifeBuoy, Moon, Sun, Globe } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { Check, ChevronLeft, LifeBuoy, Moon, Sun, Globe } from 'lucide-react';
 import { BrandLockup, BrandMark, IconButton } from '../ui';
 import { useI18n } from '../i18n';
 import { tabsFor, type Persona } from './nav';
@@ -25,7 +25,6 @@ export interface AppShellProps {
   onOpenSos?: () => void;
   theme?: 'light' | 'dark';
   onToggleTheme?: () => void;
-  onOpenLanguage?: () => void;
   identity?: { name: string; sub?: string };
   footer?: ReactNode;
   children: ReactNode;
@@ -51,12 +50,12 @@ export function AppShell({
   onOpenSos,
   theme,
   onToggleTheme,
-  onOpenLanguage,
   identity,
   footer,
   children,
 }: AppShellProps) {
-  const { t, lang } = useI18n();
+  const { t, lang, languages, setLanguage } = useI18n();
+  const [langOpen, setLangOpen] = useState(false);
   const tabs = tabsFor(persona);
   const showDock = !hideDock && !bare;
   const isDark = theme === 'dark';
@@ -100,7 +99,7 @@ export function AppShell({
             )}
             {footer}
             <div className="t-xs pt-1 text-ink-4">
-              {t('app.name')} · v3.0.0
+              {t('app.name')} · v3.1.0
             </div>
           </div>
         </aside>
@@ -116,7 +115,7 @@ export function AppShell({
               </IconButton>
             ) : (
               <span className="lg:hidden">
-                <BrandMark size={34} />
+                <BrandMark size={30} />
               </span>
             )}
 
@@ -126,7 +125,11 @@ export function AppShell({
                   <div className="truncate text-[1.02rem] font-bold leading-tight tracking-[-0.01em] text-ink">
                     {shortTitle ?? title}
                   </div>
-                  {subtitle && <div className="truncate text-[0.74rem] leading-tight text-ink-3">{subtitle}</div>}
+                  {subtitle && (
+                    <div className="line-clamp-2 text-[0.74rem] leading-tight text-ink-3 sm:line-clamp-1">
+                      {subtitle}
+                    </div>
+                  )}
                 </>
               ) : (
                 <BrandLockup size={30} name={t('app.name')} />
@@ -135,18 +138,64 @@ export function AppShell({
 
             <div className="flex shrink-0 items-center gap-1.5">
               {actions}
-              {onOpenLanguage && (
-                <IconButton label={t('c.language')} variant="ghost" size="sm" onClick={onOpenLanguage}>
+              <div className="relative">
+                <IconButton
+                  label={t('c.language')}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setLangOpen((v) => !v)}
+                  aria-expanded={langOpen}
+                >
                   <span className="flex items-center gap-1 text-[0.7rem] font-extrabold uppercase">
                     <Globe className="h-4 w-4" />
-                    {lang}
+                    <span className="hidden sm:inline">{lang}</span>
                   </span>
                 </IconButton>
-              )}
+                {langOpen && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label={t('c.close')}
+                      tabIndex={-1}
+                      className="fixed inset-0 z-40 cursor-default bg-transparent"
+                      onClick={() => setLangOpen(false)}
+                    />
+                    <div
+                      role="menu"
+                      aria-label={t('c.language')}
+                      className="fixed inset-x-3 top-[68px] z-50 overflow-hidden rounded-[var(--r-md)] border border-[var(--line)] bg-[var(--surface)] p-1.5 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[13.5rem]"
+                      style={{ boxShadow: 'var(--shadow-3)' }}
+                    >
+                      <div className="t-eyebrow px-2 py-1.5">{t('c.language')}</div>
+                      {languages.map((l) => (
+                        <button
+                          key={l.code}
+                          type="button"
+                          role="menuitemradio"
+                          aria-checked={l.code === lang}
+                          onClick={() => {
+                            setLanguage(l.code);
+                            setLangOpen(false);
+                          }}
+                          className="flex w-full items-center justify-between gap-2 rounded-[var(--r-xs)] px-2 py-2 text-left text-[0.9rem] font-semibold text-ink hover:bg-[var(--surface-sunken)]"
+                        >
+                          <span className="truncate">
+                            {l.native}
+                            <span className="ml-1.5 text-[0.72rem] font-medium text-ink-4">{l.label}</span>
+                          </span>
+                          {l.code === lang && <Check className="h-4 w-4 shrink-0 text-[var(--brand-teal)]" />}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
               {onToggleTheme && (
-                <IconButton label={t('c.theme')} variant="ghost" size="sm" onClick={onToggleTheme}>
-                  {isDark ? <Sun /> : <Moon />}
-                </IconButton>
+                <span className="hidden sm:inline-flex">
+                  <IconButton label={t('c.theme')} variant="ghost" size="sm" onClick={onToggleTheme}>
+                    {isDark ? <Sun /> : <Moon />}
+                  </IconButton>
+                </span>
               )}
               {onOpenSos && (
                 <button

@@ -54,7 +54,7 @@ test('TIER 3 — Cross-Feature Interaction 2: Elder Quick Login -> Patient Home 
   const homeSrc = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
 
   // Verify elder quickLogin path requires zero PIN
-  assert.ok(loginSrc.includes("quickLogin('patient_primary')"), 'Elder login bypasses PIN check');
+  assert.ok(loginSrc.includes('if (!hasPin)'), 'An elder profile without a PIN bypasses the keypad');
 
   // Verify patient home screen loads the activity launcher upon entrance
   assert.ok(homeSrc.includes("t('home.myActivities')"), 'Patient home renders the activities section');
@@ -67,7 +67,7 @@ test('TIER 3 — Cross-Feature Interaction 3: Caregiver PIN Auth -> Caregiver Cl
   const dashSrc = fs.readFileSync(path.join(rootDir, 'src/pages/caregiver/CaregiverHome.tsx'), 'utf-8');
 
   // Verify caregiver login requires PIN entry
-  assert.ok(loginSrc.includes('login(selectedUser, pin)'), 'Caregiver route verifies security PIN');
+  assert.ok(loginSrc.includes('login(accountId, withPin ??'), 'Caregiver route verifies the account PIN');
 
   // Verify dashboard displays clinical metrics
   assert.ok(dashSrc.includes("t('cg.adherence')"), 'Dashboard displays reminder adherence');

@@ -119,9 +119,9 @@ export default function PatientHomeScreen({ onNavigate }: PatientHomeScreenProps
   const todayLabel = useMemo(
     () =>
       new Intl.DateTimeFormat(meta.htmlLang, {
-        weekday: 'long',
+        weekday: 'short',
         day: 'numeric',
-        month: 'long',
+        month: 'short',
       }).format(new Date()),
     [meta.htmlLang],
   );
@@ -200,7 +200,6 @@ export default function PatientHomeScreen({ onNavigate }: PatientHomeScreenProps
       onNavigate={onNavigate}
       onOpenSos={() => window.dispatchEvent(new Event('open-safe-return'))}
       onToggleTheme={toggleTheme}
-      onOpenLanguage={() => onNavigate('settings')}
       theme={state.accessibility?.theme}
       identity={{ name: patientName, sub: `${t('auth.elder')} · ${patient?.age ?? 72}` }}
       title={`${greeting}, ${patientName}`}
@@ -323,11 +322,15 @@ export default function PatientHomeScreen({ onNavigate }: PatientHomeScreenProps
           <Card tone="sage">
             <div className="flex items-center gap-3.5">
               <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--r-sm)] bg-[var(--brand-teal)] text-white">
-                <Check className="h-6 w-6" />
+                {reminders.length === 0 ? <Bell className="h-6 w-6" /> : <Check className="h-6 w-6" />}
               </span>
               <div className="min-w-0">
-                <div className="text-[1.05rem] font-bold text-ink">{t('home.noReminderToday')}</div>
-                <div className="t-sm">{t('home.noReminderBody')}</div>
+                <div className="text-[1.05rem] font-bold text-ink">
+                  {reminders.length === 0 ? t('home.noRemindersSet') : t('home.noReminderToday')}
+                </div>
+                <div className="t-sm">
+                  {reminders.length === 0 ? t('home.noRemindersSetBody') : t('home.noReminderBody')}
+                </div>
               </div>
               <div className="ml-auto hidden items-center gap-2 text-[0.82rem] font-semibold text-ink-3 sm:flex">
                 <Check className="h-4 w-4" /> {doneToday} {t('rem.completed').toLowerCase()}

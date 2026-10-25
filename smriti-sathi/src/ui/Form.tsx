@@ -123,14 +123,24 @@ export function ChoiceRow({
   native?: string;
 }) {
   const id = useId();
+  // A radio *row* can host its own controls (e.g. "hear this language"), so it is
+  // a div with radio semantics rather than a <button> — nested buttons are
+  // invalid HTML and confuse screen readers.
   return (
-    <button
-      type="button"
+    <div
       role="radio"
+      tabIndex={0}
       aria-checked={selected}
       aria-labelledby={id}
       onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
       className={cx(
+        'cursor-pointer select-none',
         'flex w-full items-center gap-3.5 rounded-[var(--r-md)] border-2 p-3.5 text-left transition-all',
         selected
           ? 'border-brand bg-brand-soft shadow-[var(--shadow-1)]'
@@ -159,6 +169,6 @@ export function ChoiceRow({
       >
         {selected && <span className="h-2 w-2 rounded-full bg-white" />}
       </span>
-    </button>
+    </div>
   );
 }

@@ -130,7 +130,6 @@ export default function MemoryMatchGame({ onBack }: Props) {
           </div>
           <h1 className="t-h1 mt-4">{t('games.match')}</h1>
           <p className="t-body mx-auto mt-1.5 max-w-[40ch]">{t('games.matchDesc')}</p>
-          <p className="t-sm mt-3">{t('games.takeYourTime')}</p>
         </Card>
 
           <div>

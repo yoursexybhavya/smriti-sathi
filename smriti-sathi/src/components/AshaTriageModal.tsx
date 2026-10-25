@@ -1,51 +1,151 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ClipboardList, Download, MessageCircle, Printer, Stethoscope } from 'lucide-react';
-import { Alert, Button, ProgressBar, Segmented, Sheet, Tag } from '../ui';
+import { Alert, Button, EmptyState, ProgressBar, Segmented, Sheet, Tag } from '../ui';
 import { useApp } from '../context/AppContext';
 import { useI18n } from '../i18n';
+import { db, gameSessionRepository, reminderRepository } from '../database';
+import { calculateMedian } from '../engine/spiBaseline';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const SESSIONS = [
-  { day: 'Day 1', score: 78 },
-  { day: 'Day 3', score: 80 },
-  { day: 'Day 5', score: 84 },
-  { day: 'Day 7', score: 83 },
-  { day: 'Day 9', score: 86 },
-  { day: 'Day 11', score: 85 },
-  { day: 'Day 13', score: 88 },
-  { day: 'Day 14', score: 86 },
-];
+interface TrendPoint {
+  label: string;
+  score: number;
+}
 
-const DOMAINS = [
-  { key: 'prog.domainRecall', score: 88, note: 'Consistent recall of family faces across 5 sessions' },
-  { key: 'prog.domainRecognition', score: 84, note: 'Stable pattern recognition; occasional cue needed' },
-  { key: 'prog.domainAttention', score: 79, note: 'Attention drops after 6 minutes — short sessions advised' },
-  { key: 'prog.domainRoutine', score: 91, note: 'Strong routine sequencing; morning routine best' },
-];
+interface DomainRow {
+  key: string;
+  score: number;
+  sessions: number;
+}
 
+const DOMAIN_BY_GAME: Record<string, string> = {
+  remember: 'prog.domainRecall',
+  family_quiz: 'prog.domainRecognition',
+  recognise: 'prog.domainRecognition',
+  memory_match: 'prog.domainAttention',
+  daily_routine: 'prog.domainRoutine',
+  test: 'prog.domainAttention',
+};
+
+/**
+ * ASHA / PHC triage sheet.
+ *
+ * Everything here is computed from the sessions this elder actually played and
+ * the reminders they actually acknowledged. Before seven sessions there is
+ * nothing honest to report, so the sheet says the baseline is calibrating
+ * instead of showing a score.
+ */
 export const AshaTriageModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const { state } = useApp();
-  const { t } = useI18n();
+  const { t, meta } = useI18n();
   const [tab, setTab] = useState<'overview' | 'domains' | 'guidelines'>('overview');
+  const [loading, setLoading] = useState(false);
+  const [sessions, setSessions] = useState(0);
+  const [median, setMedian] = useState(0);
+  const [adherence, setAdherence] = useState<number | null>(null);
+  const [trend, setTrend] = useState<TrendPoint[]>([]);
+  const [domains, setDomains] = useState<DomainRow[]>([]);
 
-  const elderName = state.currentPatient?.name ?? t('auth.elderName');
-  const elderAge = state.currentPatient?.age ?? 72;
+  const elderName = state.currentPatient?.name ?? t('saf.unknownElder');
+  const elderAge = state.currentPatient?.age ?? null;
 
-  const median = 86;
-  const stability = median >= 80 ? t('prog.stable') : median >= 65 ? t('prog.watch') : t('prog.declining');
+  const load = useCallback(async () => {
+    const rawId = state.currentPatient?.id;
+    const userId = rawId ? parseInt(rawId, 10) : NaN;
+    if (isNaN(userId)) {
+      setSessions(0);
+      setMedian(0);
+      setAdherence(null);
+      setTrend([]);
+      setDomains([]);
+      return;
+    }
 
-  const waMessage = `*SMRITI SATHI — ASHA COGNITIVE TRIAGE*\n\nPatient: ${elderName}, ${elderAge}\nSessions reviewed: 14\nSPI (14-session median): ${median}\nStatus: ${stability}\n\nDomain scores:\n${DOMAINS.map((d) => `• ${d.key.split('.').pop()}: ${d.score}`).join('\n')}\n\nNote: This is a screening summary from a cognitive-stimulation app. It is not a diagnosis.`;
+    setLoading(true);
+    try {
+      const all = await gameSessionRepository.getByUserId(userId);
+      const ordered = [...all].sort((a, b) => a.createdAt - b.createdAt);
+      const recent = ordered.slice(-14);
+      setSessions(ordered.length);
+      setMedian(recent.length ? Math.round(calculateMedian(recent.map((s) => s.score))) : 0);
+
+      const dayFmt = new Intl.DateTimeFormat(meta.htmlLang, { day: 'numeric' });
+      setTrend(
+        ordered.slice(-8).map((s) => ({
+          label: dayFmt.format(new Date(s.createdAt)),
+          score: s.score,
+        })),
+      );
+
+      const byDomain = new Map<string, number[]>();
+      ordered.forEach((s) => {
+        const key = DOMAIN_BY_GAME[s.gameType];
+        if (!key) return;
+        byDomain.set(key, [...(byDomain.get(key) ?? []), s.score]);
+      });
+      setDomains(
+        Array.from(byDomain.entries()).map(([key, scores]) => ({
+          key,
+          score: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+          sessions: scores.length,
+        })),
+      );
+
+      const [reminders, completions] = await Promise.all([
+        reminderRepository.getByUserId(userId),
+        db.reminderCompletions.where('userId').equals(userId).toArray(),
+      ]);
+      const total = reminders.length;
+      if (total === 0) {
+        setAdherence(null);
+      } else {
+        const doneIds = new Set(completions.map((c) => c.reminderId));
+        const done = reminders.filter((r) => r.status === 'completed' || doneIds.has(r.id!)).length;
+        setAdherence(Math.round((done / total) * 100));
+      }
+    } catch {
+      setSessions(0);
+      setMedian(0);
+      setAdherence(null);
+      setTrend([]);
+      setDomains([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [state.currentPatient?.id, meta.htmlLang]);
+
+  useEffect(() => {
+    if (isOpen) void load();
+  }, [isOpen, load]);
+
+  const status = median >= 80 ? t('prog.stable') : median >= 65 ? t('prog.watch') : t('prog.declining');
+  const calibrated = sessions >= 7;
+
+  const waMessage = [
+    '*SMRITI SATHI — ASHA COGNITIVE TRIAGE*',
+    '',
+    `${t('ob.nameLabel')}: ${elderName}${elderAge ? `, ${elderAge}` : ''}`,
+    `${t('prog.sessions')}: ${sessions}`,
+    calibrated ? `SPI (14-session median): ${median} · ${status}` : t('saf.calibrating'),
+    adherence !== null ? `${t('prog.adherence')}: ${adherence}%` : '',
+    '',
+    ...domains.map((d) => `• ${t(d.key)}: ${d.score} (${d.sessions})`),
+    '',
+    t('saf.disclaimer'),
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   return (
     <Sheet
       open={isOpen}
       onClose={onClose}
       eyebrow={t('saf.triage')}
-      title={`${elderName} · ${elderAge}`}
+      title={elderAge ? `${elderName} · ${elderAge}` : elderName}
       wide
       footer={
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -54,6 +154,7 @@ export const AshaTriageModal: React.FC<Props> = ({ isOpen, onClose }) => {
           </Button>
           <Button
             block
+            disabled={!calibrated}
             onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(waMessage)}`, '_blank')}
             icon={<MessageCircle className="h-[18px] w-[18px]" />}
           >
@@ -66,8 +167,12 @@ export const AshaTriageModal: React.FC<Props> = ({ isOpen, onClose }) => {
         <Tag tone="teal" icon={<Stethoscope className="h-3 w-3" />}>
           {t('prog.stability')}
         </Tag>
-        <Tag tone={median >= 80 ? 'success' : 'saffron'}>{stability}</Tag>
-        <Tag>{t('prog.sessions')}: 14</Tag>
+        <Tag tone={!calibrated ? 'saffron' : median >= 80 ? 'success' : 'saffron'}>
+          {calibrated ? status : t('saf.calibrating')}
+        </Tag>
+        <Tag>
+          {t('prog.sessions')}: {sessions}
+        </Tag>
       </div>
 
       <div className="mt-4">
@@ -85,50 +190,67 @@ export const AshaTriageModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
       {tab === 'overview' && (
         <div className="mt-4">
-          <div className="grid grid-cols-3 gap-2.5">
-            <div className="stat">
-              <span className="stat__label">SPI</span>
-              <span className="stat__value text-brand">{median}</span>
-            </div>
-            <div className="stat">
-              <span className="stat__label">{t('prog.adherence')}</span>
-              <span className="stat__value">94%</span>
-            </div>
-            <div className="stat">
-              <span className="stat__label">{t('prog.sessions')}</span>
-              <span className="stat__value">14</span>
-            </div>
-          </div>
-
-          <div className="mt-4 flex h-[130px] items-stretch gap-1.5">
-            {SESSIONS.map((s) => (
-              <div key={s.day} className="flex min-w-0 flex-1 flex-col items-center gap-1">
-                <div className="flex h-full w-full items-end">
-                  <div
-                    className="w-full rounded-t-[5px]"
-                    style={{
-                      height: `${Math.max(6, ((s.score - 50) / 50) * 100)}%`,
-                      background: 'linear-gradient(180deg, var(--brand-teal-bright), var(--brand-teal))',
-                    }}
-                    title={`${s.day}: ${s.score}`}
-                  />
+          {!calibrated ? (
+            <EmptyState
+              icon={<ClipboardList />}
+              title={t('saf.calibrating')}
+              body={t('saf.calibratingBody')}
+            />
+          ) : (
+            <>
+              <div className="grid grid-cols-3 gap-2.5">
+                <div className="stat">
+                  <span className="stat__label">SPI</span>
+                  <span className="stat__value text-brand">{median}</span>
                 </div>
-                <span className="text-[0.6rem] font-bold text-ink-4">{s.day.split(' ')[1]}</span>
+                <div className="stat">
+                  <span className="stat__label">{t('prog.adherence')}</span>
+                  <span className="stat__value">{adherence === null ? '—' : `${adherence}%`}</span>
+                </div>
+                <div className="stat">
+                  <span className="stat__label">{t('prog.sessions')}</span>
+                  <span className="stat__value">{sessions}</span>
+                </div>
               </div>
-            ))}
-          </div>
-          <p className="t-xs mt-2">{t('prog.stabilityBody')}</p>
+
+              <div className="mt-4 flex h-[130px] items-stretch gap-1.5">
+                {trend.map((s, i) => (
+                  <div key={`${s.label}-${i}`} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+                    <div className="flex h-full w-full items-end">
+                      <div
+                        className="w-full rounded-t-[5px]"
+                        style={{
+                          height: `${Math.max(6, Math.min(100, s.score))}%`,
+                          background: 'linear-gradient(180deg, var(--brand-teal-bright), var(--brand-teal))',
+                        }}
+                        title={`${s.label}: ${s.score}`}
+                      />
+                    </div>
+                    <span className="text-[0.6rem] font-bold text-ink-4">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="t-xs mt-2">{t('prog.stabilityBody')}</p>
+            </>
+          )}
+          {loading && <p className="t-xs mt-2">{t('c.loading')}</p>}
         </div>
       )}
 
       {tab === 'domains' && (
         <div className="mt-4 flex flex-col gap-3.5">
-          {DOMAINS.map((d) => (
-            <div key={d.key}>
-              <ProgressBar label={t(d.key)} value={d.score} showValue />
-              <p className="t-xs mt-1">{d.note}</p>
-            </div>
-          ))}
+          {domains.length === 0 ? (
+            <EmptyState icon={<ClipboardList />} title={t('saf.noDomains')} body={t('saf.noDomainsBody')} />
+          ) : (
+            domains.map((d) => (
+              <div key={d.key}>
+                <ProgressBar label={t(d.key)} value={d.score} showValue />
+                <p className="t-xs mt-1">
+                  {d.sessions} {t('prog.sessions').toLowerCase()}
+                </p>
+              </div>
+            ))
+          )}
         </div>
       )}
 
@@ -138,10 +260,10 @@ export const AshaTriageModal: React.FC<Props> = ({ isOpen, onClose }) => {
             {t('saf.triageBody')}
           </Alert>
           <ul className="flex flex-col gap-2 text-[0.86rem] leading-snug text-ink-2">
-            <li>• Keep sessions under 8 minutes; attention drops after 6.</li>
-            <li>• Prefer morning sessions for this patient.</li>
-            <li>• Escalate to PHC if SPI drops below 65 across 3 sessions.</li>
-            <li>• Use the family album daily — recognition scores are the strongest.</li>
+            <li>• {t('saf.guide1')}</li>
+            <li>• {t('saf.guide2')}</li>
+            <li>• {t('saf.guide3')}</li>
+            <li>• {t('saf.guide4')}</li>
           </ul>
         </div>
       )}

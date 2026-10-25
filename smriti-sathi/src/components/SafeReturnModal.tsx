@@ -4,16 +4,13 @@ import { QRCodeSvg } from './QRCodeSvg';
 import { Button, Sheet, Tag } from '../ui';
 import { useApp } from '../context/AppContext';
 import { useI18n } from '../i18n';
+import { MEDICAL_CARD_EVENT, medicalCardService, type MedicalCard } from '../services/care/MedicalCardService';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const BLOOD_GROUP = 'O+';
-const CONDITIONS = ['Dementia (moderate)', 'Hypertension', 'Sundowning in the evening'];
-const MEDICINES = ['Donepezil 5 mg — night', 'Amlodipine 5 mg — morning'];
-const ALLERGIES = ['Penicillin'];
 
 /**
  * Safe Return — designed for a stranger, not for the elder or the family.
@@ -23,26 +20,35 @@ export const SafeReturnModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const { state } = useApp();
   const { t, lang } = useI18n();
 
-  const elderName = state.currentPatient?.name ?? t('auth.elderName');
-  const elderAge = state.currentPatient?.age ?? 72;
+  const elderName = state.currentPatient?.name ?? t('saf.unknownElder');
+  const elderAge = state.currentPatient?.age ?? null;
 
-  const [guardianName, setGuardianName] = useState('Bhavya (Son)');
-  const [guardianPhone, setGuardianPhone] = useState('+91 98765 43210');
+  const [guardianName, setGuardianName] = useState(state.emergencyContact?.name ?? '');
+  const [guardianPhone, setGuardianPhone] = useState(state.emergencyContact?.phone ?? '');
+  const [card, setCard] = useState<MedicalCard>(() => medicalCardService.get());
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
 
   useEffect(() => {
-    try {
-      setGuardianName(localStorage.getItem('smriti_linked_caregiver_name') || guardianName);
-      setGuardianPhone(localStorage.getItem('smriti_linked_caregiver_phone') || guardianPhone);
-    } catch {
-      /* ignore */
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!isOpen) return;
+    setGuardianName(state.emergencyContact?.name ?? '');
+    setGuardianPhone(state.emergencyContact?.phone ?? '');
+    setCard(medicalCardService.get());
+  }, [isOpen, state.emergencyContact?.name, state.emergencyContact?.phone]);
+
+  useEffect(() => {
+    const sync = () => setCard(medicalCardService.get());
+    window.addEventListener(MEDICAL_CARD_EVENT, sync);
+    return () => window.removeEventListener(MEDICAL_CARD_EVENT, sync);
   }, []);
 
+  const hasContact = guardianName.trim().length > 0 && guardianPhone.replace(/[^0-9]/g, '').length >= 8;
   const cleanPhone = guardianPhone.replace(/[^0-9]/g, '');
-  const qrPayload = `https://smriti-sathi.onrender.com/rescue?name=${encodeURIComponent(elderName)}&phone=${cleanPhone}&blood=${encodeURIComponent(BLOOD_GROUP)}&lang=${lang}`;
+  const qrPayload = `SMRITI SATHI · ${elderName}${elderAge ? ` · ${elderAge}` : ''} · SOS ${
+    hasContact ? `${guardianName} ${guardianPhone}` : '112 / 14567'
+  }${card.bloodGroup ? ` · Blood ${card.bloodGroup}` : ''}${card.conditions.length ? ` · ${card.conditions.join(', ')}` : ''}${
+    card.medicines.length ? ` · Meds ${card.medicines.join(', ')}` : ''
+  }${card.allergies.length ? ` · Allergy ${card.allergies.join(', ')}` : ''}`;
 
   const shareLocation = () => {
     const send = (lat?: number, lng?: number) => {
@@ -70,7 +76,9 @@ export const SafeReturnModal: React.FC<Props> = ({ isOpen, onClose }) => {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(
-      `Please help. This is ${elderName}, who has dementia and may be lost. Please call ${guardianName} at ${guardianPhone}, or call 112.`,
+      hasContact
+        ? `Please help. This is ${elderName}, who has dementia and may be lost. Please call ${guardianName} at ${guardianPhone}, or call 112.`
+        : `Please help. This is ${elderName}, who has dementia and may be lost. Please call 112 or 14567.`,
     );
     u.lang = 'en-IN';
     u.rate = 0.9;
@@ -87,13 +95,22 @@ export const SafeReturnModal: React.FC<Props> = ({ isOpen, onClose }) => {
       className="!bg-[var(--surface)]"
       footer={
         <div className="flex flex-col gap-2">
-          <a href={`tel:${cleanPhone}`} className="btn btn--danger btn--lg btn--block">
-            <Phone className="h-[18px] w-[18px]" />
-            {t('saf.callGuardian')} · {guardianPhone}
-          </a>
-          <Button variant="secondary" block onClick={shareLocation} loading={locating} icon={<MessageCircle className="h-[18px] w-[18px]" />}>
-            {t('saf.shareLocation')}
-          </Button>
+          {hasContact ? (
+            <>
+              <a href={`tel:${cleanPhone}`} className="btn btn--danger btn--lg btn--block">
+                <Phone className="h-[18px] w-[18px]" />
+                {t('saf.callGuardian')} · {guardianPhone}
+              </a>
+              <Button variant="secondary" block onClick={shareLocation} loading={locating} icon={<MessageCircle className="h-[18px] w-[18px]" />}>
+                {t('saf.shareLocation')}
+              </Button>
+            </>
+          ) : (
+            <a href="tel:112" className="btn btn--danger btn--lg btn--block">
+              <Phone className="h-[18px] w-[18px]" />
+              {t('saf.callEmergency')}
+            </a>
+          )}
         </div>
       }
     >
@@ -106,7 +123,8 @@ export const SafeReturnModal: React.FC<Props> = ({ isOpen, onClose }) => {
               {elderName}
             </div>
             <div className="mt-0.5 text-[0.95rem] font-bold text-[var(--danger-strong)] opacity-85">
-              {elderAge} {t('c.years')} · {t('saf.hasDementia')}
+              {elderAge ? `${elderAge} ${t('c.years')} · ` : ''}
+              {t('saf.hasDementia')}
             </div>
           </div>
           <Tag tone="danger" icon={<ShieldAlert className="h-3 w-3" />}>
@@ -120,15 +138,27 @@ export const SafeReturnModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
       {/* One-tap actions */}
       <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-        <a href={`tel:${cleanPhone}`} className="card card--pad card--interactive flex items-center gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--danger)] text-white">
-            <Phone className="h-5 w-5" />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-[0.95rem] font-bold text-ink">{guardianName}</span>
-            <span className="t-xs block">{guardianPhone}</span>
-          </span>
-        </a>
+        {hasContact ? (
+          <a href={`tel:${cleanPhone}`} className="card card--pad card--interactive flex items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--danger)] text-white">
+              <Phone className="h-5 w-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[0.95rem] font-bold text-ink">{guardianName}</span>
+              <span className="t-xs block">{guardianPhone}</span>
+            </span>
+          </a>
+        ) : (
+          <div className="card card--pad flex items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--surface-sunken)] text-ink-3">
+              <Phone className="h-5 w-5" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[0.95rem] font-bold text-ink">{t('saf.noContact')}</span>
+              <span className="t-xs block">{t('saf.noContactBody')}</span>
+            </span>
+          </div>
+        )}
 
         <a href="tel:14567" className="card card--pad card--interactive flex items-center gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[var(--brand-teal-soft)] text-[var(--brand-teal-deep)]">
@@ -179,27 +209,31 @@ export const SafeReturnModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <div className="flex items-center gap-2">
             <Droplet className="h-4 w-4 text-[var(--danger)]" />
             <span className="text-[0.95rem] font-bold text-ink">
-              {t('saf.bloodGroup')}: {BLOOD_GROUP}
+              {t('saf.bloodGroup')}: {card.bloodGroup || t('c.notAdded')}
             </span>
           </div>
-          <dl className="mt-2 grid gap-2 text-[0.82rem] sm:grid-cols-2">
-            <div>
-              <dt className="font-bold text-ink-3">{t('saf.conditions')}</dt>
-              <dd className="text-ink-2">{CONDITIONS.join(', ')}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-ink-3">{t('saf.medicines')}</dt>
-              <dd className="text-ink-2">{MEDICINES.join(', ')}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-ink-3">{t('saf.allergies')}</dt>
-              <dd className="text-ink-2">{ALLERGIES.join(', ')}</dd>
-            </div>
-            <div>
-              <dt className="font-bold text-ink-3">{t('saf.language')}</dt>
-              <dd className="text-ink-2">{lang.toUpperCase()}</dd>
-            </div>
-          </dl>
+          {medicalCardService.isEmpty(card) ? (
+            <p className="t-xs mt-2">{t('saf.cardEmpty')}</p>
+          ) : (
+            <dl className="mt-2 grid gap-2 text-[0.82rem] sm:grid-cols-2">
+              <div>
+                <dt className="font-bold text-ink-3">{t('saf.conditions')}</dt>
+                <dd className="text-ink-2">{card.conditions.join(', ') || t('c.notAdded')}</dd>
+              </div>
+              <div>
+                <dt className="font-bold text-ink-3">{t('saf.medicines')}</dt>
+                <dd className="text-ink-2">{card.medicines.join(', ') || t('c.notAdded')}</dd>
+              </div>
+              <div>
+                <dt className="font-bold text-ink-3">{t('saf.allergies')}</dt>
+                <dd className="text-ink-2">{card.allergies.join(', ') || t('c.notAdded')}</dd>
+              </div>
+              <div>
+                <dt className="font-bold text-ink-3">{t('saf.language')}</dt>
+                <dd className="text-ink-2">{lang.toUpperCase()}</dd>
+              </div>
+            </dl>
+          )}
         </div>
         <div className="mx-auto flex flex-col items-center gap-1.5">
           <div className="rounded-[var(--r-sm)] bg-white p-2 shadow-[var(--shadow-2)]">

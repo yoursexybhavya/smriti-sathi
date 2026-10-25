@@ -50,9 +50,10 @@ export default function PatientProfileSetup({
     if (!validate()) return;
     onNext({
       id: initial?.id ?? `patient_${Date.now()}`,
-      name: name.trim() || t('auth.elderName'),
+      name: name.trim(),
       age: Number(age),
       preferredLanguage: initial?.preferredLanguage ?? 'en',
+      profileImage: initial?.profileImage,
       dailyRoutine: initial?.dailyRoutine ?? [],
       reminderPreferences: initial?.reminderPreferences ?? {
         medicine: true,
@@ -87,7 +88,7 @@ export default function PatientProfileSetup({
         label={t('ob.ageLabel')}
         htmlFor="ob-age"
         error={ageError}
-        hint={!ageError ? 'Valid elder care range: 40–120 years' : undefined}
+        hint={!ageError ? t('ob.ageRange') : undefined}
       >
         <Input
           id="ob-age"
@@ -109,7 +110,7 @@ export default function PatientProfileSetup({
           {t('c.next')}
         </Button>
         <Button variant="ghost" size="lg" onClick={onBack}>
-          ← Back to Welcome
+          ← {t('c.back')}
         </Button>
       </div>
     </Card>

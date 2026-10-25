@@ -151,7 +151,7 @@ export default function SafetyDashboard({ onNavigate, onBack, persona = 'caregiv
         {t('saf.disclaimer')}
       </Alert>
       <p className="t-xs mt-3 text-center">
-        <Tag>{t('app.name')} v3.0.0</Tag>
+        <Tag>{t('app.name')} v3.1.0</Tag>
       </p>
     </AppShell>
   );

@@ -1,9 +1,11 @@
 import { HeartHandshake, Languages, ShieldCheck, Sparkles } from 'lucide-react';
 import { Button, Card } from '../../ui';
 import { useI18n } from '../../i18n';
+import { useAuth } from '../../context/AuthContext';
 
-export default function OnboardingWelcome({ onNext, onCancel }: { onNext: () => void; onCancel?: () => void }) {
+export default function OnboardingWelcome({ onNext }: { onNext: () => void }) {
   const { t } = useI18n();
+  const { persona } = useAuth();
 
   const points = [
     { icon: Sparkles, title: t('games.title'), body: t('games.subtitle') },
@@ -14,13 +16,16 @@ export default function OnboardingWelcome({ onNext, onCancel }: { onNext: () => 
   return (
     <Card className="flex flex-col gap-5">
       <div>
-        <h1 className="t-h1">{t('ob.welcomeTitle')}</h1>
-        <p className="t-body mt-1.5">{t('ob.welcomeBody')}</p>
+        <h1 className="t-h1">{persona === 'elder' ? t('ob.welcomeTitle') : t('ob.welcomeTitleCare')}</h1>
+        <p className="t-body mt-1.5">{persona === 'elder' ? t('ob.welcomeBody') : t('ob.welcomeBodyCare')}</p>
       </div>
 
       <ul className="flex flex-col gap-2.5">
         {points.map(({ icon: Icon, title, body }) => (
-          <li key={title} className="flex items-start gap-3 rounded-[var(--r-md)] border border-[var(--line-soft)] bg-[var(--surface-warm)] p-3">
+          <li
+            key={title}
+            className="flex items-start gap-3 rounded-[var(--r-md)] border border-[var(--line-soft)] bg-[var(--surface-warm)] p-3"
+          >
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--brand-teal-soft)] text-[var(--brand-teal-deep)]">
               <Icon className="h-5 w-5" />
             </span>
@@ -33,25 +38,13 @@ export default function OnboardingWelcome({ onNext, onCancel }: { onNext: () => 
       </ul>
 
       <div className="flex items-center gap-2 rounded-[var(--r-sm)] bg-[var(--success-soft)] px-3 py-2 text-[0.8rem] font-semibold text-[var(--success)]">
-        <ShieldCheck className="h-4 w-4" />
+        <ShieldCheck className="h-4 w-4 shrink-0" />
         {t('c.offlineBody')}
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <Button size="lg" onClick={onNext}>
-          {t('c.next')}
-        </Button>
-        {onCancel && (
-          <Button variant="ghost" size="lg" onClick={onCancel}>
-            Return to Profile Selection
-          </Button>
-        )}
-      </div>
-      <p className="t-xs">
-        <button type="button" onClick={onCancel} className="font-bold text-brand hover:underline">
-          Switch Profile / Login
-        </button>
-      </p>
+      <Button size="lg" onClick={onNext}>
+        {t('ob.letsBegin')}
+      </Button>
     </Card>
   );
 }
