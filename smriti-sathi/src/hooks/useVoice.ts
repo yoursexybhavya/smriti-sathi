@@ -7,20 +7,21 @@
  */
 
 import { useCallback, useRef, useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import type { Language } from '../i18n/translations';
+import { useI18n } from '../i18n';
+import type { LanguageCode } from '../i18n/types';
 import { synthesizeBhashiniTTS } from '../services/bhashiniService';
 
-// Web Speech API language mappings
-const SPEECH_LANG_MAP: Record<Language, string[]> = {
+// Web Speech API language mappings (best voice first, then graceful fallbacks)
+const SPEECH_LANG_MAP: Record<LanguageCode, string[]> = {
   en: ['en-IN', 'en-GB', 'en-US'],
+  hi: ['hi-IN', 'en-IN'],
   as: ['as-IN', 'bn-IN', 'hi-IN', 'en-IN'],
-  brx: ['hi-IN', 'en-IN'],
-  mni: ['bn-IN', 'hi-IN', 'en-IN'],
+  brx: ['brx-IN', 'hi-IN', 'en-IN'],
+  mni: ['mni-IN', 'bn-IN', 'hi-IN', 'en-IN'],
 };
 
 export function useVoice() {
-  const { language } = useLanguage();
+  const { lang: language } = useI18n();
   const [isSpeaking, setIsSpeaking] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const activeAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -43,7 +44,7 @@ export function useVoice() {
    * Speak a text message in the user's preferred language.
    * Priority: Online Government Bhashini AI Neural Voice -> Offline Web Speech API.
    */
-  const speak = useCallback(async (text: string, overrideLang?: Language) => {
+  const speak = useCallback(async (text: string, overrideLang?: LanguageCode) => {
     const targetLang = overrideLang || language;
 
     // Stop previous audio
@@ -60,7 +61,7 @@ export function useVoice() {
     // Try online Bhashini TTS first if navigator is online
     if (navigator.onLine && targetLang !== 'en') {
       try {
-        const audioUri = await synthesizeBhashiniTTS(text, targetLang);
+        const audioUri = await synthesizeBhashiniTTS(text, targetLang as unknown as Parameters<typeof synthesizeBhashiniTTS>[1]);
         if (audioUri) {
           const audio = new Audio(audioUri);
           activeAudioRef.current = audio;

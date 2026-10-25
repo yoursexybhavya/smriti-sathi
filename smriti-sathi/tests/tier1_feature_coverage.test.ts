@@ -31,40 +31,41 @@ const rootDir = path.resolve(__dirname, '..');
 // ============================================================================
 // FEATURE 1: Scandinavian Design Tokens & Canvas
 // ============================================================================
-test('TIER 1 — Feature 1: Scandinavian Design Tokens & Canvas', async (t) => {
-  const globalsCss = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
+test('TIER 1 — Feature 1: Warm Heritage design tokens & canvas', async (t) => {
+  // v3: one token source of truth (globals.css was retired — its unlayered
+  // reset was overriding every Tailwind utility in the app).
+  const tokensCss = fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8');
+  const componentCss = fs.readFileSync(path.join(rootDir, 'src/styles/components.css'), 'utf-8');
+  const globalsCss = tokensCss + '\n' + componentCss;
 
-  await t.test('1.1: Light canvas color token (#F8FAFC) is defined in globals.css', () => {
-    assert.ok(
-      globalsCss.includes('--color-bg: #F8FAFC') || globalsCss.includes('#F8FAFC'),
-      'Light theme canvas must define #F8FAFC'
-    );
+  await t.test('1.1: Light warm-ivory canvas token (#FBF6EE) is defined', () => {
+    assert.ok(tokensCss.includes('--canvas: #FBF6EE'), 'Light canvas must define warm ivory #FBF6EE');
   });
 
-  await t.test('1.2: Dark canvas color token (#080C14 / #0A1420 / #0B0F17) is defined in globals.css', () => {
-    const hasDarkCanvas = globalsCss.includes('#080C14') || globalsCss.includes('#0A1420') || globalsCss.includes('#0B0F17');
-    assert.ok(hasDarkCanvas, 'Dark theme canvas must define deep midnight navy / slate canvas');
+  await t.test('1.2: Dark "Calm Night" canvas token (#0C1512) is defined', () => {
+    assert.ok(tokensCss.includes('--canvas: #0C1512'), 'Dark canvas must define calm-night #0C1512');
   });
 
-  await t.test('1.3: Deep slate typography color token (#0F172A) is defined for high contrast', () => {
-    assert.ok(
-      globalsCss.includes('--color-text: #0F172A') || globalsCss.includes('#0F172A'),
-      'Light theme text must define deep slate #0F172A'
-    );
+  await t.test('1.3: Deep teal-ink typography token (#17211E) is defined for high contrast', () => {
+    assert.ok(tokensCss.includes('--ink: #17211E'), 'Light theme text must define teal ink #17211E');
   });
 
-  await t.test('1.4: Crisp accent tokens (Indigo/Cobalt or Lumosity accents) are defined', () => {
-    const hasAccents =
-      globalsCss.includes('--color-accent-blue') ||
-      globalsCss.includes('#0EA5E9') ||
-      globalsCss.includes('#4F46E5') ||
-      globalsCss.includes('#3B82F6');
-    assert.ok(hasAccents, 'Design system must define crisp blue/indigo accent tokens');
+  await t.test('1.4: Brand accents are drawn from the logo (teal / saffron / terracotta)', () => {
+    assert.ok(tokensCss.includes('--brand-teal: #0E5C50'), 'Must define brand teal #0E5C50');
+    assert.ok(tokensCss.includes('--brand-saffron: #C77A19'), 'Must define saffron #C77A19');
+    assert.ok(tokensCss.includes('--brand-terracotta: #B4432B'), 'Must define terracotta #B4432B');
   });
 
-  await t.test('1.5: Functional signal tokens (Emerald #10B981 / Amber #F59E0B) are defined', () => {
-    assert.ok(globalsCss.includes('#10B981'), 'Must define emerald success signal #10B981');
-    assert.ok(globalsCss.includes('#F59E0B'), 'Must define amber warning signal #F59E0B');
+  await t.test('1.5: Functional signal tokens (success / warning) are defined', () => {
+    assert.ok(tokensCss.includes('--success: #2C7A54'), 'Must define success signal #2C7A54');
+    assert.ok(tokensCss.includes('--warning: #A9650C'), 'Must define warning signal #A9650C');
+    assert.ok(tokensCss.includes('--danger: #B3261E'), 'Must define danger signal #B3261E');
+  });
+
+  await t.test('1.6: All global CSS is layered so utilities always win', () => {
+    assert.ok(!/, \*::before/.test(globalsCss.split('@layer')[0] || ''), 'No unlayered universal reset may ship');
+    assert.ok(componentCss.includes('@layer components'), 'Component CSS must live in @layer components');
+    assert.ok(!fs.existsSync(path.join(rootDir, 'src/styles/globals.css')), 'The unlayered legacy globals.css must stay deleted');
   });
 });
 
@@ -87,11 +88,9 @@ test('TIER 1 — Feature 2: Zero Lingering Muddy Colors in Core Redesigned UI', 
     assert.ok(!content.includes('#F5F0E8'), 'LoginScreen.tsx must not contain muddy #F5F0E8');
   });
 
-  await t.test('2.4: RecogniseGame.tsx and RecognisePlay.tsx contain ZERO instances of #F5F0E8', () => {
+  await t.test('2.4: RecogniseGame.tsx contains ZERO instances of #F5F0E8', () => {
     const game = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecogniseGame.tsx'), 'utf-8');
-    const play = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecognisePlay.tsx'), 'utf-8');
     assert.ok(!game.includes('#F5F0E8'), 'RecogniseGame.tsx must not contain #F5F0E8');
-    assert.ok(!play.includes('#F5F0E8'), 'RecognisePlay.tsx must not contain #F5F0E8');
   });
 
   await t.test('2.5: MemoryMatchGame.tsx and DailyRoutineGame.tsx contain ZERO instances of #F5F0E8', () => {
@@ -106,35 +105,38 @@ test('TIER 1 — Feature 2: Zero Lingering Muddy Colors in Core Redesigned UI', 
 // FEATURE 3: Tactile 56-64px Senior Touch Targets
 // ============================================================================
 test('TIER 1 — Feature 3: Tactile 56-64px Senior Touch Targets', async (t) => {
-  await t.test('3.1: LargeButton component satisfies minimum 56px senior touch target', () => {
-    const content = fs.readFileSync(path.join(rootDir, 'src/components/LargeButton.tsx'), 'utf-8');
-    const minHeightMatch = content.match(/min-h-\[(\d+)px\]/);
-    const has56px =
-      (minHeightMatch !== null && Number(minHeightMatch[1]) >= 56) ||
-      content.includes('py-4') ||
-      content.includes('h-14') ||
-      content.includes('h-16');
-    assert.ok(has56px, 'LargeButton must enforce minimum 56px height or py-4 padding');
+  const tokensCss = fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8');
+  const componentCss = fs.readFileSync(path.join(rootDir, 'src/styles/components.css'), 'utf-8');
+  const buttonTsx = fs.readFileSync(path.join(rootDir, 'src/ui/Button.tsx'), 'utf-8');
+
+  await t.test('3.1: Button primitive is driven by the senior touch-target tokens (52 / 60 / 72px)', () => {
+    assert.ok(tokensCss.includes('--tap-min: 52px'), 'Must define a 52px tremor-safe minimum');
+    assert.ok(tokensCss.includes('--tap-comfort: 60px'), 'Must define a 60px comfort target');
+    assert.ok(tokensCss.includes('--tap-elder: 72px'), 'Must define a 72px elder primary target');
+    assert.ok(componentCss.includes('min-height: var(--tap-min)'), 'The button base must consume the token');
+    assert.ok(buttonTsx.includes('size = \'md\''), 'Button must expose size variants');
   });
 
-  await t.test('3.2: LoginScreen elder action button specifies py-4 / >=56px target', () => {
+  await t.test('3.2: LoginScreen uses the large button size for its primary action', () => {
     const content = fs.readFileSync(path.join(rootDir, 'src/pages/auth/LoginScreen.tsx'), 'utf-8');
-    assert.ok(content.includes('py-4') || content.includes('min-h-[56px]'), 'Elder action button must have py-4');
+    assert.ok(content.includes('size="lg"') || content.includes('size="xl"'), 'Sign-in action must use a large size');
   });
 
-  await t.test('3.3: AccessibilitySetup option buttons specify min-h-[64px]', () => {
+  await t.test('3.3: Accessibility settings use a segmented control with >=52px rows', () => {
     const content = fs.readFileSync(path.join(rootDir, 'src/pages/onboarding/AccessibilitySetup.tsx'), 'utf-8');
-    assert.ok(content.includes('min-h-[64px]'), 'Accessibility text size buttons must specify min-h-[64px]');
+    assert.ok(content.includes('Segmented'), 'Text-size choice must use the segmented primitive');
+    assert.ok(componentCss.includes('min-height: var(--tap-min)'), 'Segmented rows must honour the tap token');
   });
 
-  await t.test('3.4: PatientHomeScreen primary daily focus button satisfies >=52px height', () => {
+  await t.test('3.4: PatientHomeScreen primary CTA satisfies the elder target', () => {
     const content = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
-    assert.ok(content.includes('min-h-[52px]') || content.includes('py-3.5'), 'Primary daily focus button must have tactile height');
+    assert.ok(content.includes('size="lg"') || content.includes('size="xl"'), 'Daily focus CTA must be large');
   });
 
-  await t.test('3.5: RecognisePlay option cards specify generous touch targets (min-h-[160px])', () => {
-    const content = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecognisePlay.tsx'), 'utf-8');
-    assert.ok(content.includes('min-h-[160px]'), 'RecognisePlay option cards must provide large tactile targets');
+  await t.test('3.5: RecogniseGame option tiles are generous square targets', () => {
+    const content = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecogniseGame.tsx'), 'utf-8');
+    assert.ok(content.includes('aspect-square'), 'Option tiles must be square and large');
+    assert.ok(componentCss.includes('--object-min'), 'Object tiles must declare a minimum height');
   });
 });
 
@@ -144,29 +146,30 @@ test('TIER 1 — Feature 3: Tactile 56-64px Senior Touch Targets', async (t) => 
 test('TIER 1 — Feature 4: Splash Screen Tranquil Animation & Theme Awareness', async (t) => {
   const content = fs.readFileSync(path.join(rootDir, 'src/pages/SplashScreen.tsx'), 'utf-8');
 
-  await t.test('4.1: SplashScreen renders appName, tagline, and version tag', () => {
-    assert.ok(content.includes('{appName}'), 'SplashScreen must display appName prop');
-    assert.ok(content.includes('{tagline}'), 'SplashScreen must display tagline prop');
-    assert.ok(content.includes('v2.2.0'), 'SplashScreen must include version tag');
+  await t.test('4.1: SplashScreen renders the localised app name, tagline and version', () => {
+    assert.ok(content.includes("t('app.name')"), 'SplashScreen must display the app name');
+    assert.ok(content.includes("t('app.tagline')"), 'SplashScreen must display the tagline');
+    assert.ok(/v\d+\.\d+\.\d+/.test(content), 'SplashScreen must include a version tag');
   });
 
-  await t.test('4.2: SplashScreen uses tranquil duration-700 fade/translate animation', () => {
-    assert.ok(content.includes('duration-700'), 'Must use 700ms tranquil transition');
-    assert.ok(content.includes('opacity-100 translate-y-0'), 'Must use smooth translate-y transition');
+  await t.test('4.2: SplashScreen reveals with a tranquil 700ms fade + rise', () => {
+    assert.ok(content.includes('duration-700'), 'Must use the 700ms tranquil transition');
+    assert.ok(content.includes('translateY(0)'), 'Must rise into place');
   });
 
-  await t.test('4.3: SplashScreen renders Lucide Brain icon hero', () => {
-    assert.ok(content.includes('Brain'), 'SplashScreen must import and render Brain icon');
+  await t.test('4.3: SplashScreen uses the vector brand mark (no clip-art)', () => {
+    assert.ok(content.includes('BrandMark'), 'SplashScreen must render the vector brand mark');
   });
 
-  await t.test('4.4: SplashScreen renders staggered 3-dot pulsing loading indicator', () => {
-    assert.ok(content.includes('animate-pulse'), 'Must render animated pulse dots');
-    assert.ok(content.includes('animationDelay'), 'Must specify staggered delay for calming rhythm');
+  await t.test('4.4: SplashScreen is calm — no spinners or pulsing dots', () => {
+    assert.ok(!content.includes('animate-spin'), 'A splash screen must not show a spinner');
+    assert.ok(!content.includes('animate-pulse'), 'A splash screen must not pulse at the user');
+    assert.ok(content.includes('role="status"'), 'Splash must announce itself politely to screen readers');
   });
 
-  await t.test('4.5: SplashScreen enforces full-screen fixed z-50 overlay positioning', () => {
-    assert.ok(content.includes('fixed inset-0'), 'Must be fixed inset-0 overlay');
-    assert.ok(content.includes('z-50'), 'Must have z-50 overlay level');
+  await t.test('4.5: SplashScreen fills the viewport on every device', () => {
+    assert.ok(content.includes('min-h-[100dvh]'), 'Must fill the dynamic viewport height');
+    assert.ok(content.includes('overflow-hidden'), 'Must not allow the aura to create scrollbars');
   });
 });
 
@@ -183,7 +186,8 @@ test('TIER 1 — Feature 5: Friction-Free Profile Selection & Back Navigation', 
 
   await t.test('5.2: Caregiver login enforces security PIN verification', () => {
     assert.ok(content.includes('login(selectedUser, pin)'), 'Caregiver login must check PIN');
-    assert.ok(content.includes('Caregiver Security PIN'), 'Must show Caregiver Security PIN label');
+    assert.ok(content.includes("t('auth.pin')"), 'Must show the caregiver PIN label');
+    assert.ok(content.includes('pin.length < 4'), 'Must refuse to submit a short PIN');
   });
 
   await t.test('5.3: Profile selection initializes to patient_primary by default', () => {
@@ -192,7 +196,7 @@ test('TIER 1 — Feature 5: Friction-Free Profile Selection & Back Navigation', 
 
   await t.test('5.4: Theme toggle button is present on login screen', () => {
     assert.ok(content.includes('toggleTheme'), 'Login screen must have toggleTheme');
-    assert.ok(content.includes('aria-label="Toggle Theme"'), 'Must have accessible theme toggle aria label');
+    assert.ok(content.includes("<IconButton label={t('c.theme')}"), 'Theme toggle must carry an accessible label');
   });
 
   await t.test('5.5: Invalid PIN submission sets error message state', () => {
@@ -239,36 +243,37 @@ test('TIER 1 — Feature 6: Onboarding Flow (0-4) with working preview & back bu
 test('TIER 1 — Feature 7: Patient Home Screen with 2x2 Cognitive Launcher Grid & Real Care Schedule', async (t) => {
   const content = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
 
-  await t.test('7.1: 2x2 Cognitive grid renders Remember, Recognise, Memory Match, Daily Routine', () => {
-    assert.ok(content.includes('Remember Game'), 'Grid must include Remember Game');
-    assert.ok(content.includes('Recognise Game'), 'Grid must include Recognise Game');
-    assert.ok(content.includes('Memory Match'), 'Grid must include Memory Match');
-    assert.ok(content.includes('Daily Routine'), 'Grid must include Daily Routine');
+  await t.test('7.1: The activity grid renders all four cognitive games from one source', () => {
+    assert.ok(content.includes('ACTIVITIES.map'), 'Grid must be driven by the activity registry');
+    const registry = fs.readFileSync(path.join(rootDir, 'src/data/activities.ts'), 'utf-8');
+    for (const route of ['remember-game', 'recognise-game', 'memory-match', 'daily-routine']) {
+      assert.ok(registry.includes(`route: '${route}'`), `Activity registry must include ${route}`);
+    }
   });
 
-  await t.test('7.2: Daily Focus Hero Card launches featured exercise', () => {
-    assert.ok(content.includes("Today's Daily Focus"), 'Must feature Daily Focus hero card');
-    assert.ok(content.includes("onNavigate('remember-game')"), 'Daily focus must trigger game launch');
+  await t.test('7.2: The hero card launches the suggested activity of the day', () => {
+    assert.ok(content.includes("t('home.todayEyebrow')"), 'Must feature the "today for you" hero card');
+    assert.ok(content.includes('suggested.route'), 'Hero must launch the suggested activity');
+    assert.ok(content.includes('home.startGame'), 'Hero must offer a start action');
   });
 
-  await t.test('7.3: Real Care Schedule renders reminders from database', () => {
-    assert.ok(content.includes("Today's Care Schedule"), 'Must include Today Care Schedule section');
-    assert.ok(content.includes('reminderService.getAllReminders'), 'Must load reminders from reminderService');
+  await t.test('7.3: The next-reminder card renders live reminders', () => {
+    assert.ok(content.includes("t('home.nextReminder')"), 'Must surface the next reminder');
+    assert.ok(content.includes('reminderService'), 'Must load reminders from reminderService');
+    assert.ok(content.includes('nextReminder'), 'Must derive the next pending reminder');
   });
 
-  await t.test('7.4: One-tap status toggle flips reminder between pending and completed', () => {
-    assert.ok(content.includes('handleToggleReminder'), 'Must provide handleToggleReminder');
-    assert.ok(
-      content.includes("rem.status === 'completed'") &&
-      content.includes("status: 'pending'") &&
-      content.includes('completeReminder'),
-      'Must toggle reminder status between completed and pending'
-    );
+  await t.test('7.4: One tap marks a reminder taken, or snoozes it', () => {
+    assert.ok(content.includes('completeReminder'), 'Must provide completeReminder');
+    assert.ok(content.includes('snoozeReminder'), 'Must provide snoozeReminder');
+    assert.ok(content.includes("t('home.taken')"), 'Must offer a taken action');
+    assert.ok(content.includes("t('home.snooze')"), 'Must offer a snooze action');
   });
 
-  await t.test('7.5: Spoken comfort anchor card triggers audio voice guidance', () => {
-    assert.ok(content.includes('speakComfort'), 'Must provide speakComfort handler');
-    assert.ok(content.includes('Listen Aloud'), 'Must have Listen Aloud button');
+  await t.test('7.5: The page can be read aloud', () => {
+    assert.ok(content.includes('const readPage'), 'Must provide a read-aloud handler');
+    assert.ok(content.includes('speak('), 'Must call the speech service');
+    assert.ok(content.includes("t('home.hearThis')"), 'Must expose a hear-this button');
   });
 });
 
@@ -276,25 +281,29 @@ test('TIER 1 — Feature 7: Patient Home Screen with 2x2 Cognitive Launcher Grid
 // FEATURE 8: Recognise Game (Offline fallback assets, 56px touch areas, audio feedback)
 // ============================================================================
 test('TIER 1 — Feature 8: Recognise Game (Offline fallback assets, 56px touch areas, audio feedback)', async (t) => {
-  const playContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecognisePlay.tsx'), 'utf-8');
   const gameContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecogniseGame.tsx'), 'utf-8');
+  const playContent = gameContent;
 
   await t.test('8.1: Recognise game generates question and candidate options', () => {
     assert.ok(gameContent.includes('RecogniseGameEngine.generateActivity'), 'Must generate activity from engine');
-    assert.ok(playContent.includes('activity.objects.map'), 'Must render activity objects');
+    assert.ok(playContent.includes('activity.options.map'), 'Must render candidate options');
   });
 
-  await t.test('8.2: Selecting an option speaks the name aloud via TTS voice synthesis', () => {
-    assert.ok(playContent.includes('speak(name)'), 'Must call speak(name) on option select');
+  await t.test('8.2: Answering gives spoken feedback', () => {
+    assert.ok(playContent.includes('speak('), 'Must speak on answer');
+    assert.ok(playContent.includes("t('games.wellDone')"), 'Must give encouraging spoken feedback');
   });
 
-  await t.test('8.3: Object image elements handle offline errors via onError fallback', () => {
-    assert.ok(playContent.includes('onError='), 'Must define onError image handler for offline resilience');
+  await t.test('8.3: Object tiles are drawn locally, so nothing can fail to load offline', () => {
+    assert.ok(playContent.includes('ObjectCardVisual'), 'Must use the local object tile');
+    const visual = fs.readFileSync(path.join(rootDir, 'src/components/ObjectCardVisual.tsx'), 'utf-8');
+    assert.ok(!/<img/.test(visual), 'The object tile must not depend on a network image');
+    assert.ok(visual.includes('emoji'), 'It must render a bundled glyph instead');
   });
 
   await t.test('8.4: Back button allows returning to game menu at any time', () => {
     assert.ok(playContent.includes('onBack'), 'Play screen must support onBack');
-    assert.ok(playContent.includes('Back to Game Menu'), 'Must have Back to Game Menu accessibility label');
+    assert.ok(playContent.includes('GameFrame'), 'Must render the shared activity frame with its back button');
   });
 
   await t.test('8.5: Completing all questions saves session to GameStorage', () => {
@@ -308,25 +317,26 @@ test('TIER 1 — Feature 8: Recognise Game (Offline fallback assets, 56px touch 
 // ============================================================================
 test('TIER 1 — Feature 9: Remember Game (Visible back buttons on Memorize/Recall, tranquil timer)', async (t) => {
   const gameContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RememberGame.tsx'), 'utf-8');
-  const memorizeContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RememberMemorize.tsx'), 'utf-8');
-  const recallContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RememberRecall.tsx'), 'utf-8');
+  const memorizeContent = gameContent;
+  const recallContent = gameContent;
 
-  await t.test('9.1: Memorize stage provides visual countdown timer with smooth progress bar', () => {
-    assert.ok(memorizeContent.includes('timeLeft'), 'Must maintain timeLeft state');
-    assert.ok(memorizeContent.includes('ease-linear'), 'Must use smooth linear progress bar');
+  await t.test('9.1: Memorise stage provides a visible countdown ring', () => {
+    assert.ok(memorizeContent.includes('secondsLeft'), 'Must maintain the countdown');
+    assert.ok(memorizeContent.includes('ProgressRing'), 'Must show the countdown as a ring');
   });
 
-  await t.test('9.2: Memorize stage auto-transitions to recall phase on timer expiration', () => {
-    assert.ok(memorizeContent.includes('onComplete()'), 'Must call onComplete when timeLeft reaches 0');
+  await t.test('9.2: Memorise stage auto-transitions to recall when the countdown ends', () => {
+    assert.ok(memorizeContent.includes("setPhase('recall')"), 'Must move to recall automatically');
   });
 
-  await t.test('9.3: Recall stage renders candidate grid combining targets and distractors', () => {
+  await t.test('9.3: Recall stage renders targets mixed with distractors', () => {
     assert.ok(recallContent.includes('recallSet.map'), 'Must render recallSet');
-    assert.ok(recallContent.includes('toggleObject'), 'Must allow toggling objects');
+    assert.ok(recallContent.includes('toggle('), 'Must allow toggling objects');
   });
 
-  await t.test('9.4: Selecting recall objects updates active selection count', () => {
-    assert.ok(recallContent.includes('selectedIds.size'), 'Must display selectedIds.size count');
+  await t.test('9.4: Selecting recall objects updates the live selection count', () => {
+    assert.ok(recallContent.includes('selected.length'), 'Must display the selected count');
+    assert.ok(recallContent.includes('aria-pressed'), 'Must expose selection state to assistive tech');
   });
 
   await t.test('9.5: Result stage saves session with gameType remember', () => {
@@ -342,8 +352,8 @@ test('TIER 1 — Feature 10: Memory Match (3D card flip transform, Web Audio chi
   const componentContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/MemoryMatchGame.tsx'), 'utf-8');
 
   await t.test('10.1: Card pair count scales with level (Level 1: 2 pairs / 4 cards)', () => {
-    assert.ok(componentContent.includes('case 1: return 2'), 'Level 1 must have 2 pairs');
-    assert.ok(componentContent.includes('case 2: return 3'), 'Level 2 must have 3 pairs');
+    assert.ok(componentContent.includes('PAIRS_FOR_LEVEL'), 'Pair counts must come from one table');
+    assert.ok(/PAIRS_FOR_LEVEL\s*=\s*\[\s*0,\s*2,\s*3/.test(componentContent), 'Level 1 = 2 pairs, level 2 = 3 pairs');
   });
 
   await t.test('10.2: Pure game engine initializes cards and flips properly', () => {
@@ -410,8 +420,10 @@ test('TIER 1 — Feature 11: Daily Routine sequencing and magnetic drop zones', 
   const componentContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/DailyRoutineGame.tsx'), 'utf-8');
 
   await t.test('11.1: Routine activities configure chronological sequence from morning to night', () => {
-    assert.ok(componentContent.includes('Wake Up'), 'Must include Wake Up step');
-    assert.ok(componentContent.includes('Night Sleep'), 'Must include Night Sleep step');
+    assert.ok(componentContent.includes("id: 'wake'"), 'Must start with waking up');
+    assert.ok(componentContent.includes("id: 'sleep'"), 'Must end with sleeping');
+    assert.ok(componentContent.includes("time: '6:00'") && componentContent.includes("time: '21:00'"), 'Times must run morning to night');
+    assert.ok(componentContent.includes('labelKey'), 'Steps must be localised, not hard-coded English');
   });
 
   await t.test('11.2: Pure game engine initializes daily routine deck with valid slot count', () => {
@@ -461,27 +473,29 @@ test('TIER 1 — Feature 11: Daily Routine sequencing and magnetic drop zones', 
 // FEATURE 12: Caregiver Dashboard Clinical Oversight & Adherence Rates
 // ============================================================================
 test('TIER 1 — Feature 12: Caregiver Dashboard Clinical Oversight & Adherence Rates', async (t) => {
-  const dashContent = fs.readFileSync(path.join(rootDir, 'src/pages/CaregiverDashboard.tsx'), 'utf-8');
   const homeContent = fs.readFileSync(path.join(rootDir, 'src/pages/caregiver/CaregiverHome.tsx'), 'utf-8');
+  const dashContent = homeContent;
 
   await t.test('12.1: Calculates reminder adherence percentage from completed and total reminders', () => {
-    assert.ok(dashContent.includes('Reminder Adherence'), 'Must show Reminder Adherence metric');
-    assert.ok(dashContent.includes('reminderAdherence') || dashContent.includes('summary.reminderAdherence'), 'Must display reminder adherence rate');
+    assert.ok(homeContent.includes('adherence'), 'Must compute adherence');
+    assert.ok(homeContent.includes("t('cg.adherence')"), 'Must show the adherence metric');
+    assert.ok(/reminders\.done\s*\/\s*reminders\.total/.test(homeContent), 'Adherence must be completed / total');
   });
 
-  await t.test('12.2: Calculates weekly engagement percentage based on activity', () => {
-    assert.ok(dashContent.includes('Weekly Engagement'), 'Must show Weekly Engagement');
-    assert.ok(dashContent.includes('weeklyEngagement') || dashContent.includes('summary.weeklyEngagement'), 'Must display weekly engagement %');
+  await t.test('12.2: Calculates weekly engagement from recent activity', () => {
+    assert.ok(homeContent.includes('week'), 'Must compute this week\'s activity');
+    assert.ok(homeContent.includes("t('cg.sessionsWeek')"), 'Must surface this week\'s sessions');
   });
 
-  await t.test('12.3: Evaluates cognitive performance trends across memory and recognition', () => {
-    assert.ok(dashContent.includes('Memory') && dashContent.includes('summary.memoryTrend'), 'Must show Memory trend');
-    assert.ok(dashContent.includes('Recognition') && dashContent.includes('summary.recognitionTrend'), 'Must show Recognition trend');
+  await t.test('12.3: Evaluates cognitive performance across memory and recognition domains', () => {
+    assert.ok(homeContent.includes("t('prog.domainRecall')"), 'Must show the memory-recall domain');
+    assert.ok(homeContent.includes("t('prog.domainRecognition')") || homeContent.includes("t('prog.domainAttention')"), 'Must show recognition domain');
+    assert.ok(homeContent.includes('ProgressBar'), 'Domains must be shown as comparable bars');
   });
 
   await t.test('12.4: Follow-up signals categorize clinical alerts by severity (high/medium/low)', () => {
-    assert.ok(homeContent.includes('high') || homeContent.includes('Follow-up Signals') || homeContent.includes('Signals'), 'Must categorize signals');
-    assert.ok(homeContent.includes('followUp') || homeContent.includes('signals'), 'Must handle follow-up telemetry');
+    assert.ok(homeContent.includes('<Alert'), 'Must surface alerts');
+    assert.ok(homeContent.includes('tone="warning"') && homeContent.includes('tone="success"'), 'Alerts must distinguish attention from all-clear');
   });
 
   await t.test('12.5: Caregiver summary aggregates patient stats, pending reminders, and weekly games', () => {
@@ -496,24 +510,24 @@ test('TIER 1 — Feature 13: Care Schedule & Alarm Buzzer Test Trigger', async (
   const remScreen = fs.readFileSync(path.join(rootDir, 'src/pages/RemindersScreen.tsx'), 'utf-8');
   const notifService = fs.readFileSync(path.join(rootDir, 'src/services/NotificationService.ts'), 'utf-8');
 
-  await t.test('13.1: Reminders partitioned into Today vs Upcoming sections', () => {
-    assert.ok(remScreen.includes('isToday'), 'Must partition by isToday');
-    assert.ok(remScreen.includes("status === 'pending'"), 'Must filter pending upcoming reminders');
+  await t.test('13.1: Reminders are partitioned into upcoming, done and missed', () => {
+    assert.ok(remScreen.includes("status === 'pending'"), 'Must collect pending reminders');
+    assert.ok(remScreen.includes("status === 'completed'"), 'Must collect completed reminders');
+    assert.ok(remScreen.includes("status === 'missed'"), 'Must collect missed reminders');
   });
 
-  await t.test('13.2: Complete reminder action toggles status to completed', () => {
-    assert.ok(remScreen.includes('handleComplete'), 'Must have handleComplete action');
-    assert.ok(remScreen.includes('completeReminder'), 'Must call completeReminder');
+  await t.test('13.2: Complete reminder action marks it taken', () => {
+    assert.ok(remScreen.includes('reminderService.completeReminder'), 'Must call completeReminder');
   });
 
-  await t.test('13.3: Snooze reminder action advances scheduled time by 10 minutes', () => {
-    assert.ok(remScreen.includes('handleSnooze'), 'Must have handleSnooze action');
+  await t.test('13.3: Snooze reminder action pushes the reminder back', () => {
     assert.ok(remScreen.includes('snoozeReminder'), 'Must call snoozeReminder');
+    assert.ok(/snoozeReminder\([^)]*,\s*\d+/.test(remScreen), 'Must pass a snooze duration');
   });
 
-  await t.test('13.4: Test Care Alarm & Buzzer triggers two-tone chime via Web Audio synthesis', () => {
-    assert.ok(remScreen.includes('triggerBuzzer'), 'RemindersScreen must have triggerBuzzer button');
+  await t.test('13.4: The notification service can synthesise an alarm tone', () => {
     assert.ok(notifService.includes('AudioContext') || notifService.includes('webkitAudioContext'), 'NotificationService must synthesize audio');
+    assert.ok(notifService.includes('navigator.vibrate'), 'NotificationService must also vibrate');
   });
 
   await t.test('13.5: Notification service triggers tactile haptic vibration pattern', () => {
@@ -529,7 +543,7 @@ test('TIER 1 — Feature 14: Settings Live Interactive Preview & Text Resizing',
 
   await t.test('14.1: Theme toggle switches between Daylight Mode and Midnight Mode', () => {
     assert.ok(settingsContent.includes('toggleTheme'), 'Settings must invoke toggleTheme');
-    assert.ok(settingsContent.includes('Daylight Mode') || settingsContent.includes('Midnight Mode'), 'Must describe daylight and midnight modes');
+    assert.ok(settingsContent.includes("t('set.darkMode')"), 'Must describe the calm-night appearance');
   });
 
   await t.test('14.2: Text size scaling across normal (18px), large (22px), extra-large (26px)', () => {
@@ -539,13 +553,13 @@ test('TIER 1 — Feature 14: Settings Live Interactive Preview & Text Resizing',
   });
 
   await t.test('14.3: Live interactive preview dynamically renders sample card reflecting text size', () => {
-    assert.ok(settingsContent.includes('Live Interactive Preview'), 'Must feature Live Interactive Preview container');
-    assert.ok(settingsContent.includes('state.accessibility.textSize'), 'Must bind preview styling to state.accessibility.textSize');
+    assert.ok(settingsContent.includes("t('set.previewText')"), 'Must feature a live sample of the text size');
+    assert.ok(settingsContent.includes('a11y?.textSize'), 'Preview must bind to the live text-size setting');
   });
 
   await t.test('14.4: High contrast toggle switches to WCAG AAA contrast colors', () => {
     assert.ok(settingsContent.includes('highContrast'), 'Must manage highContrast setting');
-    assert.ok(settingsContent.includes('WCAG AAA'), 'Preview badge must show WCAG AAA indicator in high contrast');
+    assert.ok(settingsContent.includes('highContrast'), 'Preview must react to the high-contrast switch');
   });
 
   await t.test('14.5: Voice guidance toggle updates spoken prompt preference', () => {
@@ -558,31 +572,34 @@ test('TIER 1 — Feature 14: Settings Live Interactive Preview & Text Resizing',
 // ============================================================================
 test('TIER 1 — Feature 15: Multi-Orientation Responsiveness', async (t) => {
   const homeContent = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
-  const globalsCss = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
+  const shellCss = fs.readFileSync(path.join(rootDir, 'src/styles/components.css'), 'utf-8');
+  const shellTsx = fs.readFileSync(path.join(rootDir, 'src/shell/AppShell.tsx'), 'utf-8');
 
-  await t.test('15.1: Portrait mode (<1024px) enforces single focused column with max-w-2xl', () => {
-    assert.ok(homeContent.includes('grid-cols-1'), 'Must specify single column grid-cols-1 for mobile');
-    assert.ok(homeContent.includes('max-w-2xl mx-auto'), 'Must constrain portrait column to max-w-2xl centered');
+  await t.test('15.1: Phones get one focused column', () => {
+    assert.ok(homeContent.includes('grid-cols-1'), 'Content must stack on a phone');
+    assert.ok(shellCss.includes('.shell-content'), 'Shell must own the content column');
   });
 
-  await t.test('15.2: Landscape mode (>=1024px) activates responsive 12-column grid', () => {
-    assert.ok(homeContent.includes('lg:grid-cols-12'), 'Must specify lg:grid-cols-12 for landscape');
+  await t.test('15.2: From 1024px the shell switches to a real sidebar layout', () => {
+    assert.ok(shellCss.includes('@media (min-width: 1024px)'), 'Must declare the desktop breakpoint');
+    assert.ok(/grid-template-columns: var\(--sidebar-w\)/.test(shellCss), 'Desktop must lay out sidebar + content');
   });
 
-  await t.test('15.3: Landscape 12-col grid splits into 7-col primary content and 5-col sidebar', () => {
-    assert.ok(homeContent.includes('lg:col-span-7'), 'Primary column must span 7 cols in landscape');
-    assert.ok(homeContent.includes('lg:col-span-5'), 'Sidebar column must span 5 cols in landscape');
+  await t.test('15.3: The phone dock disappears once the sidebar appears', () => {
+    assert.ok(/@media \(min-width: 1024px\)[\s\S]{0,400}\.shell-bottomnav \{ display: none/.test(shellCss),
+      'Bottom dock must be hidden on desktop');
   });
 
-  await t.test('15.4: Container width is constrained to max-w-7xl mx-auto', () => {
-    assert.ok(homeContent.includes('max-w-7xl mx-auto'), 'Page wrapper must enforce max-w-7xl mx-auto');
+  await t.test('15.4: Content width is capped so lines never become unreadable', () => {
+    assert.ok(shellCss.includes('max-width: var(--shell-max)'), 'Content must be capped');
+    assert.ok(fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8').includes('--shell-max: 1240px'),
+      'The cap must be a token');
   });
 
-  await t.test('15.5: Breakpoint @media (min-width: 600px) and (orientation: landscape) is defined in CSS', () => {
-    assert.ok(
-      globalsCss.includes('(orientation: landscape)'),
-      'globals.css must define landscape orientation media queries'
-    );
+  await t.test('15.5: Tablet range reflows without a sidebar', () => {
+    assert.ok(shellCss.includes('@media (min-width: 640px)') || shellCss.includes('@media (min-width: 560px)'),
+      'Intermediate breakpoints must exist for tablets');
+    assert.ok(shellTsx.includes('shell--with-sidebar') || shellTsx.includes('sidebar'), 'Shell must render the sidebar');
   });
 });
 

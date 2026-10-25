@@ -1,0 +1,205 @@
+/* ==========================================================================
+   Base layer — reset + typography + global behaviour.
+   CRITICAL: everything lives in @layer base so Tailwind utilities
+   (p-*, m-*, space-y-*, gap-*) always win. The old unlayered
+   `* { margin:0; padding:0 }` reset silently defeated every spacing
+   utility in the app; never do that again.
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background-color: var(--canvas);
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    font-weight: 450;
+    color: var(--ink);
+    background-color: var(--canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+  }
+
+  /* Subtle warm paper grain on the canvas — one layer, no repaint cost */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+    background-image:
+      radial-gradient(900px 520px at 88% -8%, var(--brand-teal-soft), transparent 62%),
+      radial-gradient(760px 420px at -6% 104%, var(--brand-saffron-soft), transparent 60%);
+  }
+  :root[data-theme='dark'] body::before { opacity: 0.55; }
+
+  #root {
+    position: relative;
+    z-index: 1;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-title);
+    color: var(--ink);
+    font-variation-settings: 'SOFT' 40, 'WONK' 1;
+  }
+
+  p { margin: 0; }
+  ul, ol { margin: 0; padding: 0; list-style: none; }
+
+  a {
+    color: var(--brand-teal);
+    text-decoration: none;
+    text-underline-offset: 3px;
+  }
+  a:hover { text-decoration: underline; }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  input, select, textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  img, svg, video { display: block; max-width: 100%; }
+
+  /* Focus: visible, warm, never clipped */
+  :focus-visible {
+    outline: 3px solid var(--brand-teal);
+    outline-offset: 3px;
+    border-radius: var(--r-xs);
+  }
+  :focus:not(:focus-visible) { outline: none; }
+
+  ::selection {
+    background: var(--brand-teal-soft);
+    color: var(--ink);
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border-radius: 999px;
+    border: 3px solid var(--canvas);
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-4); }
+
+  input[type='range'] { accent-color: var(--brand-teal); }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   Typography helpers
+   ========================================================================== */
+@layer components {
+  .t-display {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    font-weight: 600;
+    line-height: 1.08;
+    letter-spacing: -0.028em;
+  }
+  .t-h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    font-weight: 600;
+    line-height: 1.14;
+    letter-spacing: var(--tracking-title);
+  }
+  .t-h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-h2);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: var(--tracking-title);
+  }
+  .t-h3 {
+    font-family: var(--font-ui);
+    font-size: var(--text-h3);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .t-body-lg {
+    font-size: var(--text-body-lg);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+  .t-body {
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    color: var(--ink-2);
+  }
+  .t-sm {
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--ink-3);
+  }
+  .t-xs {
+    font-size: var(--text-xs);
+    line-height: 1.4;
+    color: var(--ink-3);
+  }
+  .t-eyebrow {
+    font-size: var(--text-2xs);
+    font-weight: 800;
+    letter-spacing: var(--tracking-eyebrow);
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .t-num {
+    font-family: var(--font-num);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    letter-spacing: -0.02em;
+  }
+  .t-muted { color: var(--ink-3); }
+  .t-strong { color: var(--ink); font-weight: 700; }
+
+  /* Language-aware script classes so Indic text gets the right face + size */
+  .lang-hi, .lang-as, .lang-brx, .lang-mni, .lang-bn { font-family: 'Noto Sans Devanagari', var(--font-ui); }
+  .lang-as, .lang-mni, .lang-bn { font-family: 'Noto Sans Bengali', var(--font-ui); }
+}

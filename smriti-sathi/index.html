@@ -1,71 +1,98 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light" data-scale="large">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#0F172A" />
-    <meta name="description" content="Smriti Sathi — AI-powered memory care companion for elderly with cognitive impairment and dementia." />
-    <meta name="keywords" content="dementia, memory care, elderly, cognitive stimulation, assistive health, MedTech" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#FBF6EE" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0C1512" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="Smriti Sathi — a warm, offline-first memory companion for elders living with dementia, and the family who cares for them." />
+    <meta name="keywords" content="dementia, memory care, elderly, cognitive stimulation, assistive health, MedTech, SIH26003" />
     <meta name="author" content="Smriti Sathi Health Technologies" />
-    <meta property="og:title" content="Smriti Sathi — Cognitive Care Companion" />
-    <meta property="og:description" content="AI-powered memory care companion for elderly with dementia" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Smriti Sathi" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <meta property="og:title" content="Smriti Sathi — Memory care that speaks your language" />
+    <meta property="og:description" content="Cognitive games, gentle reminders, a family memory book and an emergency rescue card — all working offline." />
     <meta property="og:image" content="/logo.png" />
     <meta property="og:type" content="website" />
-    <title>Smriti Sathi — Cognitive Care & Memory Companion</title>
+
+    <title>Smriti Sathi — Memory care companion</title>
+
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/icons/logo-192.png" />
     <link rel="manifest" href="/manifest.json" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="preload" href="/fonts/Fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/PlusJakartaSans-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!--
+      Appearance boot script: sets theme / text scale / contrast on <html>
+      before first paint so there is never a flash of the wrong palette.
+      Keys must stay in sync with AppContext (smriti_sathi_theme) and
+      I18nProvider (smriti_lang).
+    -->
     <script>
-      (function() {
+      (function () {
+        var root = document.documentElement;
         try {
-          var t = localStorage.getItem('smriti_sathi_theme');
-          var isDark = t === 'dark';
-          if (isDark) {
-            document.documentElement.classList.add('dark', 'theme-dark');
-            document.documentElement.classList.remove('theme-light');
-            document.documentElement.style.colorScheme = 'dark';
-          } else {
-            document.documentElement.classList.add('theme-light');
-            document.documentElement.classList.remove('dark', 'theme-dark');
-            document.documentElement.style.colorScheme = 'light';
-          }
-        } catch(e) {}
+          var theme = localStorage.getItem('smriti_sathi_theme');
+          var params = new URLSearchParams(window.location.search);
+          var forced = params.get('theme');
+          root.dataset.theme = forced === 'dark' ? 'dark' : theme === 'dark' ? 'dark' : 'light';
+          root.style.colorScheme = root.dataset.theme;
+
+          var lang = params.get('lang') || localStorage.getItem('smriti_lang') || 'en';
+          root.lang = lang;
+        } catch (e) {
+          root.dataset.theme = 'light';
+        }
+        root.dataset.scale = 'large';
+        root.dataset.contrast = 'normal';
       })();
     </script>
+
     <style>
-      html {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
+      /* First-paint only. Everything else lives in src/styles/*.css inside
+         proper @layer blocks, so Tailwind utilities always win. */
+      html,
       body {
         margin: 0;
         padding: 0;
-        width: 100%;
-        height: 100%;
-        font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: var(--color-bg, #F8FAFC);
-        color: var(--color-text, #0F172A);
-        overflow-x: hidden;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-y;
+        min-height: 100%;
+        background: #fbf6ee;
+      }
+      html[data-theme='dark'],
+      html[data-theme='dark'] body {
+        background: #0c1512;
+      }
+      body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        overscroll-behavior-y: none;
       }
       #root {
-        width: 100%;
-        min-height: 100%;
-        display: flex;
-        flex-direction: column;
+        min-height: 100vh;
+        min-height: 100dvh;
+        isolation: isolate;
       }
     </style>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div style="font-family: system-ui; padding: 32px; max-width: 560px; margin: 0 auto; color: #17211e">
+        <h1 style="font-size: 24px">Smriti Sathi needs JavaScript</h1>
+        <p style="line-height: 1.6">
+          This memory companion runs entirely in your browser so that it keeps working without a network. Please enable
+          JavaScript, or open the app on a device where it is available.
+        </p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

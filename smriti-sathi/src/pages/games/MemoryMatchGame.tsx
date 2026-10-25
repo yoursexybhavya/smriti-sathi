@@ -1,360 +1,254 @@
-import { useState, useEffect } from 'react';
-import { useApp } from '../../context/AppContext';
-import { GameSession } from '../../models/GameSession';
-import { REMEMBER_OBJECTS, RememberObject } from '../../models/GameSession';
-import { GameStorage } from '../../services/storage/GameStorage';
-import AppHeader from '../../components/AppHeader';
-import LargeButton from '../../components/LargeButton';
-import ProgressCard from '../../components/ProgressCard';
+import { useEffect, useRef, useState } from 'react';
+import { Check, ChevronLeft, Layers, RotateCcw, Sparkles } from 'lucide-react';
 import ObjectCardVisual from '../../components/ObjectCardVisual';
-import { ArrowLeft, Clock, Target, TrendingUp, CheckCircle, Sparkles, HelpCircle } from 'lucide-react';
+import { Button, Card, ProgressRing, Tag, GameFrame, LevelPicker } from '../../ui';
+import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
+import { useVoice } from '../../hooks/useVoice';
+import { GameSession, REMEMBER_OBJECTS, RememberObject } from '../../models/GameSession';
+import { GameStorage } from '../../services/storage/GameStorage';
 
-interface MemoryMatchGameProps {
+interface Props {
   onBack: () => void;
 }
 
-type Phase = 'intro' | 'play' | 'result';
-
 interface CardItem {
-  id: string; // unique card id for the grid
-  objectId: string; // the id of the object on the card
+  id: string;
+  objectId: string;
   object: RememberObject;
-  isFlipped: boolean;
-  isMatched: boolean;
+  flipped: boolean;
+  matched: boolean;
 }
 
-export default function MemoryMatchGame({ onBack }: MemoryMatchGameProps) {
+const PAIRS_FOR_LEVEL = [0, 2, 3, 4, 6, 8];
+
+export default function MemoryMatchGame({ onBack }: Props) {
   const { state } = useApp();
+  const { t } = useI18n();
+  const { speak } = useVoice();
   const patientId = state.currentPatient?.id || 'default';
-  const isOnline = navigator.onLine;
 
-  const [phase, setPhase] = useState<Phase>('intro');
-  const [difficulty, setDifficulty] = useState(1);
-  const [selectedLevel, setSelectedLevel] = useState(1);
+  const [phase, setPhase] = useState<'intro' | 'play' | 'result'>('intro');
+  const [level, setLevel] = useState(1);
   const [cards, setCards] = useState<CardItem[]>([]);
-  const [flippedIds, setFlippedIds] = useState<string[]>([]);
-  const [startTime, setStartTime] = useState(0);
+  const [flipped, setFlipped] = useState<string[]>([]);
+  const [locked, setLocked] = useState(false);
   const [moves, setMoves] = useState(0);
-  const [timeSpent, setTimeSpent] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const startedAt = useRef(0);
+  const saved = useRef(false);
 
-  const getPairCount = (level: number) => {
-    switch (level) {
-      case 1: return 2; // 4 cards
-      case 2: return 3; // 6 cards
-      case 3: return 4; // 8 cards
-      case 4: return 6; // 12 cards
-      case 5: return 8; // 16 cards
-      default: return 2;
-    }
-  };
-
-  const startGame = (level: number) => {
-    const pairCount = getPairCount(level);
-    const shuffledObjects = [...REMEMBER_OBJECTS].sort(() => Math.random() - 0.5).slice(0, pairCount);
-    
-    // Create pairs
-    const gameCards: CardItem[] = [];
-    shuffledObjects.forEach(obj => {
-      gameCards.push({ id: Math.random().toString(), objectId: obj.id, object: obj, isFlipped: false, isMatched: false });
-      gameCards.push({ id: Math.random().toString(), objectId: obj.id, object: obj, isFlipped: false, isMatched: false });
+  const start = (lvl: number) => {
+    const pairs = PAIRS_FOR_LEVEL[lvl] ?? 2;
+    const objects = [...REMEMBER_OBJECTS].sort(() => Math.random() - 0.5).slice(0, pairs);
+    const deck: CardItem[] = [];
+    objects.forEach((o) => {
+      deck.push({ id: `${o.id}-a-${Math.random()}`, objectId: o.id, object: o, flipped: false, matched: false });
+      deck.push({ id: `${o.id}-b-${Math.random()}`, objectId: o.id, object: o, flipped: false, matched: false });
     });
-
-    setCards(gameCards.sort(() => Math.random() - 0.5));
-    setDifficulty(level);
-    setFlippedIds([]);
+    setCards(deck.sort(() => Math.random() - 0.5));
+    setFlipped([]);
     setMoves(0);
+    setLocked(false);
+    setLevel(lvl);
     setPhase('play');
-    setStartTime(Date.now());
+    startedAt.current = Date.now();
+    saved.current = false;
   };
 
-  const handleCardClick = (id: string) => {
-    if (isLocked) return;
-    
-    const cardIndex = cards.findIndex(c => c.id === id);
-    if (cardIndex === -1 || cards[cardIndex].isFlipped || cards[cardIndex].isMatched) return;
+  const flip = (id: string) => {
+    if (locked) return;
+    const card = cards.find((c) => c.id === id);
+    if (!card || card.flipped || card.matched) return;
 
-    const newCards = [...cards];
-    newCards[cardIndex].isFlipped = true;
-    setCards(newCards);
+    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, flipped: true } : c)));
+    const next = [...flipped, id];
+    setFlipped(next);
 
-    const newFlipped = [...flippedIds, id];
-    setFlippedIds(newFlipped);
-
-    if (newFlipped.length === 2) {
-      setMoves(m => m + 1);
-      setIsLocked(true);
-      
-      const card1 = cards.find(c => c.id === newFlipped[0]);
-      const card2 = cards.find(c => c.id === newFlipped[1]);
-
-      if (card1 && card2 && card1.objectId === card2.objectId) {
-        // Match!
-        const id1 = card1.id;
-        const id2 = card2.id;
-        setTimeout(() => {
-          setCards(prev => prev.map(c => 
-            (c.id === id1 || c.id === id2) ? { ...c, isMatched: true } : c
-          ));
-          setFlippedIds([]);
-          setIsLocked(false);
-        }, 500);
-      } else {
-        // No match
-        const id1 = card1?.id;
-        const id2 = card2?.id;
-        setTimeout(() => {
-          setCards(prev => prev.map(c => 
-            (c.id === id1 || c.id === id2) ? { ...c, isFlipped: false } : c
-          ));
-          setFlippedIds([]);
-          setIsLocked(false);
-        }, 1100);
-      }
+    if (next.length === 2) {
+      setMoves((m) => m + 1);
+      setLocked(true);
+      const [a, b] = next.map((cid) => cards.find((c) => c.id === cid));
+      const isPair = a && b && a.objectId === b.objectId;
+      window.setTimeout(() => {
+        setCards((prev) =>
+          prev.map((c) =>
+            c.id === a?.id || c.id === b?.id ? { ...c, matched: !!isPair, flipped: !!isPair } : c,
+          ),
+        );
+        if (isPair) speak(t('games.wellDone'));
+        setFlipped([]);
+        setLocked(false);
+      }, isPair ? 420 : 900);
     }
   };
 
-  // Check win condition
+  const totalPairs = cards.length / 2;
+  const matchedPairs = cards.filter((c) => c.matched).length / 2;
+  const done = cards.length > 0 && cards.every((c) => c.matched);
+
   useEffect(() => {
-    if (phase === 'play' && cards.length > 0 && cards.every(c => c.isMatched)) {
-      const endTime = Date.now();
-      const timeElapsed = (endTime - startTime) / 1000;
-      setTimeSpent(timeElapsed);
-      
-      const pairCount = getPairCount(difficulty);
-      const minMoves = pairCount;
-      const accuracy = Math.round((minMoves / Math.max(minMoves, moves)) * 100);
+    if (!done || saved.current) return;
+    saved.current = true;
+    const seconds = (Date.now() - startedAt.current) / 1000;
+    setElapsed(seconds);
+    const accuracy = Math.min(100, Math.round((totalPairs / Math.max(1, moves)) * 100));
+    setPhase('result');
+    const session: GameSession = {
+      id: `match_${Date.now()}`,
+      patientId,
+      gameType: 'memory_match',
+      difficulty: level,
+      score: totalPairs,
+      totalObjects: cards.length,
+      accuracy,
+      responseTime: seconds,
+      timestamp: Date.now(),
+    };
+    GameStorage.saveSession(session).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [done]);
 
-      const session: GameSession = {
-        id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        patientId,
-        gameType: 'memory_match',
-        difficulty,
-        score: pairCount,
-        totalObjects: pairCount,
-        accuracy,
-        responseTime: timeElapsed,
-        timestamp: Date.now(),
-      };
-      
-      GameStorage.saveSession(session).then(() => {
-        setPhase('result');
-      });
-    }
-  }, [cards, phase, difficulty, moves, patientId, startTime]);
+  const shell = (children: React.ReactNode, title: string, subtitle?: string, progress?: number) => (
+    <GameFrame
+      title={title}
+      subtitle={subtitle}
+      onBack={onBack}
+      progress={progress}
+      badge={<Tag tone="info">{t('games.levelN', { n: level })}</Tag>}
+    >
+      {children}
+    </GameFrame>
+  );
 
   if (phase === 'intro') {
-    return (
-      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col transition-colors duration-200">
-        <AppHeader 
-          title="Memory Match" 
-          subtitle="Find the matching pairs" 
-          isOnline={isOnline} 
-          showBack 
-          onBack={onBack} 
-        />
-        <div className="flex-1 max-w-lg mx-auto px-4 sm:px-6 py-6 space-y-6 w-full flex flex-col justify-center">
-          <div className="p-6 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-sm space-y-4">
-            <div className="w-16 h-16 rounded-2xl bg-[#10B981]/15 border border-[#10B981]/30 mx-auto flex items-center justify-center text-[#10B981]">
-              <Sparkles size={36} />
-            </div>
-            <h3 className="text-xl font-bold text-[var(--color-text)] text-center">How to Play</h3>
-            <ul className="space-y-3">
-              <li className="flex gap-3 text-[var(--color-text-secondary)]">
-                <span className="font-bold text-[#10B981] bg-[var(--color-bg-subtle)] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0">1</span>
-                <span className="pt-0.5">Tap any card to flip it over and see the image.</span>
-              </li>
-              <li className="flex gap-3 text-[var(--color-text-secondary)]">
-                <span className="font-bold text-[#10B981] bg-[var(--color-bg-subtle)] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0">2</span>
-                <span className="pt-0.5">Tap a second card to find its matching twin.</span>
-              </li>
-              <li className="flex gap-3 text-[var(--color-text-secondary)]">
-                <span className="font-bold text-[#10B981] bg-[var(--color-bg-subtle)] w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0">3</span>
-                <span className="pt-0.5">Match all the pairs to complete the level. No timer pressure!</span>
-              </li>
-            </ul>
+    return shell(
+      <div className="introgrid">
+        <Card className="text-center">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[var(--info-soft)] text-[var(--info)]">
+            <Layers className="h-8 w-8" />
           </div>
-          
-          {/* Clean Tier Selector */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold text-[var(--color-text)] mb-2 text-center">
-                Select Difficulty Tier
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {[
-                  { level: 1, label: 'Gentle', sub: '2 Pairs' },
-                  { level: 2, label: 'Standard', sub: '3 Pairs' },
-                  { level: 3, label: 'Active', sub: '4 Pairs' },
-                  { level: 4, label: 'Master', sub: '6 Pairs' },
-                  { level: 5, label: 'Champion', sub: '8 Pairs' },
-                ].map(tier => (
-                  <button
-                    key={tier.level}
-                    type="button"
-                    onClick={() => setSelectedLevel(tier.level)}
-                    className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer select-none active:scale-95 ${
-                      selectedLevel === tier.level
-                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-600 dark:border-indigo-400 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs ring-2 ring-indigo-500/20'
-                        : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-slate-300 dark:hover:border-slate-700 font-medium'
-                    }`}
-                  >
-                    <span className="block text-sm font-bold">Level {tier.level}</span>
-                    <span className="block text-xs text-[var(--color-text-muted)] mt-0.5">{tier.sub}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
+          <h1 className="t-h1 mt-4">{t('games.match')}</h1>
+          <p className="t-body mx-auto mt-1.5 max-w-[40ch]">{t('games.matchDesc')}</p>
+          <p className="t-sm mt-3">{t('games.takeYourTime')}</p>
+        </Card>
 
-            <LargeButton
-              variant="primary"
-              onPress={() => startGame(selectedLevel)}
-            >
-              Start Level {selectedLevel}
-            </LargeButton>
-
-            <LargeButton onPress={onBack} variant="outline">
-              Back to Games Hub
-            </LargeButton>
-          </div>
+          <div>
+          <div className="t-eyebrow mb-2">{t('games.pickLevel')}</div>
+          <LevelPicker current={level} caption={(lvl) => `${PAIRS_FOR_LEVEL[lvl]} ${t('games.pairsFound')}`} onPick={start} />
         </div>
-      </div>
+      </div>,
+      t('games.match'),
+      t('games.howToPlay'),
     );
   }
 
   if (phase === 'play') {
-    const gridCols = cards.length <= 4 ? 'grid-cols-2' : cards.length <= 6 ? 'grid-cols-3' : 'grid-cols-4';
-    return (
-      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between transition-colors duration-200">
-        <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-40">
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={() => setPhase('intro')} 
-              className="w-12 h-12 min-w-[48px] min-h-[48px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-[var(--color-text)] border border-[var(--color-border)] transition-colors cursor-pointer active:scale-95"
-              aria-label="Back"
+    return shell(
+      <>
+        <div className="flex items-center justify-between gap-2">
+          <span className="t-sm font-bold text-ink-2">
+            {matchedPairs} / {totalPairs} {t('games.pairsFound')}
+          </span>
+          <span className="t-sm">
+            {t('games.attempts')}: <b className="t-num">{moves}</b>
+          </span>
+        </div>
+
+        <div
+          className="mx-auto grid w-full flex-1 content-center gap-2.5"
+          style={{
+            gridTemplateColumns: `repeat(${cards.length <= 4 ? 2 : cards.length <= 9 ? 3 : 4}, minmax(0, 1fr))`,
+            maxWidth: `${(cards.length <= 4 ? 2 : cards.length <= 9 ? 3 : 4) * 132}px`,
+          }}
+        >
+          {cards.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => flip(c.id)}
+              aria-label={c.flipped || c.matched ? c.object.name : 'Hidden card'}
+              className="relative grid aspect-square place-items-center rounded-[var(--r-md)] border-2 transition-all"
+              style={{
+                borderColor: c.matched ? 'var(--success)' : c.flipped ? 'var(--brand-teal)' : 'var(--line)',
+                background: c.matched
+                  ? 'var(--success-soft)'
+                  : c.flipped
+                    ? 'var(--surface)'
+                    : 'linear-gradient(150deg, var(--brand-teal-soft), var(--surface-sunken))',
+                boxShadow: c.flipped || c.matched ? 'var(--shadow-1)' : 'none',
+                transform: c.flipped || c.matched ? 'rotateY(0deg)' : 'none',
+              }}
             >
-              <ArrowLeft size={22} />
+              {c.flipped || c.matched ? (
+                <ObjectCardVisual
+                  imageUrl={c.object.imageUrl}
+                  name={c.object.name}
+                  emoji={c.object.emoji}
+                  className="h-full w-full"
+                  imgClassName="h-full w-full object-contain p-2"
+                />
+              ) : (
+                <span className="cardback-glyph" aria-hidden="true">
+                  ❁
+                </span>
+              )}
+              {c.matched && (
+                <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-[var(--success)] text-white">
+                  <Check className="h-3 w-3" />
+                </span>
+              )}
             </button>
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-[var(--color-text)]">Memory Match</h2>
-              <span className="text-xs text-[var(--color-text-secondary)]">Level {difficulty}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs sm:text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
-              Moves: {moves}
-            </span>
-          </div>
-        </header>
-
-        <main className="flex-1 flex flex-col justify-center max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto w-full p-4 sm:p-6 md:p-8">
-          <div className={`grid ${gridCols} gap-3 sm:gap-4`}>
-            {cards.map(card => (
-              <button 
-                key={card.id} 
-                type="button"
-                onClick={() => handleCardClick(card.id)}
-                className={`aspect-square rounded-3xl cursor-pointer transition-all duration-300 transform-gpu relative shadow-sm border-3 ${
-                  card.isFlipped || card.isMatched 
-                    ? 'border-[#10B981] bg-[var(--color-card)] ring-4 ring-[#10B981]/20 scale-102' 
-                    : 'border-[var(--color-border)] bg-[var(--color-bg-subtle)] hover:border-[#10B981] hover:scale-102'
-                }`}
-                aria-label={card.isFlipped || card.isMatched ? card.object.name : 'Hidden card'}
-              >
-                {(card.isFlipped || card.isMatched) ? (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-2.5 animate-in fade-in zoom-in duration-200">
-                    <ObjectCardVisual imageUrl={card.object.imageUrl} name={card.object.name} emoji={card.object.emoji} className="w-14 h-14 sm:w-20 sm:h-20" />
-                    <span className="text-xs sm:text-sm font-bold text-[var(--color-text)] mt-1 truncate w-full text-center">
-                      {card.object.name}
-                    </span>
-                  </div>
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-2xl bg-[var(--color-card)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-muted)]">
-                      <HelpCircle size={24} />
-                    </div>
-                  </div>
-                )}
-                {card.isMatched && (
-                  <div className="absolute inset-0 bg-[#10B981]/15 rounded-3xl pointer-events-none border-2 border-[#10B981]" />
-                )}
-              </button>
-            ))}
-          </div>
-        </main>
-
-        <footer className="bg-[var(--color-card)] border-t border-[var(--color-border)] px-4 py-3 text-center">
-          <p className="text-xs sm:text-sm text-[var(--color-text-secondary)]">
-            Tap cards to find pairs. Matched pairs stay turned up!
-          </p>
-        </footer>
-      </div>
+          ))}
+        </div>
+      </>,
+      t('games.match'),
+      `${matchedPairs} ${t('c.of')} ${totalPairs}`,
+      (matchedPairs / Math.max(1, totalPairs)) * 100,
     );
   }
 
-  // Result phase
-  const pairCount = getPairCount(difficulty);
-  const minMoves = pairCount;
-  const accuracy = Math.round((minMoves / Math.max(minMoves, moves)) * 100);
-  
-  return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200">
-      <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
+  const accuracy = Math.min(100, Math.round((totalPairs / Math.max(1, moves)) * 100));
+  return shell(
+    <>
+      <Card className="text-center">
+        <ProgressRing value={accuracy} size={120} stroke={10}>
           <div>
-            <h2 className="text-xl font-bold text-[var(--color-text)]">Activity Complete</h2>
-            <p className="text-sm text-[var(--color-text-secondary)]">Match Results & Progression</p>
+            <div className="t-num text-[1.6rem] font-extrabold text-ink">{totalPairs}</div>
+            <div className="text-[0.62rem] font-bold uppercase tracking-wider text-ink-3">{t('games.pairsFound')}</div>
           </div>
-          <span className="text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
-            Level {difficulty}
-          </span>
-        </div>
-      </header>
-
-      <main className="max-w-lg mx-auto px-4 sm:px-6 py-6 space-y-6 pb-10">
-        <div className="flex justify-center py-2">
-          <div className="w-24 h-24 rounded-full bg-[#10B981]/15 flex items-center justify-center shadow-md border-4 border-[#10B981]/30">
-            <CheckCircle size={48} className="text-[#10B981]" />
+        </ProgressRing>
+        <h1 className="t-h1 mt-4">{t('games.wellDone')}</h1>
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <div className="stat">
+            <span className="stat__label">{t('games.attempts')}</span>
+            <span className="stat__value">{moves}</span>
+          </div>
+          <div className="stat">
+            <span className="stat__label">{t('games.accuracy')}</span>
+            <span className="stat__value">{accuracy}%</span>
+          </div>
+          <div className="stat">
+            <span className="stat__label">{t('games.timeTaken')}</span>
+            <span className="stat__value">{Math.round(elapsed)}s</span>
           </div>
         </div>
-
-        <div className="text-center">
-          <p className="text-2xl text-[var(--color-text)] font-extrabold leading-tight">
-            {accuracy >= 80 ? 'Excellent memory!' : 'Good effort!'}
-          </p>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            You matched all pairs in {moves} moves.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-3 gap-3">
-          <ProgressCard icon={<Target size={20} />} label="Moves" value={`${moves}`} color="#E65100" />
-          <ProgressCard icon={<TrendingUp size={20} />} label="Accuracy" value={`${accuracy}%`} color="#10B981" />
-          <ProgressCard icon={<Clock size={20} />} label="Time" value={`${Math.round(timeSpent)}s`} color="#0EA5E9" />
-        </div>
-
-        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4 flex justify-between items-center">
-          <span className="text-base text-[var(--color-text)] font-semibold">Difficulty Level</span>
-          <span className="text-base font-bold text-[#E65100] bg-[#E65100]/15 px-3 py-0.5 rounded-full border border-[#E65100]/30">
-            Level {difficulty}
-          </span>
-        </div>
-
-        <div className="space-y-3 pt-2">
-          {accuracy >= 70 && difficulty < 5 ? (
-            <LargeButton variant="primary" onPress={() => startGame(difficulty + 1)}>
-              Advance to Level {difficulty + 1}
-            </LargeButton>
-          ) : (
-            <LargeButton variant="primary" onPress={() => startGame(difficulty)}>
-              Play Level {difficulty} Again
-            </LargeButton>
+        <div className="mt-4 flex flex-col gap-2">
+          {level < 5 && (
+            <Button block size="lg" onClick={() => start(level + 1)} icon={<Sparkles className="h-[18px] w-[18px]" />}>
+              {t('games.nextLevel')}
+            </Button>
           )}
-          <LargeButton onPress={onBack} variant="outline">
-            Back to Games Hub
-          </LargeButton>
+          <Button variant="secondary" block onClick={() => start(level)} icon={<RotateCcw className="h-[18px] w-[18px]" />}>
+            {t('games.playAgain')}
+          </Button>
+          <Button variant="ghost" block onClick={onBack}>
+            {t('games.backToGames')}
+          </Button>
         </div>
-      </main>
-    </div>
+      </Card>
+    </>,
+    t('games.sessionComplete'),
+    t('games.match'),
   );
 }

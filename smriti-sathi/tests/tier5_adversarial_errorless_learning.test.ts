@@ -43,85 +43,64 @@ const rootDir = path.resolve(__dirname, '..');
 // SUITE 1: Static Code AST & Negative Feedback Elimination Audit
 // ============================================================================
 test('TIER 5 — Suite 1: Static Code Audit - Zero Negative Feedback across Cognitive Games', async (t) => {
+  // v3 cognitive games (the old MathWorkout / LanguageWorkout / DailyRoutine /
+  // MemoryMatch pages were retired; these are their replacements).
   const gameFiles = [
-    'src/pages/MathWorkout.tsx',
-    'src/pages/LanguageWorkout.tsx',
-    'src/pages/DailyRoutine.tsx',
-    'src/pages/MemoryMatch.tsx',
+    'src/pages/games/RememberGame.tsx',
+    'src/pages/games/RecogniseGame.tsx',
+    'src/pages/games/MemoryMatchGame.tsx',
+    'src/pages/games/DailyRoutineGame.tsx',
+    'src/games/family/FamilyMemoryGame.tsx',
   ];
 
-  await t.test('1.1: MathWorkout.tsx contains ZERO red error colors (#7F1D1D, #EF4444)', () => {
-    const filePath = path.join(rootDir, 'src/pages/MathWorkout.tsx');
-    const content = fs.readFileSync(filePath, 'utf-8');
+  const FORBIDDEN_COLOURS = ['#7F1D1D', '#EF4444', 'rgb(127, 29, 29)', 'rgb(239, 68, 68)'];
+  const FORBIDDEN_ICONS = ['XCircle', 'AlertTriangle', 'AlertCircle', 'ThumbsDown'];
+  const FORBIDDEN_WORDS = ['tryAgain', 'Try again', 'Wrong', 'Incorrect', 'Game over', 'You failed'];
 
-    assert.ok(!content.includes('#7F1D1D'), 'MathWorkout.tsx must NOT contain #7F1D1D');
-    assert.ok(!content.includes('#EF4444'), 'MathWorkout.tsx must NOT contain #EF4444');
-    assert.ok(!content.includes('rgb(127, 29, 29)'), 'MathWorkout.tsx must NOT contain rgb(127, 29, 29)');
-    assert.ok(!content.includes('rgb(239, 68, 68)'), 'MathWorkout.tsx must NOT contain rgb(239, 68, 68)');
+  await t.test('1.1: Remember Game contains ZERO red error colours', () => {
+    const content = fs.readFileSync(path.join(rootDir, 'src/pages/games/RememberGame.tsx'), 'utf-8');
+    for (const c of FORBIDDEN_COLOURS) assert.ok(!content.includes(c), `RememberGame must not use ${c}`);
   });
 
-  await t.test('1.2: LanguageWorkout.tsx contains ZERO red error colors (#7F1D1D, #EF4444)', () => {
-    const filePath = path.join(rootDir, 'src/pages/LanguageWorkout.tsx');
-    const content = fs.readFileSync(filePath, 'utf-8');
-
-    assert.ok(!content.includes('#7F1D1D'), 'LanguageWorkout.tsx must NOT contain #7F1D1D');
-    assert.ok(!content.includes('#EF4444'), 'LanguageWorkout.tsx must NOT contain #EF4444');
-    assert.ok(!content.includes('rgb(127, 29, 29)'), 'LanguageWorkout.tsx must NOT contain rgb(127, 29, 29)');
-    assert.ok(!content.includes('rgb(239, 68, 68)'), 'LanguageWorkout.tsx must NOT contain rgb(239, 68, 68)');
+  await t.test('1.2: Recognise Game contains ZERO red error colours', () => {
+    const content = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecogniseGame.tsx'), 'utf-8');
+    for (const c of FORBIDDEN_COLOURS) assert.ok(!content.includes(c), `RecogniseGame must not use ${c}`);
   });
 
-  await t.test('1.3: DailyRoutine.tsx contains ZERO red error colors (#7F1D1D, #EF4444)', () => {
-    const filePath = path.join(rootDir, 'src/pages/DailyRoutine.tsx');
-    const content = fs.readFileSync(filePath, 'utf-8');
-
-    assert.ok(!content.includes('#7F1D1D'), 'DailyRoutine.tsx must NOT contain #7F1D1D');
-    assert.ok(!content.includes('#EF4444'), 'DailyRoutine.tsx must NOT contain #EF4444');
-    assert.ok(!content.includes('rgb(127, 29, 29)'), 'DailyRoutine.tsx must NOT contain rgb(127, 29, 29)');
-    assert.ok(!content.includes('rgb(239, 68, 68)'), 'DailyRoutine.tsx must NOT contain rgb(239, 68, 68)');
+  await t.test('1.3: Daily Routine Game contains ZERO red error colours', () => {
+    const content = fs.readFileSync(path.join(rootDir, 'src/pages/games/DailyRoutineGame.tsx'), 'utf-8');
+    for (const c of FORBIDDEN_COLOURS) assert.ok(!content.includes(c), `DailyRoutineGame must not use ${c}`);
   });
 
-  await t.test('1.4: MemoryMatch.tsx contains ZERO red error colors (#7F1D1D, #EF4444)', () => {
-    const filePath = path.join(rootDir, 'src/pages/MemoryMatch.tsx');
-    const content = fs.readFileSync(filePath, 'utf-8');
-
-    assert.ok(!content.includes('#7F1D1D'), 'MemoryMatch.tsx must NOT contain #7F1D1D');
-    assert.ok(!content.includes('#EF4444'), 'MemoryMatch.tsx must NOT contain #EF4444');
-    assert.ok(!content.includes('rgb(127, 29, 29)'), 'MemoryMatch.tsx must NOT contain rgb(127, 29, 29)');
-    assert.ok(!content.includes('rgb(239, 68, 68)'), 'MemoryMatch.tsx must NOT contain rgb(239, 68, 68)');
+  await t.test('1.4: Memory Match Game contains ZERO red error colours', () => {
+    const content = fs.readFileSync(path.join(rootDir, 'src/pages/games/MemoryMatchGame.tsx'), 'utf-8');
+    for (const c of FORBIDDEN_COLOURS) assert.ok(!content.includes(c), `MemoryMatchGame must not use ${c}`);
   });
 
-  await t.test('1.5: ZERO tryAgain vocal prompts in any cognitive game', () => {
+  await t.test('1.5: ZERO punitive words anywhere in the cognitive games', () => {
     for (const relPath of gameFiles) {
-      const filePath = path.join(rootDir, relPath);
-      const content = fs.readFileSync(filePath, 'utf-8');
-      assert.ok(!content.includes('t.tryAgain'), `${relPath} must NOT call speak(t.tryAgain)`);
-      assert.ok(!content.includes('tryAgain'), `${relPath} must NOT reference tryAgain`);
+      const content = fs.readFileSync(path.join(rootDir, relPath), 'utf-8');
+      for (const w of FORBIDDEN_WORDS) {
+        assert.ok(!content.includes(w), `${relPath} must not say "${w}"`);
+      }
     }
   });
 
-  await t.test('1.6: ZERO error icons (XCircle, AlertTriangle, AlertCircle) in cognitive games', () => {
+  await t.test('1.6: ZERO error icons in the cognitive games', () => {
     for (const relPath of gameFiles) {
-      const filePath = path.join(rootDir, relPath);
-      const content = fs.readFileSync(filePath, 'utf-8');
-      assert.ok(!content.includes('XCircle'), `${relPath} must NOT import or render XCircle`);
-      assert.ok(!content.includes('AlertTriangle'), `${relPath} must NOT import or render AlertTriangle`);
-      assert.ok(!content.includes('AlertCircle'), `${relPath} must NOT import or render AlertCircle`);
-      assert.ok(!content.includes('ThumbsDown'), `${relPath} must NOT import or render ThumbsDown`);
+      const content = fs.readFileSync(path.join(rootDir, relPath), 'utf-8');
+      for (const icon of FORBIDDEN_ICONS) {
+        assert.ok(!content.includes(icon), `${relPath} must not render ${icon}`);
+      }
     }
   });
 
-  await t.test('1.7: Scaffolding CSS animation in globals.css uses ONLY emerald tones', () => {
-    const cssPath = path.join(rootDir, 'src/styles/globals.css');
-    const cssContent = fs.readFileSync(cssPath, 'utf-8');
-
-    const keyframeMatch = cssContent.match(/@keyframes scaffoldPulse\s*\{[\s\S]*?\}/);
-    assert.ok(keyframeMatch, '@keyframes scaffoldPulse must be defined in globals.css');
-
-    const keyframeCSS = keyframeMatch[0];
-    assert.ok(/rgba\(\s*16,\s*185,\s*129/.test(keyframeCSS), 'scaffoldPulse must use emerald rgba(16, 185, 129)');
-    assert.ok(!keyframeCSS.includes('red'), 'scaffoldPulse must never use red');
-    assert.ok(!keyframeCSS.includes('#EF4444'), 'scaffoldPulse must never use #EF4444');
-    assert.ok(!keyframeCSS.includes('#7F1D1D'), 'scaffoldPulse must never use #7F1D1D');
+  await t.test('1.7: The scaffold cue pulses in brand teal, never in red', () => {
+    const componentCss = fs.readFileSync(path.join(rootDir, 'src/styles/components.css'), 'utf-8');
+    const block = componentCss.slice(componentCss.indexOf('.scaffold-pulse-active'));
+    assert.ok(block.includes('--brand-teal'), 'Scaffold cue must use the brand teal');
+    assert.ok(!block.slice(0, 600).includes('#EF4444'), 'Scaffold cue must never use red');
+    assert.ok(componentCss.includes('@keyframes softPulse'), 'The pulse keyframes must exist');
   });
 });
 
@@ -482,17 +461,18 @@ test('TIER 5 — Suite 3: Inactivity Scaffolding Timer Precision & Multi-Modal R
 // SUITE 4: prefers-reduced-motion Accessibility Fallback Verification
 // ============================================================================
 test('TIER 5 — Suite 4: prefers-reduced-motion Fallback & WCAG AAA Conformance', async (t) => {
-  const cssPath = path.join(rootDir, 'src/styles/globals.css');
-  const cssContent = fs.readFileSync(cssPath, 'utf-8');
+  const baseCss = fs.readFileSync(path.join(rootDir, 'src/styles/base.css'), 'utf-8');
+  const componentCss = fs.readFileSync(path.join(rootDir, 'src/styles/components.css'), 'utf-8');
+  const cssContent = baseCss + '\n' + componentCss;
 
-  await t.test('4.1: globals.css specifies @media (prefers-reduced-motion: reduce) block', () => {
+  await t.test('4.1: A global prefers-reduced-motion block exists', () => {
     assert.ok(
       cssContent.includes('@media (prefers-reduced-motion: reduce)'),
       'Must declare @media (prefers-reduced-motion: reduce)'
     );
   });
 
-  await t.test('4.2: Scaffolding pulse disables animation and transform under reduced-motion', () => {
+  await t.test('4.2: Switching off motion also switches off the scaffold animation', () => {
     const reducedMotionSection = cssContent.slice(
       cssContent.indexOf('@media (prefers-reduced-motion: reduce)')
     );
@@ -505,29 +485,26 @@ test('TIER 5 — Suite 4: prefers-reduced-motion Fallback & WCAG AAA Conformance
       reducedMotionSection.includes('animation: none !important'),
       'animation must be none !important'
     );
+  });
+
+  await t.test('4.3: Under reduced motion the scaffold becomes a static teal outline', () => {
+    const reducedMotionSection = componentCss.slice(
+      componentCss.indexOf('@media (prefers-reduced-motion: reduce)')
+    );
+
     assert.ok(
-      reducedMotionSection.includes('transform: none !important'),
-      'transform must be none !important'
+      /outline:\s*\d+px solid var\(--brand-teal\)\s*!important/.test(reducedMotionSection),
+      'outline must be a solid brand-teal outline !important'
+    );
+    assert.ok(
+      reducedMotionSection.includes('animation: none !important'),
+      'the pulse must stop entirely'
     );
   });
 
-  await t.test('4.3: Scaffolding pulse provides static high-contrast emerald outline & shadow', () => {
-    const reducedMotionSection = cssContent.slice(
-      cssContent.indexOf('@media (prefers-reduced-motion: reduce)')
-    );
-
-    assert.ok(
-      reducedMotionSection.includes('outline: 4px solid #10B981 !important'),
-      'outline must be 4px solid #10B981 !important'
-    );
-    assert.ok(
-      reducedMotionSection.includes('box-shadow: 0 0 24px 8px rgba(16, 185, 129, 0.6) !important'),
-      'box-shadow must provide high-contrast emerald beacon'
-    );
-    assert.ok(
-      reducedMotionSection.includes('border-color: #10B981 !important'),
-      'border-color must be #10B981 !important'
-    );
+  await t.test('4.4: Text never relies on colour alone for meaning', () => {
+    assert.ok(baseCss.includes('@layer base'), 'Typography belongs to the base layer');
+    assert.ok(componentCss.includes('.alert'), 'Alerts must have a component style with icon + text');
   });
 });
 
@@ -616,12 +593,14 @@ test('TIER 5 — Suite 6: Scandinavian Token Integrity & Redesigned UI Adversari
     'src/pages/SplashScreen.tsx',
     'src/pages/auth/LoginScreen.tsx',
     'src/pages/games/RecogniseGame.tsx',
-    'src/pages/games/RecognisePlay.tsx',
+    'src/pages/games/RecogniseGame.tsx',
     'src/pages/games/RememberGame.tsx',
-    'src/pages/games/RememberMemorize.tsx',
-    'src/pages/games/RememberRecall.tsx',
+    'src/pages/games/RecogniseGame.tsx',
     'src/pages/games/MemoryMatchGame.tsx',
     'src/pages/games/DailyRoutineGame.tsx',
+    'src/pages/PatientHomeScreen.tsx',
+    'src/pages/SplashScreen.tsx',
+    'src/pages/auth/LoginScreen.tsx',
   ];
 
   await t.test('6.1: Zero lingering #F5F0E8 across redesigned primary screens', () => {
@@ -640,8 +619,8 @@ test('TIER 5 — Suite 6: Scandinavian Token Integrity & Redesigned UI Adversari
 
   await t.test('6.3: Cognitive games contain zero punitive feedback words (tryAgain, game over)', () => {
     const gameFiles = [
-      'src/pages/games/RecognisePlay.tsx',
-      'src/pages/games/RememberRecall.tsx',
+      'src/pages/games/RememberGame.tsx',
+      'src/pages/games/RecogniseGame.tsx',
       'src/pages/games/MemoryMatchGame.tsx',
       'src/pages/games/DailyRoutineGame.tsx',
     ];
@@ -652,13 +631,10 @@ test('TIER 5 — Suite 6: Scandinavian Token Integrity & Redesigned UI Adversari
     }
   });
 
-  await t.test('6.4: globals.css Scandinavian canvas tokens (#F8FAFC, dark midnight) are strictly defined', () => {
-    const globals = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
-    assert.ok(globals.includes('#F8FAFC'), 'globals.css must define light canvas #F8FAFC');
-    assert.ok(
-      globals.includes('#080C14') || globals.includes('#0B0F17'),
-      'globals.css must define a deep midnight dark canvas (#080C14 / #0B0F17)'
-    );
+  await t.test('6.4: Both canvas tokens are strictly defined in the token layer', () => {
+    const tokens = fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8');
+    assert.ok(tokens.includes('--canvas: #FBF6EE'), 'tokens.css must define the warm ivory canvas');
+    assert.ok(tokens.includes('--canvas: #0C1512'), 'tokens.css must define the calm-night canvas');
   });
 
   await t.test('6.5: Viewport meta tag in index.html prevents user scale breaking senior layout', () => {

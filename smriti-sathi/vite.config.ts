@@ -12,7 +12,15 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 3000,
-    strictPort: true,
+    strictPort: false,
+    // Allow sandbox / tunnel preview hosts (Arena, ngrok, e2b) and LAN access
+    allowedHosts: true,
+    hmr: { overlay: true },
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 4000,
+    allowedHosts: true,
   },
   plugins: [
     react(),

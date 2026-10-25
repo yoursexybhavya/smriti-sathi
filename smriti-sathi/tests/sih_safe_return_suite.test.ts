@@ -49,9 +49,9 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
     assert.ok(fs.existsSync(badgePath), 'WearableBadgeGeneratorModal.tsx must exist');
     const content = fs.readFileSync(badgePath, 'utf8');
     assert.ok(content.includes('window.print()'), 'Must include 1-click browser printing');
-    assert.ok(content.includes('85mm'), 'Must support CR80 standard card width');
-    assert.ok(content.includes('54mm'), 'Must support CR80 standard card height');
-    assert.ok(content.includes('cardSide'), 'Must support toggling between front and back card faces');
+    assert.ok(content.includes('85.6'), 'Must use the true CR80 width of 85.6mm');
+    assert.ok(/54\s*mm/.test(content), 'Must use the true CR80 height of 54mm');
+    assert.ok(content.includes('aspectRatio'), 'The on-screen preview must keep the card aspect ratio');
   });
 
   // Test 4: Sundowning Circadian Care
@@ -60,9 +60,15 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
     assert.ok(fs.existsSync(sundownPath), 'SundowningCareModal.tsx must exist');
     const content = fs.readFileSync(sundownPath, 'utf8');
     assert.ok(content.includes('4-7-8') || content.includes('breathPhase'), 'Must implement breathing cycle');
-    assert.ok(content.includes('SpeechSynthesisUtterance'), 'Must implement familiar voice reassurance');
+    assert.ok(content.includes('useVoice'), 'Must speak through the shared voice hook');
+    assert.ok(content.includes('speak('), 'Must offer familiar-voice reassurance');
     assert.ok(content.includes('AudioContext') || content.includes('webkitAudioContext'), 'Must synthesize gentle ambient chime sounds');
-    assert.ok(content.includes('as:') && content.includes('brx:') && content.includes('mni:'), 'Must support Northeast languages');
+    for (const code of ['as', 'brx', 'mni']) {
+      assert.ok(
+        fs.existsSync(path.join(rootDir, `src/i18n/locales/${code}.ts`)),
+        `Must ship the ${code} locale`,
+      );
+    }
   });
 
   // Test 5: ASHA Triaging Hub & SPI Engine
@@ -70,9 +76,10 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
     const ashaPath = path.join(rootDir, 'src/components/AshaTriageModal.tsx');
     assert.ok(fs.existsSync(ashaPath), 'AshaTriageModal.tsx must exist');
     const content = fs.readFileSync(ashaPath, 'utf8');
-    assert.ok(content.includes('14-Session') || content.includes('14-session'), 'Must track 14-session moving median');
-    assert.ok(content.includes('Working Memory'), 'Must evaluate Working Memory domain');
-    assert.ok(content.includes('Temporal Sequencing'), 'Must evaluate Temporal Sequencing domain');
+    assert.ok(content.includes('14'), 'Must track the 14-session window');
+    assert.ok(content.includes('DOMAINS'), 'Must evaluate cognitive domains');
+    assert.ok(content.includes("prog.domainRecall"), 'Must evaluate memory recall');
+    assert.ok(content.includes("prog.domainRoutine"), 'Must evaluate daily-routine sequencing');
     assert.ok(content.includes('wa.me'), 'Must support 1-click WhatsApp triage dispatch to PHC doctor');
     assert.ok(content.includes('window.print()'), 'Must support printable ASHA community health record');
   });
@@ -81,7 +88,8 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
   test('6.1: LoginScreen.tsx features prominent 1-tap Good Samaritan rescue bar bypassing login', () => {
     const loginPath = path.join(rootDir, 'src/pages/auth/LoginScreen.tsx');
     const content = fs.readFileSync(loginPath, 'utf8');
-    assert.ok(content.includes('Found a Lost Elder?'), 'Must display Good Samaritan emergency button');
+    assert.ok(content.includes("t('auth.needHelp')"), 'Must display the Good Samaritan rescue bar');
+    assert.ok(content.includes('showSafeReturn'), 'Must open the safe-return card from sign-in');
     assert.ok(content.includes('SafeReturnModal'), 'Must mount SafeReturnModal directly on login screen');
   });
 

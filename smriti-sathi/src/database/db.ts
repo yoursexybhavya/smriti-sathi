@@ -14,7 +14,7 @@ export interface User {
 export interface GameSession {
   id?: number;
   userId: number;
-  gameType: 'remember' | 'recognise' | 'test' | 'memory_match' | 'family_quiz';
+  gameType: 'remember' | 'recognise' | 'test' | 'memory_match' | 'family_quiz' | 'daily_routine';
   difficulty: number;
   score: number;
   totalObjects: number;

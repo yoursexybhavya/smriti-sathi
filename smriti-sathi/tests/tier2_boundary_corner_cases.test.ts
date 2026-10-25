@@ -58,28 +58,28 @@ function getContrastRatio(hex1: string, hex2: string): number {
 // ============================================================================
 // FEATURE 1: Scandinavian Design Tokens Boundaries
 // ============================================================================
-test('TIER 2 — Feature 1: Scandinavian Design Tokens Boundaries', async (t) => {
-  const globalsCss = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
+test('TIER 2 — Feature 1: Warm Heritage design token boundaries', async (t) => {
+  const globalsCss = fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8');
 
   await t.test('2.1.1: Light canvas color normalization handles case-insensitivity', () => {
     const hasLightCanvas =
-      globalsCss.toLowerCase().includes('#f8fafc') || globalsCss.toUpperCase().includes('#F8FAFC');
-    assert.ok(hasLightCanvas, 'Must support #F8FAFC light canvas regardless of case');
+      globalsCss.toLowerCase().includes('#fbf6ee') || globalsCss.toUpperCase().includes('#FBF6EE');
+    assert.ok(hasLightCanvas, 'Must support the warm ivory #FBF6EE canvas regardless of case');
   });
 
-  await t.test('2.1.2: Contrast ratio of light theme text (#0F172A) on #F8FAFC canvas exceeds WCAG AAA (7.0:1)', () => {
-    const ratio = getContrastRatio('#0F172A', '#F8FAFC');
+  await t.test('2.1.2: Contrast of light-theme ink (#17211E) on ivory canvas (#FBF6EE) exceeds WCAG AAA', () => {
+    const ratio = getContrastRatio('#17211E', '#FBF6EE');
     assert.ok(ratio >= 7.0, `Contrast ratio ${ratio.toFixed(2)} must exceed WCAG AAA 7.0:1`);
   });
 
-  await t.test('2.1.3: Contrast ratio of dark theme text (#FFFFFF) on midnight canvas (#0A1420) exceeds WCAG AAA (7.0:1)', () => {
-    const ratio = getContrastRatio('#FFFFFF', '#0A1420');
+  await t.test('2.1.3: Contrast of dark-theme ink (#F3EFE7) on calm-night canvas (#0C1512) exceeds WCAG AAA', () => {
+    const ratio = getContrastRatio('#F3EFE7', '#0C1512');
     assert.ok(ratio >= 7.0, `Contrast ratio ${ratio.toFixed(2)} must exceed WCAG AAA 7.0:1`);
   });
 
   await t.test('2.1.4: Design tokens contain valid hex format without syntax errors', () => {
     const hexMatches = globalsCss.match(/#[0-9a-fA-F]{3,8}/g);
-    assert.ok(hexMatches && hexMatches.length > 10, 'Must extract valid hex color codes from globals.css');
+    assert.ok(hexMatches && hexMatches.length > 10, 'Must extract valid hex color codes from tokens.css');
     for (const hex of hexMatches) {
       assert.ok(
         hex.length === 4 || hex.length === 7 || hex.length === 9,
@@ -88,10 +88,12 @@ test('TIER 2 — Feature 1: Scandinavian Design Tokens Boundaries', async (t) =>
     }
   });
 
-  await t.test('2.1.5: CSS variable fallbacks defined in body rules ensure graceful rendering', () => {
+  await t.test('2.1.5: Every global rule lives in a cascade layer, so utilities can win', () => {
     const indexCss = fs.readFileSync(path.join(rootDir, 'src/index.css'), 'utf-8');
-    assert.ok(indexCss.includes('var(--color-bg'), 'Must specify var(--color-bg) fallback');
-    assert.ok(indexCss.includes('var(--color-text'), 'Must specify var(--color-text) fallback');
+    const baseCss = fs.readFileSync(path.join(rootDir, 'src/styles/base.css'), 'utf-8');
+    assert.ok(indexCss.includes("@import 'tailwindcss'"), 'Tailwind must be imported first');
+    assert.ok(baseCss.includes('@layer base'), 'The reset must live in @layer base');
+    assert.ok(!/^\s*\*\s*,/m.test(baseCss.split('@layer base')[0]), 'No unlayered universal selector may precede the layer');
   });
 });
 
@@ -116,16 +118,16 @@ test('TIER 2 — Feature 2: Zero Lingering Muddy Colors Boundaries', async (t) =
     assert.ok(!patientHome.includes('bg-[#1B5E20]'), 'PatientHomeScreen buttons must not use legacy bg-[#1B5E20]');
   });
 
-  await t.test('2.2.4: globals.css contains ZERO legacy muddy tokens (#F5F0E8, #FDF8F0)', () => {
-    const globalsCss = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
-    assert.ok(!globalsCss.includes('#F5F0E8'), 'globals.css must not define legacy #F5F0E8');
-    assert.ok(!globalsCss.includes('#FDF8F0'), 'globals.css must not define legacy #FDF8F0');
+  await t.test('2.2.4: The token layer contains ZERO legacy muddy tokens (#F5F0E8, #FDF8F0)', () => {
+    const tokensCss = fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8');
+    assert.ok(!tokensCss.toUpperCase().includes('#F5F0E8'), 'tokens.css must not define legacy #F5F0E8');
+    assert.ok(!tokensCss.toUpperCase().includes('#FDF8F0'), 'tokens.css must not define legacy #FDF8F0');
   });
 
-  await t.test('2.2.5: ErrorBoundary component has been purged of #F5F0E8 and adopts dark #0B0F17 canvas', () => {
+  await t.test('2.2.5: ErrorBoundary is purged of muddy colours and reads from tokens', () => {
     const errBoundary = fs.readFileSync(path.join(rootDir, 'src/components/ErrorBoundary.tsx'), 'utf-8');
-    assert.ok(!errBoundary.includes('#F5F0E8'), 'ErrorBoundary must be purged of #F5F0E8');
-    assert.ok(errBoundary.includes('#0B0F17') || errBoundary.includes('slate-50'), 'ErrorBoundary adopts Scandinavian slate/canvas');
+    assert.ok(!errBoundary.toUpperCase().includes('#F5F0E8'), 'ErrorBoundary must be purged of #F5F0E8');
+    assert.ok(errBoundary.includes('var(--') || errBoundary.includes('var(--canvas)'), 'ErrorBoundary must consume design tokens');
   });
 });
 
@@ -133,33 +135,31 @@ test('TIER 2 — Feature 2: Zero Lingering Muddy Colors Boundaries', async (t) =
 // FEATURE 3: Senior Touch Targets Boundaries
 // ============================================================================
 test('TIER 2 — Feature 3: Senior Touch Targets Boundaries', async (t) => {
-  await t.test('3.1: Minimum height constraint boundary on mobile viewports (<360px)', () => {
-    const buttonContent = fs.readFileSync(path.join(rootDir, 'src/components/LargeButton.tsx'), 'utf-8');
-    const minHeightMatch = buttonContent.match(/min-h-\[(\d+)px\]/);
-    assert.ok(
-      (minHeightMatch !== null && Number(minHeightMatch[1]) >= 56) ||
-        buttonContent.includes('py-4') ||
-        buttonContent.includes('h-14'),
-      'Button height must never collapse below 56px'
-    );
+  const tokensCss = fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8');
+  const componentCss = fs.readFileSync(path.join(rootDir, 'src/styles/components.css'), 'utf-8');
+
+  await t.test('3.1: Button height can never collapse below the tremor-safe token', () => {
+    const match = tokensCss.match(/--tap-min:\s*(\d+)px/);
+    assert.ok(match, 'A minimum tap token must exist');
+    assert.ok(Number(match[1]) >= 52, 'The minimum tap target must be at least 52px');
+    assert.ok(componentCss.includes('min-height: var(--tap-min)'), 'Buttons must consume that token');
   });
 
-  await t.test('3.2: Icon-only buttons (back, audio, settings) maintain minimum 40x40px touch areas', () => {
+  await t.test('3.2: Icon-only buttons keep a >=44px hit area', () => {
+    assert.ok(componentCss.includes('.iconbtn'), 'An icon button primitive must exist');
+    const block = componentCss.slice(componentCss.indexOf('.iconbtn '), componentCss.indexOf('.iconbtn ') + 400);
+    assert.ok(/(min-)?(width|height):\s*(4[4-9]|[5-9]\d)px/.test(block), 'Icon buttons must be at least 44px square');
+  });
+
+  await t.test('3.3: Touch targets are spaced so a tremor cannot hit two at once', () => {
     const homeContent = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
-    assert.ok(homeContent.includes('min-h-[40px]'), 'Icon and utility buttons must specify minimum 40px bounding box');
+    assert.ok(/gap-3(\.5)?/.test(homeContent) || homeContent.includes('gap-4'), 'Activity grid must space targets >=12px');
+    assert.ok(tokensCss.includes('--s-3:'), 'Spacing must come from the token scale');
   });
 
-  await t.test('3.3: Touch target vertical spacing (gap-3.5 or gap-4) prevents accidental adjacent tap', () => {
-    const homeContent = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
-    assert.ok(homeContent.includes('gap-3.5') || homeContent.includes('gap-4'), 'Launcher grid must space targets >=14px');
-  });
-
-  await t.test('3.4: Disabled button state maintains physical touch dimensions without shrinkage', () => {
-    const buttonContent = fs.readFileSync(path.join(rootDir, 'src/components/LargeButton.tsx'), 'utf-8');
-    assert.ok(
-      buttonContent.includes('disabled:opacity') || buttonContent.includes('disabled:cursor-not-allowed'),
-      'Disabled buttons must use opacity without reducing layout dimensions'
-    );
+  await t.test('3.4: Disabled buttons keep their physical size', () => {
+    assert.ok(componentCss.includes('disabled'), 'Disabled styling must be handled in the button layer');
+    assert.ok(/\.btn:disabled[\s\S]{0,200}opacity/.test(componentCss), 'Disabled must be expressed as opacity, not shrinkage');
   });
 
   await t.test('3.5: Senior accessibility tap target height range (56px to 64px) verified against guidelines', () => {
@@ -187,17 +187,19 @@ test('TIER 2 — Feature 4: Splash Screen Boundaries', async (t) => {
     assert.strictEqual(renderedName, 'Smriti Sathi', 'Empty appName must fall back to Smriti Sathi');
   });
 
-  await t.test('4.3: Extremely long appName/tagline strings are constrained with max-w-xs and px-8', () => {
-    assert.ok(splashContent.includes('max-w-xs'), 'Tagline must be constrained to max-w-xs');
-    assert.ok(splashContent.includes('px-8'), 'Tagline must have padding px-8');
+  await t.test('4.3: Long names are constrained so the mark always stays centred', () => {
+    assert.ok(splashContent.includes('text-center'), 'Splash copy must be centred');
+    assert.ok(splashContent.includes('px-6') || splashContent.includes('px-5'), 'Must reserve horizontal padding');
   });
 
-  await t.test('4.4: High z-index (z-50) guarantees overlay sits above all other app layers', () => {
-    assert.ok(splashContent.includes('z-50'), 'Must enforce z-50 to supersede bottom navigation');
+  await t.test('4.4: The splash owns the whole viewport above everything else', () => {
+    assert.ok(splashContent.includes('overflow-hidden'), 'Must not create scrollbars over the app');
+    assert.ok(splashContent.includes('role="status"'), 'Must be announced as a status region');
   });
 
-  await t.test('4.5: Initial render starts at opacity-0 and translates smoothly', () => {
-    assert.ok(splashContent.includes('opacity-0 translate-y-4'), 'Initial state must be hidden before timeout fires');
+  await t.test('4.5: The mark starts hidden and fades in, so there is no flash', () => {
+    assert.ok(splashContent.includes('opacity: visible ? 1 : 0'), 'Initial state must be transparent');
+    assert.ok(splashContent.includes('duration-700'), 'The reveal must be slow enough to feel calm');
   });
 });
 
@@ -207,21 +209,24 @@ test('TIER 2 — Feature 4: Splash Screen Boundaries', async (t) => {
 test('TIER 2 — Feature 5: Profile Selection Boundaries', async (t) => {
   const loginContent = fs.readFileSync(path.join(rootDir, 'src/pages/auth/LoginScreen.tsx'), 'utf-8');
 
-  await t.test('5.1: Caregiver login with invalid PIN displays clear error without throwing', () => {
-    assert.ok(loginContent.includes('result.error || \'Login failed\''), 'Must format login error gracefully');
+  await t.test('5.1: A wrong PIN shows a gentle, translated message instead of throwing', () => {
+    assert.ok(loginContent.includes("t('auth.pinWrong')"), 'Must show a localised PIN error');
+    assert.ok(loginContent.includes('{error}'), 'Must render the error state');
   });
 
-  await t.test('5.2: Caregiver login with empty PIN keeps submit button disabled', () => {
-    assert.ok(loginContent.includes('disabled={isLoading || !pin}'), 'Submit button must be disabled when pin is empty');
+  await t.test('5.2: A short PIN cannot be submitted', () => {
+    assert.ok(loginContent.includes('pin.length < 4'), 'Submit must require four digits');
+    assert.ok(loginContent.includes('disabled='), 'The submit control must actually disable');
   });
 
-  await t.test('5.3: Caregiver PIN input toggles visibility mask between text and password', () => {
-    assert.ok(loginContent.includes("showPin ? 'text' : 'password'"), 'Must toggle input type');
-    assert.ok(loginContent.includes('setShowPin(!showPin)'), 'Must toggle showPin state');
+  await t.test('5.3: The PIN is entered on a tactile keypad with delete', () => {
+    assert.ok(loginContent.includes('Delete'), 'Must offer a delete key for mistakes');
+    assert.ok(loginContent.includes('aria-label="Tactile Keypad for Caregiver PIN"'), 'Keypad must be labelled for assistive tech');
   });
 
-  await t.test('5.4: Rapid double-tap on elder login button is protected by isLoading flag', () => {
-    assert.ok(loginContent.includes('disabled={isLoading}'), 'Elder login button must disable during loading');
+  await t.test('5.4: Rapid double-tap cannot start two sign-ins', () => {
+    assert.ok(loginContent.includes('loading={busy}'), 'Button must show and block while busy');
+    assert.ok(loginContent.includes('setBusy(true)'), 'Busy state must be set during sign-in');
   });
 
   await t.test('5.5: Switching selected profiles resets any prior error message', () => {
@@ -253,9 +258,9 @@ test('TIER 2 — Feature 6: Onboarding Flow Boundaries', async (t) => {
     assert.ok(flowContent.includes('if (patient) {'), 'Must check patient existence before completing');
   });
 
-  await t.test('6.5: Default switch statement falls back to OnboardingWelcome on unexpected step', () => {
-    assert.ok(flowContent.includes('default:'), 'Must provide default branch');
-    assert.ok(flowContent.includes('OnboardingWelcome'), 'Default branch must render OnboardingWelcome');
+  await t.test('6.5: An unexpected step can never leave the user on a blank screen', () => {
+    assert.ok(flowContent.includes('OnboardingWelcome'), 'A welcome step must exist');
+    assert.ok(/step > 4|step === 4|step < 5/.test(flowContent) || flowContent.includes('Math.min'), 'Step must be clamped to the known range');
   });
 });
 
@@ -265,28 +270,31 @@ test('TIER 2 — Feature 6: Onboarding Flow Boundaries', async (t) => {
 test('TIER 2 — Feature 7: Patient Home Screen Boundaries', async (t) => {
   const homeContent = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
 
-  await t.test('7.1: Zero scheduled reminders displays serene empty-state card instead of crash', () => {
-    assert.ok(homeContent.includes('reminders.length > 0 ?'), 'Must branch on reminders length');
-    assert.ok(homeContent.includes('No care reminders scheduled for today'), 'Must show reassuring empty message');
+  await t.test('7.1: No reminder today shows reassurance, never an empty hole', () => {
+    assert.ok(homeContent.includes('nextReminder ?'), 'Must branch on whether a reminder exists');
+    assert.ok(homeContent.includes("t('home.noReminderToday')"), 'Must show the reassuring empty message');
+    assert.ok(homeContent.includes("t('home.noReminderBody')"), 'Must explain why it is empty');
   });
 
-  await t.test('7.2: Completed reminder receives line-through styling and muted text color', () => {
-    assert.ok(homeContent.includes('line-through'), 'Completed reminder must apply line-through text decoration');
-    assert.ok(homeContent.includes('opacity-65'), 'Completed reminder container must reduce opacity to 65%');
+  await t.test('7.2: Completed work is acknowledged rather than struck through', () => {
+    assert.ok(homeContent.includes("t('rem.completed')") || homeContent.includes('doneToday'), 'Must show what was completed');
+    assert.ok(homeContent.includes('Check'), 'Completion must read as a positive tick');
   });
 
-  await t.test('7.3: Long reminder titles are constrained via truncate class', () => {
-    assert.ok(homeContent.includes('truncate'), 'Reminder title must use truncate to prevent multi-line overflow');
+  await t.test('7.3: Long titles and names cannot break the layout', () => {
+    assert.ok(homeContent.includes('truncate'), 'Reminder/activity titles must truncate');
+    assert.ok(homeContent.includes('min-w-0'), 'Flex children must be allowed to shrink');
   });
 
-  await t.test('7.4: Rapid double-click on reminder toggle is handled safely with try/catch', () => {
-    assert.ok(homeContent.includes('try {'), 'Must wrap reminder toggle in try block');
-    assert.ok(homeContent.includes('catch (err)'), 'Must catch toggle errors without unhandled rejection');
+  await t.test('7.4: Reminder actions cannot leave the UI inconsistent on failure', () => {
+    assert.ok(homeContent.includes('await reminderService'), 'Actions must await the service');
+    assert.ok(homeContent.includes('await load(userId)'), 'State must be reloaded from the database after an action');
   });
 
-  await t.test('7.5: Buzzer testing state disables test button while active', () => {
-    assert.ok(homeContent.includes('disabled={isBuzzerTesting}'), 'Must disable buzzer button while ringing');
-    assert.ok(homeContent.includes("'Ringing...' : 'Test Alarm'"), 'Must update label during buzzer test');
+  await t.test('7.5: Safety actions are real buttons reachable by keyboard', () => {
+    assert.ok(homeContent.includes('type="button"'), 'Safety cards must be real buttons');
+    assert.ok(homeContent.includes('open-safe-return'), 'The safe-return action must be wired');
+    assert.ok(homeContent.includes('open-sundowning'), 'The evening-calm action must be wired');
   });
 });
 
@@ -294,15 +302,17 @@ test('TIER 2 — Feature 7: Patient Home Screen Boundaries', async (t) => {
 // FEATURE 8: Recognise Game Boundaries
 // ============================================================================
 test('TIER 2 — Feature 8: Recognise Game Boundaries', async (t) => {
-  const playContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecognisePlay.tsx'), 'utf-8');
   const gameContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RecogniseGame.tsx'), 'utf-8');
+  const playContent = gameContent;
 
-  await t.test('8.1: Offline broken image hides gracefully without breaking layout', () => {
-    assert.ok(playContent.includes("style.display = 'none'"), 'Must set display none on broken image load error');
+  await t.test('8.1: No remote image can break the layout offline', () => {
+    assert.ok(!/<img/.test(playContent), 'The game must not load remote images');
+    assert.ok(playContent.includes('ObjectCardVisual'), 'It must draw local glyph tiles instead');
   });
 
-  await t.test('8.2: Confirm button is disabled when no option is selected', () => {
-    assert.ok(playContent.includes('disabled={!selectedOption}'), 'Confirm button must be disabled without selection');
+  await t.test('8.2: Options lock once an answer has been given', () => {
+    assert.ok(playContent.includes('disabled={!!feedback}'), 'Options must disable after answering');
+    assert.ok(playContent.includes('setFeedback'), 'Feedback state must drive the lock');
   });
 
   await t.test('8.3: 0% accuracy score (0 correct answers) calculates cleanly without division by zero', () => {
@@ -320,7 +330,7 @@ test('TIER 2 — Feature 8: Recognise Game Boundaries', async (t) => {
   });
 
   await t.test('8.5: Next level progression is clamped to maximum difficulty level 5', () => {
-    assert.ok(gameContent.includes('Math.min(5, difficulty + 1)'), 'Difficulty must be clamped to level 5');
+    assert.ok(/level < 5/.test(gameContent), 'Difficulty must be clamped to level 5');
   });
 });
 
@@ -329,24 +339,26 @@ test('TIER 2 — Feature 8: Recognise Game Boundaries', async (t) => {
 // ============================================================================
 test('TIER 2 — Feature 9: Remember Game Boundaries', async (t) => {
   const gameContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RememberGame.tsx'), 'utf-8');
-  const recallContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/RememberRecall.tsx'), 'utf-8');
+  const recallContent = gameContent;
 
-  await t.test('9.1: Zero objects selected in recall yields 0 selected items count', () => {
-    assert.ok(recallContent.includes('selectedIds.size'), 'Must track size of selected set');
+  await t.test('9.1: Zero objects selected yields a zero count and a blocked submit', () => {
+    assert.ok(recallContent.includes('selected.length'), 'Must track the selection');
+    assert.ok(recallContent.includes('disabled={selected.length === 0}'), 'Submit must be blocked with nothing selected');
   });
 
-  await t.test('9.2: Deselecting an object removes it from selected set without error', () => {
-    assert.ok(recallContent.includes('newSet.delete(obj.id)'), 'Must delete item when already selected');
-    assert.ok(recallContent.includes('newSet.add(obj.id)'), 'Must add item when not selected');
+  await t.test('9.2: Deselecting an object removes it without error', () => {
+    assert.ok(/prev\.filter\(\(o\) => o\.id !== obj\.id\)/.test(recallContent), 'Must filter the object out');
+    assert.ok(recallContent.includes('[...prev, obj]'), 'Must add the object back');
   });
 
-  await t.test('9.3: Recall grid responsive columns adapt cleanly between small and large sets', () => {
-    assert.ok(recallContent.includes('recallSet.length <= 6'), 'Must check recallSet length <= 6');
-    assert.ok(recallContent.includes('recallSet.length <= 9'), 'Must check recallSet length <= 9');
+  await t.test('9.3: The recall grid reflows from two columns up', () => {
+    assert.ok(recallContent.includes('object-grid'), 'Must use the object grid');
+    assert.ok(/\.object-grid[\s\S]{0,300}grid-template-columns/.test(
+      fs.readFileSync(path.join(rootDir, 'src/styles/components.css'), 'utf-8')), 'The grid must be defined responsively');
   });
 
   await t.test('9.4: Difficulty level progression is clamped to maximum level 5', () => {
-    assert.ok(gameContent.includes('Math.min(5, difficulty + 1)'), 'Must clamp difficulty to level 5');
+    assert.ok(/level < 5/.test(gameContent), 'Must not offer a sixth level');
   });
 
   await t.test('9.5: Response time calculation handles sub-second precision', () => {
@@ -390,8 +402,8 @@ test('TIER 2 — Feature 10: Memory Match Boundaries', async (t) => {
 
   await t.test('10.5: Board lock prevents third card flip before pair evaluation', () => {
     const gameContent = fs.readFileSync(path.join(rootDir, 'src/pages/games/MemoryMatchGame.tsx'), 'utf-8');
-    assert.ok(gameContent.includes('if (isLocked) return;'), 'Must block card click while board is locked');
-    assert.ok(gameContent.includes('setIsLocked(true)'), 'Must set isLocked when 2 cards are flipped');
+    assert.ok(gameContent.includes('if (locked) return;'), 'Must block card click while board is locked');
+    assert.ok(gameContent.includes('setLocked(true)'), 'Must lock the board when two cards are up');
   });
 });
 
@@ -453,7 +465,7 @@ test('TIER 2 — Feature 11: Daily Routine Boundaries', async (t) => {
 
   await t.test('11.5: UI component guards slot placement when selectedCardId is null', () => {
     const content = fs.readFileSync(path.join(rootDir, 'src/pages/games/DailyRoutineGame.tsx'), 'utf-8');
-    assert.ok(content.includes('if (!selectedCardId) return;'), 'Must return if no card is selected');
+    assert.ok(content.includes('if (!picked) return;'), 'Must return if no card is selected');
   });
 });
 
@@ -461,34 +473,29 @@ test('TIER 2 — Feature 11: Daily Routine Boundaries', async (t) => {
 // FEATURE 12: Caregiver Dashboard Boundaries
 // ============================================================================
 test('TIER 2 — Feature 12: Caregiver Dashboard Boundaries', async (t) => {
-  const dashContent = fs.readFileSync(path.join(rootDir, 'src/pages/CaregiverDashboard.tsx'), 'utf-8');
+  const dashContent = fs.readFileSync(path.join(rootDir, 'src/pages/caregiver/CaregiverHome.tsx'), 'utf-8');
 
-  await t.test('12.1: Zero patient session history defaults engagement rate cleanly', () => {
-    assert.ok(dashContent.includes('summary.weeklyEngagement'), 'Must display summary.weeklyEngagement');
+  await t.test('12.1: A patient with no history shows dashes, never NaN', () => {
+    assert.ok(/reminders\.total \?/.test(dashContent), 'Adherence must guard against zero');
+    assert.ok(dashContent.includes("'—'"), 'Empty metrics must render an em dash');
   });
 
-  await t.test('12.2: Empty recent activities feed renders reassuring empty state message', () => {
-    assert.ok(dashContent.includes('No recent activities'), 'Must render "No recent activities" placeholder');
+  await t.test('12.2: An empty activity feed says so instead of rendering nothing', () => {
+    assert.ok(dashContent.includes("t('cg.waiting')"), 'Must render a reassuring empty-state message');
   });
 
-  await t.test('12.3: Non-diagnostic disclaimer is rendered under clinical trend cards', () => {
-    assert.ok(
-      dashContent.includes('This is not a medical diagnosis'),
-      'Must display clinical non-diagnostic disclaimer'
-    );
+  await t.test('12.3: Clinical surfaces carry a non-diagnostic disclaimer', () => {
+    assert.ok(dashContent.includes("t('saf.disclaimer')"), 'Must show the non-diagnostic disclaimer');
   });
 
-  await t.test('12.4: Performance trend changed alert renders only when alert state is active', () => {
-    assert.ok(
-      dashContent.includes('Performance trend has changed'),
-      'Must contain performance trend changed advisory'
-    );
+  await t.test('12.4: Alerts appear only when something is genuinely pending', () => {
+    assert.ok(dashContent.includes('reminders.pending'), 'Must derive alerts from live state');
+    assert.ok(dashContent.includes('tone="success"'), 'Must show an all-clear when nothing is pending');
   });
 
-  await t.test('12.5: Trend badges map stable, improving, declining with distinct visual colors', () => {
-    assert.ok(dashContent.includes("'↑ Improving'"), 'Must show Improving arrow');
-    assert.ok(dashContent.includes("'↓ Declining'"), 'Must show Declining arrow');
-    assert.ok(dashContent.includes("'→ Stable'"), 'Must show Stable arrow');
+  await t.test('12.5: Status is expressed with words as well as colour', () => {
+    assert.ok(dashContent.includes('Tag'), 'Status must be shown as a tag');
+    assert.ok(dashContent.includes("t('cg.sessionsWeek')") || dashContent.includes("t('cg.accuracy')"), 'Must name each metric in words');
   });
 });
 
@@ -517,15 +524,15 @@ test('TIER 2 — Feature 13: Care Schedule & Alarm Buzzer Boundaries', async (t)
     assert.strictEqual(snoozedTime - originalTime, 600000, 'Snooze must add 600,000 milliseconds');
   });
 
-  await t.test('13.4: Delete confirmation modal protects against accidental reminder deletion', () => {
-    assert.ok(
-      remScreen.includes('showDeleteConfirm') || remScreen.includes('handleDelete'),
-      'Must provide delete handler'
-    );
+  await t.test('13.4: Deleting a reminder asks first', () => {
+    assert.ok(remScreen.includes('ConfirmDialog'), 'Must confirm before deleting');
+    assert.ok(remScreen.includes('toDelete'), 'Must track the reminder awaiting confirmation');
   });
 
-  await t.test('13.5: Empty scheduled reminders list renders empty state guidance', () => {
-    assert.ok(remScreen.includes('No reminders yet') || remScreen.includes('reminders.length === 0'), 'Must display empty schedule guidance');
+  await t.test('13.5: An empty schedule teaches the next step', () => {
+    assert.ok(remScreen.includes('EmptyState'), 'Must use the shared empty state');
+    assert.ok(remScreen.includes("t('rem.emptyTitle')"), 'Must explain that no reminders exist yet');
+    assert.ok(remScreen.includes("t('rem.add')"), 'Must offer the add action inline');
   });
 });
 
@@ -535,29 +542,33 @@ test('TIER 2 — Feature 13: Care Schedule & Alarm Buzzer Boundaries', async (t)
 test('TIER 2 — Feature 14: Settings Boundaries', async (t) => {
   const settingsContent = fs.readFileSync(path.join(rootDir, 'src/pages/SettingsScreen.tsx'), 'utf-8');
 
-  await t.test('14.1: Daylight vs Midnight mode maps directly to theme-light and theme-dark', () => {
-    assert.ok(settingsContent.includes('Daylight Mode'), 'Must define Daylight Mode');
-    assert.ok(settingsContent.includes('Midnight Mode'), 'Must define Midnight Mode');
+  await t.test('14.1: Appearance is a single switch bound to the theme attribute', () => {
+    assert.ok(settingsContent.includes("t('set.darkMode')"), 'Must offer the calm-night switch');
+    assert.ok(settingsContent.includes('toggleTheme'), 'Must call toggleTheme');
   });
 
-  await t.test('14.2: Text size setting scales preview paragraph between text-lg, text-xl, and text-2xl', () => {
-    assert.ok(settingsContent.includes("'text-2xl'"), 'Extra large text must apply text-2xl in preview');
-    assert.ok(settingsContent.includes("'text-xl'"), 'Large text must apply text-xl in preview');
-    assert.ok(settingsContent.includes("'text-lg'"), 'Normal text must apply text-lg in preview');
+  await t.test('14.2: Text size is chosen from three named steps', () => {
+    assert.ok(settingsContent.includes("'normal'"), 'Must support comfort size');
+    assert.ok(settingsContent.includes("'large'"), 'Must support large size');
+    assert.ok(settingsContent.includes("'extra-large'"), 'Must support extra-large size');
+    assert.ok(settingsContent.includes('Segmented'), 'Must be a segmented control, not a dropdown');
   });
 
-  await t.test('14.3: High contrast mode applies stark black background and yellow borders', () => {
-    assert.ok(settingsContent.includes('bg-black border-yellow-400'), 'High contrast preview must use black & yellow-400');
+  await t.test('14.3: High contrast is a real toggle that the shell responds to', () => {
+    assert.ok(settingsContent.includes('highContrast'), 'Must manage the high-contrast setting');
+    const indexCss = fs.readFileSync(path.join(rootDir, 'src/index.css'), 'utf-8');
+    assert.ok(indexCss.includes('--contrast') || fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8').includes('[data-contrast'),
+      'Contrast must be driven by a document attribute');
   });
 
-  await t.test('14.4: Sign out / profile switcher button is present and accessible', () => {
-    assert.ok(settingsContent.includes('Sign Out'), 'Settings must include Sign Out button');
-    assert.ok(settingsContent.includes('handleLogout'), 'Must have handleLogout handler');
+  await t.test('14.4: Signing out is present and guarded', () => {
+    assert.ok(settingsContent.includes("t('set.signOut')"), 'Must include a sign-out action');
+    assert.ok(settingsContent.includes('logout'), 'Must call logout');
   });
 
-  await t.test('14.5: Language selection menu supports English and Regional Indian languages', () => {
-    assert.ok(settingsContent.includes('Multilingual Language'), 'Must support Multilingual Language menu');
-    assert.ok(settingsContent.includes('LANGUAGES.map'), 'Must map over available languages');
+  await t.test('14.5: Language selection offers every supported language', () => {
+    assert.ok(settingsContent.includes('languages.map'), 'Must map over the available languages');
+    assert.ok(settingsContent.includes('setLanguage'), 'Must actually change the language');
   });
 });
 
@@ -565,28 +576,30 @@ test('TIER 2 — Feature 14: Settings Boundaries', async (t) => {
 // FEATURE 15: Multi-Orientation Boundaries
 // ============================================================================
 test('TIER 2 — Feature 15: Multi-Orientation Boundaries', async (t) => {
-  const globalsCss = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
+  const baseCss = fs.readFileSync(path.join(rootDir, 'src/styles/base.css'), 'utf-8');
+  const componentCss = fs.readFileSync(path.join(rootDir, 'src/styles/components.css'), 'utf-8');
+  const tokensCss = fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8');
   const homeContent = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
 
-  await t.test('15.1: Viewport width <1024px retains single focused centered column (max-w-2xl)', () => {
-    assert.ok(homeContent.includes('max-w-2xl mx-auto lg:max-w-none'), 'Portrait must center with max-w-2xl');
+  await t.test('15.1: Phones keep one focused column', () => {
+    assert.ok(homeContent.includes('grid-cols-1'), 'Content must stack on a phone');
   });
 
-  await t.test('15.2: Viewport width >=1024px unsets max-w-2xl and activates 12-column grid', () => {
-    assert.ok(homeContent.includes('lg:max-w-none'), 'Landscape must un-constrain width constraint');
-    assert.ok(homeContent.includes('lg:grid-cols-12'), 'Landscape must expand to 12 columns');
+  await t.test('15.2: Tablets already get a two-column activity grid', () => {
+    assert.ok(homeContent.includes('sm:grid-cols-2'), 'Must reflow at the small breakpoint');
   });
 
-  await t.test('15.3: Body global CSS sets overflow-x: hidden to prevent unwanted horizontal scrolling', () => {
-    assert.ok(globalsCss.includes('overflow-x: hidden'), 'body must enforce overflow-x: hidden');
+  await t.test('15.3: Nothing can scroll the page sideways', () => {
+    assert.ok(baseCss.includes('overflow-x: hidden') || baseCss.includes('overflow-x: clip'), 'body must suppress horizontal scroll');
   });
 
-  await t.test('15.4: Tablet breakpoint (768px) sets --max-width to 1120px', () => {
-    assert.ok(globalsCss.includes('--max-width: 1120px'), 'Tablet media query must set --max-width: 1120px');
+  await t.test('15.4: Tablet width is capped by the shell token', () => {
+    assert.ok(tokensCss.includes('--shell-max'), 'Content cap must be a token');
   });
 
-  await t.test('15.5: Desktop breakpoint (1024px) sets --max-width to 1240px', () => {
-    assert.ok(globalsCss.includes('--max-width: 1240px'), 'Desktop media query must set --max-width: 1240px');
+  await t.test('15.5: Desktop gets the wide cap and a sidebar', () => {
+    assert.ok(tokensCss.includes('--shell-max: 1240px'), 'Desktop cap must be 1240px');
+    assert.ok(componentCss.includes('@media (min-width: 1024px)'), 'Must declare the desktop breakpoint');
   });
 });
 

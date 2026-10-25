@@ -1,965 +1,422 @@
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  Brain, 
-  Eye, 
-  Pill, 
-  Droplets, 
-  Activity, 
-  Calendar, 
-  TrendingUp, 
-  Settings, 
-  BookOpen, 
-  Grid3X3, 
-  Volume2, 
-  Sun, 
-  Moon, 
-  Heart,
-  Sparkles,
-  BellRing,
-  Plus,
-  CheckCircle2,
-  Circle,
-  Play,
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
   Bell,
+  BookHeart,
+  Check,
   ChevronRight,
-  ShieldCheck,
-  User,
-  Users,
-  Globe,
-  Radio,
-  Sunset,
-  ShieldAlert,
-  Phone
+  Clock,
+  Flame,
+  Image as ImageIcon,
+  LifeBuoy,
+  Moon,
+  Phone,
+  Play,
+  Sunrise,
+  TrendingUp,
+  Volume2,
 } from 'lucide-react';
-import ProgressCard from '../components/ProgressCard';
-import SectionHeader from '../components/SectionHeader';
-import StatusIndicator from '../components/StatusIndicator';
-import LargeButton from '../components/LargeButton';
-import RoleAndProfileModal from '../components/RoleAndProfileModal';
+import { AppShell } from '../shell/AppShell';
+import { ACTIVITIES, TONE_STYLES } from '../data/activities';
+import { Button, Card, ProgressRing, Section, Tag } from '../ui';
 import { useApp } from '../context/AppContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useI18n } from '../i18n';
 import { useVoice } from '../hooks/useVoice';
 import { reminderService } from '../services/ReminderService';
-import { notificationService } from '../services/NotificationService';
 import { gameSessionRepository } from '../database';
-import { Reminder } from '../database/db';
-import { formatTime, isToday } from '../utils/dateUtils';
+import type { Reminder } from '../database/db';
 
-interface PatientHomeScreenProps {
+export interface PatientHomeScreenProps {
   onNavigate: (screen: string) => void;
   isOnline?: boolean;
 }
 
-export default function PatientHomeScreen({ onNavigate, isOnline = true }: PatientHomeScreenProps) {
-  const { state, toggleTheme } = useApp();
-  const { language, t } = useLanguage();
-  const { speak, isSpeaking } = useVoice();
-  const patient = state.currentPatient;
-  const isDark = state.accessibility?.theme === 'dark';
-  const userId = patient?.id ? parseInt(patient.id, 10) : undefined;
-
-  // Real data state
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [activitiesTodayCount, setActivitiesTodayCount] = useState<number>(0);
-  const [currentStreak, setCurrentStreak] = useState<number>(0);
-  const [accuracy, setAccuracy] = useState<string>('—');
-  const [isSpeakingComfort, setIsSpeakingComfort] = useState(false);
-  const [isBuzzerTesting, setIsBuzzerTesting] = useState(false);
-  const [gameProgress, setGameProgress] = useState({
-    remember: { doneToday: false, level: 1 },
-    recognise: { doneToday: false, level: 1 },
-    memoryMatch: { doneToday: false, level: 1 },
-    dailyRoutine: { doneToday: false, level: 1 },
-  });
-
-  // Role and Profile modal state
-  const [showRoleProfileModal, setShowRoleProfileModal] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      return params.has('modal');
-    }
-    return false;
-  });
-  const [modalInitialTab, setModalInitialTab] = useState<'role' | 'profile' | 'language' | 'sync'>(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const m = params.get('modal');
-      if (m === 'role' || m === 'language' || m === 'sync') return m;
-    }
-    return 'profile';
-  });
-
-  // Notification permission state
-  const [notificationPermission, setNotificationPermission] = useState<string>(
-    typeof Notification !== 'undefined' ? Notification.permission : 'granted'
-  );
-
-  const requestNotificationPermission = async () => {
-    try {
-      if (typeof Notification !== 'undefined' && Notification.requestPermission) {
-        const res = await Notification.requestPermission();
-        setNotificationPermission(res);
-        if (res === 'granted') {
-          await notificationService.triggerBuzzer(
-            '🔔 Care Reminders Enabled',
-            'Smriti Sathi will now alert you for daily medicine and routine schedules.'
-          );
-        }
-      }
-    } catch (err) {
-      console.warn('Failed to request notification permission:', err);
-    }
-  };
-
-  // Load real patient data from IndexedDB
-  const loadRealData = useCallback(async (uid: number) => {
-    try {
-      // 1. Load real reminders
-      const allReminders = await reminderService.getAllReminders(uid);
-      setReminders(allReminders);
-
-      // 2. Load real game sessions
-      const sessions = await gameSessionRepository.getByUserId(uid);
-      const stats = await gameSessionRepository.getStats(uid);
-
-      // Real activities completed today
-      const todaySessions = sessions.filter(s => isToday(s.createdAt));
-      setActivitiesTodayCount(todaySessions.length);
-
-      // Per-game level and daily completion
-      const getGameLevel = (type: string) => {
-        const gameSess = sessions.filter(s => (s.gameType as string) === type);
-        if (!gameSess.length) return 1;
-        const maxDiff = Math.max(...gameSess.map(s => s.difficulty || 1));
-        return Math.min(5, Math.max(1, maxDiff));
-      };
-
-      setGameProgress({
-        remember: {
-          doneToday: todaySessions.some(s => s.gameType === 'remember'),
-          level: getGameLevel('remember'),
-        },
-        recognise: {
-          doneToday: todaySessions.some(s => s.gameType === 'recognise'),
-          level: getGameLevel('recognise'),
-        },
-        memoryMatch: {
-          doneToday: todaySessions.some(s => s.gameType === 'memory_match'),
-          level: getGameLevel('memory_match'),
-        },
-        dailyRoutine: {
-          doneToday: todaySessions.some(s => (s.gameType as string) === 'daily_routine'),
-          level: getGameLevel('daily_routine'),
-        },
-      });
-
-      // Real calculated streak
-      const streak = calculateStreak(sessions.map(s => s.createdAt));
-      setCurrentStreak(streak);
-
-      // Real accuracy
-      if (stats.totalGames > 0 && stats.averageAccuracy > 0) {
-        setAccuracy(`${stats.averageAccuracy}%`);
-      } else {
-        setAccuracy('—');
-      }
-    } catch (err) {
-      console.error('Failed to load patient data from database:', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (userId) {
-      loadRealData(userId);
-    }
-  }, [userId, loadRealData]);
-
-  // Toggle reminder completion with real database update
-  const handleToggleReminder = async (rem: Reminder) => {
-    if (!userId || !rem.id) return;
-    try {
-      if (rem.status === 'completed') {
-        await reminderService.updateReminder(rem.id, { status: 'pending' });
-      } else {
-        await reminderService.completeReminder(rem.id, userId);
-      }
-      await loadRealData(userId);
-    } catch (err) {
-      console.error('Error toggling reminder status:', err);
-    }
-  };
-
-  // Test care buzzer & notification
-  const handleTestBuzzer = async () => {
-    setIsBuzzerTesting(true);
-    try {
-      await notificationService.triggerBuzzer(
-        '🔔 Care Schedule Test Alarm',
-        'This is the audible chime and vibration that alerts for daily medicine and care routines.'
-      );
-    } catch (err) {
-      console.warn('Buzzer test error:', err);
-    } finally {
-      setTimeout(() => setIsBuzzerTesting(false), 3000);
-    }
-  };
-
-  // Speak comfort message aloud in selected language
-  const speakComfort = async () => {
-    setIsSpeakingComfort(true);
-    try {
-      const message = t.comfortQuote || "Take your time. There is no rush. Every moment you spend here strengthens your mind, keeps your memories bright, and brings peace to your day.";
-      await speak(message, language);
-    } catch (err) {
-      console.error('Error speaking comfort message:', err);
-    } finally {
-      setIsSpeakingComfort(false);
-    }
-  };
-
-  const speakGreeting = async () => {
-    try {
-      const text = `${greeting}, ${patient?.name || 'Kamala Baa'}`;
-      await speak(text, language);
-    } catch (err) {
-      console.warn('Error speaking greeting:', err);
-    }
-  };
-
-  const greeting = getGreeting(language);
-
-  return (
-    <div className="min-h-screen w-full flex-1 flex flex-col bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200">
-      {/* Elder-friendly Scandinavian App Header */}
-      <header className="sticky top-0 z-40 w-full bg-[var(--color-card)]/95 backdrop-blur-md border-b-2 border-[var(--color-border)] transition-colors duration-200">
-        <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-3.5 sm:px-6 py-3 gap-2 sm:gap-4">
-          
-          {/* Left: Warm Greeting with Avatar, Full Elder Name & Voice Reader */}
-          <div className="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
-            <button
-              type="button"
-              onClick={() => {
-                setModalInitialTab('profile');
-                setShowRoleProfileModal(true);
-              }}
-              className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-500/30 flex items-center justify-center text-2xl sm:text-3xl flex-shrink-0 shadow-xs hover:scale-105 active:scale-95 transition-all cursor-pointer"
-              title="Edit Elder Name, Age & Avatar"
-            >
-              {patient?.profileImage || '👵'}
-            </button>
-            <div className="min-w-0 flex-1">
-              {/* Elder Greeting with Voice Speaker */}
-              <div className="flex items-center gap-1.5 min-w-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalInitialTab('profile');
-                    setShowRoleProfileModal(true);
-                  }}
-                  className="text-left text-base sm:text-xl font-extrabold text-[var(--color-text)] tracking-tight leading-snug hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer truncate"
-                  title="Click to view/edit Name & Age"
-                >
-                  {greeting}, {patient?.name || 'Kamala Baa'}
-                </button>
-                <button
-                  type="button"
-                  onClick={speakGreeting}
-                  className="w-9 h-9 min-h-[40px] min-w-[40px] rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center hover:bg-indigo-100 transition-all active:scale-90 cursor-pointer flex-shrink-0 shadow-xs"
-                  aria-label="Listen to greeting aloud"
-                  title="Listen to Greeting"
-                >
-                  <Volume2 size={16} />
-                </button>
-              </div>
-
-              {/* Sub-bar: Age & App Subtitle */}
-              <div className="flex items-center gap-2 mt-0.5 min-w-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalInitialTab('profile');
-                    setShowRoleProfileModal(true);
-                  }}
-                  className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-300/60 dark:border-indigo-800/60 hover:bg-indigo-100 transition-colors cursor-pointer flex-shrink-0"
-                  title="Age and Profile details"
-                >
-                  <span>Age {patient?.age || 72}</span>
-                  <span className="text-[9px] opacity-70">✏️</span>
-                </button>
-                <span className="text-[11px] text-[var(--color-text-secondary)] font-medium truncate inline-flex items-center gap-1.5">
-                  <img src="/logo.png" alt="Smriti Sathi" className="w-4 h-4 rounded-full object-cover shadow-xs ring-1 ring-emerald-500/40" />
-                  <span className="sm:hidden">স্মৃতি সাথী</span>
-                  <span className="hidden sm:inline">স্মৃতি সাথী · Memory Companion</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right utility toolbar: Language, Theme, Role, Settings */}
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            {/* Language Switcher Trigger */}
-            <button
-              type="button"
-              onClick={() => {
-                setModalInitialTab('language');
-                setShowRoleProfileModal(true);
-              }}
-              className="h-10 sm:h-11 min-h-[40px] px-2.5 sm:px-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-200 border-2 border-indigo-300 dark:border-indigo-800 hover:border-indigo-500 transition-all active:scale-95 shadow-xs flex items-center justify-center gap-1 cursor-pointer text-xs font-bold"
-              aria-label="Select Language"
-              title="Change Language & Voice"
-            >
-              <Globe size={16} className="text-indigo-600 dark:text-indigo-400" />
-              <span className="uppercase font-extrabold text-[11px] sm:text-xs">{language}</span>
-              <span className="text-[9px] opacity-70">▾</span>
-            </button>
-
-            {/* Quick Role Switcher Button - responsive visibility */}
-            <button
-              type="button"
-              onClick={() => {
-                setModalInitialTab('role');
-                setShowRoleProfileModal(true);
-              }}
-              className="hidden sm:inline-flex h-10 sm:h-11 min-h-[40px] px-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 hover:border-emerald-500 transition-all active:scale-95 shadow-xs items-center justify-center gap-1.5 cursor-pointer text-xs font-bold"
-              aria-label="Switch User Role"
-              title="Switch to Son / Guardian or Doctor"
-            >
-              <Users size={16} className="text-emerald-600 dark:text-emerald-400" />
-              <span>Role: Elder ▾</span>
-            </button>
-
-            {/* Theme Toggle (Tactile target) */}
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] rounded-2xl flex items-center justify-center bg-[var(--color-bg-subtle)] text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-indigo-500 dark:hover:border-indigo-400 transition-all active:scale-95 cursor-pointer shadow-xs"
-              aria-label={isDark ? 'Switch to Daylight Light Theme' : 'Switch to Midnight Dark Theme'}
-              title={isDark ? 'Light Theme' : 'Dark Theme'}
-            >
-              {isDark ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} />}
-            </button>
-
-            {/* Settings Button (visible on tablet/desktop, mobile uses bottom bar) */}
-            <button
-              onClick={() => onNavigate('settings')}
-              className="hidden sm:flex w-10 h-10 sm:w-11 sm:h-11 min-w-[40px] min-h-[40px] rounded-2xl bg-indigo-50 dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-200 dark:border-slate-700 hover:border-indigo-600 dark:hover:border-indigo-400 hover:bg-indigo-100 dark:hover:bg-slate-700 transition-all active:scale-95 shadow-xs items-center justify-center cursor-pointer"
-              aria-label="Settings and Preferences"
-              title="Settings"
-            >
-              <Settings size={18} className="text-indigo-600 dark:text-indigo-400" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content Layout */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-48 sm:pb-56">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start max-w-2xl mx-auto lg:max-w-none">
-          
-          {/* LEFT COLUMN: Cognitive Play & Core Activities (7 cols on Landscape) */}
-          <div className="lg:col-span-7 space-y-7 sm:space-y-8">
-
-            {/* Quick Emergency Rescue & Circadian Calm Companion Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              {/* 1. Safe Return Rescue Card */}
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent('open-safe-return'))}
-                className="w-full p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white shadow-md hover:shadow-lg border-2 border-red-400/50 flex items-center justify-between gap-3 text-left transition-all active:scale-[0.98] cursor-pointer min-h-[76px]"
-                aria-label="I Need Help - Safe Return Emergency Card"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl shrink-0 shadow-inner">
-                    🆘
-                  </div>
-                  <div>
-                    <div className="text-base font-extrabold tracking-tight">
-                      {language === 'as' ? 'জৰুৰীকালীন সাহাৰ্য' : 'I Need Help'}
-                    </div>
-                    <div className="text-xs text-red-100 font-medium mt-0.5">
-                      {language === 'as' ? 'অভিভাৱকৰ নম্বৰ আৰু ঠিকনা' : 'Call Guardian & Show Rescue QR'}
-                    </div>
-                  </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
-                  →
-                </div>
-              </button>
-
-              {/* 2. Sundowning Evening Calm Card */}
-              <button
-                type="button"
-                onClick={() => window.dispatchEvent(new CustomEvent('open-sundowning'))}
-                className="w-full p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-600 text-white shadow-md hover:shadow-lg border-2 border-amber-400/50 flex items-center justify-between gap-3 text-left transition-all active:scale-[0.98] cursor-pointer min-h-[76px]"
-                aria-label="Evening Calm & Sundowning Care"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-amber-100 shrink-0 shadow-inner">
-                    <Sunset size={24} />
-                  </div>
-                  <div>
-                    <div className="text-base font-extrabold tracking-tight">
-                      {language === 'as' ? 'সান্ধ্যকালীন শান্ততা' : 'Evening Calm'}
-                    </div>
-                    <div className="text-xs text-amber-100 font-medium mt-0.5">
-                      {language === 'as' ? '৪-৭-৮ উশাহ আৰু পৰিয়ালৰ কণ্ঠ' : '4-7-8 Breathing & Voice Calm'}
-                    </div>
-                  </div>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
-                  →
-                </div>
-              </button>
-            </div>
-            
-            {/* Daily Focus Hero Card */}
-            <div className="p-6 sm:p-8 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-sm space-y-5 transition-all">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-2 flex-1">
-                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                    <Sparkles size={14} className="text-indigo-600 dark:text-indigo-400" />
-                    <span>{t.dailyFocus || "Today's Daily Focus"}</span>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--color-text)] tracking-tight pt-0.5">
-                    Remember Game
-                  </h2>
-                  <p className="text-base sm:text-lg text-[var(--color-text-secondary)] leading-relaxed">
-                    {t.dailyFocusDesc || "View familiar everyday objects, then recall them peacefully. Strengthens visual memory with zero pressure."}
-                  </p>
-                </div>
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 shadow-sm flex items-center justify-center flex-shrink-0">
-                  <Eye size={36} />
-                </div>
-              </div>
-
-              <LargeButton
-                onPress={() => onNavigate('remember-game')}
-                icon={<Play size={22} fill="currentColor" />}
-                size="lg"
-              >
-                {t.startDailyExercise || "Start Daily Exercise"}
-              </LargeButton>
-            </div>
-
-            {/* Cognitive Exercises Grid - 2x2 High-Definition Cards */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <SectionHeader
-                  title={t.todaysExercises || "Cognitive Exercises"}
-                  icon={<Brain size={24} className="text-indigo-600 dark:text-indigo-400" />}
-                />
-                <span className="text-xs font-bold text-[var(--color-text-secondary)] bg-[var(--color-bg-subtle)] px-3 py-1 rounded-full border border-[var(--color-border)]">
-                  4 Calibrated Games
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {/* 1. Remember Game Card */}
-                <button
-                  type="button"
-                  onClick={() => onNavigate('remember-game')}
-                  className="w-full p-5 rounded-3xl border-2 border-slate-200 dark:border-slate-700/80 bg-[var(--color-card)] hover:border-indigo-500 dark:hover:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-150 active:translate-y-1 active:scale-[0.99] flex flex-col justify-between gap-3 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/30 cursor-pointer min-h-[140px]"
-                  aria-label="Play Remember Game"
-                >
-                  <div className="flex items-start justify-between gap-2 w-full">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center flex-shrink-0 shadow-xs">
-                      <Eye size={28} />
-                    </div>
-                    <span className="text-xs font-extrabold px-2.5 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800">
-                      {t.level || 'Level'} {gameProgress.remember.level}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-[var(--color-text)] tracking-tight">
-                      Remember
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5 leading-snug">
-                      Observe familiar objects, then recall gently
-                    </p>
-                  </div>
-                  <div className="pt-1">
-                    {gameProgress.remember.doneToday ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        <CheckCircle2 size={14} /> Completed Today
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-3 py-1 rounded-full border border-indigo-200/60 dark:border-indigo-800/60">
-                        <Play size={12} fill="currentColor" /> Ready to Play
-                      </span>
-                    )}
-                  </div>
-                </button>
-
-                {/* 2. Recognise Game Card */}
-                <button
-                  type="button"
-                  onClick={() => onNavigate('recognise-game')}
-                  className="w-full p-5 rounded-3xl border-2 border-slate-200 dark:border-slate-700/80 bg-[var(--color-card)] hover:border-cyan-500 dark:hover:border-cyan-400 shadow-sm hover:shadow-md transition-all duration-150 active:translate-y-1 active:scale-[0.99] flex flex-col justify-between gap-3 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-500/30 cursor-pointer min-h-[140px]"
-                  aria-label="Play Recognise Game"
-                >
-                  <div className="flex items-start justify-between gap-2 w-full">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-cyan-200 dark:border-cyan-800 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 flex items-center justify-center flex-shrink-0 shadow-xs">
-                      <Brain size={28} />
-                    </div>
-                    <span className="text-xs font-extrabold px-2.5 py-1 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border border-cyan-200/80 dark:border-cyan-800">
-                      {t.level || 'Level'} {gameProgress.recognise.level}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-[var(--color-text)] tracking-tight">
-                      Recognise
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5 leading-snug">
-                      Spot subtle differences and patterns
-                    </p>
-                  </div>
-                  <div className="pt-1">
-                    {gameProgress.recognise.doneToday ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        <CheckCircle2 size={14} /> Completed Today
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 px-3 py-1 rounded-full border border-cyan-200/60 dark:border-cyan-800/60">
-                        <Play size={12} fill="currentColor" /> Ready to Play
-                      </span>
-                    )}
-                  </div>
-                </button>
-
-                {/* 3. Memory Match Card */}
-                <button
-                  type="button"
-                  onClick={() => onNavigate('memory-match')}
-                  className="w-full p-5 rounded-3xl border-2 border-slate-200 dark:border-slate-700/80 bg-[var(--color-card)] hover:border-purple-500 dark:hover:border-purple-400 shadow-sm hover:shadow-md transition-all duration-150 active:translate-y-1 active:scale-[0.99] flex flex-col justify-between gap-3 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/30 cursor-pointer min-h-[140px]"
-                  aria-label="Play Memory Match Game"
-                >
-                  <div className="flex items-start justify-between gap-2 w-full">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0 shadow-xs">
-                      <Grid3X3 size={28} />
-                    </div>
-                    <span className="text-xs font-extrabold px-2.5 py-1 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800">
-                      {t.level || 'Level'} {gameProgress.memoryMatch.level}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-[var(--color-text)] tracking-tight">
-                      Memory Match
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5 leading-snug">
-                      Pair matching cultural and floral cards
-                    </p>
-                  </div>
-                  <div className="pt-1">
-                    {gameProgress.memoryMatch.doneToday ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        <CheckCircle2 size={14} /> Completed Today
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 px-3 py-1 rounded-full border border-purple-200/60 dark:border-purple-800/60">
-                        <Play size={12} fill="currentColor" /> Ready to Play
-                      </span>
-                    )}
-                  </div>
-                </button>
-
-                {/* 4. Daily Routine Card */}
-                <button
-                  type="button"
-                  onClick={() => onNavigate('daily-routine')}
-                  className="w-full p-5 rounded-3xl border-2 border-slate-200 dark:border-slate-700/80 bg-[var(--color-card)] hover:border-amber-500 dark:hover:border-amber-400 shadow-sm hover:shadow-md transition-all duration-150 active:translate-y-1 active:scale-[0.99] flex flex-col justify-between gap-3 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-500/30 cursor-pointer min-h-[140px]"
-                  aria-label="Play Daily Routine Game"
-                >
-                  <div className="flex items-start justify-between gap-2 w-full">
-                    <div className="w-14 h-14 rounded-2xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0 shadow-xs">
-                      <Sun size={28} />
-                    </div>
-                    <span className="text-xs font-extrabold px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800">
-                      {t.level || 'Level'} {gameProgress.dailyRoutine.level}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-[var(--color-text)] tracking-tight">
-                      Daily Routine
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5 leading-snug">
-                      Sequence comforting dawn to dusk habits
-                    </p>
-                  </div>
-                  <div className="pt-1">
-                    {gameProgress.dailyRoutine.doneToday ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-                        <CheckCircle2 size={14} /> Completed Today
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-3 py-1 rounded-full border border-amber-200/60 dark:border-amber-800/60">
-                        <Play size={12} fill="currentColor" /> Ready to Play
-                      </span>
-                    )}
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            {/* Featured Anchor Card: Personal Memory Book */}
-            <div className="p-6 sm:p-7 bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-white dark:from-slate-800 dark:via-purple-950/20 dark:to-slate-800 rounded-3xl border-2 border-indigo-200 dark:border-indigo-900/60 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-purple-100 dark:bg-purple-950/80 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-800 flex items-center justify-center flex-shrink-0 shadow-xs">
-                  <BookOpen size={30} />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-purple-700 dark:text-purple-300 uppercase tracking-wider">
-                    {t.cherishedStories || "Cherished Family Stories"}
-                  </span>
-                  <h3 className="text-lg sm:text-xl font-bold text-[var(--color-text)]">Personal Memory Book</h3>
-                  <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] mt-0.5">
-                    {t.familyMemoryBookDesc || "Explore family photos, familiar village places, and voice notes"}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <button
-                  type="button"
-                  onClick={() => onNavigate('family-memory-game')}
-                  className="min-h-[56px] px-6 py-3.5 rounded-2xl bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-extrabold text-sm shadow-[0_4px_12px_rgba(225,29,72,0.3)] border-2 border-rose-400/60 transition-all active:translate-y-1 flex items-center justify-center gap-2 cursor-pointer"
-                  aria-label="Play Family Memory Quiz"
-                >
-                  <span>🎮 {t.familyQuizBtn || "Family Quiz"}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onNavigate('memory-book-viewer')}
-                  className="min-h-[56px] px-6 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-bold text-sm shadow-[0_4px_12px_rgba(79,70,229,0.3)] border-2 border-indigo-400/60 transition-all active:translate-y-1 flex items-center justify-center gap-2 cursor-pointer"
-                  aria-label="Open Personal Memory Book"
-                >
-                  <span>{t.viewPhotosBtn || "View Photos"}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Daily Comfort & Audio Anchor Card */}
-            <div className="p-6 sm:p-7 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-xs space-y-3.5 transition-colors duration-200">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
-                  <Heart size={20} fill="currentColor" />
-                  <span>{t.comfortTitle || "Daily Comfort & Reassurance"}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={speakComfort}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-2xl border-2 text-xs font-bold transition-all active:scale-95 min-h-[44px] cursor-pointer ${
-                    isSpeakingComfort
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                      : 'bg-[var(--color-bg-subtle)] text-[var(--color-text)] border-[var(--color-border)] hover:border-emerald-500'
-                  }`}
-                >
-                  <Volume2 size={16} />
-                  <span>{isSpeakingComfort ? 'Speaking...' : (t.listenAloud || 'Listen Aloud')}</span>
-                </button>
-              </div>
-              <p className="text-sm sm:text-base text-[var(--color-text-secondary)] leading-relaxed italic">
-                "{t.comfortQuote || "Take your time. There is no rush. Every moment you spend here strengthens your mind, keeps your memories bright, and brings peace to your day."}"
-              </p>
-            </div>
-          </div>
-
-          {/* Right Column (5 cols in Landscape, Full Width in Portrait) */}
-          <div className="lg:col-span-5 space-y-7 sm:space-y-8">
-            {/* Today's Real Care Schedule */}
-            <div className="space-y-3.5">
-              <SectionHeader
-                title={t.careScheduleTitle || "Today's Care Schedule"}
-                icon={<Calendar size={22} className="text-amber-600 dark:text-amber-400" />}
-                action={{
-                  label: 'Manage',
-                  onPress: () => onNavigate('reminders'),
-                }}
-              />
-
-              {/* Audible Buzzer & Notification Test Card */}
-              <div className="p-4.5 sm:p-5 bg-[var(--color-card)] rounded-2xl border-2 border-[var(--color-border)] flex items-center justify-between gap-3.5 shadow-xs">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center flex-shrink-0">
-                    <BellRing size={22} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-[var(--color-text)] truncate">Care Alarm & Buzzer</p>
-                    <p className="text-xs text-[var(--color-text-secondary)] truncate">Audible chime even in background</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleTestBuzzer}
-                  disabled={isBuzzerTesting}
-                  className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all active:scale-95 flex items-center gap-2 min-h-[46px] cursor-pointer border-2 ${
-                    isBuzzerTesting
-                      ? 'bg-amber-500 border-amber-500 text-white'
-                      : 'bg-[var(--color-bg-subtle)] text-[var(--color-text)] border-[var(--color-border)] hover:border-amber-500'
-                  }`}
-                >
-                  <Volume2 size={16} />
-                  <span>{isBuzzerTesting ? 'Ringing...' : 'Test Alarm'}</span>
-                </button>
-              </div>
-
-              {/* Reminders List from Real DB */}
-              <div className="space-y-3.5">
-                {reminders.length > 0 ? (
-                  reminders.map(rem => {
-                    const isCompleted = rem.status === 'completed';
-                    return (
-                      <div
-                        key={rem.id}
-                        className={`w-full p-4.5 sm:p-5 bg-[var(--color-card)] rounded-2xl border-2 border-[var(--color-border)] flex items-center justify-between gap-4 transition-all shadow-xs ${
-                          isCompleted ? 'opacity-65 bg-[var(--color-bg-subtle)]' : ''
-                        }`}
-                      >
-                        <button
-                          type="button"
-                          onClick={() => handleToggleReminder(rem)}
-                          className="flex items-center gap-3.5 min-w-0 flex-1 text-left active:scale-[0.99] transition-transform cursor-pointer"
-                          aria-label={`Toggle ${rem.title}`}
-                        >
-                          <div className="w-13 h-13 rounded-2xl bg-[var(--color-bg-subtle)] border border-[var(--color-border)] flex items-center justify-center flex-shrink-0">
-                            {getReminderIcon(rem.type)}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h4 className={`text-base font-bold text-[var(--color-text)] truncate ${isCompleted ? 'line-through text-[var(--color-text-muted)]' : ''}`}>
-                              {rem.title}
-                            </h4>
-                            <p className="text-xs text-[var(--color-text-secondary)] font-semibold mt-0.5">
-                              {formatTime(rem.scheduledTime)} {rem.description ? `· ${rem.description}` : ''}
-                            </p>
-                          </div>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleToggleReminder(rem)}
-                          className={`w-14 h-14 min-w-[56px] min-h-[56px] rounded-2xl flex items-center justify-center border-2 transition-all active:scale-90 flex-shrink-0 cursor-pointer ${
-                            isCompleted
-                              ? 'bg-emerald-600 border-emerald-600 text-white shadow-xs'
-                              : 'bg-[var(--color-bg-subtle)] border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-emerald-500 hover:text-emerald-600'
-                          }`}
-                          aria-label={isCompleted ? 'Marked complete' : 'Mark as complete'}
-                        >
-                          {isCompleted ? <CheckCircle2 size={28} className="stroke-[2.5]" /> : <Circle size={28} className="stroke-[2]" />}
-                        </button>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="p-6 sm:p-7 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] text-center space-y-4 shadow-xs">
-                    <p className="text-sm font-medium text-[var(--color-text-secondary)]">
-                      {t.noRemindersScheduled || "No care reminders scheduled for today. Your routine is peaceful."}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => onNavigate('reminders')}
-                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-2 border-emerald-500/30 text-sm font-bold hover:bg-emerald-500/25 transition-all cursor-pointer min-h-[48px]"
-                    >
-                      <Plus size={16} />
-                      <span>{t.addReminderBtn || "Add Care Reminder"}</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Real Engagement & Progress Stats (Zero Dummy Data) */}
-            <div className="space-y-3.5">
-              <SectionHeader
-                title={t.progressSummaryTitle || "Your Progress Today"}
-                icon={<TrendingUp size={22} className="text-indigo-600 dark:text-indigo-400" />}
-                action={{
-                  label: 'View Details',
-                  onPress: () => onNavigate('progress'),
-                }}
-              />
-              <div className="grid grid-cols-3 gap-3 sm:gap-3.5">
-                <div onClick={() => onNavigate('progress')} className="cursor-pointer active:scale-95 transition-transform">
-                  <ProgressCard
-                    icon={<Brain size={22} />}
-                    label={t.activitiesCompletedLabel || "Activities"}
-                    value={activitiesTodayCount}
-                    subtitle="Completed"
-                    color="#10B981"
-                  />
-                </div>
-                <div onClick={() => onNavigate('progress')} className="cursor-pointer active:scale-95 transition-transform">
-                  <ProgressCard
-                    icon={<Sparkles size={22} />}
-                    label={t.currentStreakLabel || "Streak"}
-                    value={currentStreak > 0 ? `${currentStreak} ${currentStreak === 1 ? 'Day' : 'Days'}` : '0 Days'}
-                    subtitle="Daily Habit"
-                    color="#F59E0B"
-                  />
-                </div>
-                <div onClick={() => onNavigate('progress')} className="cursor-pointer active:scale-95 transition-transform">
-                  <ProgressCard
-                    icon={<Eye size={22} />}
-                    label={t.accuracyLabel || "Accuracy"}
-                    value={accuracy}
-                    subtitle="Recall Score"
-                    color="#6366F1"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Dedicated Elder Name, Age & Role Management Card */}
-            <div className="p-6 sm:p-7 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-xs space-y-4 transition-all">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-13 h-13 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-200 dark:border-emerald-800 flex items-center justify-center text-2xl flex-shrink-0 shadow-xs">
-                    {patient?.profileImage || '👵'}
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] truncate">
-                      {patient?.name || 'Kamala Baa'} (Age {patient?.age || 72})
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] truncate">
-                      Active Profile · Role: Elderly Patient (Self)
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalInitialTab('profile');
-                    setShowRoleProfileModal(true);
-                  }}
-                  className="w-full min-h-[50px] py-3 px-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border-2 border-indigo-200 dark:border-indigo-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xs"
-                >
-                  <User size={16} />
-                  <span>{t.editNameAgeBtn || "Edit Name & Age"}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalInitialTab('role');
-                    setShowRoleProfileModal(true);
-                  }}
-                  className="w-full min-h-[50px] py-3 px-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-300 dark:border-emerald-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer shadow-xs"
-                >
-                  <Users size={16} />
-                  <span>{t.switchRoleBtn || "Switch Role (Son, Doctor)"}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Prominent Settings & System Preferences Card (Guaranteed Discovery) */}
-            <div className="p-6 sm:p-7 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-xs space-y-4.5 transition-all">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-13 h-13 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border-2 border-indigo-200 dark:border-indigo-800 flex items-center justify-center flex-shrink-0 shadow-xs">
-                    <Settings size={26} className="stroke-[2.5]" />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-base sm:text-lg font-bold text-[var(--color-text)] truncate">
-                      {t.preferencesCardTitle || "Preferences & Display"}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[var(--color-text-secondary)] truncate">
-                      Text size, high contrast, languages & updates
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => onNavigate('settings')}
-                className="w-full min-h-[56px] py-4 px-5 rounded-2xl bg-[var(--color-bg-subtle)] hover:bg-slate-100 dark:hover:bg-slate-800 text-[var(--color-text)] border-2 border-[var(--color-border)] hover:border-indigo-500 font-bold text-sm sm:text-base flex items-center justify-between transition-all active:scale-[0.99] cursor-pointer shadow-xs"
-              >
-                <span>Open App Settings</span>
-                <ChevronRight size={18} className="text-[var(--color-text-muted)]" />
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </main>
-
-      <RoleAndProfileModal
-        isOpen={showRoleProfileModal}
-        onClose={() => setShowRoleProfileModal(false)}
-        initialTab={modalInitialTab}
-        onNavigate={onNavigate}
-      />
-    </div>
-  );
-}
-
-function getReminderIcon(type: Reminder['type']) {
-  switch (type) {
-    case 'medicine':
-      return <Pill size={22} className="text-emerald-600 dark:text-emerald-400" />;
-    case 'hydration':
-      return <Droplets size={22} className="text-blue-600 dark:text-blue-400" />;
-    case 'activity':
-      return <Activity size={22} className="text-emerald-600 dark:text-emerald-400" />;
-    case 'appointment':
-      return <Calendar size={22} className="text-purple-600 dark:text-purple-400" />;
-    default:
-      return <Calendar size={22} className="text-amber-600 dark:text-amber-400" />;
-  }
+function greetingKey(hour: number) {
+  if (hour < 12) return 'home.morning';
+  if (hour < 17) return 'home.afternoon';
+  if (hour < 21) return 'home.evening';
+  return 'home.night';
 }
 
 function calculateStreak(timestamps: number[]): number {
   if (!timestamps.length) return 0;
-  
-  const dates = new Set(
-    timestamps.map(t => {
-      const d = new Date(t);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    })
+  const days = new Set(
+    timestamps.map((ts) => {
+      const d = new Date(ts);
+      return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    }),
   );
-
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
-
-  const checkDate = dates.has(todayStr) ? today : (dates.has(yesterdayStr) ? yesterday : null);
-  if (!checkDate) return 0;
-
   let streak = 0;
-  const cursor = new Date(checkDate);
-  while (true) {
-    const str = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
-    if (dates.has(str)) {
-      streak++;
+  const cursor = new Date();
+  for (let i = 0; i < 400; i += 1) {
+    const key = `${cursor.getFullYear()}-${cursor.getMonth()}-${cursor.getDate()}`;
+    if (days.has(key)) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    } else if (i === 0) {
+      // today not played yet — keep counting from yesterday
       cursor.setDate(cursor.getDate() - 1);
     } else {
       break;
     }
   }
-
   return streak;
 }
 
-function getGreeting(lang?: string): string {
-  const hour = new Date().getHours();
-  if (lang === 'as') {
-    if (hour < 12) return 'সুপ্ৰভাত';
-    if (hour < 17) return 'শুভ অপৰাহ্ন';
-    return 'শুভ সন্ধিয়া';
-  }
-  if (lang === 'brx') {
-    if (hour < 12) return 'फुंनि मोजां';
-    if (hour < 17) return 'सानजौफुनि मोजां';
-    return 'बेलासि मोजां';
-  }
-  if (lang === 'mni') {
-    if (hour < 12) return 'অয়ুক্কি য়াইফপা';
-    if (hour < 17) return 'নুংথিলকি য়াইফপা';
-    return 'নুমিদাংকি য়াইফপা';
-  }
-  if (hour < 12) return 'Good Morning';
-  if (hour < 17) return 'Good Afternoon';
-  return 'Good Evening';
+export default function PatientHomeScreen({ onNavigate }: PatientHomeScreenProps) {
+  const { state, toggleTheme } = useApp();
+  const { t, meta, lang } = useI18n();
+  const { speak, isSpeaking } = useVoice();
+
+  const patient = state.currentPatient;
+  const patientName = patient?.name || t('auth.elderName');
+  const userId = patient?.id ? parseInt(patient.id, 10) : undefined;
+
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [sessionsToday, setSessionsToday] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [accuracy, setAccuracy] = useState<number | null>(null);
+  const [levels, setLevels] = useState<Record<string, { level: number; done: boolean }>>({});
+
+  const load = useCallback(async (uid: number) => {
+    try {
+      const [all, sessions, stats] = await Promise.all([
+        reminderService.getAllReminders(uid),
+        gameSessionRepository.getByUserId(uid),
+        gameSessionRepository.getStats(uid),
+      ]);
+      setReminders(all);
+
+      const today = sessions.filter((s) => {
+        const d = new Date(s.createdAt);
+        const now = new Date();
+        return (
+          d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+        );
+      });
+      setSessionsToday(today.length);
+      setStreak(calculateStreak(sessions.map((s) => s.createdAt)));
+      setAccuracy(stats.totalGames > 0 && stats.averageAccuracy > 0 ? Math.round(stats.averageAccuracy) : null);
+
+      const next: Record<string, { level: number; done: boolean }> = {};
+      for (const a of ACTIVITIES) {
+        const mine = sessions.filter((s) => (s.gameType as string) === a.id);
+        next[a.id] = {
+          done: today.some((s) => (s.gameType as string) === a.id),
+          level: mine.length ? Math.min(5, Math.max(...mine.map((s) => s.difficulty || 1))) : 1,
+        };
+      }
+      setLevels(next);
+    } catch {
+      /* offline / empty database is a normal state */
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userId) load(userId);
+  }, [userId, load]);
+
+  const greeting = t(greetingKey(new Date().getHours()));
+  const todayLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat(meta.htmlLang, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+      }).format(new Date()),
+    [meta.htmlLang],
+  );
+
+  const timeFmt = useMemo(
+    () => new Intl.DateTimeFormat(meta.htmlLang, { hour: 'numeric', minute: '2-digit', hour12: true }),
+    [meta.htmlLang],
+  );
+  const pending = useMemo(
+    () => reminders.filter((r) => r.status === 'pending').sort((a, b) => a.scheduledTime - b.scheduledTime),
+    [reminders],
+  );
+  const nextReminder = pending[0];
+  const doneToday = reminders.filter((r) => r.status === 'completed').length;
+
+  const suggested = useMemo(
+    () => ACTIVITIES.find((a) => !levels[a.id]?.done) ?? ACTIVITIES[0],
+    [levels],
+  );
+
+  const completedCount = ACTIVITIES.filter((a) => levels[a.id]?.done).length;
+
+  const completeReminder = async (rem: Reminder) => {
+    if (!userId || !rem.id) return;
+    await reminderService.completeReminder(rem.id, userId);
+    await load(userId);
+  };
+  const snoozeReminder = async (rem: Reminder) => {
+    if (!userId || !rem.id) return;
+    await reminderService.snoozeReminder(rem.id, 15);
+    await load(userId);
+  };
+
+  const readPage = async () => {
+    const parts = [`${greeting}, ${patientName}.`];
+    if (nextReminder)
+      parts.push(`${t('home.nextReminder')}: ${nextReminder.title} ${timeFmt.format(new Date(nextReminder.scheduledTime))}.`);
+    else parts.push(t('home.noReminderToday'));
+    if (!levels[suggested.id]?.done) parts.push(`${t('home.startGame')}: ${t(suggested.titleKey)}.`);
+    parts.push(t('home.takeYourTime'));
+    await speak(parts.join(' '), lang);
+  };
+
+  return (
+    <AppShell
+      persona="elder"
+      activeTab="home"
+      onNavigate={onNavigate}
+      onOpenSos={() => window.dispatchEvent(new Event('open-safe-return'))}
+      onToggleTheme={toggleTheme}
+      onOpenLanguage={() => onNavigate('settings')}
+      theme={state.accessibility?.theme}
+      identity={{ name: patientName, sub: `${t('auth.elder')} · ${patient?.age ?? 72}` }}
+      title={`${greeting}, ${patientName}`}
+      shortTitle={patientName}
+      subtitle={todayLabel}
+      actions={
+        <Button
+          variant="secondary"
+          size="sm"
+          className="hidden sm:inline-flex"
+          onClick={readPage}
+          loading={isSpeaking}
+          icon={<Volume2 className="h-4 w-4" />}
+        >
+          {t('home.hearThis')}
+        </Button>
+      }
+    >
+      {/* ── Hero: today's single gentle next step ─────────────────────── */}
+      <section className="rise-in">
+        <Card tone="ink" className="overflow-hidden !p-0">
+          <div className="flex flex-col gap-5 p-5 sm:p-7 lg:flex-row lg:items-center lg:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <Tag tone="teal" className="!border-white/25 !bg-white/12 !text-white">
+                  <Sunrise className="h-3 w-3" /> {t('home.todayEyebrow')}
+                </Tag>
+                {streak > 0 && (
+                  <Tag className="!border-white/25 !bg-white/12 !text-white">
+                    <Flame className="h-3 w-3" /> {streak} {t('home.streak')}
+                  </Tag>
+                )}
+              </div>
+
+              <h2
+                className="mt-3 text-[1.75rem] leading-[1.15] text-[#FBF6EE] sm:text-[2.15rem]"
+                style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}
+              >
+                {t(suggested.titleKey)}
+              </h2>
+              <p className="mt-1.5 max-w-md text-[0.95rem] leading-relaxed text-[#CFE3DD]">{t(suggested.descKey)}</p>
+
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <Button
+                  variant="saffron"
+                  size="lg"
+                  onClick={() => onNavigate(suggested.route)}
+                  icon={<Play className="h-[18px] w-[18px]" />}
+                >
+                  {levels[suggested.id]?.done ? t('home.playAgain') : t('home.startGame')}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={readPage}
+                  loading={isSpeaking}
+                  icon={<Volume2 className="h-4 w-4" />}
+                >
+                  {t('home.hearThis')}
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-5 rounded-[var(--r-lg)] bg-white/8 p-4 ring-1 ring-white/12">
+              <ProgressRing value={(completedCount / ACTIVITIES.length) * 100} size={78} stroke={7} tone="#E8A94E">
+                <span className="t-num text-[1.05rem] font-extrabold text-[#FBF6EE]">
+                  {completedCount}/{ACTIVITIES.length}
+                </span>
+              </ProgressRing>
+              <div>
+                <div className="text-[0.92rem] font-bold text-[#FBF6EE]">{t('home.sessionsToday')}</div>
+                <div className="text-[0.78rem] text-[#AFCBC4]">
+                  {sessionsToday} {t('prog.sessions').toLowerCase()}
+                </div>
+                {accuracy !== null && (
+                  <div className="mt-1 flex items-center gap-1 text-[0.78rem] text-[#AFCBC4]">
+                    <TrendingUp className="h-3.5 w-3.5" /> {accuracy}% {t('prog.accuracy').toLowerCase()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      {/* ── Next reminder ─────────────────────────────────────────────── */}
+      <div className="mt-4 rise-in delay-1">
+        {nextReminder ? (
+          <Card tone="sage">
+            <div className="flex flex-wrap items-center gap-4">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--r-sm)] bg-[var(--brand-teal)] text-white">
+                <Bell className="h-6 w-6" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="t-eyebrow !text-[var(--brand-teal-deep)] opacity-80">{t('home.nextReminder')}</div>
+                <div className="mt-0.5 truncate text-[1.15rem] font-bold text-ink">{nextReminder.title}</div>
+                <div className="mt-0.5 flex items-center gap-1.5 text-[0.9rem] font-semibold text-ink-2">
+                  <Clock className="h-4 w-4" /> {timeFmt.format(new Date(nextReminder.scheduledTime))}
+                </div>
+              </div>
+              <div className="flex w-full gap-2 sm:w-auto">
+                <Button block size="lg" onClick={() => completeReminder(nextReminder)} icon={<Check className="h-[18px] w-[18px]" />}>
+                  {t('home.taken')}
+                </Button>
+                <Button variant="secondary" size="lg" onClick={() => snoozeReminder(nextReminder)}>
+                  {t('home.snooze')}
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <Card tone="sage">
+            <div className="flex items-center gap-3.5">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--r-sm)] bg-[var(--brand-teal)] text-white">
+                <Check className="h-6 w-6" />
+              </span>
+              <div className="min-w-0">
+                <div className="text-[1.05rem] font-bold text-ink">{t('home.noReminderToday')}</div>
+                <div className="t-sm">{t('home.noReminderBody')}</div>
+              </div>
+              <div className="ml-auto hidden items-center gap-2 text-[0.82rem] font-semibold text-ink-3 sm:flex">
+                <Check className="h-4 w-4" /> {doneToday} {t('rem.completed').toLowerCase()}
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+
+      {/* ── Activities grid ───────────────────────────────────────────── */}
+      <Section
+        className="mt-6"
+        title={t('home.myActivities')}
+        subtitle={t('games.subtitle')}
+        action={
+          <button type="button" className="t-sm font-bold text-brand hover:underline" onClick={() => onNavigate('games')}>
+            {t('c.viewAll')}
+          </button>
+        }
+      >
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {ACTIVITIES.map((a) => {
+            const meta2 = levels[a.id];
+            const Icon = a.icon;
+            return (
+              <button
+                key={a.id}
+                type="button"
+                onClick={() => onNavigate(a.route)}
+                className="card card--interactive card--pad min-h-[112px]"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span
+                    className="grid h-11 w-11 place-items-center rounded-[var(--r-sm)]"
+                    style={{ background: TONE_STYLES[a.tone].bg, color: TONE_STYLES[a.tone].fg }}
+                  >
+                    <Icon className="h-[22px] w-[22px]" />
+                  </span>
+                  {meta2?.done ? (
+                    <Tag tone="success" icon={<Check className="h-3 w-3" />}>
+                      {t('home.doneToday')}
+                    </Tag>
+                  ) : (
+                    <Tag>{t('games.levelN', { n: meta2?.level ?? 1 })}</Tag>
+                  )}
+                </div>
+                <div className="mt-3 text-[1rem] font-bold text-ink">{t(a.titleKey)}</div>
+                <div className="t-xs mt-0.5 line-clamp-2">{t(a.descKey)}</div>
+                <div className="mt-2 flex items-center gap-1 text-[0.78rem] font-bold" style={{ color: TONE_STYLES[a.tone].fg }}>
+                  {a.minutes} {t('c.min')} <ChevronRight className="h-3.5 w-3.5" />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </Section>
+
+      {/* ── Family album + progress ───────────────────────────────────── */}
+      <div className="mt-6 grid gap-3 lg:grid-cols-2">
+        <button type="button" onClick={() => onNavigate('memory-book')} className="card card--interactive card--pad card--saffron text-left">
+          <div className="flex items-center gap-3.5">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--r-sm)] bg-[var(--brand-saffron)] text-[#2B1A03]">
+              <BookHeart className="h-6 w-6" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[1.05rem] font-bold text-ink">{t('home.myAlbum')}</div>
+              <div className="t-sm">{t('mem.subtitle')}</div>
+            </div>
+            <ChevronRight className="ml-auto h-5 w-5 shrink-0 text-[var(--brand-saffron-ink)]" />
+          </div>
+        </button>
+
+        <button type="button" onClick={() => onNavigate('progress')} className="card card--interactive card--pad text-left">
+          <div className="flex items-center gap-3.5">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[var(--r-sm)] bg-[var(--info-soft)] text-[var(--info)]">
+              <TrendingUp className="h-6 w-6" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[1.05rem] font-bold text-ink">{t('home.myProgress')}</div>
+              <div className="t-sm">
+                {accuracy !== null ? `${accuracy}% ${t('prog.accuracy').toLowerCase()}` : t('prog.noneBody')}
+              </div>
+            </div>
+            <ChevronRight className="ml-auto h-5 w-5 shrink-0 text-ink-4" />
+          </div>
+        </button>
+      </div>
+
+      {/* ── Safety & comfort strip ────────────────────────────────────── */}
+      <Section className="mt-6" title={t('saf.title')} subtitle={t('saf.subtitle')}>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event('open-safe-return'))}
+            className="card card--pad card--interactive text-left"
+            style={{ background: 'var(--danger)', borderColor: 'transparent', color: '#fff' }}
+          >
+            <LifeBuoy className="h-7 w-7" />
+            <div className="mt-2.5 text-[1.05rem] font-extrabold">{t('home.imLost')}</div>
+            <div className="mt-0.5 text-[0.82rem] leading-snug text-white/80">{t('home.imLostBody')}</div>
+          </button>
+
+          <a href="tel:+919999999999" className="card card--pad card--interactive text-left">
+            <Phone className="h-7 w-7 text-brand" />
+            <div className="mt-2.5 text-[1.05rem] font-bold text-ink">{t('home.callFamily')}</div>
+            <div className="t-sm mt-0.5">{t('saf.emergencyContact')}</div>
+          </a>
+
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event('open-sundowning'))}
+            className="card card--pad card--interactive text-left"
+          >
+            <Moon className="h-7 w-7 text-[var(--brand-saffron)]" />
+            <div className="mt-2.5 text-[1.05rem] font-bold text-ink">{t('home.eveningCalm')}</div>
+            <div className="t-sm mt-0.5">{t('home.eveningCalmBody')}</div>
+          </button>
+        </div>
+      </Section>
+
+      <p className="t-sm mt-7 flex items-center justify-center gap-2 text-center">
+        <ImageIcon className="h-4 w-4 opacity-60" />
+        {t('home.takeYourTime')}
+      </p>
+      <p className="sr-only">{t('app.tagline')}</p>
+    </AppShell>
+  );
 }

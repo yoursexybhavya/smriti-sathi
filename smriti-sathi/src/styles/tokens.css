@@ -1,0 +1,224 @@
+/* ==========================================================================
+   Smriti Sathi — Design Tokens  ·  "Warm Heritage Care"  v3.0
+   One palette, one type scale, one spacing rhythm for every surface.
+   Elders get warmth + size; caregivers get density; clinicians get clarity.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ── Brand ───────────────────────────────────────────────────────────── */
+  --brand-teal: #0E5C50;
+  --brand-teal-deep: #0A4239;
+  --brand-teal-bright: #157A69;
+  --brand-teal-soft: #E2F0EC;
+  --brand-teal-line: #BFDDD6;
+
+  --brand-saffron: #C77A19;
+  --brand-saffron-ink: #8A5308;
+  --brand-saffron-soft: #FCEFDC;
+  --brand-saffron-line: #F2D9B2;
+
+  --brand-terracotta: #B4432B;
+  --brand-terracotta-ink: #8E2F1B;
+  --brand-terracotta-soft: #FBEAE5;
+  --brand-terracotta-line: #F0C9BE;
+
+  /* ── Canvas & surfaces ───────────────────────────────────────────────── */
+  --canvas: #FBF6EE;
+  --canvas-deep: #F4EDE1;
+  --surface: #FFFFFF;
+  --surface-warm: #FDF9F2;
+  --surface-sunken: #F5EEE3;
+  --surface-ink: #17211E;      /* dark panels on light canvas */
+  --scrim: rgba(18, 27, 24, 0.46);
+
+  /* ── Lines ───────────────────────────────────────────────────────────── */
+  --line: #E8DDCC;
+  --line-strong: #D6C7B0;
+  --line-soft: #F1E9DC;
+
+  /* ── Text ────────────────────────────────────────────────────────────── */
+  --ink: #17211E;
+  --ink-2: #414F4A;
+  --ink-3: #68766F;
+  --ink-4: #93A09A;
+  --ink-inverse: #FBF6EE;
+
+  /* ── Semantic ────────────────────────────────────────────────────────── */
+  --success: #2C7A54;
+  --success-soft: #E4F2EA;
+  --success-line: #BEE0CD;
+  --success-ink: #1C5C3C;
+  --warning: #A9650C;
+  --warning-soft: #FCEFDC;
+  --warning-line: #F1D6AC;
+  --danger: #B3261E;
+  --danger-strong: #8C1B15;
+  --danger-soft: #FBE9E7;
+  --danger-line: #F2C7C2;
+  --info: #245E93;
+  --info-soft: #E7F0F9;
+  --info-line: #C3D9EE;
+  --info-ink: #1B4670;
+
+  /* ── Elevation (warm-tinted, never grey) ─────────────────────────────── */
+  --shadow-1: 0 1px 2px rgba(23, 33, 30, 0.06), 0 2px 8px -2px rgba(23, 33, 30, 0.05);
+  --shadow-2: 0 4px 14px -6px rgba(23, 33, 30, 0.16), 0 2px 6px -2px rgba(23, 33, 30, 0.06);
+  --shadow-3: 0 18px 44px -22px rgba(23, 33, 30, 0.30), 0 6px 16px -10px rgba(23, 33, 30, 0.14);
+  --shadow-pop: 0 28px 70px -30px rgba(23, 33, 30, 0.38);
+  --shadow-brand: 0 10px 24px -12px rgba(14, 92, 80, 0.55);
+  --shadow-nav: 0 -10px 30px -18px rgba(23, 33, 30, 0.28);
+
+  /* ── Radii ───────────────────────────────────────────────────────────── */
+  --r-xs: 10px;
+  --r-sm: 14px;
+  --r-md: 18px;
+  --r-lg: 24px;
+  --r-xl: 30px;
+  --r-2xl: 38px;
+  --r-full: 999px;
+
+  /* ── Type ────────────────────────────────────────────────────────────── */
+  --font-display: 'Fraunces', 'Noto Sans Devanagari', 'Noto Sans Bengali', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Plus Jakarta Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-num: 'Plus Jakarta Sans', ui-monospace, monospace;
+
+  --text-display: clamp(2.05rem, 4.4vw, 3rem);
+  --text-h1: clamp(1.62rem, 3vw, 2.2rem);
+  --text-h2: clamp(1.32rem, 2.2vw, 1.62rem);
+  --text-h3: clamp(1.12rem, 1.5vw, 1.28rem);
+  --text-body-lg: clamp(1.12rem, 1.4vw, 1.28rem);
+  --text-body: 1.0625rem;
+  --text-sm: 0.9375rem;
+  --text-xs: 0.8125rem;
+  --text-2xs: 0.75rem;
+
+  --leading-tight: 1.16;
+  --leading-snug: 1.32;
+  --leading-body: 1.55;
+
+  --tracking-title: -0.022em;
+  --tracking-eyebrow: 0.10em;
+
+  /* ── Space (4px rhythm) ──────────────────────────────────────────────── */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 20px; --s-6: 24px; --s-7: 32px; --s-8: 40px;
+  --s-9: 56px; --s-10: 72px;
+
+  /* ── Touch ───────────────────────────────────────────────────────────── */
+  --tap-min: 52px;
+  --tap-comfort: 60px;
+  --tap-elder: 72px;
+
+  /* ── Motion ──────────────────────────────────────────────────────────── */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.42, 0.42, 1);
+  --dur-fast: 130ms;
+  --dur: 210ms;
+  --dur-slow: 380ms;
+
+  /* ── Layout ──────────────────────────────────────────────────────────── */
+  --shell-max: 1240px;
+  --shell-pad: clamp(16px, 4.2vw, 32px);
+  --header-h: 68px;
+  --nav-h: 74px;
+  --sidebar-w: 264px;
+}
+
+/* ── Calm Night (dark) ─────────────────────────────────────────────────── */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --brand-teal: #63D3B8;
+  --brand-teal-deep: #9DE8D6;
+  --brand-teal-bright: #86E0CB;
+  --brand-teal-soft: #14312B;
+  --brand-teal-line: #235047;
+
+  --brand-saffron: #EDB061;
+  --brand-saffron-ink: #F6C888;
+  --brand-saffron-soft: #322512;
+  --brand-saffron-line: #4B3A1D;
+
+  --brand-terracotta: #F0977C;
+  --brand-terracotta-ink: #F5AE96;
+  --brand-terracotta-soft: #34190F;
+  --brand-terracotta-line: #52291B;
+
+  --canvas: #0C1512;
+  --canvas-deep: #091010;
+  --surface: #131F1B;
+  --surface-warm: #17251F;
+  --surface-sunken: #0F1A17;
+  --surface-ink: #EAF3EE;
+  --scrim: rgba(3, 8, 6, 0.62);
+
+  --line: #253A32;
+  --line-strong: #335048;
+  --line-soft: #1B2B25;
+
+  --ink: #F0F6F2;
+  --ink-2: #C2D0C9;
+  --ink-3: #93A49C;
+  --ink-4: #6D7F77;
+  --ink-inverse: #0C1512;
+
+  --success: #62D69B;
+  --success-soft: #0F2A20;
+  --success-line: #1F4A38;
+  --success-ink: #A7EFC8;
+  --warning: #EFB45F;
+  --warning-soft: #2C2211;
+  --warning-line: #4A3A1E;
+  --danger: #FF8A7A;
+  --danger-strong: #FFA598;
+  --danger-soft: #341714;
+  --danger-line: #552723;
+  --info: #82BDF2;
+  --info-soft: #10202F;
+  --info-line: #22415C;
+  --info-ink: #B9DCFB;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.42), 0 2px 10px -2px rgba(0, 0, 0, 0.34);
+  --shadow-2: 0 6px 20px -10px rgba(0, 0, 0, 0.72), 0 2px 8px -4px rgba(0, 0, 0, 0.5);
+  --shadow-3: 0 22px 50px -26px rgba(0, 0, 0, 0.9), 0 8px 20px -12px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 32px 80px -30px rgba(0, 0, 0, 0.92);
+  --shadow-brand: 0 12px 28px -14px rgba(99, 211, 184, 0.42);
+  --shadow-nav: 0 -12px 34px -20px rgba(0, 0, 0, 0.86);
+}
+
+/* ── Comfort scales (elder accessibility) ──────────────────────────────── */
+:root[data-scale='comfort'] { font-size: 17px; }
+:root[data-scale='large'] { font-size: 18.5px; }
+:root[data-scale='xlarge'] { font-size: 20px; }
+
+/* ── High-contrast safety mode ─────────────────────────────────────────── */
+:root[data-contrast='high'] {
+  --ink: #000000;
+  --ink-2: #141414;
+  --ink-3: #2B2B2B;
+  --line: #6B6B6B;
+  --line-strong: #2B2B2B;
+  --canvas: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-warm: #FFFFFF;
+  --surface-sunken: #F4F4F4;
+  --brand-teal: #00473C;
+  --brand-teal-deep: #00352D;
+  --shadow-1: 0 0 0 1px #2B2B2B;
+  --shadow-2: 0 0 0 1px #2B2B2B, 0 2px 0 #2B2B2B;
+  --shadow-3: 0 0 0 2px #000000;
+}
+:root[data-contrast='high'][data-theme='dark'] {
+  --ink: #FFFFFF;
+  --ink-2: #F0F0F0;
+  --ink-3: #D8D8D8;
+  --canvas: #000000;
+  --surface: #000000;
+  --surface-warm: #080808;
+  --surface-sunken: #121212;
+  --line: #8A8A8A;
+  --line-strong: #C8C8C8;
+  --brand-teal: #7DFFE0;
+}

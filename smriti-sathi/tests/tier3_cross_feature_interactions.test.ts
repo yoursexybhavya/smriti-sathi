@@ -56,23 +56,23 @@ test('TIER 3 — Cross-Feature Interaction 2: Elder Quick Login -> Patient Home 
   // Verify elder quickLogin path requires zero PIN
   assert.ok(loginSrc.includes("quickLogin('patient_primary')"), 'Elder login bypasses PIN check');
 
-  // Verify patient home screen loads 2x2 launcher upon entrance
-  assert.ok(homeSrc.includes('Cognitive Exercises'), 'Patient home renders Cognitive Exercises header');
-  assert.ok(homeSrc.includes('grid-cols-1 sm:grid-cols-2'), 'Patient home renders 2x2 grid structure');
-  assert.ok(homeSrc.includes('Remember Game') && homeSrc.includes('Recognise Game'), 'Includes primary cognitive games');
+  // Verify patient home screen loads the activity launcher upon entrance
+  assert.ok(homeSrc.includes("t('home.myActivities')"), 'Patient home renders the activities section');
+  assert.ok(homeSrc.includes('grid-cols-1') && homeSrc.includes('sm:grid-cols-2'), 'Patient home reflows 1 -> 2 -> 4 columns');
+  assert.ok(homeSrc.includes('ACTIVITIES.map'), 'Launcher is driven by the activity registry');
 });
 
 test('TIER 3 — Cross-Feature Interaction 3: Caregiver PIN Auth -> Caregiver Clinical Adherence Oversight (Features 5 & 12)', async () => {
   const loginSrc = fs.readFileSync(path.join(rootDir, 'src/pages/auth/LoginScreen.tsx'), 'utf-8');
-  const dashSrc = fs.readFileSync(path.join(rootDir, 'src/pages/CaregiverDashboard.tsx'), 'utf-8');
+  const dashSrc = fs.readFileSync(path.join(rootDir, 'src/pages/caregiver/CaregiverHome.tsx'), 'utf-8');
 
   // Verify caregiver login requires PIN entry
   assert.ok(loginSrc.includes('login(selectedUser, pin)'), 'Caregiver route verifies security PIN');
 
   // Verify dashboard displays clinical metrics
-  assert.ok(dashSrc.includes('Reminder Adherence'), 'Dashboard displays Reminder Adherence');
-  assert.ok(dashSrc.includes('Weekly Engagement'), 'Dashboard displays Weekly Engagement');
-  assert.ok(dashSrc.includes('Memory') && dashSrc.includes('Recognition'), 'Dashboard tracks both cognitive domains');
+  assert.ok(dashSrc.includes("t('cg.adherence')"), 'Dashboard displays reminder adherence');
+  assert.ok(dashSrc.includes("t('cg.sessionsWeek')"), 'Dashboard displays this week\'s sessions');
+  assert.ok(dashSrc.includes("t('prog.domainRecall')") || dashSrc.includes("t('prog.domainRecognition')"), 'Dashboard tracks cognitive domains');
 });
 
 test('TIER 3 — Cross-Feature Interaction 4: Onboarding Flow Complete -> Database Profile Persist -> Greeting Update (Features 6 & 7)', async () => {
@@ -303,23 +303,22 @@ test('TIER 3 — Cross-Feature Interaction 13: Settings Text Size Change Propaga
 test('TIER 3 — Cross-Feature Interaction 14: Responsive Orientation Shift Reconfigures Layout Grid (Features 15 & 7)', async () => {
   const homeSrc = fs.readFileSync(path.join(rootDir, 'src/pages/PatientHomeScreen.tsx'), 'utf-8');
 
-  // Verify responsive Tailwind classes support both portrait and landscape
+  // Verify the layout reflows from a single column up to a four-column desktop grid
   assert.ok(homeSrc.includes('grid-cols-1'), 'Portrait layout activates 1 column');
-  assert.ok(homeSrc.includes('lg:grid-cols-12'), 'Landscape layout activates 12 column split');
-  assert.ok(homeSrc.includes('lg:col-span-7') && homeSrc.includes('lg:col-span-5'), 'Landscape defines 7/5 column ratio');
+  assert.ok(homeSrc.includes('sm:grid-cols-2'), 'Tablet layout activates 2 columns');
+  assert.ok(homeSrc.includes('lg:grid-cols-4'), 'Desktop layout activates 4 columns');
+  assert.ok(homeSrc.includes('lg:flex-row'), 'The hero reflows to a row on desktop');
 });
 
 test('TIER 3 — Cross-Feature Interaction 15: Scandinavian Colors Active across Theme Transitions with Zero Muddy Bleed (Features 1 & 2)', async () => {
-  const globals = fs.readFileSync(path.join(rootDir, 'src/styles/globals.css'), 'utf-8');
+  const globals = fs.readFileSync(path.join(rootDir, 'src/styles/tokens.css'), 'utf-8');
 
-  // Verify pure light and dark tokens
-  assert.ok(globals.includes('#F8FAFC'), 'Light canvas is clean #F8FAFC');
-  assert.ok(
-    globals.includes('#080C14') || globals.includes('#0A1420') || globals.includes('#0B0F17'),
-    'Dark canvas is deep midnight/slate'
-  );
-  assert.ok(!globals.includes('#F5F0E8'), 'Zero muddy #F5F0E8 in tokens');
-  assert.ok(!globals.includes('#FDF8F0'), 'Zero warm muddy #FDF8F0 in tokens');
+  // Verify both palettes are declared and neither leaks the legacy mud
+  assert.ok(globals.includes('--canvas: #FBF6EE'), 'Light canvas is warm ivory #FBF6EE');
+  assert.ok(globals.includes('--canvas: #0C1512'), 'Dark canvas is calm night #0C1512');
+  assert.ok(!globals.toUpperCase().includes('#F5F0E8'), 'Zero muddy #F5F0E8 in tokens');
+  assert.ok(!globals.toUpperCase().includes('#FDF8F0'), 'Zero warm muddy #FDF8F0 in tokens');
+  assert.ok(!globals.toUpperCase().includes('#1B5E20'), 'Zero legacy forest green #1B5E20 in tokens');
 });
 
 test('TIER 3 — Cross-Feature Interaction 16: Care Alert Buzzer Audio Synthesis + Vibration Sequence (Features 13 & 4)', async () => {

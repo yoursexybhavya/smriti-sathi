@@ -1,468 +1,258 @@
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Volume2, CheckCircle, RotateCcw, ArrowRight, Sun, Coffee, Pill, Footprints, Moon, Utensils } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Check, Clock, Coffee, Footprints, Moon, Pill, RotateCcw, Sparkles, Sun, Utensils } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Button, Card, ProgressRing, Tag, GameFrame, LevelPicker } from '../../ui';
 import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 import { useVoice } from '../../hooks/useVoice';
 import { GameSession } from '../../models/GameSession';
 import { GameStorage } from '../../services/storage/GameStorage';
-import LargeButton from '../../components/LargeButton';
-import ProgressCard from '../../components/ProgressCard';
 
-interface DailyRoutineGameProps {
+interface Props {
   onBack: () => void;
 }
 
-interface RoutineItem {
+interface Step {
   id: string;
-  name: string;
-  period: string;
-  order: number;
-  iconName: 'sun' | 'coffee' | 'pill' | 'walk' | 'lunch' | 'sleep';
-  description: string;
+  icon: LucideIcon;
+  labelKey: string;
+  time: string;
 }
 
-const ALL_ROUTINE_STEPS: RoutineItem[] = [
-  { id: 'wake', name: 'Wake Up', period: 'Morning', order: 0, iconName: 'sun', description: 'Begin your day with morning light' },
-  { id: 'brush', name: 'Morning Tea & Breakfast', period: 'Morning', order: 1, iconName: 'coffee', description: 'Have a warm tea and healthy breakfast' },
-  { id: 'medicine', name: 'Take Morning Medicine', period: 'Morning', order: 2, iconName: 'pill', description: 'Take prescribed morning medication with water' },
-  { id: 'walk', name: 'Morning Walk in Garden', period: 'Morning', order: 3, iconName: 'walk', description: 'Gentle walk for fresh air and gentle movement' },
-  { id: 'lunch', name: 'Lunch & Family Time', period: 'Afternoon', order: 4, iconName: 'lunch', description: 'Nutritious lunch and relaxation' },
-  { id: 'sleep', name: 'Night Sleep & Rest', period: 'Night', order: 5, iconName: 'sleep', description: 'Peaceful night rest to recharge' },
+const ALL_STEPS: Step[] = [
+  { id: 'wake', icon: Sun, labelKey: 'rem.typeWalk', time: '6:00' },
+  { id: 'breakfast', icon: Coffee, labelKey: 'rem.typeMeal', time: '8:00' },
+  { id: 'medicine', icon: Pill, labelKey: 'rem.typeMedicine', time: '9:00' },
+  { id: 'walk', icon: Footprints, labelKey: 'games.routineDesc', time: '11:00' },
+  { id: 'lunch', icon: Utensils, labelKey: 'rem.typeMeal', time: '13:00' },
+  { id: 'sleep', icon: Moon, labelKey: 'home.night', time: '21:00' },
 ];
 
-export default function DailyRoutineGame({ onBack }: DailyRoutineGameProps) {
+const COUNT_FOR_LEVEL = [0, 3, 4, 5, 6, 6];
+
+export default function DailyRoutineGame({ onBack }: Props) {
   const { state } = useApp();
-  const patientId = state.currentPatient?.id || 'default';
+  const { t } = useI18n();
   const { speak } = useVoice();
+  const patientId = state.currentPatient?.id || 'default';
 
   const [phase, setPhase] = useState<'intro' | 'play' | 'result'>('intro');
-  const [difficulty, setDifficulty] = useState(1);
-  const [selectedLevel, setSelectedLevel] = useState(1);
-  const [activeItems, setActiveItems] = useState<RoutineItem[]>([]);
-  const [shuffledDeck, setShuffledDeck] = useState<RoutineItem[]>([]);
-  const [placedSlots, setPlacedSlots] = useState<(RoutineItem | null)[]>([]);
-  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [level, setLevel] = useState(1);
+  const [steps, setSteps] = useState<Step[]>([]);
+  const [deck, setDeck] = useState<Step[]>([]);
+  const [slots, setSlots] = useState<(Step | null)[]>([]);
+  const [picked, setPicked] = useState<string | null>(null);
   const [attempts, setAttempts] = useState(0);
-  const [startTime, setStartTime] = useState(0);
-  const [totalTime, setTotalTime] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  const startedAt = useRef(0);
 
-  const getStepCount = (level: number) => {
-    switch (level) {
-      case 1: return 3; // Wake, Breakfast, Medicine
-      case 2: return 4; // Wake, Breakfast, Medicine, Walk
-      case 3: return 5; // Wake, Breakfast, Medicine, Walk, Lunch
-      case 4:
-      case 5: return 6; // All 6 steps
-      default: return 3;
-    }
-  };
-
-  const startLevel = (lvl: number) => {
-    const count = getStepCount(lvl);
-    const selected = ALL_ROUTINE_STEPS.slice(0, count).map((item, idx) => ({
-      ...item,
-      order: idx,
-    }));
-
-    setActiveItems(selected);
-    const shuffled = [...selected].sort(() => Math.random() - 0.5);
-    setShuffledDeck(shuffled);
-    setPlacedSlots(new Array(count).fill(null));
-    setSelectedCardId(null);
-    setDifficulty(lvl);
+  const start = (lvl: number) => {
+    const count = COUNT_FOR_LEVEL[lvl] ?? 3;
+    const active = ALL_STEPS.slice(0, count);
+    setSteps(active);
+    setDeck([...active].sort(() => Math.random() - 0.5));
+    setSlots(new Array(count).fill(null));
+    setPicked(null);
     setAttempts(0);
-    setStartTime(Date.now());
+    setLevel(lvl);
     setPhase('play');
-
-    speak('Arrange your daily routine in chronological order. Tap a card, then tap where it happens first.');
+    startedAt.current = Date.now();
+    speak(t('games.orderBody'));
   };
 
-  const handleCardSelect = (item: RoutineItem) => {
-    if (placedSlots.some(p => p?.id === item.id)) return;
-    setSelectedCardId(item.id);
-    speak(item.name);
-  };
-
-  const handleSlotClick = async (slotIdx: number) => {
-    if (!selectedCardId) return;
-    if (placedSlots[slotIdx] !== null) return;
-
-    const card = activeItems.find(c => c.id === selectedCardId);
+  const place = async (slotIdx: number) => {
+    if (!picked) return;
+    if (slots[slotIdx] !== null) return;
+    const card = steps.find((s) => s.id === picked);
     if (!card) return;
 
-    setAttempts(prev => prev + 1);
+    setAttempts((a) => a + 1);
 
-    // Errorless learning: if correct slot, lock into place
-    if (card.order === slotIdx) {
-      const nextSlots = [...placedSlots];
-      nextSlots[slotIdx] = card;
-      setPlacedSlots(nextSlots);
-      setSelectedCardId(null);
-      speak(`Correct! ${card.name}`);
+    // Errorless learning: only the correct slot accepts the card.
+    if (card.id === steps[slotIdx].id) {
+      const next = [...slots];
+      next[slotIdx] = card;
+      setSlots(next);
+      setPicked(null);
+      speak(card.id);
 
-      // Check if complete
-      const isComplete = nextSlots.every(slot => slot !== null);
-      if (isComplete) {
-        const elapsed = (Date.now() - startTime) / 1000;
-        setTotalTime(elapsed);
-        const accuracy = Math.round((activeItems.length / Math.max(activeItems.length, attempts + 1)) * 100);
-
+      if (next.every((s) => s !== null)) {
+        const seconds = (Date.now() - startedAt.current) / 1000;
+        setElapsed(seconds);
+        const accuracy = Math.min(100, Math.round((steps.length / Math.max(steps.length, attempts + 1)) * 100));
+        setPhase('result');
         const session: GameSession = {
           id: `routine_${Date.now()}`,
           patientId,
-          gameType: 'recognise',
-          difficulty,
-          score: activeItems.length,
-          totalObjects: activeItems.length,
+          gameType: 'daily_routine',
+          difficulty: level,
+          score: steps.length,
+          totalObjects: steps.length,
           accuracy,
-          responseTime: elapsed,
+          responseTime: seconds,
           timestamp: Date.now(),
         };
-        await GameStorage.saveSession(session);
-        setPhase('result');
-        speak('Outstanding work! Your daily routine is fully completed.');
+        await GameStorage.saveSession(session).catch(() => undefined);
       }
     } else {
-      // Gentle feedback without punishment
-      setSelectedCardId(null);
-      speak(`Not quite. Think about what time ${card.name} usually takes place.`);
+      speak(t('games.routineNudge'));
     }
   };
 
-  const renderIcon = (iconName: RoutineItem['iconName'], size = 28) => {
-    switch (iconName) {
-      case 'sun': return <Sun size={size} className="text-[#E65100]" />;
-      case 'coffee': return <Coffee size={size} className="text-[#BC6C25]" />;
-      case 'pill': return <Pill size={size} className="text-[#0EA5E9]" />;
-      case 'walk': return <Footprints size={size} className="text-[#10B981]" />;
-      case 'lunch': return <Utensils size={size} className="text-[#EC4899]" />;
-      case 'sleep': return <Moon size={size} className="text-[#A855F7]" />;
-      default: return <Sun size={size} className="text-[#E65100]" />;
-    }
-  };
+  const shell = (children: React.ReactNode, subtitle?: string, progress?: number) => (
+    <GameFrame
+      title={t('games.routine')}
+      subtitle={subtitle}
+      onBack={onBack}
+      progress={progress}
+      badge={<Tag tone="success">{t('games.levelN', { n: level })}</Tag>}
+    >
+      {children}
+    </GameFrame>
+  );
 
-  // INTRO PHASE
   if (phase === 'intro') {
-    return (
-      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between transition-colors duration-200">
-        <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4 shadow-sm sticky top-0 z-40">
-          <div className="max-w-3xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={onBack}
-                className="w-10 h-10 bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] rounded-xl flex items-center justify-center transition-colors border border-[var(--color-border)] text-[var(--color-text)]"
-                aria-label="Back"
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--color-text)]">Daily Routine</h1>
-                <p className="text-xs sm:text-sm text-[var(--color-text-secondary)]">Temporal Orientation & Sequence Activity</p>
-              </div>
-            </div>
-            <span className="text-xs sm:text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
-              Cognitive Focus
-            </span>
+    return shell(
+      <div className="introgrid">
+        <Card className="text-center">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[var(--success-soft)] text-[var(--success)]">
+            <Sun className="h-8 w-8" />
           </div>
-        </header>
+          <h1 className="t-h1 mt-4">{t('games.routine')}</h1>
+          <p className="t-body mx-auto mt-1.5 max-w-[40ch]">{t('games.orderBody')}</p>
+          <p className="t-sm mt-3">{t('games.takeYourTime')}</p>
+        </Card>
 
-        <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6 w-full flex flex-col justify-center">
-          <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-6 md:p-8 shadow-sm space-y-6">
-            <div className="flex items-center justify-center">
-              <div className="w-24 h-24 rounded-3xl bg-[#10B981]/15 flex items-center justify-center border-4 border-[#10B981]/30 shadow-md">
-                <Sun size={48} className="text-[#10B981]" />
-              </div>
-            </div>
-
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-text)]">Order Your Day</h2>
-              <p className="text-base text-[var(--color-text-secondary)] max-w-xl mx-auto leading-relaxed">
-                Connect each daily habit in the order you do it from morning until night. Strengthens focus, daily structure, and natural memory flow.
-              </p>
-            </div>
-
-            {/* Steps Preview */}
-            <div className="bg-[var(--color-bg-subtle)] rounded-2xl p-5 border border-[var(--color-border)] space-y-3">
-              <p className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider text-center">
-                Example Sequence:
-              </p>
-              <div className="flex items-center justify-center gap-2 flex-wrap text-sm font-bold text-[var(--color-text)]">
-                <span className="px-3 py-1.5 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] shadow-xs flex items-center gap-1.5">
-                  <Sun size={16} className="text-[#E65100]" /> Morning Wake
-                </span>
-                <span className="text-[var(--color-text-muted)]">→</span>
-                <span className="px-3 py-1.5 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] shadow-xs flex items-center gap-1.5">
-                  <Coffee size={16} className="text-[#BC6C25]" /> Breakfast
-                </span>
-                <span className="text-[var(--color-text-muted)]">→</span>
-                <span className="px-3 py-1.5 bg-[var(--color-card)] rounded-xl border border-[var(--color-border)] shadow-xs flex items-center gap-1.5">
-                  <Pill size={16} className="text-[#0EA5E9]" /> Medicine
-                </span>
-              </div>
-            </div>
-
-            {/* Level Picker */}
-            <div className="space-y-4 pt-2">
-              <label className="block text-sm font-bold text-[var(--color-text)] text-center">
-                Select Starting Tier
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-                {[
-                  { level: 1, label: 'Gentle', sub: '3 Steps' },
-                  { level: 2, label: 'Standard', sub: '4 Steps' },
-                  { level: 3, label: 'Active', sub: '5 Steps' },
-                  { level: 4, label: 'Master', sub: '6 Steps' },
-                  { level: 5, label: 'Champion', sub: 'All 6' },
-                ].map(tier => (
-                  <button
-                    key={tier.level}
-                    type="button"
-                    onClick={() => setSelectedLevel(tier.level)}
-                    className={`py-3 px-2 rounded-2xl border text-center transition-all cursor-pointer select-none active:scale-95 ${
-                      selectedLevel === tier.level
-                        ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-600 dark:border-indigo-400 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs ring-2 ring-indigo-500/20'
-                        : 'bg-[var(--color-card)] border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-slate-300 dark:hover:border-slate-700 font-medium'
-                    }`}
-                  >
-                    <span className="block text-sm font-bold">Level {tier.level}</span>
-                    <span className="block text-xs text-[var(--color-text-muted)] mt-0.5">{tier.sub}</span>
-                  </button>
-                ))}
-              </div>
-
-              <LargeButton
-                variant="primary"
-                onPress={() => startLevel(selectedLevel)}
-              >
-                Start Daily Routine
-              </LargeButton>
-
-              <LargeButton onPress={onBack} variant="outline">
-                Back to Games Hub
-              </LargeButton>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // PLAY PHASE
-  if (phase === 'play') {
-    const unplacedCards = shuffledDeck.filter(
-      card => !placedSlots.some(p => p?.id === card.id)
-    );
-
-    return (
-      <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between transition-colors duration-200">
-        <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-3.5 shadow-sm sticky top-0 z-40">
-          <div className="max-w-4xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setPhase('intro')}
-                className="w-12 h-12 min-w-[48px] min-h-[48px] bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] rounded-2xl flex items-center justify-center transition-colors border border-[var(--color-border)] text-[var(--color-text)] cursor-pointer active:scale-95"
-                aria-label="Back"
-              >
-                <ArrowLeft size={22} />
-              </button>
-              <div>
-                <h2 className="text-base sm:text-lg font-bold text-[var(--color-text)]">Arrange in Chronological Order</h2>
-                <p className="text-xs text-[var(--color-text-secondary)]">Tap an item from below, then tap its slot</p>
-              </div>
-            </div>
-            <span className="text-xs sm:text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3 py-1 rounded-full border border-[#10B981]/30">
-              Level {difficulty} ({activeItems.length} steps)
-            </span>
-          </div>
-        </header>
-
-        <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-6 w-full flex flex-col justify-between space-y-6">
-          {/* Target Timeline Slots */}
-          <div className="bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] p-5 md:p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider">
-                Timeline Sequence (Earlier → Later)
-              </span>
-              <button
-                type="button"
-                onClick={() => speak('Place morning steps on the left, and evening steps on the right.')}
-                className="p-2 text-[#10B981] bg-[#10B981]/15 hover:bg-[#10B981]/25 rounded-xl border border-[#10B981]/30 transition-colors"
-                title="Voice hint"
-              >
-                <Volume2 size={18} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-              {placedSlots.map((slot, idx) => {
-                const isOccupied = slot !== null;
-                const canPlaceHere = selectedCardId !== null && !isOccupied;
-
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSlotClick(idx)}
-                    className={`relative rounded-2xl border-3 p-4 flex flex-col items-center justify-center text-center min-h-[130px] transition-all ${
-                      isOccupied
-                        ? 'bg-[#10B981]/15 border-[#10B981] shadow-sm'
-                        : canPlaceHere
-                        ? 'bg-[#E65100]/15 border-[#E65100] border-dashed hover:scale-102 ring-4 ring-[#E65100]/20 cursor-pointer animate-pulse'
-                        : 'bg-[var(--color-bg-subtle)] border-[var(--color-border)] border-dashed'
-                    }`}
-                  >
-                    <span className="absolute top-2 left-2.5 text-xs font-extrabold text-[var(--color-text-muted)]">
-                      #{idx + 1}
-                    </span>
-
-                    {isOccupied ? (
-                      <>
-                        <div className="w-12 h-12 rounded-xl bg-[var(--color-card)] border border-[var(--color-border)] shadow-xs flex items-center justify-center mb-2">
-                          {renderIcon(slot.iconName, 26)}
-                        </div>
-                        <span className="text-xs font-bold text-[var(--color-text)] leading-tight">
-                          {slot.name}
-                        </span>
-                        <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#10B981] flex items-center justify-center">
-                          <CheckCircle size={14} className="text-white" />
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center">
-                        <span className="text-xs font-bold text-[var(--color-text-secondary)] mt-2">
-                          {canPlaceHere ? 'Place Here' : `Step ${idx + 1}`}
-                        </span>
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Cards Tray (Items to Place) */}
-          <div className="space-y-3">
-            <span className="block text-sm font-bold text-[var(--color-text)] px-1">
-              Select an activity:
-            </span>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {unplacedCards.map(card => {
-                const isSelected = selectedCardId === card.id;
-
-                return (
-                  <button
-                    key={card.id}
-                    type="button"
-                    onClick={() => handleCardSelect(card)}
-                    className={`p-4 rounded-2xl border-2 flex items-center gap-3.5 transition-all active:scale-95 shadow-xs ${
-                      isSelected
-                        ? 'bg-[#E65100]/15 border-[#E65100] shadow-md ring-4 ring-[#E65100]/20 scale-102'
-                        : 'bg-[var(--color-card)] border-[var(--color-border)] hover:border-[#10B981]'
-                    }`}
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-[var(--color-bg-subtle)] border border-[var(--color-border)] flex items-center justify-center flex-shrink-0 shadow-xs">
-                      {renderIcon(card.iconName, 26)}
-                    </div>
-                    <div className="text-left">
-                      <span className="block text-sm font-bold text-[var(--color-text)] leading-snug">
-                        {card.name}
-                      </span>
-                      <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                        {card.period}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // RESULT PHASE
-  const accuracy = Math.round((activeItems.length / Math.max(activeItems.length, attempts)) * 100);
-  const canAdvance = accuracy >= 80 && difficulty < 5;
-
-  return (
-    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col justify-between transition-colors duration-200">
-      <header className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 sm:px-6 py-4 shadow-sm">
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[var(--color-text)]">Daily Routine Complete</h2>
-            <p className="text-sm text-[var(--color-text-secondary)]">Chronological Orientation Results</p>
+          <div className="t-eyebrow mb-2">{t('games.pickLevel')}</div>
+          <LevelPicker current={level} caption={(lvl) => `${COUNT_FOR_LEVEL[lvl]} ${t('c.of')} 6`} onPick={start} />
+        </div>
+      </div>,
+      t('games.howToPlay'),
+    );
+  }
+
+  if (phase === 'play') {
+    return shell(
+      <>
+        <h2 className="t-h3">{t('games.putInOrder')}</h2>
+        <p className="t-sm mt-0.5">{t('games.orderBody')}</p>
+        <p className="t-sm mt-2 rounded-[var(--r-sm)] bg-[var(--surface-warm)] px-3 py-2 font-semibold text-[var(--ink-2)]">
+          {picked ? t('games.placeHere') : t('games.selectAll')}
+        </p>
+
+        {/* timeline slots */}
+        <div className="mt-4 flex flex-col gap-2.5">
+          {slots.map((slot, i) => {
+            const filled = slot !== null;
+            // Scaffolding only: at the easier levels the slot shows which
+            // routine step belongs there; from level 3 the times are the cue.
+            const Icon = filled ? slot.icon : level <= 2 ? steps[i]?.icon : Clock;
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => place(i)}
+                className="flex items-center gap-3 rounded-[var(--r-md)] border-2 p-2.5 text-left transition-all"
+                style={{
+                  borderColor: filled ? 'var(--success-line)' : picked ? 'var(--brand-teal)' : 'var(--line)',
+                  background: filled ? 'var(--success-soft)' : picked ? 'var(--brand-teal-soft)' : 'var(--surface)',
+                  borderStyle: filled ? 'solid' : 'dashed',
+                }}
+              >
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--surface-sunken)] text-[0.78rem] font-extrabold text-ink-2">
+                  {i + 1}
+                </span>
+                <span
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--r-sm)]"
+                  style={{
+                    background: filled ? 'var(--success)' : picked ? 'var(--brand-teal)' : 'var(--surface-sunken)',
+                    color: filled ? '#fff' : picked ? '#fff' : 'var(--ink-4)',
+                  }}
+                >
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[0.95rem] font-bold text-ink">
+                    {filled ? t(slot.labelKey) : picked ? t('games.placeHere') : t('games.emptySlot')}
+                  </span>
+                  <span className="t-xs block">{filled ? slot.time : '·'}</span>
+                </span>
+                {filled && <Check className="h-5 w-5 shrink-0 text-[var(--success)]" />}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* deck */}
+        <div className="mt-4">
+          <div className="t-eyebrow mb-2">{picked ? t('games.placeHere') : t('games.selectAll')}</div>
+          <div className="flex flex-wrap gap-2">
+            {deck.map((card) => {
+              const used = slots.some((s) => s?.id === card.id);
+              const isPicked = picked === card.id;
+              const Icon = card.icon;
+              if (used) return null;
+              return (
+                <button
+                  key={card.id}
+                  type="button"
+                  onClick={() => setPicked(isPicked ? null : card.id)}
+                  className="flex min-h-[52px] items-center gap-2 rounded-full border-2 px-3.5 py-2 transition-all"
+                  style={{
+                    borderColor: isPicked ? 'var(--brand-teal)' : 'var(--line)',
+                    background: isPicked ? 'var(--brand-teal)' : 'var(--surface)',
+                    color: isPicked ? '#fff' : 'var(--ink)',
+                    transform: isPicked ? 'translateY(-2px)' : 'none',
+                  }}
+                >
+                  <Icon className="h-[18px] w-[18px]" />
+                  <span className="text-[0.88rem] font-bold">{t(card.labelKey)}</span>
+                  <span className={isPicked ? 'text-white/70' : 'text-ink-4'}>{card.time}</span>
+                </button>
+              );
+            })}
           </div>
-          <span className="text-sm font-bold text-[#10B981] bg-[#10B981]/15 px-3.5 py-1 rounded-full border border-[#10B981]/30">
-            Level {difficulty} of 5
-          </span>
         </div>
-      </header>
+      </>,
+      `${slots.filter(Boolean).length} ${t('c.of')} ${slots.length}`,
+      (slots.filter(Boolean).length / Math.max(1, slots.length)) * 100,
+    );
+  }
 
-      <main className="flex-1 max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6 w-full flex flex-col justify-center">
-        <div className="flex justify-center">
-          <div className="w-24 h-24 rounded-full bg-[#10B981]/15 flex items-center justify-center shadow-lg border-4 border-[#10B981]/30 animate-in zoom-in-75 duration-200">
-            <CheckCircle size={52} className="text-[#10B981]" />
+  return shell(
+    <>
+      <Card className="text-center">
+        <ProgressRing value={100} size={110} stroke={9}>
+          <Sparkles className="h-8 w-8 text-[var(--brand-teal)]" />
+        </ProgressRing>
+        <h1 className="t-h1 mt-4">{t('games.correctOrder')}</h1>
+        <p className="t-body mt-1">{t('prog.encourage')}</p>
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <div className="stat">
+            <span className="stat__label">{t('games.attempts')}</span>
+            <span className="stat__value">{attempts}</span>
+          </div>
+          <div className="stat">
+            <span className="stat__label">{t('games.timeTaken')}</span>
+            <span className="stat__value">{Math.round(elapsed)}s</span>
           </div>
         </div>
-
-        <div className="text-center max-w-lg mx-auto space-y-2">
-          <p className="text-2xl md:text-3xl text-[var(--color-text)] font-extrabold leading-tight">
-            {accuracy >= 80 ? 'Wonderful Routine Mastery!' : 'Good Effort on Today’s Routine!'}
-          </p>
-          <p className="text-base text-[var(--color-text-secondary)]">
-            You arranged {activeItems.length} daily habits in chronological order.
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 md:gap-4">
-          <ProgressCard
-            icon={<CheckCircle size={22} />}
-            label="Steps"
-            value={`${activeItems.length}`}
-            color="#10B981"
-          />
-          <ProgressCard
-            icon={<Sun size={22} />}
-            label="Accuracy"
-            value={`${accuracy}%`}
-            color="#E65100"
-          />
-          <ProgressCard
-            icon={<RotateCcw size={22} />}
-            label="Time"
-            value={`${Math.round(totalTime)}s`}
-            color="#0EA5E9"
-          />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="space-y-3 pt-2">
-          {canAdvance ? (
-            <LargeButton
-              variant="primary"
-              onPress={() => startLevel(difficulty + 1)}
-              icon={<ArrowRight size={22} />}
-            >
-              Advance to Level {difficulty + 1}
-            </LargeButton>
-          ) : (
-            <LargeButton
-              variant="primary"
-              onPress={() => startLevel(difficulty)}
-              icon={<RotateCcw size={22} />}
-            >
-              Practice Level {difficulty} Again
-            </LargeButton>
+        <div className="mt-4 flex flex-col gap-2">
+          {level < 5 && (
+            <Button block size="lg" onClick={() => start(level + 1)} icon={<Sparkles className="h-[18px] w-[18px]" />}>
+              {t('games.nextLevel')}
+            </Button>
           )}
-
-          <LargeButton onPress={onBack} variant="outline">
-            Back to Games Hub
-          </LargeButton>
+          <Button variant="secondary" block onClick={() => start(level)} icon={<RotateCcw className="h-[18px] w-[18px]" />}>
+            {t('games.playAgain')}
+          </Button>
+          <Button variant="ghost" block onClick={onBack}>
+            {t('games.backToGames')}
+          </Button>
         </div>
-      </main>
-    </div>
+      </Card>
+    </>,
+    t('games.sessionComplete'),
   );
 }

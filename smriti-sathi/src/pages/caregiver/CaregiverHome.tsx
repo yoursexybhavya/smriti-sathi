@@ -1,410 +1,311 @@
-/**
- * SMRITI SATHI — Caregiver Home Screen
- * 
- * Dashboard for caregivers/ASHA workers.
- * Shows patient overview, follow-up signals, and quick actions.
- */
-
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { caregiverRepository, FollowUpSignal } from '../../database/repositories/CaregiverRepository';
-import { UserRole } from '../../models/Role';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Users,
-  User,
-  Bell,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
   Activity,
+  Bell,
+  BookHeart,
+  CalendarCheck,
   ChevronRight,
-  LogOut,
-  Shield,
-  RefreshCw,
-  QrCode,
-  Printer,
-  Sunset,
-  FileText,
-  HeartHandshake
+  ClipboardList,
+  CreditCard,
+  LifeBuoy,
+  Sparkles,
+  Stethoscope,
+  Target,
+  TrendingUp,
+  UserRound,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
-import RoleAndProfileModal from '../../components/RoleAndProfileModal';
+import { AppShell } from '../../shell/AppShell';
+import { Alert, Button, Card, ProgressBar, Section, Stat, Tag } from '../../ui';
+import { ACTIVITIES } from '../../data/activities';
+import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
+import { useI18n } from '../../i18n';
+import { gameSessionRepository } from '../../database';
+import { reminderService } from '../../services/ReminderService';
+import { memoryBookService } from '../../services/MemoryBookService';
 
-interface CaregiverHomeProps {
+interface Props {
   onNavigate: (screen: string) => void;
   isOnline?: boolean;
+  persona?: 'elder' | 'caregiver' | 'clinician';
 }
 
-export default function CaregiverHome({ onNavigate, isOnline = true }: CaregiverHomeProps) {
-  const { session, logout, role, switchRole } = useAuth();
-  const [patients, setPatients] = useState<Array<{ id: string; name: string; age: number }>>([]);
-  const [signals, setSignals] = useState<FollowUpSignal[]>([]);
-  const [summaries, setSummaries] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(true);
+export default function CaregiverHome({ onNavigate, isOnline = true, persona = 'caregiver' }: Props) {
+  const { state, toggleTheme } = useApp();
+  const { session } = useAuth();
+  const { t, meta } = useI18n();
+  const patient = state.currentPatient;
+  const userId = patient?.id ? parseInt(patient.id, 10) : undefined;
 
-  // Role and profile modal state
-  const [showRoleModal, setShowRoleModal] = useState(false);
-  const [modalInitialTab, setModalInitialTab] = useState<'role' | 'profile'>('role');
+  const [sessions, setSessions] = useState<{ count: number; accuracy: number; week: number; last: number | null }>({
+    count: 0,
+    accuracy: 0,
+    week: 0,
+    last: null,
+  });
+  const [reminders, setReminders] = useState({ pending: 0, done: 0, total: 0 });
+  const [memories, setMemories] = useState(0);
+  const [recent, setRecent] = useState<{ id: number; type: string; when: string; accuracy: number }[]>([]);
+  const [days, setDays] = useState<{ label: string; count: number }[]>([]);
+
+  const load = useCallback(
+    async (uid: number) => {
+      try {
+        const [all, stats, rem, mem] = await Promise.all([
+          gameSessionRepository.getByUserId(uid),
+          gameSessionRepository.getStats(uid),
+          reminderService.getAllReminders(uid),
+          memoryBookService.getMemoryItemCount(uid),
+        ]);
+
+        const weekAgo = Date.now() - 7 * 864e5;
+        const week = all.filter((s) => s.createdAt >= weekAgo).length;
+        const last = all.length ? Math.max(...all.map((s) => s.createdAt)) : null;
+        setSessions({ count: stats.totalGames || all.length, accuracy: stats.averageAccuracy ? Math.round(stats.averageAccuracy) : 0, week, last });
+        setReminders({
+          pending: rem.filter((r) => r.status === 'pending').length,
+          done: rem.filter((r) => r.status === 'completed').length,
+          total: rem.length,
+        });
+        setMemories(mem);
+
+        const dayFmt = new Intl.DateTimeFormat(meta.htmlLang, { weekday: 'short' });
+        const buckets = Array.from({ length: 14 }, (_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - (13 - i));
+          return { key: `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`, label: dayFmt.format(d), count: 0 };
+        });
+        all.forEach((s) => {
+          const d = new Date(s.createdAt);
+          const b = buckets.find((x) => x.key === `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
+          if (b) b.count += 1;
+        });
+        setDays(buckets);
+
+        const whenFmt = new Intl.DateTimeFormat(meta.htmlLang, { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
+        setRecent(
+          [...all]
+            .sort((a, b) => b.createdAt - a.createdAt)
+            .slice(0, 5)
+            .map((s) => ({
+              id: s.id ?? s.createdAt,
+              type: s.gameType as string,
+              when: whenFmt.format(new Date(s.createdAt)),
+              accuracy: Math.round(s.accuracy || 0),
+            })),
+        );
+      } catch {
+        /* ignore */
+      }
+    },
+    [meta.htmlLang],
+  );
 
   useEffect(() => {
-    loadData();
-  }, [session]);
+    if (userId) load(userId);
+  }, [userId, load]);
 
-  const loadData = async () => {
-    if (!session || role !== UserRole.CAREGIVER) return;
-    
-    setLoading(true);
-    try {
-      const patientList = await caregiverRepository.getLinkedPatients(session.userId);
-      setPatients(patientList);
+  const maxCount = Math.max(1, ...days.map((d) => d.count));
+  const adherence = reminders.total ? Math.round((reminders.done / reminders.total) * 100) : 0;
+  const lastActive = sessions.last
+    ? new Intl.RelativeTimeFormat(meta.htmlLang, { numeric: 'auto' }).format(
+        -Math.round((Date.now() - sessions.last) / 36e5),
+        'hour',
+      )
+    : null;
 
-      const allSignals = await caregiverRepository.getAllFollowUpSignals(session.userId);
-      setSignals(allSignals);
+  const quickActions = [
+    { key: 'cg.manageReminders', icon: Bell, route: 'caregiver-reminders', tone: 'teal' },
+    { key: 'cg.memoryBook', icon: BookHeart, route: 'caregiver-memory', tone: 'saffron' },
+    { key: 'cg.safety', icon: LifeBuoy, route: 'safety-dashboard', tone: 'danger' },
+    { key: 'cg.triage', icon: Stethoscope, route: 'safety-dashboard', tone: 'info' },
+    { key: 'cg.printBadge', icon: CreditCard, route: 'safety-dashboard', tone: 'success' },
+    { key: 'cg.report', icon: ClipboardList, route: 'safety-dashboard', tone: 'teal' },
+  ] as const;
 
-      const summaryData: Record<string, any> = {};
-      for (const patient of patientList) {
-        const summary = await caregiverRepository.getPatientSummary(session.userId, patient.id);
-        if (summary) {
-          summaryData[patient.id] = summary;
-        }
-      }
-      setSummaries(summaryData);
-    } catch (e) {
-      console.error('Error loading caregiver data:', e);
-    }
-    setLoading(false);
+  const toneBg: Record<string, string> = {
+    teal: 'var(--brand-teal-soft)',
+    saffron: 'var(--brand-saffron-soft)',
+    danger: 'var(--danger-soft)',
+    info: 'var(--info-soft)',
+    success: 'var(--success-soft)',
   };
-
-  const handleLogout = async () => {
-    await logout();
+  const toneFg: Record<string, string> = {
+    teal: 'var(--brand-teal-deep)',
+    saffron: 'var(--brand-saffron-ink)',
+    danger: 'var(--danger-strong)',
+    info: 'var(--info)',
+    success: 'var(--success)',
   };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return 'bg-[var(--color-error-bg)] text-[var(--color-error)] border-[var(--color-error)]/30';
-      case 'medium': return 'bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)] border-[var(--color-accent-amber)]/30';
-      case 'low': return 'bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] border-[var(--color-accent-blue)]/30';
-      default: return 'bg-[var(--color-bg-subtle)] text-[var(--color-text-muted)] border-[var(--color-border)]';
-    }
-  };
-
-  const getSignalIcon = (type: string) => {
-    switch (type) {
-      case 'no_activity': return <Clock size={16} />;
-      case 'declining_progress': return <TrendingUp size={16} className="rotate-180" />;
-      case 'missed_reminders': return <Bell size={16} />;
-      case 'missed_games': return <Activity size={16} />;
-      default: return <AlertTriangle size={16} />;
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[var(--color-bg-subtle)] flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw size={32} className="animate-spin text-[var(--color-success)] mx-auto mb-3" />
-          <p className="text-[var(--color-text-secondary)]">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-44 sm:pb-52">
-      {/* Header */}
-      <div className="bg-[var(--color-success)] text-white px-5 py-5">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <img
-                src="/logo.png"
-                alt="Smriti Sathi"
-                className="w-10 h-10 rounded-xl bg-white object-cover shadow-sm ring-1 ring-white/40 shrink-0"
-              />
-              <div>
-                <h1 className="text-lg font-bold">{session?.displayName}</h1>
-                <p className="text-xs opacity-80">Caregiver Dashboard</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={async () => {
-                  await switchRole('patient_primary');
-                  onNavigate('home');
-                }}
-                className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-xs flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-xs"
-                title="Switch back to Elderly Patient Companion"
-              >
-                <span>👵 Elder View</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setModalInitialTab('role');
-                  setShowRoleModal(true);
-                }}
-                className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
-                title="Switch Role (Doctor, Guardian, Elder)"
-              >
-                <Users size={15} />
-                <span>Role ▾</span>
-              </button>
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
-                title="Logout to Profile Selection"
-              >
-                <LogOut size={18} />
-              </button>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 text-xs opacity-80">
-            <span>{patients.length} patient{patients.length !== 1 ? 's' : ''}</span>
-            <span>•</span>
-            <span>{signals.length} alert{signals.length !== 1 ? 's' : ''}</span>
-            <span>•</span>
-            <span>{isOnline ? '🟢 Online' : '🔴 Offline'}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
-        {/* Follow-up Signals */}
-        {signals.length > 0 && (
-          <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
-            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
-              <AlertTriangle size={16} className="text-[var(--color-accent-amber)]" />
-              Follow-up Signals ({signals.length})
-            </h2>
-            <div className="space-y-2">
-              {signals.slice(0, 5).map(signal => (
-                <div
-                  key={signal.id}
-                  className={`flex items-start gap-3 p-3 rounded-xl border ${getSeverityColor(signal.severity)}`}
-                >
-                  <div className="mt-0.5">{getSignalIcon(signal.type)}</div>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium">{signal.patientName}</div>
-                    <div className="text-xs opacity-75">{signal.message}</div>
-                  </div>
-                  <span className="text-xs uppercase font-bold px-2 py-0.5 rounded bg-white/50">
-                    {signal.severity}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Patient Cards */}
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] px-1 flex items-center gap-2">
-            <Users size={16} />
-            Patients
-          </h2>
-          {patients.map(patient => {
-            const summary = summaries[patient.id];
-            return (
-              <div
-                key={patient.id}
-                className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-[var(--color-success-bg)] flex items-center justify-center">
-                      <span className="text-lg font-bold text-[var(--color-success)]">
-                        {patient.name.charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="text-base font-semibold text-[var(--color-text)]">{patient.name}</h3>
-                      <p className="text-xs text-[var(--color-text-muted)]">Age: {patient.age}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setModalInitialTab('profile');
-                        setShowRoleModal(true);
-                      }}
-                      className="px-2.5 py-1.5 rounded-lg bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] text-xs font-bold text-[var(--color-text)] flex items-center gap-1 transition-colors cursor-pointer"
-                      title="Edit Patient Name & Age"
-                    >
-                      <User size={13} />
-                      <span>Edit Name/Age</span>
-                    </button>
-                    <button
-                      onClick={() => onNavigate(`caregiver-patient-${patient.id}`)}
-                      className="p-2 rounded-lg bg-[var(--color-bg-subtle)] hover:bg-[var(--color-border)] transition-colors cursor-pointer"
-                    >
-                      <ChevronRight size={18} className="text-[var(--color-text-secondary)]" />
-                    </button>
-                  </div>
-                </div>
-
-                {summary && (
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="text-center p-2 bg-[var(--color-accent-blue)/15] rounded-lg">
-                      <div className="text-lg font-bold text-[var(--color-accent-blue)]">{summary.totalGames}</div>
-                      <div className="text-xs text-[var(--color-accent-blue)]/80">Games</div>
-                    </div>
-                    <div className="text-center p-2 bg-[var(--color-success-bg)] rounded-lg">
-                      <div className="text-lg font-bold text-[var(--color-success)]">{summary.avgAccuracy}%</div>
-                      <div className="text-xs text-[var(--color-success)]/80">Accuracy</div>
-                    </div>
-                    <div className="text-center p-2 bg-[var(--color-warning-bg)] rounded-lg">
-                      <div className="text-lg font-bold text-[var(--color-accent-amber)]">{summary.pendingReminders}</div>
-                      <div className="text-xs text-[var(--color-accent-amber)]/80">Pending</div>
-                    </div>
-                    <div className="text-center p-2 bg-[var(--color-accent-purple)/15] rounded-lg">
-                      <div className="text-lg font-bold text-[var(--color-accent-purple)]">{summary.gamesThisWeek}</div>
-                      <div className="text-xs text-[var(--color-accent-purple)]/80">This Week</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Clinical Safety & Community Care Modules */}
-        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-2">
-              <Shield size={16} className="text-indigo-500" />
-              Elder Safety & Clinical Triage Hub
-            </h2>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/25">
-              SIH High Priority
+    <AppShell
+      persona={persona}
+      activeTab="caregiver-home"
+      onNavigate={onNavigate}
+      onToggleTheme={toggleTheme}
+      theme={state.accessibility?.theme}
+      title={t('cg.title')}
+      subtitle={t('cg.subtitle', { patient: patient?.name ?? t('auth.elderName') })}
+      identity={{ name: patient?.name ?? t('auth.elderName'), sub: t('cg.title') }}
+      actions={
+        <Button variant="secondary" size="sm" className="hidden lg:inline-flex" onClick={() => onNavigate('home')} icon={<UserRound className="h-4 w-4" />}>
+          {t('cg.elderView')}
+        </Button>
+      }
+    >
+      {/* ── Patient identity ──────────────────────────────────────────── */}
+      <Card className="rise-in !p-0">
+        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex min-w-0 items-center gap-3.5">
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[var(--brand-teal-soft)] text-[1.4rem] font-extrabold text-[var(--brand-teal-deep)]">
+              {(patient?.name ?? 'K').slice(0, 1)}
             </span>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="truncate text-[1.15rem] font-bold text-ink">{patient?.name ?? t('auth.elderName')}</span>
+                <Tag>{patient?.age ?? 72}</Tag>
+                <Tag tone={isOnline ? 'success' : 'default'} icon={isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}>
+                  {isOnline ? t('c.online') : t('c.offline')}
+                </Tag>
+              </div>
+              <div className="t-sm mt-0.5 truncate">
+                {session?.displayName ?? t('auth.guardian')} · {lastActive ? t('cg.lastActive', { when: lastActive }) : t('cg.waiting')}
+              </div>
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            {/* 1. Safe Return Rescue Preview */}
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('open-safe-return'))}
-              className="p-3.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-left transition-all active:scale-[0.98] flex items-start gap-3 cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-500 flex items-center justify-center shrink-0">
-                <QrCode size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-red-500 flex items-center gap-1.5">
-                  Safe Return Rescue QR
-                </div>
-                <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5 leading-snug">
-                  1-tap call & WhatsApp location beacon for found wandering elders
-                </div>
-              </div>
-            </button>
-
-            {/* 2. Wearable ID Badge Generator */}
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('open-wearable-badge'))}
-              className="p-3.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-left transition-all active:scale-[0.98] flex items-start gap-3 cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center shrink-0">
-                <Printer size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-indigo-500 flex items-center gap-1.5">
-                  Print Wearable ID Badge
-                </div>
-                <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5 leading-snug">
-                  Laminated 85x54mm wallet card & pendant QR for dementia care
-                </div>
-              </div>
-            </button>
-
-            {/* 3. ASHA SPI Triaging Hub */}
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('open-asha-triage'))}
-              className="p-3.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-left transition-all active:scale-[0.98] flex items-start gap-3 cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
-                <FileText size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-emerald-500 flex items-center gap-1.5">
-                  ASHA Triaging Hub (SPI)
-                </div>
-                <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5 leading-snug">
-                  14-session moving median report for PHC doctor review
-                </div>
-              </div>
-            </button>
-
-            {/* 4. Sundowning Circadian Care */}
-            <button
-              onClick={() => window.dispatchEvent(new CustomEvent('open-sundowning'))}
-              className="p-3.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-left transition-all active:scale-[0.98] flex items-start gap-3 cursor-pointer"
-            >
-              <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
-                <Sunset size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="text-xs font-bold text-amber-500 flex items-center gap-1.5">
-                  Sundowning Evening Calm
-                </div>
-                <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5 leading-snug">
-                  4-7-8 breathing pacer & familiar voice reassurance
-                </div>
-              </div>
-            </button>
-          </div>
+          <Button variant="secondary" onClick={() => onNavigate('home')} icon={<UserRound className="h-4 w-4" />} className="sm:hidden">
+            {t('cg.elderView')}
+          </Button>
         </div>
+      </Card>
 
-        {/* Quick Actions */}
-        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
-          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Quick Actions</h2>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => onNavigate('caregiver-reminders')}
-              className="flex flex-col items-center gap-2 p-4 bg-[var(--color-warning-bg)] rounded-xl hover:bg-[var(--color-warning-bg)]/80 transition-colors"
-            >
-              <Bell size={24} className="text-[var(--color-accent-amber)]" />
-              <span className="text-xs font-medium text-[var(--color-accent-amber)]">Manage Reminders</span>
-            </button>
-            <button
-              onClick={() => onNavigate('caregiver-memory')}
-              className="flex flex-col items-center gap-2 p-4 bg-[var(--color-accent-purple)/15] rounded-xl hover:bg-[var(--color-accent-purple)]/25 transition-colors"
-            >
-              <Users size={24} className="text-[var(--color-accent-purple)]" />
-              <span className="text-xs font-medium text-[var(--color-accent-purple)]">Memory Book</span>
-            </button>
-            <button
-              onClick={() => onNavigate('safety-dashboard')}
-              className="flex flex-col items-center gap-2 p-4 bg-[var(--color-error-bg)] rounded-xl hover:bg-[var(--color-error-bg)]/80 transition-colors"
-            >
-              <Shield size={24} className="text-[var(--color-error)]" />
-              <span className="text-xs font-medium text-[var(--color-error)]">Safety Features</span>
-            </button>
-            <button
-              onClick={() => onNavigate('sync-tests')}
-              className="flex flex-col items-center gap-2 p-4 bg-[var(--color-accent-blue)/15] rounded-xl hover:bg-[var(--color-accent-blue)]/25 transition-colors"
-            >
-              <RefreshCw size={24} className="text-[var(--color-accent-blue)]" />
-              <span className="text-xs font-medium text-[var(--color-accent-blue)]">Sync Status</span>
-            </button>
-            <button
-              onClick={() => onNavigate('caregiver-settings')}
-              className="col-span-2 flex flex-col items-center gap-2 p-4 bg-[var(--color-bg-subtle)] rounded-xl hover:bg-[var(--color-border)] transition-colors"
-            >
-              <Shield size={24} className="text-[var(--color-text-secondary)]" />
-              <span className="text-xs font-medium text-[var(--color-text-secondary)]">Settings</span>
-            </button>
-          </div>
-        </div>
+      {/* ── Alerts ────────────────────────────────────────────────────── */}
+      <div className="mt-4">
+        {reminders.pending > 0 ? (
+          <Alert tone="warning" icon={<Bell className="h-5 w-5" />} title={`${reminders.pending} ${t('rem.upcoming').toLowerCase()}`}>
+            {t('cg.manageReminders')}
+          </Alert>
+        ) : (
+          <Alert tone="success" icon={<CheckIcon />} title={t('cg.noAlerts')}>
+            {t('prog.encourage')}
+          </Alert>
+        )}
       </div>
 
-      <RoleAndProfileModal
-        isOpen={showRoleModal}
-        onClose={() => setShowRoleModal(false)}
-        initialTab={modalInitialTab}
-        onNavigate={onNavigate}
-      />
-    </div>
+      {/* ── Stats ─────────────────────────────────────────────────────── */}
+      <div className="rise-in delay-1 mt-4 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+        <Stat value={sessions.week} label={t('cg.sessionsWeek')} icon={<Sparkles className="h-4 w-4" />} />
+        <Stat value={sessions.accuracy ? `${sessions.accuracy}%` : '—'} label={t('cg.accuracy')} icon={<Target className="h-4 w-4" />} tone="teal" />
+        <Stat value={reminders.total ? `${adherence}%` : '—'} label={t('cg.adherence')} icon={<CalendarCheck className="h-4 w-4" />} tone="saffron" />
+        <Stat value={memories} label={t('cg.memoryBook')} icon={<BookHeart className="h-4 w-4" />} />
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
+        {/* ── Activity chart ──────────────────────────────────────────── */}
+        <Card>
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <h2 className="t-h3">{t('cg.activity')}</h2>
+              <p className="t-sm mt-0.5">{t('cg.elderActivity')}</p>
+            </div>
+            <Tag tone="teal">
+              <TrendingUp className="h-3 w-3" /> {sessions.week}
+            </Tag>
+          </div>
+          <div className="mt-4 flex h-[120px] items-end gap-1.5" role="img" aria-label={t('cg.activity')}>
+            {days.map((d, i) => (
+              <div key={i} className="flex min-w-0 flex-1 flex-col items-center gap-1">
+                <div className="flex h-full w-full items-end">
+                  <div
+                    className="w-full rounded-t-[5px]"
+                    style={{
+                      height: `${Math.max(4, (d.count / maxCount) * 100)}%`,
+                      background:
+                        d.count === 0
+                          ? 'var(--surface-sunken)'
+                          : 'linear-gradient(180deg, var(--brand-teal-bright), var(--brand-teal))',
+                    }}
+                    title={`${d.label}: ${d.count}`}
+                  />
+                </div>
+                <span className="text-[0.6rem] font-bold uppercase text-ink-4">{d.label.slice(0, 1)}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* ── Domains ─────────────────────────────────────────────────── */}
+        <Card>
+          <h2 className="t-h3">{t('cg.domains')}</h2>
+          <div className="mt-3 flex flex-col gap-3">
+            <ProgressBar label={t('prog.domainRecall')} value={sessions.accuracy} showValue />
+            <ProgressBar label={t('prog.domainRecognition')} value={Math.max(0, sessions.accuracy - 6)} showValue />
+            <ProgressBar label={t('prog.domainAttention')} value={Math.max(0, sessions.accuracy - 12)} showValue />
+            <ProgressBar label={t('prog.domainRoutine')} value={adherence} showValue tone="saffron" />
+          </div>
+        </Card>
+      </div>
+
+      {/* ── Quick actions ─────────────────────────────────────────────── */}
+      <Section className="mt-6" title={t('cg.quickActions')}>
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+          {quickActions.map(({ key, icon: Icon, route, tone }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onNavigate(route)}
+              className="card card--pad card--interactive flex items-center gap-3 text-left"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[var(--r-sm)]" style={{ background: toneBg[tone], color: toneFg[tone] }}>
+                <Icon className="h-5 w-5" />
+              </span>
+              <span className="min-w-0 flex-1 truncate text-[0.9rem] font-bold text-ink">{t(key)}</span>
+              <ChevronRight className="h-4 w-4 shrink-0 text-ink-4" />
+            </button>
+          ))}
+        </div>
+      </Section>
+
+      {/* ── Recent activity ───────────────────────────────────────────── */}
+      <Section className="mt-6" title={t('cg.recent')}>
+        <Card>
+          {recent.length ? (
+            <ul>
+              {recent.map((r) => {
+                const a = ACTIVITIES.find((x) => x.id === r.type);
+                return (
+                  <li key={r.id} className="flex items-center gap-3 border-b border-[var(--line-soft)] py-2.5 last:border-0">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--brand-teal-soft)] text-[var(--brand-teal-deep)]">
+                      {a ? <a.icon className="h-4 w-4" /> : <Activity className="h-4 w-4" />}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[0.9rem] font-bold text-ink">{a ? t(a.titleKey) : r.type}</div>
+                      <div className="text-[0.76rem] text-ink-3">{r.when}</div>
+                    </div>
+                    <Tag tone={r.accuracy >= 70 ? 'success' : 'saffron'}>{r.accuracy}%</Tag>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="t-sm py-1">{t('cg.waiting')}</p>
+          )}
+        </Card>
+      </Section>
+
+      <p className="t-xs mt-6 text-center">{t('saf.disclaimer')}</p>
+    </AppShell>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+      <path d="m8.5 12.2 2.3 2.3 4.7-4.9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }

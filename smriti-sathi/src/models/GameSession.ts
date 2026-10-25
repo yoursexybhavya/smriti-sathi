@@ -4,7 +4,7 @@
 export interface GameSession {
   id: string;
   patientId: string;
-  gameType: 'remember' | 'recognise' | 'test' | 'memory_match' | 'family_quiz';
+  gameType: 'remember' | 'recognise' | 'test' | 'memory_match' | 'family_quiz' | 'daily_routine';
   difficulty: number; // 1-5
   score: number; // correct answers
   totalObjects: number; // total objects to remember

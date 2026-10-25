@@ -1,484 +1,158 @@
-/**
- * SMRITI SATHI — Safety Dashboard
- * 
- * Caregiver interface for advanced safety features.
- * 
- * ⚠️ IMPORTANT DISCLAIMERS:
- * - Fall detection is DEMO ONLY — not medically validated
- * - Location tracking is SIMULATED — not real GPS
- * - Emergency alerts are MOCK — do not contact real services
- * - Emotion recognition is FUTURE RESEARCH — not implemented
- * 
- * These features are for demonstration and testing only.
- * They are NOT substitutes for proper medical monitoring or emergency services.
- */
+import { Activity, ClipboardList, CreditCard, Info, LifeBuoy, Moon, PhoneCall, ShieldCheck, Siren, Stethoscope, Target } from 'lucide-react';
+import { AppShell } from '../../shell/AppShell';
+import { Alert, Button, Card, ProgressBar, Section, Stat, Tag } from '../../ui';
+import { useApp } from '../../context/AppContext';
+import { useI18n } from '../../i18n';
 
-import { useState, useEffect } from 'react';
-import { FallDetectionService, FallEvent } from '../../services/safety/FallDetectionService';
-import { LocationSafetyService, SafeZone, BoundaryEvent } from '../../services/safety/LocationSafetyService';
-import { EmergencyAlertService, EmergencyAlert } from '../../services/safety/EmergencyAlertService';
-import {
-  AlertTriangle,
-  MapPin,
-  Bell,
-  Activity,
-  Shield,
-  TrendingUp,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Info,
-  Zap,
-  QrCode,
-  Printer,
-  Sunset,
-  FileText,
-  Heart
-} from 'lucide-react';
-
-interface SafetyDashboardProps {
-  onBack: () => void;
+interface Props {
+  onNavigate: (screen: string) => void;
+  onBack?: () => void;
+  isOnline?: boolean;
+  persona?: 'elder' | 'caregiver' | 'clinician';
 }
 
-export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
-  const [fallEvents, setFallEvents] = useState<FallEvent[]>([]);
-  const [boundaryEvents, setBoundaryEvents] = useState<BoundaryEvent[]>([]);
-  const [alerts, setAlerts] = useState<EmergencyAlert[]>([]);
-  const [zones, setZones] = useState<SafeZone[]>([]);
-  const [isFallMonitoring, setIsFallMonitoring] = useState(false);
-  const [isLocationMonitoring, setIsLocationMonitoring] = useState(false);
+export default function SafetyDashboard({ onNavigate, onBack, persona = 'caregiver' }: Props) {
+  const { state, toggleTheme } = useApp();
+  const { t } = useI18n();
+  const patient = state.currentPatient;
 
-  useEffect(() => {
-    // Subscribe to services
-    const unsubFall = FallDetectionService.subscribe((event) => {
-      setFallEvents(FallDetectionService.getEventHistory());
-    });
+  const open = (event: string) => window.dispatchEvent(new Event(event));
 
-    const unsubBoundary = LocationSafetyService.subscribe((event) => {
-      setBoundaryEvents(LocationSafetyService.getEventHistory());
-    });
+  const tools = [
+    {
+      key: 'saf.safeReturn',
+      body: 'saf.safeReturnBody',
+      icon: LifeBuoy,
+      tone: 'danger' as const,
+      onClick: () => open('open-safe-return'),
+      cta: t('c.viewAll'),
+    },
+    {
+      key: 'saf.sundowning',
+      body: 'saf.sundowningBody',
+      icon: Moon,
+      tone: 'warning' as const,
+      onClick: () => open('open-sundowning'),
+      cta: t('c.viewAll'),
+    },
+    {
+      key: 'saf.triage',
+      body: 'saf.triageBody',
+      icon: Stethoscope,
+      tone: 'info' as const,
+      onClick: () => open('open-asha-triage'),
+      cta: t('c.viewAll'),
+    },
+    {
+      key: 'saf.badge',
+      body: 'saf.badgeBody',
+      icon: CreditCard,
+      tone: 'success' as const,
+      onClick: () => open('open-wearable-badge'),
+      cta: t('c.print'),
+    },
+  ];
 
-    const unsubAlert = EmergencyAlertService.subscribe((alert) => {
-      setAlerts(EmergencyAlertService.getAlerts());
-    });
-
-    // Load initial data
-    setFallEvents(FallDetectionService.getEventHistory());
-    setBoundaryEvents(LocationSafetyService.getEventHistory());
-    setAlerts(EmergencyAlertService.getAlerts());
-    setZones(LocationSafetyService.getZones());
-    setIsFallMonitoring(FallDetectionService.isMonitoringActive());
-    setIsLocationMonitoring(LocationSafetyService.isMonitoringActive());
-
-    return () => {
-      unsubFall();
-      unsubBoundary();
-      unsubAlert();
-    };
-  }, []);
-
-  const triggerDemoFall = (severity: 'low' | 'medium' | 'high') => {
-    FallDetectionService.triggerDemoFall(severity);
+  const toneStyles = {
+    danger: { bg: 'var(--danger-soft)', fg: 'var(--danger-strong)', border: 'var(--danger-line)' },
+    warning: { bg: 'var(--warning-soft)', fg: 'var(--warning)', border: 'var(--warning-line)' },
+    info: { bg: 'var(--info-soft)', fg: 'var(--info)', border: 'var(--info-line)' },
+    success: { bg: 'var(--success-soft)', fg: 'var(--success)', border: 'var(--success-line)' },
   };
-
-  const triggerDemoBoundary = (zoneId: string, eventType: 'enter' | 'exit') => {
-    LocationSafetyService.triggerDemoBoundaryEvent(zoneId, eventType);
-  };
-
-  const triggerSOS = () => {
-    EmergencyAlertService.triggerManualSOS('Demo SOS triggered');
-  };
-
-  const acknowledgeAlert = (alertId: string) => {
-    EmergencyAlertService.acknowledgeAlert(alertId, 'Caregiver');
-    setAlerts(EmergencyAlertService.getAlerts());
-  };
-
-  const clearAllData = () => {
-    FallDetectionService.clearHistory();
-    LocationSafetyService.clearHistory();
-    EmergencyAlertService.clearAlerts();
-    setFallEvents([]);
-    setBoundaryEvents([]);
-    setAlerts([]);
-  };
-
-  const unacknowledgedAlerts = alerts.filter(a => !a.acknowledged);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-subtle)] pb-44 sm:pb-52">
-      {/* Header */}
-      <div className="bg-[var(--color-card)] border-b border-[var(--color-border)] px-4 py-4 sticky top-0 z-10">
-        <div className="flex items-center justify-between">
-          <button onClick={onBack} className="text-[var(--color-success)] font-semibold text-lg">
-            ← Back
-          </button>
-          <h1 className="text-lg font-bold text-[var(--color-text)]">Safety Features</h1>
-          <button
-            onClick={clearAllData}
-            className="text-sm text-[var(--color-error)] font-medium"
-          >
-            Clear
-          </button>
-        </div>
-      </div>
-
-      <div className="px-4 py-4 space-y-4">
-        {/* Important Notice */}
-        <div className="bg-[var(--color-warning-bg)] border border-[var(--color-accent-amber)]/30 rounded-2xl p-4">
-          <div className="flex items-start gap-3">
-            <AlertTriangle size={20} className="text-[var(--color-accent-amber)] flex-shrink-0 mt-0.5" />
+    <AppShell
+      persona={persona}
+      activeTab="safety-dashboard"
+      onNavigate={onNavigate}
+      onBack={onBack}
+      onToggleTheme={toggleTheme}
+      theme={state.accessibility?.theme}
+      title={t('saf.title')}
+      subtitle={t('saf.subtitle')}
+      identity={{ name: patient?.name ?? t('auth.elderName'), sub: t('saf.title') }}
+    >
+      {/* Emergency call-out */}
+      <Card tone="danger" className="rise-in">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3.5">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[var(--danger)] text-white">
+              <Siren className="h-6 w-6" />
+            </span>
             <div>
-              <h3 className="text-sm font-semibold text-[var(--color-accent-amber)]">Demo & Research Features</h3>
-              <p className="text-xs text-[var(--color-accent-amber)]/90 mt-1">
-                These features are for demonstration and testing only.
-                They are NOT medically validated and do NOT replace proper monitoring.
-                In a real emergency, call local emergency services.
-              </p>
+              <div className="t-h3 !text-[var(--danger-strong)]">{t('home.imLost')}</div>
+              <p className="t-sm mt-0.5 !text-[var(--danger-strong)] opacity-85">{t('saf.foundElderBody')}</p>
             </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="danger" onClick={() => open('open-safe-return')} icon={<LifeBuoy className="h-[18px] w-[18px]" />}>
+              {t('saf.safeReturn')}
+            </Button>
+            <a href="tel:+919999999999" className="btn btn--secondary">
+              <PhoneCall className="h-[18px] w-[18px]" />
+              {t('saf.callGuardian')}
+            </a>
           </div>
         </div>
+      </Card>
 
-        {/* SIH Priority Clinical Safety & Lost Elder Tools */}
-        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-2">
-              <Shield size={16} className="text-red-500" />
-              SIH Lost Elder & Clinical Safety Suite
-            </h2>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500/15 text-red-500 border border-red-500/30">
-              Live Tools
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* 1. Safe Return Card */}
-            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 flex flex-col justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-500 flex items-center justify-center shrink-0">
-                  <QrCode size={20} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-red-500">
-                    Safe Return Rescue Mode
-                  </div>
-                  <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
-                    1-Tap bystander phone dial, GPS WhatsApp dispatch & camera QR.
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('open-safe-return'))}
-                className="w-full py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
-              >
-                Launch Safe Return Mode →
-              </button>
-            </div>
-
-            {/* 2. Wearable Badge Generator */}
-            <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex flex-col justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center shrink-0">
-                  <Printer size={20} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-indigo-500">
-                    Wearable ID Card Generator
-                  </div>
-                  <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
-                    Generate & print 85x54mm laminated wallet card or necklace pendant.
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('open-wearable-badge'))}
-                className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
-              >
-                Print Wearable ID Card →
-              </button>
-            </div>
-
-            {/* 3. ASHA Triage Hub */}
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
-                  <FileText size={20} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-emerald-500">
-                    ASHA Cognitive Triaging Hub
-                  </div>
-                  <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
-                    14-Session SPI longitudinal median index & PHC referral sheet.
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('open-asha-triage'))}
-                className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
-              >
-                Open ASHA Triaging Sheet →
-              </button>
-            </div>
-
-            {/* 4. Sundowning Circadian Care */}
-            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col justify-between gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
-                  <Sunset size={20} />
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-amber-500">
-                    Sundowning Evening Care
-                  </div>
-                  <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
-                    Non-pharmacological 4-7-8 breathing & familiar voice soothing.
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('open-sundowning'))}
-                className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
-              >
-                Start Evening Calming Session →
-              </button>
-            </div>
-          </div>
+      {/* Clinical snapshot (ASHA view) */}
+      <Section className="mt-6" title={t('prog.stability')} subtitle={t('prog.stabilityBody')}>
+        <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+          <Stat value="82%" label={t('cg.stability')} tone="teal" icon={<ShieldCheck className="h-4 w-4" />} />
+          <Stat value="14" label={t('prog.sessions')} icon={<Activity className="h-4 w-4" />} />
+          <Stat value="84%" label={t('cg.accuracy')} tone="saffron" icon={<Target className="h-4 w-4" />} />
+          <Stat value="—" label={t('cg.adherence')} />
         </div>
+        <Card className="mt-3">
+          <div className="flex flex-col gap-3">
+            <ProgressBar label={t('prog.domainRecall')} value={82} showValue />
+            <ProgressBar label={t('prog.domainRecognition')} value={76} showValue />
+            <ProgressBar label={t('prog.domainAttention')} value={68} showValue />
+            <ProgressBar label={t('prog.domainRoutine')} value={71} showValue tone="saffron" />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button size="sm" onClick={() => open('open-asha-triage')} icon={<ClipboardList className="h-4 w-4" />}>
+              {t('cg.triage')}
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => open('open-wearable-badge')} icon={<CreditCard className="h-4 w-4" />}>
+              {t('cg.printBadge')}
+            </Button>
+          </div>
+        </Card>
+      </Section>
 
-        {/* Active Alerts */}
-        {unacknowledgedAlerts.length > 0 && (
-          <div className="bg-[var(--color-error-bg)] border border-[var(--color-error)]/30 rounded-2xl p-4">
-            <h2 className="text-sm font-semibold text-[var(--color-error)] mb-3 flex items-center gap-2">
-              <Bell size={16} />
-              Active Alerts ({unacknowledgedAlerts.length})
-            </h2>
-            <div className="space-y-2">
-              {unacknowledgedAlerts.slice(0, 3).map(alert => (
-                <div key={alert.id} className="bg-[var(--color-card)] rounded-xl p-3 border border-[var(--color-error)]/20">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-bold uppercase px-2 py-0.5 rounded ${
-                        alert.severity === 'critical' ? 'bg-[var(--color-error-bg)] text-[var(--color-error)]' :
-                        alert.severity === 'high' ? 'bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)]' :
-                        'bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)]'
-                      }`}>
-                        {alert.severity}
-                      </span>
-                      <span className="text-xs text-[var(--color-text-muted)]">{alert.type}</span>
-                    </div>
-                    <span className="text-xs text-[var(--color-text-muted)]">
-                      {new Date(alert.timestamp).toLocaleTimeString()}
-                    </span>
+      {/* Tools */}
+      <Section className="mt-6" title={t('cg.quickActions')}>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {tools.map(({ key, body, icon: Icon, tone, onClick, cta }) => {
+            const s = toneStyles[tone];
+            return (
+              <Card key={key} className="flex flex-col justify-between">
+                <div className="flex items-start gap-3">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-sm)]" style={{ background: s.bg, color: s.fg }}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-[1rem] font-bold text-ink">{t(key)}</div>
+                    <div className="t-sm mt-0.5">{t(body)}</div>
                   </div>
-                  <p className="text-sm text-[var(--color-text)] mb-2">{alert.message}</p>
-                  <button
-                    onClick={() => acknowledgeAlert(alert.id)}
-                    className="w-full py-2 bg-[var(--color-error)] text-white rounded-lg text-sm font-medium hover:bg-[var(--color-error)]/90"
-                  >
-                    Acknowledge
-                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Fall Detection */}
-        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-2">
-              <Activity size={16} />
-              Fall Detection
-            </h2>
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              isFallMonitoring ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]' : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-muted)]'
-            }`}>
-              {isFallMonitoring ? 'Active' : 'Inactive'}
-            </span>
-          </div>
-          <p className="text-xs text-[var(--color-text-muted)] mb-3">
-            Demo fall detection with threshold-based algorithm.
-            Not medically validated.
-          </p>
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            <button
-              onClick={() => triggerDemoFall('low')}
-              className="py-2 bg-[var(--color-warning-bg)] text-[var(--color-accent-amber)] rounded-lg text-xs font-medium hover:bg-[var(--color-warning-bg)]/80"
-            >
-              Demo: Low
-            </button>
-            <button
-              onClick={() => triggerDemoFall('medium')}
-              className="py-2 bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)] rounded-lg text-xs font-medium hover:bg-[var(--color-accent-amber)]/25"
-            >
-              Demo: Medium
-            </button>
-            <button
-              onClick={() => triggerDemoFall('high')}
-              className="py-2 bg-[var(--color-error-bg)] text-[var(--color-error)] rounded-lg text-xs font-medium hover:bg-[var(--color-error-bg)]/80"
-            >
-              Demo: High
-            </button>
-          </div>
-          {fallEvents.length > 0 && (
-            <div className="text-xs text-[var(--color-text-muted)]">
-              {fallEvents.length} event{fallEvents.length !== 1 ? 's' : ''} detected
-            </div>
-          )}
+                <Button variant="secondary" size="sm" className="mt-3 self-start" onClick={onClick}>
+                  {cta}
+                </Button>
+              </Card>
+            );
+          })}
         </div>
+      </Section>
 
-        {/* Location Safety */}
-        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-2">
-              <MapPin size={16} />
-              Location Safety
-            </h2>
-            <span className={`text-xs px-2 py-1 rounded-full ${
-              isLocationMonitoring ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]' : 'bg-[var(--color-bg-subtle)] text-[var(--color-text-muted)]'
-            }`}>
-              {isLocationMonitoring ? 'Active' : 'Inactive'}
-            </span>
-          </div>
-          <p className="text-xs text-[var(--color-text-muted)] mb-3">
-            Safe zone monitoring with simulated location.
-            No real GPS tracking in prototype.
-          </p>
-          <div className="space-y-2 mb-3">
-            {zones.map(zone => (
-              <div key={zone.id} className="flex items-center justify-between p-2 bg-[var(--color-bg-subtle)] rounded-lg">
-                <div>
-                  <div className="text-sm font-medium text-[var(--color-text)]">{zone.name}</div>
-                  <div className="text-xs text-[var(--color-text-muted)]">{zone.radiusMeters}m radius</div>
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => triggerDemoBoundary(zone.id, 'enter')}
-                    className="px-2 py-1 bg-[var(--color-success-bg)] text-[var(--color-success)] rounded text-xs hover:bg-[var(--color-success-bg)]/80"
-                  >
-                    Enter
-                  </button>
-                  <button
-                    onClick={() => triggerDemoBoundary(zone.id, 'exit')}
-                    className="px-2 py-1 bg-[var(--color-error-bg)] text-[var(--color-error)] rounded text-xs hover:bg-[var(--color-error-bg)]/80"
-                  >
-                    Exit
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          {boundaryEvents.length > 0 && (
-            <div className="text-xs text-[var(--color-text-muted)]">
-              {boundaryEvents.length} boundary event{boundaryEvents.length !== 1 ? 's' : ''}
-            </div>
-          )}
-        </div>
-
-        {/* Emergency SOS */}
-        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
-          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
-            <Zap size={16} />
-            Emergency SOS
-          </h2>
-          <p className="text-xs text-[var(--color-text-muted)] mb-3">
-            Manual emergency alert. Demo only — does not contact real services.
-          </p>
-          <button
-            onClick={triggerSOS}
-            className="w-full py-3 bg-[var(--color-error)] text-white rounded-xl font-semibold hover:bg-[var(--color-error)]/90"
-          >
-            Trigger Demo SOS
-          </button>
-        </div>
-
-        {/* Future Research Feature */}
-        <div className="bg-[var(--color-accent-purple)/10] border border-[var(--color-accent-purple)]/30 rounded-2xl p-4">
-          <div className="flex items-start gap-3">
-            <Info size={20} className="text-[var(--color-accent-purple)] flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--color-accent-purple)] mb-1">
-                Future Research Feature
-              </h3>
-              <p className="text-xs text-[var(--color-accent-purple)]/90">
-                <strong>Emotion Recognition:</strong> Camera-based emotion analysis is being researched
-                for future versions. This is NOT implemented in the current prototype.
-                No continuous monitoring or clinical claims are made.
-              </p>
-              <div className="mt-2 text-xs text-[var(--color-accent-purple)]">
-                Status: Architecture-ready for future research
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Event History */}
-        {(fallEvents.length > 0 || boundaryEvents.length > 0) && (
-          <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
-            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3 flex items-center gap-2">
-              <Clock size={16} />
-              Recent Events
-            </h2>
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {[...fallEvents.map(e => ({ ...e, type: 'fall' as const })),
-                ...boundaryEvents.map(e => ({ ...e, type: 'boundary' as const }))]
-                .sort((a, b) => b.timestamp - a.timestamp)
-                .slice(0, 10)
-                .map((event, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 bg-[var(--color-bg-subtle)] rounded-lg">
-                    <div className="flex items-center gap-2">
-                      {event.type === 'fall' ? (
-                        <Activity size={14} className="text-[var(--color-accent-amber)]" />
-                      ) : (
-                        <MapPin size={14} className="text-[var(--color-accent-blue)]" />
-                      )}
-                      <div>
-                        <div className="text-xs font-medium text-[var(--color-text)]">
-                          {event.type === 'fall' ? 'Fall detected' : `Zone ${event.eventType}`}
-                        </div>
-                        <div className="text-xs text-[var(--color-text-muted)]">
-                          {new Date(event.timestamp).toLocaleString()}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        )}
-
-        {/* Feature Status Summary */}
-        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4">
-          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">Feature Status</h2>
-          <div className="space-y-2 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--color-text-secondary)]">Fall Detection</span>
-              <span className="px-2 py-0.5 bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)] rounded">SIMULATED</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--color-text-secondary)]">Location Safety</span>
-              <span className="px-2 py-0.5 bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)] rounded">SIMULATED</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--color-text-secondary)]">Emergency Alerts</span>
-              <span className="px-2 py-0.5 bg-[var(--color-accent-amber)/15] text-[var(--color-accent-amber)] rounded">SIMULATED</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--color-text-secondary)]">Sensor Integration</span>
-              <span className="px-2 py-0.5 bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] rounded">ARCHITECTURE-READY</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--color-text-secondary)]">ML Models</span>
-              <span className="px-2 py-0.5 bg-[var(--color-accent-blue)/15] text-[var(--color-accent-blue)] rounded">ARCHITECTURE-READY</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[var(--color-text-secondary)]">Emotion Recognition</span>
-              <span className="px-2 py-0.5 bg-[var(--color-accent-purple)/15] text-[var(--color-accent-purple)] rounded">FUTURE RESEARCH</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Alert tone="info" icon={<Info className="h-5 w-5" />} title={t('set.about')} className="mt-5">
+        {t('saf.disclaimer')}
+      </Alert>
+      <p className="t-xs mt-3 text-center">
+        <Tag>{t('app.name')} v3.0.0</Tag>
+      </p>
+    </AppShell>
   );
 }

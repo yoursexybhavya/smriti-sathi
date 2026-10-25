@@ -1,65 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,700;9..144,800&display=swap');
-@import "tailwindcss";
-@import "./styles/globals.css";
+/* ==========================================================================
+   Smriti Sathi — stylesheet entry
+   Order matters: Tailwind layers first, then our design layers.
+   ========================================================================== */
+@import 'tailwindcss';
+@import './styles/fonts.css';
+@import './styles/tokens.css';
+@import './styles/base.css';
+@import './styles/components.css';
 
-@custom-variant dark (&:where(.dark, .dark *, .theme-dark, .theme-dark *));
+/* Dark mode is driven by an explicit attribute, not the OS query, so the
+   in-app calm-night toggle always wins. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-@theme {
-  --color-bg: #F8FAFC;
-  --color-background: #F8FAFC;
-  --color-card: #FFFFFF;
-  --color-border: #E2E8F0;
-  --color-text: #0F172A;
-  --color-text-muted: #64748B;
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #334155;
-  --color-primary: #4F46E5;
-  --color-primary-light: #6366F1;
-  --color-primary-dark: #3730A3;
-  --color-secondary: #3B82F6;
-  --color-secondary-light: #60A5FA;
-  --color-accent: #3B82F6;
-  --color-surface: #FFFFFF;
-  --color-surface-warm: #FFFBF5;
-  --color-surface-card: #FFFFFF;
-  --color-success: #059669;
-  --color-warning: #D97706;
-  --color-error: #DC2626;
-  --color-offline: #64748B;
+/* Expose design tokens as Tailwind utilities: bg-surface, text-ink, border-line… */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-canvas-deep: var(--canvas-deep);
+  --color-surface: var(--surface);
+  --color-surface-warm: var(--surface-warm);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-line-soft: var(--line-soft);
+  --color-brand: var(--brand-teal);
+  --color-brand-deep: var(--brand-teal-deep);
+  --color-brand-soft: var(--brand-teal-soft);
+  --color-brand-line: var(--brand-teal-line);
+  --color-saffron: var(--brand-saffron);
+  --color-saffron-soft: var(--brand-saffron-soft);
+  --color-saffron-line: var(--brand-saffron-line);
+  --color-terracotta: var(--brand-terracotta);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --font-sans: var(--font-ui);
+  --font-serif: var(--font-display);
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --radius-2xl: var(--r-2xl);
 }
 
-* { -webkit-tap-highlight-color: transparent; }
-
-body {
-  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--color-bg, #F8FAFC);
-  color: var(--color-text, #0F172A);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }
-html { scroll-behavior: smooth; }
-*:focus-visible { outline: 3px solid #4F46E5; outline-offset: 2px; border-radius: 12px; }
-
-body.high-contrast {
-  --color-primary: #000000;
-  --color-text-primary: #000000;
-  --color-background: #FFFFFF;
-  --color-surface-warm: #FFFFFF;
-  background-color: #FFFFFF !important;
-  color: #000000 !important;
-  filter: contrast(1.2);
-}
-body.text-size-large { font-size: 110%; }
-body.text-size-extra-large { font-size: 125%; }
-
-/* Premium utilities */
-.glass-pill {
-  background: color-mix(in srgb, var(--color-card) 88%, transparent);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-}
+/* Tell the browser which script face to prefer for Indic text. */
+:lang(hi) { font-family: 'Noto Sans Devanagari', var(--font-ui); }
+:lang(as), :lang(mni), :lang(bn) { font-family: 'Noto Sans Bengali', var(--font-ui); }
+:lang(brx) { font-family: 'Noto Sans Devanagari', var(--font-ui); }

@@ -1,474 +1,285 @@
-import { useState, useEffect } from 'react';
-import { Plus, Pill, Calendar, Clock, Bell, Check, Edit2, Trash2, Volume2, ArrowLeft } from 'lucide-react';
-import AppHeader from '../components/AppHeader';
-import Card from '../components/Card';
-import LargeButton from '../components/LargeButton';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Bell, CalendarDays, Check, Clock, Droplets, Pill, Plus, Trash2, Utensils, Volume2 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { AppShell } from '../shell/AppShell';
+import { Button, Card, ConfirmDialog, EmptyState, Field, Input, Section, Segmented, Sheet, Tag } from '../ui';
 import { useApp } from '../context/AppContext';
+import { useI18n } from '../i18n';
+import { useVoice } from '../hooks/useVoice';
 import { reminderService } from '../services/ReminderService';
-import { notificationService } from '../services/NotificationService';
-import { Reminder } from '../database/db';
-import { formatTime, formatDate, isToday } from '../utils/dateUtils';
+import type { Reminder } from '../database/db';
 
-interface RemindersScreenProps {
+interface Props {
   onNavigate: (screen: string) => void;
+  onBack?: () => void;
   isOnline?: boolean;
+  persona?: 'elder' | 'caregiver' | 'clinician';
 }
 
-export default function RemindersScreen({ onNavigate, isOnline = true }: RemindersScreenProps) {
-  const { state } = useApp();
-  const userId = state.currentPatient?.id ? parseInt(state.currentPatient.id) : undefined;
+const TYPE_META: Record<Reminder['type'], { icon: LucideIcon; labelKey: string; tone: 'teal' | 'saffron' | 'info' | 'success' }> = {
+  medicine: { icon: Pill, labelKey: 'rem.typeMedicine', tone: 'teal' },
+  hydration: { icon: Droplets, labelKey: 'rem.typeWater', tone: 'info' },
+  activity: { icon: Utensils, labelKey: 'rem.typeWalk', tone: 'success' },
+  appointment: { icon: CalendarDays, labelKey: 'rem.typeAppointment', tone: 'saffron' },
+};
 
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
+const TONE_BG: Record<string, string> = {
+  teal: 'var(--brand-teal-soft)',
+  saffron: 'var(--brand-saffron-soft)',
+  info: 'var(--info-soft)',
+  success: 'var(--success-soft)',
+};
+const TONE_FG: Record<string, string> = {
+  teal: 'var(--brand-teal-deep)',
+  saffron: 'var(--brand-saffron-ink)',
+  info: 'var(--info)',
+  success: 'var(--success)',
+};
 
-  // Form state
-  const [title, setTitle] = useState('');
-  const [type, setType] = useState<Reminder['type']>('medicine');
-  const [description, setDescription] = useState('');
-  const [hour, setHour] = useState(9);
-  const [minute, setMinute] = useState(0);
-  const [repeatPattern, setRepeatPattern] = useState<Reminder['repeatPattern']>('none');
+export default function RemindersScreen({ onNavigate, persona = 'elder' }: Props) {
+  const { state, toggleTheme } = useApp();
+  const { t, meta } = useI18n();
+  const { speak } = useVoice();
+  const patient = state.currentPatient;
+  const userId = patient?.id ? parseInt(patient.id, 10) : undefined;
+  const isCaregiver = persona !== 'elder';
+
+  const [items, setItems] = useState<Reminder[]>([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [toDelete, setToDelete] = useState<Reminder | null>(null);
+  const [form, setForm] = useState({ type: 'medicine' as Reminder['type'], title: '', time: '08:00', repeat: 'daily' as NonNullable<Reminder['repeatPattern']> });
+
+  const timeFmt = useMemo(
+    () => new Intl.DateTimeFormat(meta.htmlLang, { hour: 'numeric', minute: '2-digit', hour12: true }),
+    [meta.htmlLang],
+  );
+
+  const load = useCallback(async (uid: number) => {
+    try {
+      setItems(await reminderService.getAllReminders(uid));
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
-    if (userId) {
-      loadReminders();
-      reminderService.initialize(userId, state.currentPatient?.name);
-    }
-  }, [userId]);
+    if (userId) load(userId);
+  }, [userId, load]);
 
-  const loadReminders = async () => {
-    if (!userId) return;
-    setLoading(true);
-    try {
-      const data = await reminderService.getAllReminders(userId);
-      setReminders(data);
-    } catch (error) {
-      console.error('Failed to load reminders:', error);
-    } finally {
-      setLoading(false);
-    }
+  const { upcoming, done, missed } = useMemo(() => {
+    const s = [...items].sort((a, b) => a.scheduledTime - b.scheduledTime);
+    return {
+      upcoming: s.filter((r) => r.status === 'pending'),
+      done: s.filter((r) => r.status === 'completed'),
+      missed: s.filter((r) => r.status === 'missed'),
+    };
+  }, [items]);
+
+  const complete = async (r: Reminder) => {
+    if (!userId || !r.id) return;
+    await reminderService.completeReminder(r.id, userId);
+    await load(userId);
+  };
+  const snooze = async (r: Reminder) => {
+    if (!userId || !r.id) return;
+    await reminderService.snoozeReminder(r.id, 15);
+    await load(userId);
+  };
+  const remove = async () => {
+    if (!toDelete?.id) return;
+    await reminderService.deleteReminder(toDelete.id);
+    setToDelete(null);
+    if (userId) await load(userId);
   };
 
-  const handleCreate = async () => {
-    if (!userId || !title.trim()) return;
-
-    try {
-      const now = new Date();
-      const scheduledTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        hour,
-        minute
-      ).getTime();
-
-      await reminderService.createReminder(
-        userId,
-        type,
-        title.trim(),
-        scheduledTime,
-        description.trim() || undefined,
-        repeatPattern
-      );
-
-      resetForm();
-      await loadReminders();
-    } catch (error) {
-      console.error('Failed to create reminder:', error);
-    }
+  const add = async () => {
+    if (!userId || !form.title.trim()) return;
+    const [h, m] = form.time.split(':').map(Number);
+    const when = new Date();
+    when.setHours(h, m, 0, 0);
+    if (when.getTime() < Date.now()) when.setDate(when.getDate() + 1);
+    await reminderService.createReminder(userId, form.type, form.title.trim(), when.getTime(), undefined, form.repeat);
+    setShowAdd(false);
+    setForm({ type: 'medicine', title: '', time: '08:00', repeat: 'daily' });
+    await load(userId);
   };
 
-  const handleUpdate = async () => {
-    if (!editingReminder || !title.trim()) return;
-
-    try {
-      const now = new Date();
-      const scheduledTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        hour,
-        minute
-      ).getTime();
-
-      await reminderService.updateReminder(editingReminder.id!, {
-        title: title.trim(),
-        type,
-        description: description.trim() || undefined,
-        scheduledTime,
-        repeatPattern,
-      });
-
-      resetForm();
-      setEditingReminder(null);
-      await loadReminders();
-    } catch (error) {
-      console.error('Failed to update reminder:', error);
-    }
+  const speakList = async () => {
+    const parts = upcoming.length
+      ? upcoming.map((r) => `${r.title}, ${timeFmt.format(new Date(r.scheduledTime))}`)
+      : [t('rem.emptyTitle')];
+    await speak(parts.join('. '));
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Delete this reminder?')) return;
+  const renderRow = (r: Reminder, kind: 'upcoming' | 'done' | 'missed') => {
+    const m = TYPE_META[r.type] ?? TYPE_META.medicine;
+    const Icon = m.icon;
+    return (
+      <div key={r.id} className="flex items-center gap-3 border-b border-[var(--line-soft)] py-3 last:border-0">
+        <span
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-[var(--r-sm)]"
+          style={{ background: TONE_BG[m.tone], color: TONE_FG[m.tone] }}
+        >
+          <Icon className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className={`truncate text-[0.98rem] font-bold ${kind === 'done' ? 'text-ink-3 line-through' : 'text-ink'}`}>
+            {r.title}
+          </div>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[0.8rem] text-ink-3">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3.5 w-3.5" /> {timeFmt.format(new Date(r.scheduledTime))}
+            </span>
+            {r.repeatPattern === 'daily' && (
+              <>
+                <span>·</span>
+                <span>{t('rem.everyDay')}</span>
+              </>
+            )}
+          </div>
+        </div>
 
-    try {
-      await reminderService.deleteReminder(id);
-      await loadReminders();
-    } catch (error) {
-      console.error('Failed to delete reminder:', error);
-    }
+        {kind === 'upcoming' && (
+          <div className="flex shrink-0 items-center gap-1.5">
+            <Button size="sm" onClick={() => complete(r)} icon={<Check className="h-4 w-4" />}>
+              {t('home.taken')}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => snooze(r)} className="hidden sm:inline-flex">
+              {t('home.snooze')}
+            </Button>
+          </div>
+        )}
+        {kind === 'done' && <Tag tone="success" icon={<Check className="h-3 w-3" />}>{t('c.done')}</Tag>}
+        {kind === 'missed' && <Tag tone="danger">{t('rem.missed')}</Tag>}
+        {isCaregiver && (
+          <button
+            type="button"
+            onClick={() => setToDelete(r)}
+            aria-label={t('c.delete')}
+            className="ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-4 hover:bg-[var(--danger-soft)] hover:text-[var(--danger)]"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+    );
   };
-
-  const handleComplete = async (id: number) => {
-    if (!userId) return;
-
-    try {
-      await reminderService.completeReminder(id, userId);
-      await loadReminders();
-    } catch (error) {
-      console.error('Failed to complete reminder:', error);
-    }
-  };
-
-  const handleSnooze = async (id: number) => {
-    try {
-      await reminderService.snoozeReminder(id, 10);
-      await loadReminders();
-    } catch (error) {
-      console.error('Failed to snooze reminder:', error);
-    }
-  };
-
-  const startEdit = (reminder: Reminder) => {
-    setEditingReminder(reminder);
-    setTitle(reminder.title);
-    setType(reminder.type);
-    setDescription(reminder.description || '');
-    const date = new Date(reminder.scheduledTime);
-    setHour(date.getHours());
-    setMinute(date.getMinutes());
-    setRepeatPattern(reminder.repeatPattern || 'none');
-    setShowCreateForm(true);
-  };
-
-  const resetForm = () => {
-    setTitle('');
-    setType('medicine');
-    setDescription('');
-    setHour(9);
-    setMinute(0);
-    setRepeatPattern('none');
-    setShowCreateForm(false);
-    setEditingReminder(null);
-  };
-
-  const getReminderIcon = (reminderType: Reminder['type']) => {
-    switch (reminderType) {
-      case 'medicine':
-        return <Pill size={20} className="text-[var(--color-accent-purple)]" />;
-      case 'hydration':
-        return <Pill size={20} className="text-[var(--color-accent-blue)]" />;
-      case 'activity':
-        return <Calendar size={20} className="text-[var(--color-success)]" />;
-      case 'appointment':
-        return <Calendar size={20} className="text-[var(--color-accent-amber)]" />;
-    }
-  };
-
-  const getReminderBgColor = (reminderType: Reminder['type']) => {
-    switch (reminderType) {
-      case 'medicine':
-        return 'bg-[var(--color-accent-purple)/15]';
-      case 'hydration':
-        return 'bg-[var(--color-accent-blue)/15]';
-      case 'activity':
-        return 'bg-[var(--color-success-bg)]';
-      case 'appointment':
-        return 'bg-[var(--color-warning-bg)]';
-    }
-  };
-
-  const todayReminders = reminders.filter(r => isToday(r.scheduledTime));
-  const upcomingReminders = reminders.filter(r => !isToday(r.scheduledTime) && r.status === 'pending');
 
   return (
-    <>
-      <AppHeader 
-        title="Reminders" 
-        subtitle="Never miss what matters" 
-        isOnline={isOnline} 
-        showBack 
-        onBack={() => onNavigate('home')} 
-        showSettings
-        onSettingsPress={() => onNavigate('settings')}
-      />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-44 sm:pb-52 space-y-6">
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <LargeButton
-            variant="primary"
-            onPress={() => setShowCreateForm(true)}
-            icon={<Plus size={22} />}
-          >
-            Add New Reminder
-          </LargeButton>
-          <LargeButton
-            variant="secondary"
-            onPress={async () => {
-              await notificationService.triggerBuzzer(
-                'Care Schedule Test Alarm',
-                'Testing the audible chime and vibration for scheduled care routines.'
-              );
-            }}
-            icon={<Volume2 size={22} className="text-amber-500" />}
-          >
-            Test Care Alarm
-          </LargeButton>
-        </div>
-
-        {/* Create/Edit Form */}
-        {showCreateForm && (
-          <Card className="p-5 space-y-4">
-            <h3 className="text-lg font-semibold text-[var(--color-text)]">
-              {editingReminder ? 'Edit Reminder' : 'Create Reminder'}
-            </h3>
-
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Title</label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g., Morning Medicine"
-                className="w-full px-4 py-3 bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
-              />
-            </div>
-
-            {/* Type */}
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Type</label>
-              <div className="grid grid-cols-2 gap-2">
-                {(['medicine', 'hydration', 'activity', 'appointment'] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setType(t)}
-                    className={`p-3 rounded-xl border-2 transition-all ${
-                      type === t
-                        ? 'border-[var(--color-success)] bg-[var(--color-success-bg)]'
-                        : 'border-[var(--color-border)] bg-[var(--color-card)]'
-                    }`}
-                  >
-                    <span className="text-sm font-medium capitalize">{t}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Time */}
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Time</label>
-              <div className="flex gap-2">
-                <select
-                  value={hour}
-                  onChange={(e) => setHour(parseInt(e.target.value))}
-                  className="flex-1 px-4 py-3 bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
-                >
-                  {Array.from({ length: 24 }, (_, i) => (
-                    <option key={i} value={i} className="bg-[var(--color-card)] text-[var(--color-text)]">
-                      {i.toString().padStart(2, '0')}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={minute}
-                  onChange={(e) => setMinute(parseInt(e.target.value))}
-                  className="flex-1 px-4 py-3 bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
-                >
-                  {Array.from({ length: 60 }, (_, i) => (
-                    <option key={i} value={i} className="bg-[var(--color-card)] text-[var(--color-text)]">
-                      {i.toString().padStart(2, '0')}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Repeat Pattern */}
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Repeat</label>
-              <div className="flex gap-2">
-                {(['none', 'daily', 'weekly'] as const).map((pattern) => (
-                  <button
-                    key={pattern}
-                    onClick={() => setRepeatPattern(pattern)}
-                    className={`flex-1 p-3 rounded-xl border-2 transition-all ${
-                      repeatPattern === pattern
-                        ? 'border-[var(--color-success)] bg-[var(--color-success-bg)]'
-                        : 'border-[var(--color-border)] bg-[var(--color-card)]'
-                    }`}
-                  >
-                    <span className="text-sm font-medium capitalize">
-                      {pattern === 'none' ? 'One time' : pattern}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Description (optional)</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Add notes..."
-                rows={2}
-                className="w-full px-4 py-3 bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-border)] rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-[var(--color-success)]"
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-2">
-              <button
-                onClick={resetForm}
-                className="flex-1 py-3 px-4 border border-[var(--color-border)] rounded-xl text-base font-medium text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)]"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={editingReminder ? handleUpdate : handleCreate}
-                disabled={!title.trim()}
-                className="flex-1 py-3 px-4 bg-[var(--color-success)] text-white rounded-xl text-base font-medium hover:bg-[var(--color-success)]/90 disabled:opacity-50"
-              >
-                {editingReminder ? 'Update' : 'Create'}
-              </button>
-            </div>
-          </Card>
-        )}
-
-        {/* Today's Reminders */}
-        {todayReminders.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-[var(--color-text)] px-1">Today</h3>
-            {todayReminders.map((reminder) => (
-              <Card key={reminder.id} className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className={`w-11 h-11 rounded-xl ${getReminderBgColor(reminder.type)} flex items-center justify-center flex-shrink-0`}>
-                    {getReminderIcon(reminder.type)}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-base font-semibold text-[var(--color-text)]">{reminder.title}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Clock size={13} className="text-[var(--color-text-muted)]" />
-                      <span className="text-sm text-[var(--color-text-secondary)]">{formatTime(reminder.scheduledTime)}</span>
-                      {reminder.repeatPattern && reminder.repeatPattern !== 'none' && (
-                        <span className="text-xs text-[var(--color-text-muted)] bg-[var(--color-bg-subtle)] px-2 py-0.5 rounded">
-                          {reminder.repeatPattern}
-                        </span>
-                      )}
-                    </div>
-                    {reminder.description && (
-                      <p className="text-xs text-[var(--color-text-muted)] mt-1">{reminder.description}</p>
-                    )}
-                    {reminder.status === 'pending' && (
-                      <div className="flex gap-2 mt-3">
-                        <button
-                          onClick={() => handleComplete(reminder.id!)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-[var(--color-success)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-success)]/90"
-                        >
-                          <Check size={14} />
-                          Complete
-                        </button>
-                        <button
-                          onClick={() => handleSnooze(reminder.id!)}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-[var(--color-accent-amber)] text-white rounded-lg text-xs font-medium hover:bg-[var(--color-warning)]"
-                        >
-                          <Clock size={14} />
-                          Snooze
-                        </button>
-                        <button
-                          onClick={() => startEdit(reminder)}
-                          className="p-1.5 text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-subtle)] rounded-lg"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(reminder.id!)}
-                          className="p-1.5 text-[var(--color-error)] hover:bg-[var(--color-error-bg)] rounded-lg"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    )}
-                    {reminder.status === 'completed' && (
-                      <div className="mt-2 flex items-center gap-1 text-[var(--color-success)] text-xs font-medium">
-                        <Check size={14} />
-                        Completed
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Upcoming Reminders */}
-        {upcomingReminders.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-[var(--color-text)] px-1">Upcoming</h3>
-            {upcomingReminders.map((reminder) => (
-              <Card key={reminder.id} className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className={`w-11 h-11 rounded-xl ${getReminderBgColor(reminder.type)} flex items-center justify-center flex-shrink-0`}>
-                    {getReminderIcon(reminder.type)}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-base font-semibold text-[var(--color-text)]">{reminder.title}</h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Calendar size={13} className="text-[var(--color-text-muted)]" />
-                      <span className="text-sm text-[var(--color-text-secondary)]">{formatDate(reminder.scheduledTime)}</span>
-                    </div>
-                    {reminder.description && (
-                      <p className="text-xs text-[var(--color-text-muted)] mt-1">{reminder.description}</p>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && reminders.length === 0 && !showCreateForm && (
-          <div className="text-center py-12">
-            <Bell size={48} className="text-[var(--color-border)] mx-auto mb-4" />
-            <p className="text-[var(--color-text-muted)] text-base">No reminders yet</p>
-            <p className="text-[var(--color-text-muted)] text-sm mt-1">Tap "Add New Reminder" to get started</p>
-          </div>
-        )}
-
-        {/* Offline Notice */}
-        <div className="flex items-start gap-3 p-4 bg-[var(--color-bg-subtle)] rounded-2xl border border-[var(--color-border)]">
-          <Bell size={18} className="text-[var(--color-text-secondary)] mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
-            Reminders work offline. They'll sync when you're back online.
-          </p>
-        </div>
-
-        {/* Back Button */}
-        <div className="pt-2">
-          <LargeButton
-            onPress={() => onNavigate('home')}
-            variant="outline"
-            icon={<ArrowLeft size={22} />}
-          >
-            Back to Home
-          </LargeButton>
-        </div>
+    <AppShell
+      persona={persona}
+      activeTab={isCaregiver ? 'caregiver-reminders' : 'reminders'}
+      onNavigate={onNavigate}
+      onOpenSos={persona === 'elder' ? () => window.dispatchEvent(new Event('open-safe-return')) : undefined}
+      onToggleTheme={toggleTheme}
+      theme={state.accessibility?.theme}
+      title={t('rem.title')}
+      subtitle={t('rem.subtitle')}
+      identity={{ name: patient?.name ?? t('auth.elderName'), sub: t('rem.title') }}
+    >
+      <div className="rise-in flex flex-wrap items-center gap-2">
+        <Button size="lg" onClick={() => setShowAdd(true)} icon={<Plus className="h-[18px] w-[18px]" />}>
+          {t('rem.add')}
+        </Button>
+        <Button variant="secondary" size="lg" onClick={speakList} icon={<Volume2 className="h-[18px] w-[18px]" />}>
+          {t('home.hearThis')}
+        </Button>
       </div>
-    </>
+
+      {items.length === 0 ? (
+        <Card className="mt-5">
+          <EmptyState
+            icon={<Bell />}
+            title={t('rem.emptyTitle')}
+            body={t('rem.emptyBody')}
+            action={<Button onClick={() => setShowAdd(true)} icon={<Plus className="h-4 w-4" />}>{t('rem.add')}</Button>}
+          />
+        </Card>
+      ) : (
+        <>
+          <Section className="mt-6" title={t('rem.upcoming')} subtitle={`${upcoming.length} ${t('c.of')} ${items.length}`}>
+            <Card>
+              {upcoming.length ? upcoming.map((r) => renderRow(r, 'upcoming')) : <p className="t-sm py-3">{t('home.noReminderToday')}</p>}
+            </Card>
+          </Section>
+
+          {done.length > 0 && (
+            <Section className="mt-6" title={t('rem.completed')}>
+              <Card>{done.map((r) => renderRow(r, 'done'))}</Card>
+            </Section>
+          )}
+
+          {missed.length > 0 && (
+            <Section className="mt-6" title={t('rem.missed')}>
+              <Card>{missed.map((r) => renderRow(r, 'missed'))}</Card>
+            </Section>
+          )}
+        </>
+      )}
+
+      {/* Add reminder sheet */}
+      <Sheet
+        open={showAdd}
+        onClose={() => setShowAdd(false)}
+        title={t('rem.newTitle')}
+        footer={
+          <Button block size="lg" onClick={add} disabled={!form.title.trim()} icon={<Check className="h-[18px] w-[18px]" />}>
+            {t('rem.saveReminder')}
+          </Button>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <Field label={t('rem.kind')} htmlFor="rem-type">
+            <Segmented
+              ariaLabel={t('rem.kind')}
+              value={form.type}
+              onChange={(v) => setForm((f) => ({ ...f, type: v as Reminder['type'] }))}
+              options={[
+                { value: 'medicine', label: t('rem.typeMedicine') },
+                { value: 'hydration', label: t('rem.typeWater') },
+                { value: 'activity', label: t('rem.typeMeal') },
+                { value: 'appointment', label: t('rem.typeAppointment') },
+              ]}
+            />
+          </Field>
+
+          <Field label={t('rem.whatFor')} htmlFor="rem-title" hint={t('rem.whatForHint')}>
+            <Input
+              id="rem-title"
+              value={form.title}
+              onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+              placeholder={t('rem.titlePlaceholder')}
+              data-autofocus
+            />
+          </Field>
+
+          <Field label={t('rem.atWhatTime')} htmlFor="rem-time">
+            <Input id="rem-time" type="time" value={form.time} onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))} />
+          </Field>
+
+          <Field label={t('rem.frequency')} htmlFor="rem-repeat">
+            <Segmented
+              ariaLabel={t('rem.frequency')}
+              value={form.repeat}
+              onChange={(v) => setForm((f) => ({ ...f, repeat: v as NonNullable<Reminder['repeatPattern']> }))}
+              options={[
+                { value: 'daily', label: t('rem.repeatDaily') },
+                { value: 'weekly', label: t('rem.repeatWeekly') },
+                { value: 'none', label: t('rem.repeatOnce') },
+              ]}
+            />
+          </Field>
+        </div>
+      </Sheet>
+
+      <ConfirmDialog
+        open={!!toDelete}
+        onClose={() => setToDelete(null)}
+        onConfirm={remove}
+        title={t('rem.deleteTitle')}
+        body={t('rem.deleteBody')}
+        danger
+      />
+    </AppShell>
   );
 }
