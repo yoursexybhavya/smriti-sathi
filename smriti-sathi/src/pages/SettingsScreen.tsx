@@ -42,12 +42,36 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
   const [demoError, setDemoError] = useState('');
   const [name, setName] = useState(state.currentPatient?.name ?? '');
   const [age, setAge] = useState(String(state.currentPatient?.age ?? 72));
+  const [nameError, setNameError] = useState('');
+  const [ageError, setAgeError] = useState('');
 
   const a11y = state.accessibility;
 
   const saveProfile = async () => {
     if (!state.currentPatient) return;
-    await updatePatient({ ...state.currentPatient, name: name.trim() || state.currentPatient.name, age: Number(age) || state.currentPatient.age });
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setNameError(t('ob.nameRequired'));
+      return;
+    }
+    const trimmedAge = age.trim();
+    const numAge = Number(trimmedAge);
+    if (!trimmedAge || isNaN(numAge)) {
+      setAgeError(t('ob.ageRequired'));
+      return;
+    }
+    if (numAge < 40) {
+      setAgeError(t('ob.ageTooLow'));
+      return;
+    }
+    if (numAge > 120) {
+      setAgeError(t('ob.ageTooHigh'));
+      return;
+    }
+
+    setNameError('');
+    setAgeError('');
+    await updatePatient({ ...state.currentPatient, name: trimmedName, age: numAge });
     setShowProfile(false);
   };
 
@@ -303,11 +327,35 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
         }
       >
         <div className="flex flex-col gap-4">
-          <Field label={t('ob.nameLabel')} htmlFor="p-name">
-            <Input id="p-name" value={name} onChange={(e) => setName(e.target.value)} data-autofocus />
+          <Field label={t('ob.nameLabel')} htmlFor="p-name" error={nameError}>
+            <Input
+              id="p-name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (nameError) setNameError('');
+              }}
+              data-autofocus
+            />
           </Field>
-          <Field label={t('ob.ageLabel')} htmlFor="p-age">
-            <Input id="p-age" type="number" inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} />
+          <Field
+            label={t('ob.ageLabel')}
+            htmlFor="p-age"
+            error={ageError}
+            hint={!ageError ? 'Valid elder care range: 40–120 years' : undefined}
+          >
+            <Input
+              id="p-age"
+              type="number"
+              inputMode="numeric"
+              min={40}
+              max={120}
+              value={age}
+              onChange={(e) => {
+                setAge(e.target.value);
+                if (ageError) setAgeError('');
+              }}
+            />
           </Field>
         </div>
       </Sheet>

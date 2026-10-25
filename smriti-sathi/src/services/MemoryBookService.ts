@@ -289,12 +289,11 @@ export class MemoryBookService {
    * Generate questions for the Family Memory Book Game
    */
   async getFamilyQuizQuestions(userId: number): Promise<FamilyQuizQuestion[]> {
-    let familyItems = await this.getMemoryItemsByCategory(userId, 'family');
+    const familyItems = await this.getMemoryItemsByCategory(userId, 'family');
     
-    // Auto-seed if empty so the elder never faces a blank game
+    // Only generate questions from actual family memories entered by the user
     if (familyItems.length === 0) {
-      await this.createSampleMemories(userId);
-      familyItems = await this.getMemoryItemsByCategory(userId, 'family');
+      return [];
     }
 
     const questions: FamilyQuizQuestion[] = [];

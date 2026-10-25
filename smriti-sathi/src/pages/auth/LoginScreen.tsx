@@ -20,7 +20,7 @@ const PROFILE_ICON = {
 export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const { login, quickLogin, demoUsers } = useAuth();
   const { state, toggleTheme } = useApp();
-  const { t, lang } = useI18n();
+  const { t, lang, setLanguage, languages } = useI18n();
 
   const [selectedUser, setSelectedUser] = useState<string>('patient_primary');
   const [pin, setPin] = useState('');
@@ -139,10 +139,52 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             {/* Appearance control is reachable before sign-in: an elder who
                 needs calm-night or large text should not have to log in first. */}
             <div className="mb-4 hidden items-center justify-end gap-1.5 lg:flex">
-              <Tag tone="teal" icon={<Globe className="h-3 w-3" />}>{lang.toUpperCase()}</Tag>
               <IconButton label={t('c.theme')} variant="ghost" size="sm" onClick={toggleTheme}>
                 {isDark ? <Sun /> : <Moon />}
               </IconButton>
+            </div>
+
+            {/* ── Prominent Language Switcher at App Start ─────────────────── */}
+            <div
+              className="mb-6 rounded-[var(--r-md)] border border-[var(--line)] bg-[var(--surface-warm)] p-3"
+              style={{ boxShadow: 'var(--shadow-1)' }}
+            >
+              <div className="mb-2.5 flex items-center justify-between px-0.5">
+                <span className="flex items-center gap-1.5 text-[0.82rem] font-bold tracking-wide text-ink">
+                  <Globe className="h-4 w-4 text-[var(--brand-teal)]" />
+                  {t('set.language')} · ভাষা বাছনি
+                </span>
+                <span className="text-[0.72rem] font-medium text-ink-3">
+                  {languages.find((l) => l.code === lang)?.label}
+                </span>
+              </div>
+              <div className="grid grid-cols-5 gap-1.5" role="radiogroup" aria-label={t('set.language')}>
+                {languages.map((l) => {
+                  const isActive = lang === l.code;
+                  return (
+                    <button
+                      key={l.code}
+                      type="button"
+                      role="radio"
+                      aria-checked={isActive}
+                      onClick={() => setLanguage(l.code)}
+                      className="flex flex-col items-center justify-center rounded-[var(--r-sm)] px-1 py-2 text-center transition-all"
+                      style={{
+                        background: isActive ? 'var(--brand-teal)' : 'var(--surface)',
+                        color: isActive ? '#FFFFFF' : 'var(--ink)',
+                        border: `1.5px solid ${isActive ? 'var(--brand-teal)' : 'var(--line-soft)'}`,
+                        boxShadow: isActive ? '0 2px 6px rgba(18, 117, 106, 0.2)' : 'none',
+                        minHeight: '48px',
+                      }}
+                    >
+                      <span className="text-[0.88rem] font-bold leading-tight">{l.native}</span>
+                      <span className="text-[0.62rem] font-semibold opacity-75 uppercase tracking-wide">
+                        {l.code}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <h2 className="t-h2">{t('auth.chooseProfile')}</h2>

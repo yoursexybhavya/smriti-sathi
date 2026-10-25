@@ -116,7 +116,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         } else {
           if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
-            if (params.get('demo') === 'true' || (params.get('role') === 'patient' && !params.has('step'))) {
+            if (params.get('demo') === 'true') {
               const demoPatient: PatientProfile = {
                 id: '1',
                 name: 'Kamala Baa',

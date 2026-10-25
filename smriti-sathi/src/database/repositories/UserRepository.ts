@@ -4,6 +4,12 @@ import { generateUUID } from '../../utils/uuid';
 export class UserRepository {
   // Create a new user
   async create(user: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<number> {
+    if (user.age !== undefined) {
+      const numAge = Number(user.age);
+      if (isNaN(numAge) || numAge < 40 || numAge > 120) {
+        throw new Error(`Invalid age: ${user.age}. Human age must be between 40 and 120 for elder care.`);
+      }
+    }
     const now = Date.now();
     const id = await db.users.add({
       ...user,
@@ -27,6 +33,12 @@ export class UserRepository {
 
   // Update user
   async update(id: number, updates: Partial<User>): Promise<void> {
+    if (updates.age !== undefined) {
+      const numAge = Number(updates.age);
+      if (isNaN(numAge) || numAge < 40 || numAge > 120) {
+        throw new Error(`Invalid age: ${updates.age}. Human age must be between 40 and 120 for elder care.`);
+      }
+    }
     await db.users.update(id, {
       ...updates,
       updatedAt: Date.now(),

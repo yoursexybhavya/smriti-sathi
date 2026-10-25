@@ -110,4 +110,40 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
     assert.ok(content.includes('open-safe-return'), 'Must trigger open-safe-return on tap');
     assert.ok(content.includes('open-sundowning'), 'Must trigger open-sundowning on tap');
   });
+
+  test('7.1: Aging Limiter rejects impossible ages (e.g. 239) and enforces 40-120 bounds', () => {
+    const setupPath = path.join(rootDir, 'src/pages/onboarding/PatientProfileSetup.tsx');
+    const settingsPath = path.join(rootDir, 'src/pages/SettingsScreen.tsx');
+    const userRepoPath = path.join(rootDir, 'src/database/repositories/UserRepository.ts');
+    
+    const setupContent = fs.readFileSync(setupPath, 'utf8');
+    const settingsContent = fs.readFileSync(settingsPath, 'utf8');
+    const userRepoContent = fs.readFileSync(userRepoPath, 'utf8');
+
+    // Verify PatientProfileSetup validation
+    assert.ok(setupContent.includes('numAge < 40'), 'Must enforce minimum age 40 for senior memory care');
+    assert.ok(setupContent.includes('numAge > 120'), 'Must reject impossible ages over 120 (e.g. 239)');
+    assert.ok(setupContent.includes('setAgeError'), 'Must display error message to user');
+
+    // Verify SettingsScreen profile editing validation
+    assert.ok(settingsContent.includes('numAge < 40'), 'Settings must enforce minimum age 40');
+    assert.ok(settingsContent.includes('numAge > 120'), 'Settings must enforce maximum age 120');
+
+    // Verify backend UserRepository guard
+    assert.ok(userRepoContent.includes('numAge < 40 || numAge > 120'), 'UserRepository must enforce 40-120 age bounds');
+  });
+
+  test('7.2: Prominent Language Selector is rendered at app start on LoginScreen', () => {
+    const loginPath = path.join(rootDir, 'src/pages/auth/LoginScreen.tsx');
+    const content = fs.readFileSync(loginPath, 'utf8');
+    assert.ok(content.includes('languages.map'), 'Must map over all 5 regional languages at app start');
+    assert.ok(content.includes('setLanguage'), 'Must allow 1-tap language switching directly on login screen');
+    assert.ok(content.includes("t('set.language')"), 'Must label language section clearly');
+  });
+
+  test('7.3: Clean Real-World State — MemoryBookService does not pollute database with fake memories', () => {
+    const memServicePath = path.join(rootDir, 'src/services/MemoryBookService.ts');
+    const content = fs.readFileSync(memServicePath, 'utf8');
+    assert.ok(!content.includes('createSampleMemories(userId)'), 'Must not auto-seed fake relatives into production database');
+  });
 });

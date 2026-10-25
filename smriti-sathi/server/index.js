@@ -22,7 +22,7 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ONLINE',
     platform: 'Smriti Sathi Cloud Production Platform',
-    version: '2.4.0',
+    version: '3.0.0',
     recordsStored: telemetryDatabase.sessions.length,
     lastSync: telemetryDatabase.lastSyncedAt,
   });
@@ -56,16 +56,16 @@ app.post('/api/sync', (req, res) => {
 
 // 3. Telemetry summary endpoint (for remote ASHA or doctor web view)
 app.get('/api/telemetry', (req, res) => {
+  const totalReminders = telemetryDatabase.reminders.length;
+  const completedReminders = telemetryDatabase.reminders.filter((r) => r.status === 'completed').length;
+  const adherence = totalReminders > 0 ? `${Math.round((completedReminders / totalReminders) * 100)}%` : null;
+
   res.json({
-    patient: {
-      name: 'Elder Patient',
-      age: 72,
-      location: 'Guwahati, Assam',
-    },
     totalSessions: telemetryDatabase.sessions.length,
     recentSessions: telemetryDatabase.sessions.slice(-20),
-    medicationAdherenceRate: '93%',
+    medicationAdherenceRate: adherence,
     lastSync: telemetryDatabase.lastSyncedAt,
+    activeAlerts: telemetryDatabase.sosAlerts.filter((a) => a.status === 'DISPATCHED_TO_ASHA_WORKER').length,
   });
 });
 
@@ -86,10 +86,10 @@ app.post('/api/sos', (req, res) => {
 // 5. In-App Auto-Update & Version Authority (Render Cloud Backend)
 app.get('/api/version', (req, res) => {
   res.json({
-    latestVersion: 'v2.9.2',
-    versionCode: 292,
-    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.2/SmritiSathi-v2.9.2.apk',
-    releaseNotes: 'Smriti Sathi v2.9.2: Safe Return Lost Elder Rescue Mode, Wearable Physical ID Badge Generator, Sundowning Circadian Care, and ASHA Rural Cognitive Triaging Hub.',
+    latestVersion: 'v3.0.0',
+    versionCode: 300,
+    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v3.0.0/SmritiSathi-v3.0.0.apk',
+    releaseNotes: 'Smriti Sathi v3.0.0: Warm Heritage Care complete UI/UX overhaul, 52/60/72px touch targets, errorless learning cognitive games, offline fonts, and safe return rescue tools.',
     publishedAt: new Date().toISOString(),
   });
 });

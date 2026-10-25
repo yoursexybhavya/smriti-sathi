@@ -15,12 +15,43 @@ export default function PatientProfileSetup({
   const { t } = useI18n();
   const [name, setName] = useState(initial?.name ?? '');
   const [age, setAge] = useState(String(initial?.age ?? ''));
+  const [nameError, setNameError] = useState('');
+  const [ageError, setAgeError] = useState('');
+
+  const validate = (): boolean => {
+    let isValid = true;
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setNameError(t('ob.nameRequired'));
+      isValid = false;
+    } else {
+      setNameError('');
+    }
+
+    const trimmedAge = age.trim();
+    const numAge = Number(trimmedAge);
+    if (!trimmedAge || isNaN(numAge)) {
+      setAgeError(t('ob.ageRequired'));
+      isValid = false;
+    } else if (numAge < 40) {
+      setAgeError(t('ob.ageTooLow'));
+      isValid = false;
+    } else if (numAge > 120) {
+      setAgeError(t('ob.ageTooHigh'));
+      isValid = false;
+    } else {
+      setAgeError('');
+    }
+
+    return isValid;
+  };
 
   const submit = () => {
+    if (!validate()) return;
     onNext({
       id: initial?.id ?? `patient_${Date.now()}`,
       name: name.trim() || t('auth.elderName'),
-      age: Number(age) || 72,
+      age: Number(age),
       preferredLanguage: initial?.preferredLanguage ?? 'en',
       dailyRoutine: initial?.dailyRoutine ?? [],
       reminderPreferences: initial?.reminderPreferences ?? {
@@ -39,12 +70,38 @@ export default function PatientProfileSetup({
         <p className="t-body mt-1.5">{t('ob.nameBody')}</p>
       </div>
 
-      <Field label={t('ob.nameLabel')} htmlFor="ob-name">
-        <Input id="ob-name" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('auth.elderName')} data-autofocus />
+      <Field label={t('ob.nameLabel')} htmlFor="ob-name" error={nameError}>
+        <Input
+          id="ob-name"
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            if (nameError) setNameError('');
+          }}
+          placeholder={t('auth.elderName')}
+          data-autofocus
+        />
       </Field>
 
-      <Field label={t('ob.ageLabel')} htmlFor="ob-age">
-        <Input id="ob-age" type="number" inputMode="numeric" value={age} onChange={(e) => setAge(e.target.value)} placeholder="72" />
+      <Field
+        label={t('ob.ageLabel')}
+        htmlFor="ob-age"
+        error={ageError}
+        hint={!ageError ? 'Valid elder care range: 40–120 years' : undefined}
+      >
+        <Input
+          id="ob-age"
+          type="number"
+          inputMode="numeric"
+          min={40}
+          max={120}
+          value={age}
+          onChange={(e) => {
+            setAge(e.target.value);
+            if (ageError) setAgeError('');
+          }}
+          placeholder="72"
+        />
       </Field>
 
       <div className="flex flex-wrap gap-2">
