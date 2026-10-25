@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useApp } from '../../context/AppContext';
 import { UserRole } from '../../models/Role';
-import { User, Shield, Eye, EyeOff, Lock, HeartHandshake, Sun, Moon } from 'lucide-react';
+import { User, Shield, Eye, EyeOff, Lock, HeartHandshake, Sun, Moon, ShieldAlert, Phone, QrCode } from 'lucide-react';
+import { SafeReturnModal } from '../../components/SafeReturnModal';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -18,6 +19,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const [showPin, setShowPin] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSafeReturn, setShowSafeReturn] = useState(false);
 
   const handleLogin = async () => {
     if (!selectedUser) {
@@ -88,6 +90,35 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight text-white">Smriti Sathi</h1>
           <p className="text-sm sm:text-base text-slate-300 font-medium">Cognitive Care & Memory Companion</p>
+        </div>
+
+        {/* 🆘 Good Samaritan / Bystander Safe Return Action */}
+        <div className="w-full">
+          <button
+            type="button"
+            onClick={() => setShowSafeReturn(true)}
+            className="w-full p-4 sm:p-4.5 rounded-3xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white shadow-xl shadow-red-950/20 border-2 border-red-400/40 flex items-center justify-between gap-3 transition-all active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex items-center gap-3.5 text-left">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                🆘
+              </div>
+              <div>
+                <div className="text-sm sm:text-base font-black tracking-tight flex items-center gap-2">
+                  <span>Found a Lost Elder?</span>
+                  <span className="text-[10px] uppercase font-extrabold bg-white/25 px-2 py-0.5 rounded-full tracking-wider">
+                    RESCUE
+                  </span>
+                </div>
+                <div className="text-xs text-red-100 font-medium mt-0.5">
+                  1-Tap Guardian Call, WhatsApp Location & Medical QR
+                </div>
+              </div>
+            </div>
+            <div className="text-xs font-extrabold bg-white text-red-700 px-3.5 py-2 rounded-2xl shrink-0 shadow-sm">
+              Open ID →
+            </div>
+          </button>
         </div>
 
         {/* Profile Selection */}
@@ -275,6 +306,12 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           <p>Local-first storage with automatic cloud synchronization.</p>
         </div>
       </div>
+
+      {/* Safe Return Emergency Rescue Modal */}
+      <SafeReturnModal
+        isOpen={showSafeReturn}
+        onClose={() => setShowSafeReturn(false)}
+      />
     </div>
   );
 }

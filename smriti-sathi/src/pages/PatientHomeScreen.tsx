@@ -26,7 +26,10 @@ import {
   User,
   Users,
   Globe,
-  Radio
+  Radio,
+  Sunset,
+  ShieldAlert,
+  Phone
 } from 'lucide-react';
 import ProgressCard from '../components/ProgressCard';
 import SectionHeader from '../components/SectionHeader';
@@ -354,6 +357,59 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
           
           {/* LEFT COLUMN: Cognitive Play & Core Activities (7 cols on Landscape) */}
           <div className="lg:col-span-7 space-y-7 sm:space-y-8">
+
+            {/* Quick Emergency Rescue & Circadian Calm Companion Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              {/* 1. Safe Return Rescue Card */}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-safe-return'))}
+                className="w-full p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-600 text-white shadow-md hover:shadow-lg border-2 border-red-400/50 flex items-center justify-between gap-3 text-left transition-all active:scale-[0.98] cursor-pointer min-h-[76px]"
+                aria-label="I Need Help - Safe Return Emergency Card"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl shrink-0 shadow-inner">
+                    🆘
+                  </div>
+                  <div>
+                    <div className="text-base font-extrabold tracking-tight">
+                      {language === 'as' ? 'জৰুৰীকালীন সাহাৰ্য' : 'I Need Help'}
+                    </div>
+                    <div className="text-xs text-red-100 font-medium mt-0.5">
+                      {language === 'as' ? 'অভিভাৱকৰ নম্বৰ আৰু ঠিকনা' : 'Call Guardian & Show Rescue QR'}
+                    </div>
+                  </div>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
+                  →
+                </div>
+              </button>
+
+              {/* 2. Sundowning Evening Calm Card */}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-sundowning'))}
+                className="w-full p-4 sm:p-5 rounded-3xl bg-gradient-to-br from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-600 text-white shadow-md hover:shadow-lg border-2 border-amber-400/50 flex items-center justify-between gap-3 text-left transition-all active:scale-[0.98] cursor-pointer min-h-[76px]"
+                aria-label="Evening Calm & Sundowning Care"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-amber-100 shrink-0 shadow-inner">
+                    <Sunset size={24} />
+                  </div>
+                  <div>
+                    <div className="text-base font-extrabold tracking-tight">
+                      {language === 'as' ? 'সান্ধ্যকালীন শান্ততা' : 'Evening Calm'}
+                    </div>
+                    <div className="text-xs text-amber-100 font-medium mt-0.5">
+                      {language === 'as' ? '৪-৭-৮ উশাহ আৰু পৰিয়ালৰ কণ্ঠ' : '4-7-8 Breathing & Voice Calm'}
+                    </div>
+                  </div>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
+                  →
+                </div>
+              </button>
+            </div>
             
             {/* Daily Focus Hero Card */}
             <div className="p-6 sm:p-8 bg-[var(--color-card)] rounded-3xl border-2 border-[var(--color-border)] shadow-sm space-y-5 transition-all">

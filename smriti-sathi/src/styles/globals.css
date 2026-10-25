@@ -341,3 +341,19 @@ body {
 
 /* Selection */
 ::selection { background: #DDD6FE; color: #1E1B4B; }
+
+/* Print Optimization for Wearable Emergency ID & ASHA Triage Sheet */
+@media print {
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .no-print, header, nav, .bottom-nav, button[aria-label="Close modal"] {
+    display: none !important;
+  }
+  .printable-card {
+    box-shadow: none !important;
+    border: 1px solid #000000 !important;
+    page-break-inside: avoid;
+  }
+}

@@ -4,16 +4,16 @@
 
 ### **Offline-First Multilingual Cognitive Care & Dementia Companion for North East India**
 
-[![Download APK](https://img.shields.io/badge/📲_Download_Android_APK-SmritiSathi--v2.9.1.apk-10B981?style=for-the-badge&logo=android&logoColor=white)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.1/SmritiSathi-v2.9.1.apk)
+[![Download APK](https://img.shields.io/badge/📲_Download_Android_APK-SmritiSathi--v2.9.2.apk-10B981?style=for-the-badge&logo=android&logoColor=white)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.2/SmritiSathi-v2.9.2.apk)
 [![Live Browser Demo](https://img.shields.io/badge/🌐_Try_Live_in_Browser-smriti--sathi.onrender.com-4F46E5?style=for-the-badge&logo=googlechrome&logoColor=white)](https://smriti-sathi.onrender.com)
 
 [![Bhashini AI](https://img.shields.io/badge/Voice_Engine-Bhashini_AI_%2B_Offline_TTS-06B6D4?style=flat-square)](https://bhashini.gov.in/)
-[![Tests](https://img.shields.io/badge/E2E_Tests-285%2F285_Passing_(100%25)-22C55E?style=flat-square)](#%EF%B8%8F-automated-verification--test-scoreboard)
+[![Tests](https://img.shields.io/badge/E2E_Tests-293%2F293_Passing_(100%25)-22C55E?style=flat-square)](#%EF%B8%8F-automated-verification--test-scoreboard)
 [![Accessibility](https://img.shields.io/badge/Accessibility-WCAG_AAA_72px%2B_Touch-F59E0B?style=flat-square)](#-scandinavian-senior-accessibility-specs)
 [![DPDP 2023](https://img.shields.io/badge/Privacy-DPDP_Act_2023_AES--GCM-8B5CF6?style=flat-square)](#-local-first-database-er-diagram)
 [![License: MIT](https://img.shields.io/badge/License-MIT-slate?style=flat-square)](https://opensource.org/licenses/MIT)
 
-[**📲 1-Tap APK**](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.1/SmritiSathi-v2.9.1.apk) • [**🌐 Web Sandbox**](https://smriti-sathi.onrender.com) • [**🗺️ System Graph**](#-1-end-to-end-system--mesh-sync-architecture) • [**🧠 Cognitive Engine**](#-3-errorless-learning--adaptive-difficulty-state-machine) • [**📈 Clinical SPI Chart**](#-4-clinical-stability-performance-index-spi-trajectory)
+[**📲 1-Tap APK**](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.2/SmritiSathi-v2.9.2.apk) • [**🌐 Web Sandbox**](https://smriti-sathi.onrender.com) • [**🗺️ System Graph**](#-1-end-to-end-system--mesh-sync-architecture) • [**🧠 Cognitive Engine**](#-3-errorless-learning--adaptive-difficulty-state-machine) • [**📈 Clinical SPI Chart**](#-4-clinical-stability-performance-index-spi-trajectory)
 
 </div>
 
@@ -274,7 +274,7 @@ erDiagram
 
 ## 🧪 Automated Verification & Test Scoreboard
 
-Every build is verified against **285 automated E2E & adversarial tests** (`npm test`) in `< 1.0s`:
+Every build is verified against **293 automated E2E, adversarial & Safe Return tests** (`npm test`) in `< 1.0s`:
 
 | Test Suite | Coverage Focus | Status | Pass Rate |
 | :--- | :--- | :---: | :--- |
@@ -285,14 +285,15 @@ Every build is verified against **285 automated E2E & adversarial tests** (`npm 
 | **Tier 5A: Errorless Shield** | 10,000-click fuzzing & 3000ms timer | ✅ PASS | `██████████ 31/31 (100%)` |
 | **Tier 5B: Voice & Modal Stress** | 25MB Audio Blobs, Portal & Haptics | ✅ PASS | `██████████ 35/35 (100%)` |
 | **Clinical SPI Engine Baseline** | 14-Session Median & Alert Triage | ✅ PASS | `██████████ 3/3   (100%)` |
-| **TOTAL** | **7 Verification Suites** | **🎉 100%** | **`285 / 285 TESTS PASSING`** |
+| **SIH Clinical & Safe Return Suite** | Offline QR, WhatsApp GPS & Wearable ID | ✅ PASS | `██████████ 8/8   (100%)` |
+| **TOTAL** | **8 Verification Suites** | **🎉 100%** | **`293 / 293 TESTS PASSING`** |
 
 ---
 
 ## 🚀 3-Command Developer Quick Start
 
 ```bash
-# 1. Install dependencies & run 285 E2E verification tests
+# 1. Install dependencies & run 293 E2E verification tests
 cd smriti-sathi && npm install && npm test
 
 # 2. Launch local development server
@@ -307,6 +308,6 @@ npm run dev
 <div align="center">
 
 **Built with ❤️ for Elderly Cognitive Care in North East India**  
-[📥 Download Android APK (`v2.9.1`)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.1/SmritiSathi-v2.9.1.apk) • [🌐 Open Web App](https://smriti-sathi.onrender.com)
+[📥 Download Android APK (`v2.9.2`)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.2/SmritiSathi-v2.9.2.apk) • [🌐 Open Web App](https://smriti-sathi.onrender.com)
 
 </div>

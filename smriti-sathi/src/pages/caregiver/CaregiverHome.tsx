@@ -22,6 +22,11 @@ import {
   LogOut,
   Shield,
   RefreshCw,
+  QrCode,
+  Printer,
+  Sunset,
+  FileText,
+  HeartHandshake
 } from 'lucide-react';
 import RoleAndProfileModal from '../../components/RoleAndProfileModal';
 
@@ -260,6 +265,93 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
               </div>
             );
           })}
+        </div>
+
+        {/* Clinical Safety & Community Care Modules */}
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-2">
+              <Shield size={16} className="text-indigo-500" />
+              Elder Safety & Clinical Triage Hub
+            </h2>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-400 border border-indigo-500/25">
+              SIH High Priority
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {/* 1. Safe Return Rescue Preview */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-safe-return'))}
+              className="p-3.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-left transition-all active:scale-[0.98] flex items-start gap-3 cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-500 flex items-center justify-center shrink-0">
+                <QrCode size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-bold text-red-500 flex items-center gap-1.5">
+                  Safe Return Rescue QR
+                </div>
+                <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5 leading-snug">
+                  1-tap call & WhatsApp location beacon for found wandering elders
+                </div>
+              </div>
+            </button>
+
+            {/* 2. Wearable ID Badge Generator */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-wearable-badge'))}
+              className="p-3.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-left transition-all active:scale-[0.98] flex items-start gap-3 cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center shrink-0">
+                <Printer size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-bold text-indigo-500 flex items-center gap-1.5">
+                  Print Wearable ID Badge
+                </div>
+                <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5 leading-snug">
+                  Laminated 85x54mm wallet card & pendant QR for dementia care
+                </div>
+              </div>
+            </button>
+
+            {/* 3. ASHA SPI Triaging Hub */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-asha-triage'))}
+              className="p-3.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-left transition-all active:scale-[0.98] flex items-start gap-3 cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+                <FileText size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-bold text-emerald-500 flex items-center gap-1.5">
+                  ASHA Triaging Hub (SPI)
+                </div>
+                <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5 leading-snug">
+                  14-session moving median report for PHC doctor review
+                </div>
+              </div>
+            </button>
+
+            {/* 4. Sundowning Circadian Care */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-sundowning'))}
+              className="p-3.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-left transition-all active:scale-[0.98] flex items-start gap-3 cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+                <Sunset size={20} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs font-bold text-amber-500 flex items-center gap-1.5">
+                  Sundowning Evening Calm
+                </div>
+                <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5 leading-snug">
+                  4-7-8 breathing pacer & familiar voice reassurance
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Quick Actions */}

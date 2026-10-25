@@ -86,10 +86,10 @@ app.post('/api/sos', (req, res) => {
 // 5. In-App Auto-Update & Version Authority (Render Cloud Backend)
 app.get('/api/version', (req, res) => {
   res.json({
-    latestVersion: 'v2.9.1',
-    versionCode: 291,
-    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.1/SmritiSathi-v2.9.1.apk',
-    releaseNotes: 'Smriti Sathi v2.9.1: Persistent Caregiver Connection & Family Pairing fix, fluid touch scrolling with full BottomNav clearance, and visual architecture documentation.',
+    latestVersion: 'v2.9.2',
+    versionCode: 292,
+    downloadUrl: 'https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.2/SmritiSathi-v2.9.2.apk',
+    releaseNotes: 'Smriti Sathi v2.9.2: Safe Return Lost Elder Rescue Mode, Wearable Physical ID Badge Generator, Sundowning Circadian Care, and ASHA Rural Cognitive Triaging Hub.',
     publishedAt: new Date().toISOString(),
   });
 });

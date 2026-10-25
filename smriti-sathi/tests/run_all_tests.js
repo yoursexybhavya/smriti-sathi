@@ -43,6 +43,10 @@ const testSuites = [
     name: 'Clinical Baseline: Stability Performance Index (SPI Engine, 3 tests)',
     path: 'src/engine/test_spi_baseline.js',
   },
+  {
+    name: 'SIH Clinical & Safe Return Emergency Suite (8 tests)',
+    path: 'tests/sih_safe_return_suite.test.ts',
+  },
 ];
 
 console.log('\n======================================================================');

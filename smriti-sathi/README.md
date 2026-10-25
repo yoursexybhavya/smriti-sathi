@@ -1,14 +1,34 @@
 <div align="center">
 
-# 🌸 Smriti Sathi — Technical & Clinical Architecture (`v2.9.1`)
+# 🌸 Smriti Sathi — Technical & Clinical Architecture (`v2.9.2`)
 
-[![Download APK](https://img.shields.io/badge/📥_Download_Android_APK-SmritiSathi--v2.9.1.apk-10B981?style=for-the-badge&logo=android&logoColor=white)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.1/SmritiSathi-v2.9.1.apk)
+[![Download APK](https://img.shields.io/badge/📥_Download_Android_APK-SmritiSathi--v2.9.2.apk-10B981?style=for-the-badge&logo=android&logoColor=white)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.2/SmritiSathi-v2.9.2.apk)
 [![Live Browser Demo](https://img.shields.io/badge/🌐_Try_Directly_in_Browser-smriti--sathi.onrender.com-4F46E5?style=for-the-badge&logo=googlechrome&logoColor=white)](https://smriti-sathi.onrender.com)
 
-> **📥 [Download Smriti Sathi Android APK (`SmritiSathi-v2.9.1.apk`)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.1/SmritiSathi-v2.9.1.apk)**  
+> **📥 [Download Smriti Sathi Android APK (`SmritiSathi-v2.9.2.apk`)](https://github.com/yoursexybhavya/smriti-sathi/releases/download/v2.9.2/SmritiSathi-v2.9.2.apk)**  
 > **🌐 [Try Directly in Browser (No Installation Required): https://smriti-sathi.onrender.com](https://smriti-sathi.onrender.com)**
 
 </div>
+
+---
+
+## 🆘 Critical SIH Innovations (v2.9.2)
+
+```mermaid
+flowchart LR
+    A["👵 Wandering Elder Found"] --> B["🆘 Safe Return Mode\n(1-Tap PIN-free)"]
+    B --> C["📞 1-Tap Guardian Call\n(tel:+91...)"]
+    B --> D["📍 WhatsApp GPS Pin\n(Google Maps Live Link)"]
+    B --> E["📱 Offline Camera QR\n(Zero-Dependency SVG)"]
+    B --> F["🪪 Wearable Badge\n(85x54mm Laminated Card)"]
+
+    G["🌇 Evening Sunset"] --> H["🌅 Sundowning Care\n(4-7-8 Breathing + Family Voice)"]
+    I["👩‍⚕️ ASHA Home Visit"] --> J["📊 ASHA Triage Hub\n(14-Session SPI Median + PHC Export)"]
+
+    style B fill:#b91c1c,stroke:#f87171,color:#ffffff
+    style H fill:#d97706,stroke:#fbbf24,color:#ffffff
+    style J fill:#047857,stroke:#34d399,color:#ffffff
+```
 
 ---
 
@@ -17,16 +37,18 @@
 ```mermaid
 flowchart TB
     subgraph UI["📱 Presentation Layer (React 18 + Tailwind 4)"]
-        HOME["👵 PatientHomeScreen\n(Voice Greeting + Daily Schedule)"]
+        HOME["👵 PatientHomeScreen\n(Voice Greeting + Safe Return + Sundowning)"]
         GAMES["🎮 4 CST Cognitive Games\n(Remember, Recognise, Routine, Match)"]
         REM["⏰ MultimodalReminderModal\n(72px+ Icons + Haptics + Audio)"]
         CARE["👨‍👦 CaregiverHome & SafetyDashboard\n(PIN: 1234 / 0000)"]
+        EMERG["🆘 Safe Return & Wearable Badge\n(PIN-Free Good Samaritan Rescue)"]
     end
 
     subgraph ENGINE["⚙️ Clinical & Voice Engines"]
         ADAPT["📐 AdaptiveDifficultyService\n(Levels 1-5 Clamping + 3s Scaffold)"]
         SPI["📈 SPI Baseline Engine\n(14-Session Rolling Median)"]
         VOICE["🔊 Voice & Language Router\n(Assamese, Bodo, Manipuri, English)"]
+        ASHA["🩺 ASHA Triaging Engine\n(ICMR Non-Diagnostic Rules)"]
     end
 
     subgraph STORAGE["🗄️ Offline-First Storage & Sync"]
@@ -35,8 +57,8 @@ flowchart TB
         CLOUD["☁️ Render Cloud REST API\n/api/sync & /api/version"]
     end
 
-    HOME & GAMES & REM & CARE --> ADAPT & SPI & VOICE
-    ADAPT & SPI --> DEXIE
+    HOME & GAMES & REM & CARE & EMERG --> ADAPT & SPI & VOICE & ASHA
+    ADAPT & SPI & ASHA --> DEXIE
     DEXIE --> BLE --> CLOUD
 
     style UI fill:#1e1b4b,stroke:#6366f1,color:#ffffff
@@ -99,19 +121,19 @@ sequenceDiagram
 
 ```text
 smriti-sathi/
-├── 🤖 android/                    # Native Capacitor Android project (versionCode 291)
+├── 🤖 android/                    # Native Capacitor Android project (versionCode 292)
 ├── ☁️ server/                     # Express Cloud Sync & Auto-OTA Version Server
-├── 🧪 tests/                      # 7 Automated Test Suites (285/285 Passing)
+├── 🧪 tests/                      # 8 Automated Test Suites (293/293 Passing)
 ├── 🎨 src/
-│   ├── components/                # Accessible UI (AppHeader, BottomNav, FamilyPairingModal)
+│   ├── components/                # Accessible UI (SafeReturnModal, AshaTriageModal, WearableBadgeGeneratorModal, SundowningCareModal, QRCodeSvg)
 │   ├── context/ & contexts/       # Auth, App, Patient, & Multilingual State
 │   ├── database/ & db/            # Offline-First IndexedDB Repositories
 │   ├── engine/                    # Clinical SPI 14-Session Baseline Engine
 │   ├── hooks/                     # useVoice, useInactivityScaffolding, useReminderScheduler
 │   ├── pages/
-│   │   ├── PatientHomeScreen.tsx  # Simplified Elder Companion Dashboard
+│   │   ├── PatientHomeScreen.tsx  # Simplified Elder Companion Dashboard (Safe Return + Sundowning)
 │   │   ├── GamesScreen.tsx        # 4 Cultural Cognitive Workouts
-│   │   ├── caregiver/             # CaregiverHome & SafetyDashboard
+│   │   ├── caregiver/             # CaregiverHome & SafetyDashboard (Clinical Triage & Wearable Badge Hub)
 │   │   └── onboarding/            # 4-Step Guided Caregiver Setup
 │   └── services/                  # AdaptiveEngine, Bhashini/TTS, Sync, & Safety
 └── 🛠️ build-apk.sh                # 1-Click Vite → Capacitor → Gradle APK Builder
@@ -123,7 +145,7 @@ smriti-sathi/
 
 | Command | Action | Expected Output |
 | :--- | :--- | :--- |
-| `npm test` | Runs all 7 E2E & Adversarial test suites | `285 / 285 Passing (100%)` in `< 1s` |
+| `npm test` | Runs all 8 E2E, Adversarial & Safe Return test suites | `293 / 293 Passing (100%)` in `< 1s` |
 | `npm run typecheck` | Strict TypeScript compiler verification | `0 Errors` |
-| `npm run build` | Production Vite asset bundle | Built in `~850ms` |
-| `./build-apk.sh` | Compiles `SmritiSathi-v2.9.1.apk` | Copies APK to root & Desktop |
+| `npm run build` | Production Vite asset bundle | Built in `~950ms` |
+| `./build-apk.sh` | Compiles `SmritiSathi-v2.9.2.apk` | Copies APK to root & Desktop |

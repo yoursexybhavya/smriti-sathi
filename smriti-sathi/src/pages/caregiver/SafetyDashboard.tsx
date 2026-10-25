@@ -29,6 +29,11 @@ import {
   XCircle,
   Info,
   Zap,
+  QrCode,
+  Printer,
+  Sunset,
+  FileText,
+  Heart
 } from 'lucide-react';
 
 interface SafetyDashboardProps {
@@ -130,6 +135,113 @@ export default function SafetyDashboard({ onBack }: SafetyDashboardProps) {
                 They are NOT medically validated and do NOT replace proper monitoring.
                 In a real emergency, call local emergency services.
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* SIH Priority Clinical Safety & Lost Elder Tools */}
+        <div className="bg-[var(--color-card)] rounded-2xl border border-[var(--color-border)] p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] flex items-center gap-2">
+              <Shield size={16} className="text-red-500" />
+              SIH Lost Elder & Clinical Safety Suite
+            </h2>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500/15 text-red-500 border border-red-500/30">
+              Live Tools
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* 1. Safe Return Card */}
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 flex flex-col justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-red-500/20 text-red-500 flex items-center justify-center shrink-0">
+                  <QrCode size={20} />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-red-500">
+                    Safe Return Rescue Mode
+                  </div>
+                  <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
+                    1-Tap bystander phone dial, GPS WhatsApp dispatch & camera QR.
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-safe-return'))}
+                className="w-full py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
+              >
+                Launch Safe Return Mode →
+              </button>
+            </div>
+
+            {/* 2. Wearable Badge Generator */}
+            <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex flex-col justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-500 flex items-center justify-center shrink-0">
+                  <Printer size={20} />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-indigo-500">
+                    Wearable ID Card Generator
+                  </div>
+                  <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
+                    Generate & print 85x54mm laminated wallet card or necklace pendant.
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-wearable-badge'))}
+                className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
+              >
+                Print Wearable ID Card →
+              </button>
+            </div>
+
+            {/* 3. ASHA Triage Hub */}
+            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center shrink-0">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-emerald-500">
+                    ASHA Cognitive Triaging Hub
+                  </div>
+                  <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
+                    14-Session SPI longitudinal median index & PHC referral sheet.
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-asha-triage'))}
+                className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
+              >
+                Open ASHA Triaging Sheet →
+              </button>
+            </div>
+
+            {/* 4. Sundowning Circadian Care */}
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+                  <Sunset size={20} />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-amber-500">
+                    Sundowning Evening Care
+                  </div>
+                  <div className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
+                    Non-pharmacological 4-7-8 breathing & familiar voice soothing.
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-sundowning'))}
+                className="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer"
+              >
+                Start Evening Calming Session →
+              </button>
             </div>
           </div>
         </div>

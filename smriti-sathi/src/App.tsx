@@ -28,6 +28,10 @@ import FamilyMemoryGame from './games/family/FamilyMemoryGame';
 import LoginScreen from './pages/auth/LoginScreen';
 import CaregiverHome from './pages/caregiver/CaregiverHome';
 import SafetyDashboard from './pages/caregiver/SafetyDashboard';
+import { SafeReturnModal } from './components/SafeReturnModal';
+import { SundowningCareModal } from './components/SundowningCareModal';
+import { AshaTriageModal } from './components/AshaTriageModal';
+import { WearableBadgeGeneratorModal } from './components/WearableBadgeGeneratorModal';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -50,6 +54,29 @@ function AppContent() {
     return 'home';
   });
   const [navigationHistory, setNavigationHistory] = useState<string[]>(['home']);
+  const [showSafeReturn, setShowSafeReturn] = useState(false);
+  const [showSundowning, setShowSundowning] = useState(false);
+  const [showAshaTriage, setShowAshaTriage] = useState(false);
+  const [showWearableBadge, setShowWearableBadge] = useState(false);
+
+  useEffect(() => {
+    const handleOpenSafeReturn = () => setShowSafeReturn(true);
+    const handleOpenSundowning = () => setShowSundowning(true);
+    const handleOpenAshaTriage = () => setShowAshaTriage(true);
+    const handleOpenWearableBadge = () => setShowWearableBadge(true);
+
+    window.addEventListener('open-safe-return', handleOpenSafeReturn);
+    window.addEventListener('open-sundowning', handleOpenSundowning);
+    window.addEventListener('open-asha-triage', handleOpenAshaTriage);
+    window.addEventListener('open-wearable-badge', handleOpenWearableBadge);
+
+    return () => {
+      window.removeEventListener('open-safe-return', handleOpenSafeReturn);
+      window.removeEventListener('open-sundowning', handleOpenSundowning);
+      window.removeEventListener('open-asha-triage', handleOpenAshaTriage);
+      window.removeEventListener('open-wearable-badge', handleOpenWearableBadge);
+    };
+  }, []);
   const [showSplash, setShowSplash] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -317,6 +344,23 @@ function AppContent() {
       <div className={`relative min-h-screen w-full flex-1 flex flex-col ${showBottomNav ? 'pb-24 sm:pb-28' : ''}`}>
         <UpdateNotifier />
         {renderScreen()}
+
+        {/* Floating Safe Return Emergency Button for Elders & Public */}
+        {isAuthenticated && role === UserRole.PATIENT && activeTab !== 'remember-game' && activeTab !== 'recognise-game' && activeTab !== 'memory-match' && activeTab !== 'daily-routine' && (
+          <div className="fixed bottom-24 right-4 sm:right-6 z-40">
+            <button
+              type="button"
+              onClick={() => setShowSafeReturn(true)}
+              className="flex items-center gap-2 px-3.5 sm:px-4 py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-full font-bold text-xs sm:text-sm shadow-xl shadow-red-950/30 border-2 border-red-300/40 active:scale-95 transition-all cursor-pointer"
+              aria-label="Safe Return Emergency ID Card"
+              title="Safe Return Emergency ID"
+            >
+              <span className="text-sm sm:text-base animate-pulse">🆘</span>
+              <span className="tracking-tight hidden xs:inline">Safe Return</span>
+            </button>
+          </div>
+        )}
+
         {showBottomNav && (
           <BottomNav 
             activeTab={activeTab} 
@@ -325,6 +369,24 @@ function AppContent() {
           />
         )}
       </div>
+
+      {/* Global Clinical & Rescue Modals */}
+      <SafeReturnModal
+        isOpen={showSafeReturn}
+        onClose={() => setShowSafeReturn(false)}
+      />
+      <SundowningCareModal
+        isOpen={showSundowning}
+        onClose={() => setShowSundowning(false)}
+      />
+      <AshaTriageModal
+        isOpen={showAshaTriage}
+        onClose={() => setShowAshaTriage(false)}
+      />
+      <WearableBadgeGeneratorModal
+        isOpen={showWearableBadge}
+        onClose={() => setShowWearableBadge(false)}
+      />
     </ScreenContainer>
   );
 }
