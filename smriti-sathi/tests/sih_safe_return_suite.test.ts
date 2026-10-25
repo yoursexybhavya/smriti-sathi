@@ -198,4 +198,23 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
     assert.ok(memContent.includes('handleTapToHear'), 'Memory cards must have handleTapToHear action');
     assert.ok(memContent.includes('useVoice'), 'MemoryBookScreen must integrate useVoice for audio reading');
   });
+
+  // Test 10: Government of India Bhashini AI (NLTM)
+  test('10.1: Government of India Bhashini AI (NLTM) integration is approved, active, and multi-service configured', () => {
+    const bhashiniPath = path.join(rootDir, 'src/services/bhashiniService.ts');
+    const voiceHookPath = path.join(rootDir, 'src/hooks/useVoice.ts');
+    const bhashiniContent = fs.readFileSync(bhashiniPath, 'utf8');
+    const voiceHookContent = fs.readFileSync(voiceHookPath, 'utf8');
+
+    // 1. Approval and configuration
+    assert.ok(bhashiniContent.includes('IS_PENDING_APPROVAL: false'), 'Bhashini must be set to approved status');
+    assert.ok(bhashiniContent.includes('IS_APPROVED: true'), 'Bhashini must mark IS_APPROVED as true');
+    assert.ok(bhashiniContent.includes('18d72059e6-821b-4f4d-9498-76232c6c2e24'), 'Must configure official Udyat key');
+    assert.ok(bhashiniContent.includes('287McPfaybEXK-HLX6gEiji4fG-NK0tShAh1E7wh56DmrvqPgjIfiZVAMy9qgaXZ'), 'Must configure official Inference key');
+    assert.ok(bhashiniContent.includes('translateBhashini'), 'Must export Neural Machine Translation service');
+
+    // 2. Integration into voice hook
+    assert.ok(voiceHookContent.includes('synthesizeBhashiniTTS'), 'useVoice must integrate synthesizeBhashiniTTS');
+    assert.ok(voiceHookContent.includes('navigator.onLine'), 'useVoice must check online status before cloud TTS');
+  });
 });

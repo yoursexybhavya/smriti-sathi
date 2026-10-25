@@ -224,6 +224,13 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
             <Alert tone="info" icon={<Globe className="h-4 w-4" />} className="mt-3">
               {t('ob.langBody')}
             </Alert>
+            <div className="mt-3 flex items-center justify-between rounded-xl bg-[var(--surface-sunken)] px-3 py-2 text-xs">
+              <span className="flex items-center gap-1.5 font-semibold text-[var(--brand-teal-deep)]">
+                <span className="inline-block h-2 w-2 rounded-full bg-[var(--success)]" />
+                Govt of India Bhashini AI (NLTM)
+              </span>
+              <span className="font-medium text-ink-3">Approved & Active</span>
+            </div>
           </Card>
         </Section>
 
@@ -394,6 +401,13 @@ export default function SettingsScreen({ onNavigate, persona = 'elder' }: Props)
               subtitle={l.label}
             />
           ))}
+        </div>
+        <div className="mt-3 flex items-center justify-between rounded-xl bg-[var(--surface-sunken)] px-3 py-2 text-xs">
+          <span className="flex items-center gap-1.5 font-semibold text-[var(--brand-teal-deep)]">
+            <span className="inline-block h-2 w-2 rounded-full bg-[var(--success)]" />
+            Govt of India Bhashini AI (NLTM)
+          </span>
+          <span className="font-medium text-ink-3">Approved & Active</span>
         </div>
       </Sheet>
 

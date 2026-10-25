@@ -58,10 +58,10 @@ export function useVoice() {
 
     setIsSpeaking(true);
 
-    // Try online Bhashini TTS first if navigator is online
-    if (navigator.onLine && targetLang !== 'en') {
+    // Try online Government Bhashini AI Neural Voice first when connected
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
       try {
-        const audioUri = await synthesizeBhashiniTTS(text, targetLang as unknown as Parameters<typeof synthesizeBhashiniTTS>[1]);
+        const audioUri = await synthesizeBhashiniTTS(text, targetLang);
         if (audioUri) {
           const audio = new Audio(audioUri);
           activeAudioRef.current = audio;
@@ -71,7 +71,7 @@ export function useVoice() {
           return;
         }
       } catch {
-        // Fall through to offline Web Speech
+        // Gracefully fall through to offline local Web Speech API
       }
     }
 
