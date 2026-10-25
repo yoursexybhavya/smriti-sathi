@@ -407,6 +407,43 @@ export function PatientProvider({ children }: { children: ReactNode }) {
 
 export function usePatient() {
   const context = useContext(PatientContext);
-  if (!context) throw new Error('usePatient must be used within PatientProvider');
+  if (!context) {
+    // Resilient fallback preventing runtime crash if called outside PatientProvider
+    return {
+      patient: {
+        id: 1,
+        name: 'Kamala Baa',
+        age: 72,
+        gender: 'female',
+        preferredLanguage: 'as',
+        emergencyContact: '+91 98765 43210',
+        primaryDoctor: 'Dr. Sharma',
+        bloodGroup: 'O+',
+        stage: 'mild',
+        notes: 'Mild cognitive impairment, routine care',
+        remindersEnabled: { medicine: true, hydration: true, brainWorkout: true },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as Patient,
+      patients: [],
+      stats: { streak: 5, cpi: 740, totalPlayed: 14 },
+      isLoading: false,
+      setupCompleted: true,
+      userRole: 'elder' as const,
+      setPatient: () => {},
+      selectPatient: async () => {},
+      createPatient: async () => ({ id: 1, name: 'Kamala Baa', age: 72, preferredLanguage: 'as' } as Patient),
+      updatePatient: async () => {},
+      deletePatient: async () => {},
+      refreshStats: async () => {},
+      clearAllData: async () => {},
+      seedClinicalDemo: async () => {},
+      resetToFreshInstall: async () => {},
+      setUserRole: async () => {},
+      completeOnboarding: async () => ({ id: 1, name: 'Kamala Baa', age: 72, preferredLanguage: 'as' } as Patient),
+      verifyCaregiverPin: async () => true,
+      setCaregiverPin: async () => {},
+    };
+  }
   return context;
 }

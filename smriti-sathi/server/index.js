@@ -94,14 +94,40 @@ app.get('/api/version', (req, res) => {
   });
 });
 
-// 6. Host the compiled Android/PWA web assets for tablet testing
-const distPath = path.join(__dirname, '../dist');
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+// 6. Host the compiled Android/PWA web assets for PC, tablet and phone testing
+const candidateDistPaths = [
+  path.resolve(__dirname, '../dist'),
+  path.resolve(__dirname, '../../smriti-sathi/dist'),
+  path.resolve(process.cwd(), 'smriti-sathi/dist'),
+  path.resolve(process.cwd(), 'dist'),
+];
+
+let validDistPath = candidateDistPaths.find((p) => fs.existsSync(path.join(p, 'index.html')));
+
+// Automatic fallback: build dist if missing
+if (!validDistPath) {
+  try {
+    const { execSync } = require('child_process');
+    console.log('[AUTO-BUILD] No dist found. Building web app assets via Vite...');
+    const buildCwd = fs.existsSync(path.resolve(__dirname, '../package.json'))
+      ? path.resolve(__dirname, '..')
+      : process.cwd();
+    execSync('npm run build', { cwd: buildCwd, stdio: 'inherit' });
+    validDistPath = candidateDistPaths.find((p) => fs.existsSync(path.join(p, 'index.html')));
+  } catch (err) {
+    console.error('[AUTO-BUILD FAILED]', err);
+  }
+}
+
+if (validDistPath) {
+  console.log(`[STATIC ASSETS] Serving Smriti Sathi Web App from: ${validDistPath}`);
+  app.use(express.static(validDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path === '/health') return next();
+    res.sendFile(path.join(validDistPath, 'index.html'));
   });
 } else {
+  console.warn('[STATIC ASSETS] Warning: Could not locate built web app assets.');
   app.get('/', (req, res) => {
     res.json({
       status: 'ONLINE',
@@ -111,7 +137,8 @@ if (fs.existsSync(distPath)) {
         health: '/health',
         sync: 'POST /api/sync',
         telemetry: 'GET /api/telemetry',
-        sos: 'POST /api/sos'
+        sos: 'POST /api/sos',
+        version: 'GET /api/version'
       }
     });
   });

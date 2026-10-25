@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "cd smriti-sathi && npm install && npm run build",
+    "postinstall": "cd smriti-sathi && npm install && npm run build",
     "start": "node smriti-sathi/server/index.js"
   },
   "dependencies": {

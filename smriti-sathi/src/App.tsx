@@ -36,6 +36,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { LanguageProvider as SecondaryLanguageProvider } from './contexts/LanguageContext';
+import { PatientProvider } from './contexts/PatientContext';
 import { UserRole } from './models/Role';
 import { APP } from './core/constants/app';
 import { UpdateNotifier } from './components/UpdateChecker';
@@ -398,7 +399,9 @@ export default function App() {
         <LanguageProvider>
           <AuthProvider>
             <AppProvider>
-              <AppContent />
+              <PatientProvider>
+                <AppContent />
+              </PatientProvider>
             </AppProvider>
           </AuthProvider>
         </LanguageProvider>
