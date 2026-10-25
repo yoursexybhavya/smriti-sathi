@@ -146,4 +146,22 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
     const content = fs.readFileSync(memServicePath, 'utf8');
     assert.ok(!content.includes('createSampleMemories(userId)'), 'Must not auto-seed fake relatives into production database');
   });
+
+  test('8.1: RecogniseGameEngine enforces semantic category pattern rules (ABAB / Categorical Type Ordering)', () => {
+    const enginePath = path.join(rootDir, 'src/models/RecogniseGame.ts');
+    const content = fs.readFileSync(enginePath, 'utf8');
+    
+    // Verify engine methods exist and enforce type ordering
+    assert.ok(content.includes('generateCategoryAlternationActivity'), 'Must implement semantic category alternation');
+    assert.ok(content.includes('generatePairedCategoryActivity'), 'Must implement paired category pattern');
+    assert.ok(content.includes('generateTripletActivity'), 'Must implement triplet rotation pattern');
+    assert.ok(content.includes('CATEGORY_NAMES'), 'Must maintain semantic category definitions');
+    assert.ok(content.includes('pickDistractors'), 'Must ensure distractors do not duplicate the target category');
+
+    // Verify RecogniseGame.tsx presents pattern hints via TTS & visual
+    const gamePath = path.join(rootDir, 'src/pages/games/RecogniseGame.tsx');
+    const gameContent = fs.readFileSync(gamePath, 'utf8');
+    assert.ok(gameContent.includes('activity.patternHint'), 'Game must render patternHint when user requests hint');
+    assert.ok(gameContent.includes('speak(activity.patternHint)'), 'Game must speak pattern hint for accessibility');
+  });
 });

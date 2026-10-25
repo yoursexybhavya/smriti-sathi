@@ -179,9 +179,19 @@ export default function RecogniseGame({ onBack }: Props) {
         </div>
 
         {hint && (
-          <p className="t-sm mt-3 text-center font-semibold text-[var(--brand-teal-deep)]">{t('games.step1')}</p>
+          <p className="t-sm mt-3 text-center font-semibold text-[var(--brand-teal-deep)]">
+            {activity.patternHint || t('games.step1')}
+          </p>
         )}
-        <Button variant="ghost" block className="mt-auto" onClick={() => setHint(true)}>
+        <Button
+          variant="ghost"
+          block
+          className="mt-auto"
+          onClick={() => {
+            setHint(true);
+            if (activity.patternHint) speak(activity.patternHint);
+          }}
+        >
           {t('games.hint')}
         </Button>
       </>,
