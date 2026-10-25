@@ -49,6 +49,8 @@ const PATIENT_SCREENS = [
 
 const CAREGIVER_SCREENS = [
   ...caregiverNavTabs,
+  'memory-book-viewer',
+  'caregiver-memory-viewer',
   'safety-dashboard',
   'demo',
   'diagnostics',
@@ -282,10 +284,23 @@ function AppContent() {
     switch (activeTab) {
       case 'caregiver-home':
         return <CaregiverHome {...shared} />;
+      case 'reminders':
       case 'caregiver-reminders':
         return <RemindersScreen {...shared} />;
+      case 'memory-book':
       case 'caregiver-memory':
         return <MemoryBookScreen {...shared} />;
+      case 'memory-book-viewer':
+      case 'caregiver-memory-viewer':
+        return (
+          <MemoryBookViewerScreen
+            {...shared}
+            persona="caregiver"
+            onBack={() => navigate('caregiver-memory')}
+            onNavigate={(tab) => navigate(tab === 'memory-book' ? 'caregiver-memory' : tab)}
+          />
+        );
+      case 'settings':
       case 'caregiver-settings':
         return <SettingsScreen {...shared} />;
       case 'safety-dashboard':

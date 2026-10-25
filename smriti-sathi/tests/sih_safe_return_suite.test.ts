@@ -164,4 +164,36 @@ describe('SIH Clinical & Safe Return Emergency Features', () => {
     assert.ok(gameContent.includes('activity.patternHint'), 'Game must render patternHint when user requests hint');
     assert.ok(gameContent.includes('speak(activity.patternHint)'), 'Game must speak pattern hint for accessibility');
   });
+
+  test('9.1: Reminders screen guards against duplicate "Taken" spam and supports responsive "Remind me later"', () => {
+    const remScreenPath = path.join(rootDir, 'src/pages/RemindersScreen.tsx');
+    const remServicePath = path.join(rootDir, 'src/services/ReminderService.ts');
+    const remScreen = fs.readFileSync(remScreenPath, 'utf8');
+    const remService = fs.readFileSync(remServicePath, 'utf8');
+
+    // 1. Guard against duplicate Taken spamming
+    assert.ok(remService.includes("reminder.status === 'completed'"), 'completeReminder must be idempotent');
+    assert.ok(remScreen.includes('busyId'), 'Taken button must have in-flight busy lock to prevent repeated clicking');
+    assert.ok(remScreen.includes('scheduledTime < endOfDay'), 'Upcoming reminders must be filtered for today so tomorrow occurrences do not reappear');
+
+    // 2. Remind me later responsiveness
+    assert.ok(remScreen.includes('snoozedIds'), 'Must maintain snoozedIds state for visual snooze feedback');
+    assert.ok(remScreen.includes("t('home.snooze')"), 'Must render Snooze feedback');
+    assert.ok(remScreen.includes('speak('), 'Must announce snooze via TTS');
+  });
+
+  test('9.2: Family Album viewer routing prevents Caregiver dashboard redirect and enables Tap-to-hear TTS', () => {
+    const appPath = path.join(rootDir, 'src/App.tsx');
+    const memScreenPath = path.join(rootDir, 'src/screens/MemoryBookScreen.tsx');
+    const appContent = fs.readFileSync(appPath, 'utf8');
+    const memContent = fs.readFileSync(memScreenPath, 'utf8');
+
+    // Caregiver routing includes memory-book-viewer
+    assert.ok(appContent.includes("case 'memory-book-viewer':"), 'Must handle memory-book-viewer in caregiver router');
+    assert.ok(appContent.includes("CAREGIVER_SCREENS"), 'CAREGIVER_SCREENS must register viewer');
+
+    // Tap to hear TTS
+    assert.ok(memContent.includes('handleTapToHear'), 'Memory cards must have handleTapToHear action');
+    assert.ok(memContent.includes('useVoice'), 'MemoryBookScreen must integrate useVoice for audio reading');
+  });
 });

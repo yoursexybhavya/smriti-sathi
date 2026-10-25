@@ -47,6 +47,8 @@ export default function RemindersScreen({ onNavigate, persona = 'elder' }: Props
   const [items, setItems] = useState<Reminder[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [toDelete, setToDelete] = useState<Reminder | null>(null);
+  const [busyId, setBusyId] = useState<number | null>(null);
+  const [snoozedIds, setSnoozedIds] = useState<Record<number, number>>({});
   const [form, setForm] = useState({ type: 'medicine' as Reminder['type'], title: '', time: '08:00', repeat: 'daily' as NonNullable<Reminder['repeatPattern']> });
 
   const timeFmt = useMemo(
@@ -66,24 +68,63 @@ export default function RemindersScreen({ onNavigate, persona = 'elder' }: Props
     if (userId) load(userId);
   }, [userId, load]);
 
-  const { upcoming, done, missed } = useMemo(() => {
+  const { upcoming, done, missed, scheduledAhead } = useMemo(() => {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const endOfDay = startOfDay + 24 * 60 * 60 * 1000;
+
     const s = [...items].sort((a, b) => a.scheduledTime - b.scheduledTime);
-    return {
-      upcoming: s.filter((r) => r.status === 'pending'),
-      done: s.filter((r) => r.status === 'completed'),
-      missed: s.filter((r) => r.status === 'missed'),
-    };
+
+    // Reminders due today (scheduledTime < endOfDay)
+    // Recurring occurrences created for tomorrow or later will NOT clutter today's pending list
+    const upcoming = s.filter((r) => r.status === 'pending' && r.scheduledTime < endOfDay);
+
+    // Completed today: completed reminders scheduled for today
+    // Deduplicate any repeated identical entries so past rapid clicks don't duplicate rows
+    const doneRaw = s.filter(
+      (r) => r.status === 'completed' && r.scheduledTime >= startOfDay && r.scheduledTime < endOfDay
+    );
+    const seenDone = new Set<string>();
+    const done = doneRaw.filter((r) => {
+      const key = `${r.title}-${r.scheduledTime}`;
+      if (seenDone.has(key)) return false;
+      seenDone.add(key);
+      return true;
+    });
+
+    const missed = s.filter(
+      (r) => r.status === 'missed' && r.scheduledTime >= startOfDay && r.scheduledTime < endOfDay
+    );
+
+    // Future pending reminders (scheduled for tomorrow or later)
+    const scheduledAhead = s.filter((r) => r.status === 'pending' && r.scheduledTime >= endOfDay);
+
+    return { upcoming, done, missed, scheduledAhead };
   }, [items]);
 
   const complete = async (r: Reminder) => {
-    if (!userId || !r.id) return;
-    await reminderService.completeReminder(r.id, userId);
-    await load(userId);
+    if (!userId || !r.id || busyId) return;
+    setBusyId(r.id);
+    try {
+      await reminderService.completeReminder(r.id, userId);
+      speak(t('games.wellDone'));
+      await load(userId);
+    } finally {
+      setBusyId(null);
+    }
   };
   const snooze = async (r: Reminder) => {
-    if (!userId || !r.id) return;
-    await reminderService.snoozeReminder(r.id, 15);
-    await load(userId);
+    if (!userId || !r.id || busyId) return;
+    setBusyId(r.id);
+    try {
+      await reminderService.snoozeReminder(r.id, 15);
+      const snoozedUntilTime = Date.now() + 15 * 60 * 1000;
+      setSnoozedIds((prev) => ({ ...prev, [r.id!]: snoozedUntilTime }));
+      speak(`${r.title} ${t('home.snooze')}. ${timeFmt.format(new Date(snoozedUntilTime))}`);
+      await load(userId);
+    } finally {
+      setBusyId(null);
+    }
   };
   const remove = async () => {
     if (!toDelete?.id) return;
@@ -111,9 +152,11 @@ export default function RemindersScreen({ onNavigate, persona = 'elder' }: Props
     await speak(parts.join('. '));
   };
 
-  const renderRow = (r: Reminder, kind: 'upcoming' | 'done' | 'missed') => {
+  const renderRow = (r: Reminder, kind: 'upcoming' | 'done' | 'missed' | 'future') => {
     const m = TYPE_META[r.type] ?? TYPE_META.medicine;
     const Icon = m.icon;
+    const isSnoozed = !!(snoozedIds[r.id!] && Date.now() < snoozedIds[r.id!]);
+
     return (
       <div key={r.id} className="flex items-center gap-3 border-b border-[var(--line-soft)] py-3 last:border-0">
         <span
@@ -130,10 +173,24 @@ export default function RemindersScreen({ onNavigate, persona = 'elder' }: Props
             <span className="flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" /> {timeFmt.format(new Date(r.scheduledTime))}
             </span>
+            {isSnoozed && (
+              <Tag tone="saffron">
+                <Clock className="mr-1 h-3 w-3 inline" />
+                {t('home.snooze')} (15m)
+              </Tag>
+            )}
             {r.repeatPattern === 'daily' && (
               <>
                 <span>·</span>
                 <span>{t('rem.everyDay')}</span>
+              </>
+            )}
+            {kind === 'future' && (
+              <>
+                <span>·</span>
+                <span className="text-[var(--brand-teal-deep)] font-semibold">
+                  {new Date(r.scheduledTime).toLocaleDateString(meta.htmlLang, { weekday: 'short', month: 'short', day: 'numeric' })}
+                </span>
               </>
             )}
           </div>
@@ -141,14 +198,27 @@ export default function RemindersScreen({ onNavigate, persona = 'elder' }: Props
 
         {kind === 'upcoming' && (
           <div className="flex shrink-0 items-center gap-1.5">
-            <Button size="sm" onClick={() => complete(r)} icon={<Check className="h-4 w-4" />}>
+            <Button
+              size="sm"
+              onClick={() => complete(r)}
+              disabled={busyId === r.id}
+              loading={busyId === r.id}
+              icon={<Check className="h-4 w-4" />}
+            >
               {t('home.taken')}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => snooze(r)} className="hidden sm:inline-flex">
-              {t('home.snooze')}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => snooze(r)}
+              disabled={busyId === r.id}
+              className="hidden sm:inline-flex"
+            >
+              {isSnoozed ? '+15m' : t('home.snooze')}
             </Button>
           </div>
         )}
+        {kind === 'future' && <Tag tone="teal">Tomorrow</Tag>}
         {kind === 'done' && <Tag tone="success" icon={<Check className="h-3 w-3" />}>{t('c.done')}</Tag>}
         {kind === 'missed' && <Tag tone="danger">{t('rem.missed')}</Tag>}
         {isCaregiver && (
@@ -206,6 +276,12 @@ export default function RemindersScreen({ onNavigate, persona = 'elder' }: Props
           {done.length > 0 && (
             <Section className="mt-6" title={t('rem.completed')}>
               <Card>{done.map((r) => renderRow(r, 'done'))}</Card>
+            </Section>
+          )}
+
+          {scheduledAhead.length > 0 && isCaregiver && (
+            <Section className="mt-6" title="Scheduled ahead (tomorrow & later)">
+              <Card>{scheduledAhead.map((r) => renderRow(r, 'future'))}</Card>
             </Section>
           )}
 

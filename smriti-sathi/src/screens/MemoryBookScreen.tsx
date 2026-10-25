@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BookHeart, Camera, ImagePlus, MapPin, Plus, Sparkles, Trash2, Users } from 'lucide-react';
+import { BookHeart, Camera, ImagePlus, MapPin, Plus, Sparkles, Trash2, Users, Volume2 } from 'lucide-react';
 import { AppShell } from '../shell/AppShell';
 import { Button, Card, ConfirmDialog, EmptyState, Field, Input, Section, Segmented, Sheet, Tag, Textarea } from '../ui';
 import { useApp } from '../context/AppContext';
 import { useI18n } from '../i18n';
+import { useVoice } from '../hooks/useVoice';
 import { memoryBookService } from '../services/MemoryBookService';
 import type { MemoryItem } from '../database/db';
 
@@ -19,6 +20,8 @@ type Filter = 'all' | 'family' | 'places' | 'memories';
 export default function MemoryBookScreen({ onNavigate, persona = 'elder' }: Props) {
   const { state, toggleTheme } = useApp();
   const { t } = useI18n();
+  const { speak, isSpeaking } = useVoice();
+  const [speakingId, setSpeakingId] = useState<number | null>(null);
   const patient = state.currentPatient;
   const userId = patient?.id ? parseInt(patient.id, 10) : undefined;
   const isCaregiver = persona !== 'elder';
@@ -105,6 +108,13 @@ export default function MemoryBookScreen({ onNavigate, persona = 'elder' }: Prop
     await memoryBookService.deleteMemoryItem(toDelete.id);
     setToDelete(null);
     await load(userId);
+  };
+
+  const handleTapToHear = async (item: MemoryItem) => {
+    setSpeakingId(item.id ?? null);
+    const text = `${item.subject}. ${item.relation ? item.relation + '. ' : ''}${item.description}`;
+    await speak(text);
+    setSpeakingId(null);
   };
 
   const filters: { id: Filter; label: string; icon: typeof Users }[] = [
@@ -217,10 +227,11 @@ export default function MemoryBookScreen({ onNavigate, persona = 'elder' }: Prop
                   {item.description && <p className="t-sm mt-1.5 line-clamp-2 leading-snug">{item.description}</p>}
                   <button
                     type="button"
-                    onClick={() => onNavigate('memory-book-viewer')}
-                    className="mt-2.5 text-[0.82rem] font-bold text-brand hover:underline"
+                    onClick={() => handleTapToHear(item)}
+                    className="mt-2.5 flex items-center gap-1.5 text-[0.82rem] font-bold text-brand hover:underline"
                   >
-                    {t('mem.tapToHear')} →
+                    <Volume2 className={`h-3.5 w-3.5 ${speakingId === item.id && isSpeaking ? 'animate-pulse text-[var(--brand-saffron)]' : ''}`} />
+                    {speakingId === item.id && isSpeaking ? 'Speaking...' : `${t('mem.tapToHear')} →`}
                   </button>
                 </div>
               </Card>

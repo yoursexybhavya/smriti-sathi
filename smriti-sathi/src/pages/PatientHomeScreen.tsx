@@ -130,12 +130,25 @@ export default function PatientHomeScreen({ onNavigate }: PatientHomeScreenProps
     () => new Intl.DateTimeFormat(meta.htmlLang, { hour: 'numeric', minute: '2-digit', hour12: true }),
     [meta.htmlLang],
   );
-  const pending = useMemo(
-    () => reminders.filter((r) => r.status === 'pending').sort((a, b) => a.scheduledTime - b.scheduledTime),
-    [reminders],
-  );
+  const [busy, setBusy] = useState(false);
+  const [snoozedUntil, setSnoozedUntil] = useState<Record<number, number>>({});
+
+  const { pending, doneToday } = useMemo(() => {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const endOfDay = startOfDay + 24 * 60 * 60 * 1000;
+
+    const pending = reminders
+      .filter((r) => r.status === 'pending' && r.scheduledTime < endOfDay)
+      .sort((a, b) => a.scheduledTime - b.scheduledTime);
+
+    const doneToday = reminders.filter(
+      (r) => r.status === 'completed' && r.scheduledTime >= startOfDay && r.scheduledTime < endOfDay
+    ).length;
+
+    return { pending, doneToday };
+  }, [reminders]);
   const nextReminder = pending[0];
-  const doneToday = reminders.filter((r) => r.status === 'completed').length;
 
   const suggested = useMemo(
     () => ACTIVITIES.find((a) => !levels[a.id]?.done) ?? ACTIVITIES[0],
@@ -145,14 +158,29 @@ export default function PatientHomeScreen({ onNavigate }: PatientHomeScreenProps
   const completedCount = ACTIVITIES.filter((a) => levels[a.id]?.done).length;
 
   const completeReminder = async (rem: Reminder) => {
-    if (!userId || !rem.id) return;
-    await reminderService.completeReminder(rem.id, userId);
-    await load(userId);
+    if (!userId || !rem.id || busy) return;
+    setBusy(true);
+    try {
+      await reminderService.completeReminder(rem.id, userId);
+      speak(t('games.wellDone'));
+      await load(userId);
+    } finally {
+      setBusy(false);
+    }
   };
   const snoozeReminder = async (rem: Reminder) => {
-    if (!userId || !rem.id) return;
-    await reminderService.snoozeReminder(rem.id, 15);
-    await load(userId);
+    if (!userId || !rem.id || busy) return;
+    setBusy(true);
+    try {
+      const snoozeMinutes = 15;
+      await reminderService.snoozeReminder(rem.id, snoozeMinutes);
+      const until = Date.now() + snoozeMinutes * 60 * 1000;
+      setSnoozedUntil((prev) => ({ ...prev, [rem.id!]: until }));
+      speak(`${rem.title} ${t('home.snooze')}. ${timeFmt.format(new Date(until))}`);
+      await load(userId);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const readPage = async () => {
@@ -267,18 +295,26 @@ export default function PatientHomeScreen({ onNavigate }: PatientHomeScreenProps
                 <Bell className="h-6 w-6" />
               </span>
               <div className="min-w-0 flex-1">
-                <div className="t-eyebrow !text-[var(--brand-teal-deep)] opacity-80">{t('home.nextReminder')}</div>
+                <div className="t-eyebrow !text-[var(--brand-teal-deep)] opacity-80 flex items-center gap-1.5">
+                  {t('home.nextReminder')}
+                  {snoozedUntil[nextReminder.id!] && Date.now() < snoozedUntil[nextReminder.id!] && (
+                    <Tag tone="saffron">
+                      <Clock className="h-3 w-3 inline mr-1" />
+                      {t('home.snooze')} (15m)
+                    </Tag>
+                  )}
+                </div>
                 <div className="mt-0.5 truncate text-[1.15rem] font-bold text-ink">{nextReminder.title}</div>
                 <div className="mt-0.5 flex items-center gap-1.5 text-[0.9rem] font-semibold text-ink-2">
                   <Clock className="h-4 w-4" /> {timeFmt.format(new Date(nextReminder.scheduledTime))}
                 </div>
               </div>
               <div className="flex w-full gap-2 sm:w-auto">
-                <Button block size="lg" onClick={() => completeReminder(nextReminder)} icon={<Check className="h-[18px] w-[18px]" />}>
+                <Button block size="lg" disabled={busy} onClick={() => completeReminder(nextReminder)} icon={<Check className="h-[18px] w-[18px]" />}>
                   {t('home.taken')}
                 </Button>
-                <Button variant="secondary" size="lg" onClick={() => snoozeReminder(nextReminder)}>
-                  {t('home.snooze')}
+                <Button variant="secondary" size="lg" disabled={busy} onClick={() => snoozeReminder(nextReminder)}>
+                  {snoozedUntil[nextReminder.id!] && Date.now() < snoozedUntil[nextReminder.id!] ? '+15m' : t('home.snooze')}
                 </Button>
               </div>
             </div>

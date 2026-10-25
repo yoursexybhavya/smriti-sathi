@@ -47,6 +47,10 @@ export class ReminderService {
     if (!reminder) {
       throw new Error('Reminder not found');
     }
+    // Prevent double-completion if already completed
+    if (reminder.status === 'completed') {
+      return;
+    }
 
     await reminderRepository.complete(reminderId, userId);
 
@@ -169,6 +173,19 @@ export class ReminderService {
         break;
       default:
         return; // No recurrence
+    }
+
+    // Guard: Prevent duplicate future occurrences if one already exists
+    const existing = await reminderRepository.getByUserId(reminder.userId);
+    const alreadyExists = existing.some(
+      (r) =>
+        r.status === 'pending' &&
+        r.title === reminder.title &&
+        Math.abs(r.scheduledTime - nextTime) < 60000
+    );
+
+    if (alreadyExists) {
+      return;
     }
 
     // Create new reminder
