@@ -85,8 +85,12 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         {/* Header Hero - Scandinavian Deep Slate Canvas */}
         <div className="bg-slate-900 text-white px-6 sm:px-8 py-7 sm:py-8 rounded-3xl text-center shadow-lg border border-slate-800 relative overflow-hidden">
           <div className="absolute -top-12 -right-12 w-32 h-32 rounded-full bg-indigo-500/15 blur-2xl pointer-events-none" />
-          <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 mx-auto flex items-center justify-center mb-3 shadow-inner">
-            <HeartHandshake size={32} className="text-indigo-300" />
+          <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3">
+            <img
+              src="/logo.png"
+              alt="Smriti Sathi"
+              className="w-full h-full rounded-2xl shadow-xl ring-2 ring-emerald-500/30 object-cover bg-white"
+            />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-1 tracking-tight text-white">Smriti Sathi</h1>
           <p className="text-sm sm:text-base text-slate-300 font-medium">Cognitive Care & Memory Companion</p>

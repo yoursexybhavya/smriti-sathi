@@ -286,7 +286,8 @@ export default function PatientHomeScreen({ onNavigate, isOnline = true }: Patie
                   <span>Age {patient?.age || 72}</span>
                   <span className="text-[9px] opacity-70">✏️</span>
                 </button>
-                <span className="text-[11px] text-[var(--color-text-secondary)] font-medium truncate">
+                <span className="text-[11px] text-[var(--color-text-secondary)] font-medium truncate inline-flex items-center gap-1.5">
+                  <img src="/logo.png" alt="Smriti Sathi" className="w-4 h-4 rounded-full object-cover shadow-xs ring-1 ring-emerald-500/40" />
                   <span className="sm:hidden">স্মৃতি সাথী</span>
                   <span className="hidden sm:inline">স্মৃতি সাথী · Memory Companion</span>
                 </span>

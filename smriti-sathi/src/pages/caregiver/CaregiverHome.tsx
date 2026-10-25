@@ -116,9 +116,11 @@ export default function CaregiverHome({ onNavigate, isOnline = true }: Caregiver
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                <Shield size={20} />
-              </div>
+              <img
+                src="/logo.png"
+                alt="Smriti Sathi"
+                className="w-10 h-10 rounded-xl bg-white object-cover shadow-sm ring-1 ring-white/40 shrink-0"
+              />
               <div>
                 <h1 className="text-lg font-bold">{session?.displayName}</h1>
                 <p className="text-xs opacity-80">Caregiver Dashboard</p>

@@ -409,30 +409,24 @@ export function usePatient() {
   const context = useContext(PatientContext);
   if (!context) {
     // Resilient fallback preventing runtime crash if called outside PatientProvider
+    const defaultPatient: Patient = {
+      id: 1,
+      name: 'Kamala Baa',
+      age: 72,
+      language: 'as',
+      remindersEnabled: { medicine: true, hydration: true, brainWorkout: true },
+      createdAt: new Date(),
+    };
     return {
-      patient: {
-        id: 1,
-        name: 'Kamala Baa',
-        age: 72,
-        gender: 'female',
-        preferredLanguage: 'as',
-        emergencyContact: '+91 98765 43210',
-        primaryDoctor: 'Dr. Sharma',
-        bloodGroup: 'O+',
-        stage: 'mild',
-        notes: 'Mild cognitive impairment, routine care',
-        remindersEnabled: { medicine: true, hydration: true, brainWorkout: true },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as Patient,
-      patients: [],
+      patient: defaultPatient,
+      patients: [defaultPatient],
       stats: { streak: 5, cpi: 740, totalPlayed: 14 },
       isLoading: false,
       setupCompleted: true,
       userRole: 'elder' as const,
       setPatient: () => {},
       selectPatient: async () => {},
-      createPatient: async () => ({ id: 1, name: 'Kamala Baa', age: 72, preferredLanguage: 'as' } as Patient),
+      createPatient: async () => defaultPatient,
       updatePatient: async () => {},
       deletePatient: async () => {},
       refreshStats: async () => {},
@@ -440,7 +434,7 @@ export function usePatient() {
       seedClinicalDemo: async () => {},
       resetToFreshInstall: async () => {},
       setUserRole: async () => {},
-      completeOnboarding: async () => ({ id: 1, name: 'Kamala Baa', age: 72, preferredLanguage: 'as' } as Patient),
+      completeOnboarding: async () => defaultPatient,
       verifyCaregiverPin: async () => true,
       setCaregiverPin: async () => {},
     };

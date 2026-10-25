@@ -25,10 +25,12 @@ export default function SplashScreen({ appName, tagline }: SplashScreenProps) {
       }`}>
         {/* Logo with tranquil ring and breathing pulse */}
         <div className="relative mb-6">
-          <div className="absolute inset-0 rounded-3xl bg-indigo-500/20 blur-md animate-pulse" />
-          <div className="relative w-24 h-24 rounded-3xl bg-slate-800/90 border border-slate-700/80 ring-4 ring-indigo-500/20 shadow-2xl backdrop-blur-sm flex items-center justify-center">
-            <Brain size={48} className="text-indigo-400 drop-shadow-sm" />
-          </div>
+          <div className="absolute inset-0 rounded-3xl bg-emerald-500/20 blur-xl animate-pulse" />
+          <img
+            src="/logo.png"
+            alt="Smriti Sathi Logo"
+            className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl shadow-2xl ring-4 ring-emerald-500/30 object-cover bg-white"
+          />
         </div>
         
         {/* App Name */}
